@@ -1,23 +1,41 @@
 #[macro_use]
 extern crate clap;
-extern crate structopt;
-#[macro_use]
-extern crate structopt_derive;
 
-use structopt::StructOpt;
+use clap::{App, Arg, ArgMatches};
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "s3", about = "The share-secrets-safely command-line interface.")]
-struct Opts {
-    #[structopt(short = "v", long = "vault",
-                help = "The configuration file describing the vault.")]
-    vault: String,
+#[derive(Debug)]
+struct VaultContext {
+    vault_path: String,
+}
+
+fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, String> {
+    Ok(VaultContext {
+        vault_path: args.value_of("config-file")
+            .map(ToOwned::to_owned)
+            .ok_or(String::from("expected arg not present"))?,
+    })
 }
 
 fn main() {
-    let app: clap::App = Opts::clap().version(crate_version!());
-    let opts = Opts::from_clap(app.get_matches());
-
-    println!("Parsed opts");
-    println!("{:?}", opts)
+    let app: App = app_from_crate!().subcommand(
+        App::new("vault")
+            .about("a variety of vault interactions")
+            .arg(
+                Arg::with_name("config-file")
+                    .required(true)
+                    .help("Path to the vault configuration file.")
+                    .default_value("./s3-vault.yml"),
+            ),
+    );
+    let matches: ArgMatches = app.get_matches();
+    match matches.subcommand() {
+        ("vault", Some(args)) => {
+            let context = vault_context_from(args).unwrap();
+            println!("Parsed opts");
+            println!("{:?}", context);
+        }
+        _ => {
+            println!("{}", matches.usage());
+        }
+    }
 }
