@@ -1,21 +1,52 @@
 #[macro_use]
 extern crate clap;
+#[macro_use]
 extern crate failure;
 
 use clap::{App, Arg, ArgMatches};
-use failure::{err_msg, Error, ResultExt};
+use failure::{Error, ResultExt};
+use std::io::{stderr, Write};
+use std::process;
+use std::str::FromStr;
+use std::convert::Into;
 
 #[derive(Debug)]
 struct VaultContext {
     vault_path: String,
 }
 
+fn required_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
+where
+    T: FromStr,
+    <T as FromStr>::Err: 'static + ::std::error::Error + Send + Sync,
+{
+    match args.value_of(name).map(FromStr::from_str) {
+        Some(Ok(t)) => Ok(t),
+        Some(Err(e)) => Err(e.into()),
+        None => Err(format_err!("expected clap argument '{}' to be set", name)),
+    }
+}
+
 fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
-        vault_path: args.value_of("config-file")
-            .map(ToOwned::to_owned)
-            .ok_or(err_msg("expected clap argument was unset"))?,
+        vault_path: required_arg(args, "config-file")?,
     })
+}
+
+fn ok_or_exit<T, E>(r: Result<T, E>) -> T
+where
+    E: Into<Error>,
+{
+    match r {
+        Ok(r) => r,
+        Err(e) => {
+            let e = e.into();
+            for cause in e.causes() {
+                writeln!(stderr(), "{}", cause).ok();
+            }
+            process::exit(1);
+        }
+    }
 }
 
 fn main() {
@@ -32,9 +63,7 @@ fn main() {
     let matches: ArgMatches = app.get_matches();
     match matches.subcommand() {
         ("vault", Some(args)) => {
-            let context = vault_context_from(args)
-                .context("context creation failed")
-                .unwrap();
+            let context = ok_or_exit(vault_context_from(args).context("context creation failed"));
             println!("Parsed opts");
             println!("{:?}", context);
         }
