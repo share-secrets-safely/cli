@@ -4,14 +4,14 @@
 
 ## On our way to the minimal viable product v1.0
 
- * [ ] setup rust workspace with libraries for
+ * [ ] **setup rust workspace with libraries for**
    * [ ] CLI
    * [ ] GPG interface
    * [ ] YAML tools
- * [ ] setup Travis CI for
+ * [ ] **setup Travis CI for**
    * [ ] linux
    * [ ] OSX
- * [ ] standalone deployables
+ * [ ] **standalone deployables**
    * [ ] static linking on OSX
    * [ ] MUSL and static linking on linux
   
