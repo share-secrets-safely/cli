@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Byron/share-secrets-safely.svg?branch=master)](https://travis-ci.org/Byron/share-secrets-safely)
+
 `share-secrets-safely` is a GPG based solution for managing shared secrets.
 
 ## Project Goals
@@ -20,6 +22,11 @@
  
 
 ## Non-Goals
+
+ * **replicate `pass` or `gpg` functionality directly**
+   * having seen what `pass` actually is and how difficult it can be to use it especially in conjunction with `gpg`, this project will not even look at the provided functionality but be driven by its project goals instead.
+ * **become something like hashicorp vault**
+   * this solution is strictly file based and *offline*, so it can fill be used without any additional setup.
 
 
 ## Development Practices
