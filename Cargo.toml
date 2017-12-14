@@ -11,6 +11,7 @@ path = "src/main.rs"
 clap = "~2.29.0"
 failure = "0.1.1"
 s3-vault = {path = "vault"}
+s3-extract = {path = "extract"}
 s3-types = {path = "types"}
 
 

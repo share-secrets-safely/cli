@@ -6,12 +6,12 @@
 
  * [ ] **setup rust workspace with libraries for**
    * [x] CLI
-   * [ ] GPG interface
-   * [ ] YAML tools
+   * [x] GPG interface
+   * [x] extraction tools
    * [ ] first library publish to crates.io
- * [ ] **setup Travis CI for**
-   * [ ] linux
-   * [ ] OSX
+ * [x] **setup Travis CI for**
+   * [x] linux
+   * [x] OSX
  * [ ] **standalone deployables**
    * [ ] static linking on OSX
    * [ ] MUSL and static linking on linux
