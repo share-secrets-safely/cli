@@ -10,9 +10,9 @@ path = "src/main.rs"
 [dependencies]
 clap = "~2.29.0"
 failure = "0.1.1"
-s3-vault = {path = "vault"}
-s3-extract = {path = "extract"}
-s3-types = {path = "types"}
+s3-vault = {path = "lib/vault"}
+s3-extract = {path = "lib/extract"}
+s3-types = {path = "lib/types"}
 
 
 
