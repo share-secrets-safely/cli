@@ -9,16 +9,13 @@ function title () {
   echo "-----------------------------------------------------"
 }
 
+GREEN="$(tput setaf 2)"
+RED="$(tput setaf 1)"
 SUCCESSFULLY=0
 IT_COUNT=0
 function it () {
   IT_COUNT=$(( IT_COUNT + 1 ))
-  echo 1>&2 -n "$(tput setaf 2)" "$@"
-}
-
-function fail () {
-  echo 1>&2 "$(tput setaf 1)" " - FAIL"
-  exit $IT_COUNT
+  echo 1>&2 -n "$GREEN" "$@"
 }
 
 function run () {
@@ -28,9 +25,9 @@ function run () {
   output="$("$@" 2>&1)"
   
   if [[ $? == "$expected_exit_code" ]]; then
-    echo 1>&2 "$(tput setaf 2)" " - OK"
+    echo 1>&2 "$GREEN" " - OK"
   else
-    echo 1>&2 "$(tput setaf 1)" " - FAIL"
+    echo 1>&2 "$RED" " - FAIL"
     echo 1>&2 "$output"
     exit $IT_COUNT
   fi

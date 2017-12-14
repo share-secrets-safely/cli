@@ -5,9 +5,10 @@
 ## On our way to the minimal viable product v1.0
 
  * [ ] **setup rust workspace with libraries for**
-   * [ ] CLI
+   * [x] CLI
    * [ ] GPG interface
    * [ ] YAML tools
+   * [ ] first library publish to crates.io
  * [ ] **setup Travis CI for**
    * [ ] linux
    * [ ] OSX
