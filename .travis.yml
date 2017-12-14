@@ -18,6 +18,11 @@ matrix:
 
 cache: cargo
 
+addons:
+  apt:
+    packages:
+      - libgpgme11-dev
+
 before_install:
   - curl -sL https://ftp.gnu.org/gnu/automake/automake-${AUTOMAKE_VERSION}.tar.gz -o automake-${AUTOMAKE_VERSION}.tar.gz
   - tar -xf automake-${AUTOMAKE_VERSION}.tar.gz
