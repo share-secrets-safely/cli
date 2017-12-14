@@ -4,13 +4,13 @@ services:
   - docker
 
 os:
-- linux
-- osx
+  - linux
+  - osx
 
 language: rust
 
 rust:
-- stable
+  - stable
 
 matrix:
   allow_failures:
@@ -37,10 +37,10 @@ before_install:
   - export LD_LIBRARY_PATH=${HOME}/.local/lib:$LD_LIBRARY_PATH
 
 script:
-- cargo doc
-- cargo test
-# JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
-- if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then make journey-tests; fi
+  - cargo doc
+  - cargo test
+  # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
+  - if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then make journey-tests; fi
 
 env:
   global:
