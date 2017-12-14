@@ -1,0 +1,11 @@
+[package]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+name = "s3-vault"
+version = "0.1.0"
+
+[dependencies]
+failure = "0.1.1"
+gpgme = "0.6.1"
+
+[dependencies.s3-types]
+path = "../types"

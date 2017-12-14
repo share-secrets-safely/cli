@@ -2,18 +2,16 @@
 extern crate clap;
 #[macro_use]
 extern crate failure;
+extern crate s3_vault as vault;
+extern crate s3_types as types;
 
+use types::VaultContext;
 use clap::{App, Arg, ArgMatches};
 use failure::{Error, ResultExt};
 use std::io::{stderr, Write};
 use std::process;
 use std::str::FromStr;
 use std::convert::Into;
-
-#[derive(Debug)]
-struct VaultContext {
-    vault_path: String,
-}
 
 fn required_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
