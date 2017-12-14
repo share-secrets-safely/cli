@@ -41,10 +41,10 @@ title "'vault' subcommand"
 it "defines a default for the vault configuration file" && \
   run $SUCCESSFULLY $exe vault
   
-title "'yaml' subcommand"
+title "'extract' subcommand"
 
-it "needs a yaml file to be defined" && \
-  run $WITH_FAILURE $exe yaml
+it "needs a file to be defined" && \
+  run $WITH_FAILURE $exe extract
 
 
 

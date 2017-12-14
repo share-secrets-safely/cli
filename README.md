@@ -8,10 +8,9 @@
    * [x] CLI
    * [x] GPG interface
    * [x] extraction tools
-   * [ ] first library publish to crates.io
  * [x] **setup Travis CI for**
    * [x] linux
-   * [x] OSX
+   * [ ] OSX
  * [ ] **standalone deployables**
    * [ ] static linking on OSX
    * [ ] MUSL and static linking on linux

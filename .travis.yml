@@ -44,7 +44,7 @@ before_install:
 
 script:
   - cargo doc
-  - cargo test
+  - cargo test --all
   # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
   - if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then make journey-tests; fi
 
