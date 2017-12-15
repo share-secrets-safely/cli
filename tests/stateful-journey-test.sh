@@ -12,8 +12,10 @@ while read -r journey; do
     make_journey_dockerfile="${journey%/*}/dockerfile-gen/${journey##*/}"
     journey_image="$image"
     if [[ -x "$make_journey_dockerfile" ]]; then
-        journey_image="$journey_image"
+        journey_image="${journey##*/}"
         BASE_IMAGE="$image" "$make_journey_dockerfile" | docker build -t "$journey_image" -
+    else
+        echo 1>&2 "Custom docker image supported via script at 'BASE_IMAGE="$image" $make_journey_dockerfile'"
     fi
 
     docker run -v "$absolute_root:/volume" --rm -t "$journey_image" "$journey" "$exe"
