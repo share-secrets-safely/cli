@@ -14,6 +14,5 @@ $(EXE):
 journey-tests: $(EXE)
 	tests/stateless-journey-test.sh $(EXE)
 
-
 lint-scripts:
 	find . -not -path '*target/*' -name '*.sh' -type f | while read -r sf; do shellcheck -x "$$sf"; done

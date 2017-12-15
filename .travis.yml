@@ -49,8 +49,8 @@ script:
   # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
   - | 
     if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then 
-        make lint-scripts; 
-        make journey-tests; 
+        make lint-scripts;
+        make journey-tests;
     fi
 
 env:

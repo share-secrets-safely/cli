@@ -21,11 +21,13 @@ function run () {
   shift
   local output=
   output="$("$@" 2>&1)"
-  
-  if [[ $? == "$expected_exit_code" ]]; then
+
+  local actual_exit_code=$?
+  if [[ "$actual_exit_code" == "$expected_exit_code" ]]; then
     echo 1>&2 "$GREEN" " - OK"
   else
     echo 1>&2 "$RED" " - FAIL"
+    echo 1>&2 "Expected actual status $actual_exit_code to be $expected_exit_code"
     echo 1>&2 "$output"
     exit $IT_COUNT
   fi
