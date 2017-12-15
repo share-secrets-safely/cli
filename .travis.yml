@@ -25,28 +25,33 @@ addons:
       - libgpg-error-dev 
 
 before_install:
-  - curl -sL https://ftp.gnu.org/gnu/automake/automake-${AUTOMAKE_VERSION}.tar.gz -o automake-${AUTOMAKE_VERSION}.tar.gz
-  - tar -xf automake-${AUTOMAKE_VERSION}.tar.gz
-  - pushd automake-${AUTOMAKE_VERSION}
-  - ./configure --prefix=${HOME}/.local >/dev/null
-  - make -j2 >/dev/null
-  - make install >/dev/null
-  - popd
-  - curl -sL https://ftp.gnu.org/gnu/gettext/gettext-${GETTEXT_VERSION}.tar.gz -o gettext-${GETTEXT_VERSION}.tar.gz
-  - tar -xf gettext-${GETTEXT_VERSION}.tar.gz
-  - pushd gettext-${GETTEXT_VERSION}
-  - ./configure --without-emacs --disable-java --disable-c++ --enable-fast-install --prefix=${HOME}/.local >/dev/null
-  - make -j2 >/dev/null
-  - make install >/dev/null
-  - popd
-  - export PATH=${HOME}/.local/bin:$PATH
-  - export LD_LIBRARY_PATH=${HOME}/.local/lib:$LD_LIBRARY_PATH
+  - |
+      curl -sL https://ftp.gnu.org/gnu/automake/automake-${AUTOMAKE_VERSION}.tar.gz -o automake-${AUTOMAKE_VERSION}.tar.gz
+      tar -xf automake-${AUTOMAKE_VERSION}.tar.gz
+      pushd automake-${AUTOMAKE_VERSION}
+      ./configure --prefix=${HOME}/.local >/dev/null
+      make -j2 >/dev/null
+      make install >/dev/null
+      popd
+      curl -sL https://ftp.gnu.org/gnu/gettext/gettext-${GETTEXT_VERSION}.tar.gz -o gettext-${GETTEXT_VERSION}.tar.gz
+      tar -xf gettext-${GETTEXT_VERSION}.tar.gz
+      pushd gettext-${GETTEXT_VERSION}
+      ./configure --without-emacs --disable-java --disable-c++ --enable-fast-install --prefix=${HOME}/.local >/dev/null
+      make -j2 >/dev/null
+      make install >/dev/null
+      popd
+      export PATH=${HOME}/.local/bin:$PATH
+      export LD_LIBRARY_PATH=${HOME}/.local/lib:$LD_LIBRARY_PATH
 
 script:
   - cargo doc
   - cargo test --all
   # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
-  - if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then make journey-tests; fi
+  - | 
+    if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then 
+        make lint-scripts; 
+        make journey-tests; 
+    fi
 
 env:
   global:
