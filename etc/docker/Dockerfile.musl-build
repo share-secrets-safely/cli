@@ -23,3 +23,4 @@ RUN tar -xf gettext-${GETTEXT_VERSION}.tar.gz \
 
 ENV PATH=${HOME}/.local/bin:$PATH
 ENV LD_LIBRARY_PATH=${HOME}/.local/lib:$LD_LIBRARY_PATH
+ENV GPGME_STATIC=1

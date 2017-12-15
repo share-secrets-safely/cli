@@ -4,13 +4,13 @@
 
 ## On our way to the minimal viable product v1.0
 
- * [ ] **setup rust workspace with libraries for**
+ * [x] **setup rust workspace with libraries for**
    * [x] CLI
    * [x] GPG interface
    * [x] extraction tools
  * [x] **setup Travis CI for**
    * [x] linux
-   * [ ] OSX
+   * [x] OSX
  * [ ] **standalone deployables**
    * [ ] static linking on OSX
    * [ ] MUSL and static linking on linux
