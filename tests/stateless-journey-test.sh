@@ -8,16 +8,26 @@ root="$(cd "${0%/*}" && pwd)"
 source "$root/utilities.sh"
 
 WITH_FAILURE=1
+SUCCESSFULLY=0
 
 title "'vault' subcommand"
 
-it "defines a default for the vault configuration file and fails if it doesn't exist" && \
-  run $WITH_FAILURE "$exe" vault
-  
+with "no existing configuration file" && {
+    it "fails even though a default was defined" && \
+      expect_run $WITH_FAILURE "$exe" vault
+}
+
+with "a minimal vault configuration file" && {
+  it "succeeds even if there is no further argument" && \
+      echo 'users:' | expect_run $SUCCESSFULLY "$exe" vault -c -
+}
+
 title "'extract' subcommand"
 
-it "needs a file to be defined" && \
-  run $WITH_FAILURE "$exe" extract
+with "no data file to read from" && {
+    it "fails" && \
+      expect_run $WITH_FAILURE "$exe" extract
+}
 
 
 

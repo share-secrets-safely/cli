@@ -8,7 +8,9 @@ help:
 	$(info lint-scripts     | Run journey tests using a pre-built linux binary)
 	$(info ---------------------------------------------------------------------------------------------------------------)
 
-$(EXE): 
+always:
+
+$(EXE): always
 	cargo build --all-features
 
 journey-tests: $(EXE)

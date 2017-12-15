@@ -1,9 +1,11 @@
 #!/bin/bash
 
 WHITE="$(tput setaf 9)"
+YELLOW="$(tput setaf 3)"
 GREEN="$(tput setaf 2)"
 RED="$(tput setaf 1)"
 IT_COUNT=0
+CONTEXT=
 
 function title () {
   echo "$WHITE-----------------------------------------------------"
@@ -11,12 +13,21 @@ function title () {
   echo "-----------------------------------------------------"
 }
 
-function it () {
-  IT_COUNT=$(( IT_COUNT + 1 ))
-  echo 1>&2 -n "$GREEN" "$@"
+function with () {
+    CONTEXT="[with] $* "
 }
 
-function run () {
+function without_context() {
+    # shellcheck disable=SC2034
+    CONTEXT=""
+}
+
+function it () {
+  IT_COUNT=$(( IT_COUNT + 1 ))
+  echo 1>&2 -n "${YELLOW}${CONTEXT}${GREEN}[it] $*"
+}
+
+function expect_run () {
   local expected_exit_code=$1
   shift
   local output=
