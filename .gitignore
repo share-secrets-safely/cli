@@ -1,3 +1,4 @@
 /.idea/
+/.docker-cargo-cache
 .DS_Store
 target/
