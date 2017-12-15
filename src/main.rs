@@ -37,8 +37,17 @@ where
         Ok(r) => r,
         Err(e) => {
             let e = e.into();
-            for cause in e.causes() {
-                writeln!(stderr(), "{}", cause).ok();
+            let causes = e.causes().collect::<Vec<_>>();
+            let num_causes = causes.len();
+            for (index, cause) in causes.iter().enumerate() {
+                if index == 0 {
+                    writeln!(stderr(), "ERROR: {}", cause).ok();
+                    if num_causes > 1 {
+                        writeln!(stderr(), "Caused by: ").ok();
+                    }
+                } else {
+                    writeln!(stderr(), " {}: {}", num_causes - index, cause).ok();
+                }
             }
             process::exit(1);
         }

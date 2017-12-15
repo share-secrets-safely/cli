@@ -7,7 +7,6 @@ root="$(cd "${0%/*}" && pwd)"
 # shellcheck source=./tests/utilities.sh
 source "$root/utilities.sh"
 
-SUCCESSFULLY=0
 WITH_FAILURE=1
 
 title "'vault' subcommand"
