@@ -10,4 +10,4 @@ $(EXE):
 	cargo build --all-features
 
 journey-tests: $(EXE)
-	tests/journey-test.sh $(EXE)
+	tests/stateless-journey-test.sh $(EXE)

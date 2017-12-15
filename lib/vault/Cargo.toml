@@ -6,6 +6,8 @@ version = "0.1.0"
 [dependencies]
 failure = "0.1.1"
 gpgme = "0.6.1"
+serde = "1.0.24"
+serde_yaml = "0.7.3"
 
 [dependencies.s3-types]
 path = "../types"
