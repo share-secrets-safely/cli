@@ -6,8 +6,9 @@ MY_MUSL_IMAGE=s3_muslrust:stable
 help:
 	$(info Available Targets)
 	$(info ---------------------------------------------------------------------------------------------------------------)
-	$(info journey-tests          | Run all journey tests using a pre-built binary)
-	$(info stateful-journey-tests | Run only stateful journey in docker)
+	$(info journey-tests           | Run all journey tests using a pre-built binary)
+	$(info stateful-journey-tests  | Run only stateful journeys in docker)
+	$(info stateless-journey-tests | Run only stateless journey)
 	$(info - Development -------------------------------------------------------------------------------------------------)
 	$(info build-image            | Build our build image)
 	$(info lint-scripts           | Run journey tests using a pre-built linux binary)
@@ -25,8 +26,10 @@ $(MUSL_EXE): build-linux-musl
 stateful-journey-tests: $(MUSL_EXE)
 	tests/stateful-journey-test.sh $< $(MUSL_IMAGE)
 
-journey-tests: $(EXE)
+stateless-journey-tests: $(EXE)
 	tests/stateless-journey-test.sh $<
+
+journey-tests: stateless-journey-tests stateful-journey-tests
 
 build-image:
 	docker build -t $(MY_MUSL_IMAGE) - < etc/docker/Dockerfile.musl-build

@@ -14,7 +14,7 @@ title "'vault' subcommand"
 
 with "no existing configuration file" && {
     it "fails even though a default was defined" && \
-      expect_run $WITH_FAILURE "$exe" vault
+      WITH_OUTPUT="error.*s3-vault.yml" expect_run $WITH_FAILURE "$exe" vault
 }
 
 with "a minimal vault configuration file" && {

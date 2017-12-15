@@ -41,7 +41,7 @@ where
             let num_causes = causes.len();
             for (index, cause) in causes.iter().enumerate() {
                 if index == 0 {
-                    writeln!(stderr(), "ERROR: {}", cause).ok();
+                    writeln!(stderr(), "error: {}", cause).ok();
                     if num_causes > 1 {
                         writeln!(stderr(), "Caused by: ").ok();
                     }
