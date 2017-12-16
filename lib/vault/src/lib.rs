@@ -5,6 +5,7 @@ extern crate s3_types as types;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
+extern crate gpgme;
 
 use failure::{Error, ResultExt};
 use std::fs::File;

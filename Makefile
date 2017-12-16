@@ -19,7 +19,7 @@ help:
 always:
 
 $(EXE): always
-	GPGME_STATIC=1 cargo build --all-features
+	GPG_ERROR_STATIC=1 GPGME_STATIC=1 cargo build --all-features -v
 
 $(MUSL_EXE): build-linux-musl
 
