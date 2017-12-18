@@ -2,6 +2,7 @@ EXE=target/debug/s3
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/s3
 MUSL_IMAGE=clux/muslrust:stable
 MY_MUSL_IMAGE=s3_muslrust:stable
+OSX_BREW_LIB_DIR=/usr/local/lib
 
 help:
 	$(info Available Targets)
@@ -19,7 +20,7 @@ help:
 always:
 
 $(EXE): always
-	GPG_ERROR_STATIC=1 GPGME_STATIC=1 cargo build --all-features -v
+	GPGME_LIB_PATH=$(OSX_BREW_LIB_DIR) DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl GPG_ERROR_LIB_PATH=$(OSX_BREW_LIB_DIR) GPG_ERROR_LIBS=gpg-error GPG_ERROR_STATIC=1 GPGME_STATIC=1 cargo build --all-features -v
 
 $(MUSL_EXE): build-linux-musl
 
@@ -35,7 +36,7 @@ build-image:
 	docker build -t $(MY_MUSL_IMAGE) - < etc/docker/Dockerfile.musl-build
 
 build-linux-musl: build-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build
+	docker run -e GPG_ERROR_LIBS=gpg-error -e GPG_ERROR_STATIC=1 -e GPGME_STATIC=1 -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build
 
 interactive-linux-musl: build-image
 	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE)
