@@ -21,8 +21,8 @@ cache: cargo
 addons:
   apt:
     packages:
-      - libgpgme11-dev
-      - libgpg-error-dev 
+      - libgpgme11-dev=1.4.3-0.1ubuntu5.1
+      - libgpg-error-dev=1.12-0.2ubuntu1
 
 before_install:
   - |
