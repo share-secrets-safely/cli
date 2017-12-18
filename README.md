@@ -11,9 +11,9 @@
  * [x] **setup Travis CI for**
    * [x] linux
    * [x] OSX
- * [ ] **standalone deployables**
-   * [ ] static linking on OSX
-   * [ ] MUSL and static linking on linux
+ * [x] **standalone deployables**
+   * [x] static linking on OSX
+   * [x] MUSL and static linking on linux
   
  * ...and many more when the boxes above are ticked :D
 
