@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate failure;
 #[macro_use]
 extern crate failure_derive;
@@ -7,7 +8,8 @@ extern crate s3_types as types;
 extern crate serde_derive;
 extern crate serde_yaml;
 
-use failure::{Error, ResultExt};
+use gpgme::{Context as GpgContext, Protocol};
+use failure::{err_msg, Error, ResultExt};
 use std::fs::File;
 use std::io::{self, stdin, Read};
 
@@ -46,7 +48,32 @@ impl Vault {
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
-pub fn do_it(ctx: &Context) -> Result<(), Error> {
-    Vault::from_file(&ctx.vault_path).context("Could not deserialize vault information")?;
-    Ok(())
+pub fn do_it(ctx: Context) -> Result<(), Error> {
+    use types::VaultCommand;
+    match ctx.command {
+        VaultCommand::Init {
+            gpg_keyfile_path,
+            gpg_key_id,
+        } => match (gpg_key_id, gpg_keyfile_path) {
+            (None, None) => {
+                let mut ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
+                let keys: Vec<_> = ctx.find_secret_keys(&Vec::<String>::new())?
+                    .filter_map(Result::ok)
+                    .collect();
+                match keys.len() {
+                    1 => {
+                        let _key = &keys[0];
+                        Ok(())
+                    },
+                    0 => Err(err_msg("No existing secret GPG key found. Please create one, or specify a key file.")),
+                    x => Err(format_err!("Found {} viable keys, which is ambiguous. Please specify one with the key-id argument.", x)),
+                }
+            }
+            _ => unimplemented!("TBD - handle all cases and return Error otherwise"),
+        },
+        VaultCommand::List => {
+            Vault::from_file(&ctx.vault_path).context("Could not deserialize vault information")?;
+            Ok(())
+        }
+    }
 }

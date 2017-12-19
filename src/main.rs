@@ -6,7 +6,7 @@ extern crate s3_extract as extract;
 extern crate s3_types as types;
 extern crate s3_vault as vault;
 
-use types::{ExtractionContext, VaultContext};
+use types::{ExtractionContext, VaultCommand, VaultContext};
 use clap::{App, Arg, ArgMatches, Shell};
 use failure::{err_msg, Error, ResultExt};
 use std::io::{stderr, stdout, Write};
@@ -61,6 +61,16 @@ where
 fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         vault_path: required_arg(args, "config-file")?,
+        command: VaultCommand::List,
+    })
+}
+fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::Init {
+            gpg_keyfile_path: args.value_of("gpg-keyfile").map(Into::into),
+            gpg_key_id: args.value_of("gpg-key-id").map(Into::into),
+        },
+        ..ctx
     })
 }
 
@@ -89,6 +99,11 @@ fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error> {
     Ok(())
 }
 
+fn usage_and_exit(args: &ArgMatches) -> ! {
+    println!("{}", args.usage());
+    process::exit(1)
+}
+
 fn main() {
     let shell = env::var("SHELL");
     let app: App = app_from_crate!()
@@ -97,9 +112,10 @@ fn main() {
             App::new("completions")
                 .about("generate completions for supported shell")
                 .arg({
-                    let arg = Arg::with_name("shell")
-                        .required(shell.is_err())
-                        .help("The name of the shell, or the path to the shell as exposed by the $SHELL variable.");
+                    let arg = Arg::with_name("shell").required(shell.is_err()).help(
+                        "The name of the shell, or the path to the shell as exposed by the \
+                         $SHELL variable.",
+                    );
                     if let Ok(shell) = shell.as_ref() {
                         arg.default_value(&shell)
                     } else {
@@ -110,6 +126,35 @@ fn main() {
         .subcommand(
             App::new("vault")
                 .about("a variety of vault interactions")
+                .subcommand(
+                    App::new("init")
+                        .about("initialize the vault")
+                        .help(
+                            "If neither --gpg-keyfile nor --gpg-key-id are set, we will use the \
+                             only key that you have a secret key for.\
+                             If you have multiple keys, the --gpg-key-id must be specified \
+                             to make the input \
+                             unambiguous.",
+                        )
+                        .arg(
+                            Arg::with_name("gpg-key-id")
+                                .short("i")
+                                .required(false)
+                                .help(
+                                    "The key-id of the public key identifying your own user \
+                                     identifying the your own user.",
+                                ),
+                        )
+                        .arg(
+                            Arg::with_name("gpg-keyfile")
+                                .short("k")
+                                .required(false)
+                                .help(
+                                    "Path to a keyfile exported with 'gpg --export --armor ...' \
+                                     identifying the your own user.",
+                                ),
+                        ),
+                )
                 .arg(
                     Arg::with_name("config-file")
                         .short("c")
@@ -135,20 +180,18 @@ fn main() {
     let res = match matches.subcommand() {
         ("completions", Some(args)) => generate_completions(appc, &args),
         ("vault", Some(args)) => {
-            let context =
-                ok_or_exit(vault_context_from(args).context("vault context creation failed"));
-            vault::do_it(&context)
+            let mut context = ok_or_exit(vault_context_from(args));
+            context = match args.subcommand() {
+                ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
+                _ => usage_and_exit(&args),
+            };
+            vault::do_it(context)
         }
         ("extract", Some(args)) => {
-            let context = ok_or_exit(
-                extraction_context_from(args).context("extraction context creation failed"),
-            );
-            extract::do_it(&context)
+            let context = ok_or_exit(extraction_context_from(args));
+            extract::do_it(context)
         }
-        _ => {
-            println!("{}", matches.usage());
-            process::exit(2)
-        }
+        _ => usage_and_exit(&matches),
     };
     ok_or_exit(res);
 }

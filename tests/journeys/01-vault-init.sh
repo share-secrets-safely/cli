@@ -13,6 +13,13 @@ title "'vault init' - without any gpg information"
 
 with "no available gpg key and no key" && {
     it "fails as it cannot identify the user" && \
-      expect_run $WITH_FAILURE "$exe" vault init
+      WITH_OUTPUT=".*specify.*keyfile.*" expect_run $WITH_FAILURE "$exe" vault init
 }
+
+with "a gpg secret key provided via stdin" && {
+    it "fails because secret keys must not be used" && \
+      WITH_OUTPUT=".*secret.*" expect_run $WITH_FAILURE "$exe" vault init --gpg-keyfile < $root/fixtures/tester.sec.asc
+}
+
+
 

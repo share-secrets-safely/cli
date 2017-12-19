@@ -43,6 +43,6 @@ with "an explicit supported shell name" && {
 
 with "with an unsupported shell" && {
     it "fails with a suitable error" && \
-      WITH_OUTPUT=".*foobar.*unsupported" expect_run $WITH_FAILURE "$exe" completions foobar
+    WITH_OUTPUT=".*foobar.*unsupported" expect_run $WITH_FAILURE "$exe" completions foobar
 }
 
