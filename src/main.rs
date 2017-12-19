@@ -7,12 +7,16 @@ extern crate s3_types as types;
 extern crate s3_vault as vault;
 
 use types::{ExtractionContext, VaultContext};
-use clap::{App, Arg, ArgMatches};
-use failure::{Error, ResultExt};
-use std::io::{stderr, Write};
+use clap::{App, Arg, ArgMatches, Shell};
+use failure::{err_msg, Error, ResultExt};
+use std::io::{stderr, stdout, Write};
+use std::env;
+use std::path::Path;
 use std::process;
 use std::str::FromStr;
 use std::convert::Into;
+
+const CLI_NAME: &'static str = "s3";
 
 fn required_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
@@ -66,8 +70,43 @@ fn extraction_context_from(args: &ArgMatches) -> Result<ExtractionContext, Error
     })
 }
 
+fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error> {
+    let shell = args.value_of("shell")
+        .ok_or(err_msg("expected 'shell' argument"))
+        .map(|s| {
+            Path::new(s)
+                .file_name()
+                .map(|f| f.to_str().expect("os-string to str conversion failed"))
+                .unwrap_or(s)
+        })
+        .and_then(|s| {
+            Shell::from_str(s)
+                .map_err(err_msg)
+                .context(format!("The shell '{}' is unsupported", s))
+                .map_err(Into::into)
+        })?;
+    app.gen_completions_to(CLI_NAME, shell, &mut stdout());
+    Ok(())
+}
+
 fn main() {
+    let shell = env::var("SHELL");
     let app: App = app_from_crate!()
+        .name(CLI_NAME)
+        .subcommand(
+            App::new("completions")
+                .about("generate completions for supported shell")
+                .arg({
+                    let arg = Arg::with_name("shell")
+                        .required(shell.is_err())
+                        .help("The name of the shell, or the path to the shell as exposed by the $SHELL variable.");
+                    if let Ok(shell) = shell.as_ref() {
+                        arg.default_value(&shell)
+                    } else {
+                        arg
+                    }
+                }),
+        )
         .subcommand(
             App::new("vault")
                 .about("a variety of vault interactions")
@@ -90,8 +129,11 @@ fn main() {
                 ),
         );
 
+    let appc = app.clone();
     let matches: ArgMatches = app.get_matches();
+
     let res = match matches.subcommand() {
+        ("completions", Some(args)) => generate_completions(appc, &args),
         ("vault", Some(args)) => {
             let context =
                 ok_or_exit(vault_context_from(args).context("vault context creation failed"));

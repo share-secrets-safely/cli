@@ -1,11 +1,11 @@
 extern crate failure;
 #[macro_use]
 extern crate failure_derive;
+extern crate gpgme;
 extern crate s3_types as types;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
-extern crate gpgme;
 
 use failure::{Error, ResultExt};
 use std::fs::File;
@@ -15,7 +15,7 @@ pub use types::VaultContext as Context;
 
 #[derive(Deserialize, Debug)]
 struct Vault {
-    users: Option<Vec<String>>
+    users: Option<Vec<String>>,
 }
 
 #[derive(Debug, Fail)]
