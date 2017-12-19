@@ -4,17 +4,14 @@
 
 ## On our way to the minimal viable product v1.0
 
- * [x] **setup rust workspace with libraries for**
-   * [x] CLI
-   * [x] GPG interface
-   * [x] extraction tools
- * [x] **setup Travis CI for**
-   * [x] linux
-   * [x] OSX
- * [x] **standalone deployables**
-   * [x] static linking on OSX
-   * [x] MUSL and static linking on linux
-  
+ * [x] **setup rust workspace for clear dependency separation**
+ * [x] **setup CI for linux and OSX**
+ * [x] **standalone deployables without additional dependencies for OSX and Linux**
+ * [ ] **complete a happy journey with**
+   * [ ] adding a new user
+   * [ ] create a partition
+   * [ ] add contents
+   * [ ] add another user and re-encrypt parition content
  * ...and many more when the boxes above are ticked :D
 
 ## Project Goals
