@@ -31,6 +31,8 @@ $(EXE): always
 	GPGME_LIB_PATH=$(OSX_BREW_LIB_DIR) DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl GPG_ERROR_LIB_PATH=$(OSX_BREW_LIB_DIR) GPG_ERROR_LIBS=gpg-error cargo build --all-features
 
 $(MUSL_EXE): build-linux-musl
+	
+$(LIBC_EXE): build-linux-libc
 
 stateful-journey-tests: $(LIBC_EXE)
 	tests/stateful-journey-test.sh $< $(MY_LIBC_IMAGE)
