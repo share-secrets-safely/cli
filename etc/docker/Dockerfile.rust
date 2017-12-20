@@ -1,0 +1,5 @@
+FROM rust:latest
+
+RUN apt-get update
+RUN apt-get install -y  libgpgme-dev=1.8.0-3+b2
+

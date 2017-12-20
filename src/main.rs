@@ -128,8 +128,7 @@ fn main() {
                 .about("a variety of vault interactions")
                 .subcommand(
                     App::new("init")
-                        .about("initialize the vault")
-                        .help(
+                        .about(
                             "If neither --gpg-keyfile nor --gpg-key-id are set, we will use the \
                              only key that you have a secret key for.\
                              If you have multiple keys, the --gpg-key-id must be specified \
@@ -138,8 +137,11 @@ fn main() {
                         )
                         .arg(
                             Arg::with_name("gpg-key-id")
+                                .long("gpg-key-id")
                                 .short("i")
                                 .required(false)
+                                .takes_value(true)
+                                .value_name("userid")
                                 .help(
                                     "The key-id of the public key identifying your own user \
                                      identifying the your own user.",
@@ -148,7 +150,10 @@ fn main() {
                         .arg(
                             Arg::with_name("gpg-keyfile")
                                 .short("k")
+                                .long("gpg-keyfile")
                                 .required(false)
+                                .takes_value(true)
+                                .value_name("keyfile")
                                 .help(
                                     "Path to a keyfile exported with 'gpg --export --armor ...' \
                                      identifying the your own user.",

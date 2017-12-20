@@ -18,7 +18,7 @@ with "no available gpg key and no key" && {
 
 with "a gpg secret key provided via stdin" && {
     it "fails because secret keys must not be used" && \
-      WITH_OUTPUT=".*secret.*" expect_run $WITH_FAILURE "$exe" vault init --gpg-keyfile < $root/fixtures/tester.sec.asc
+      WITH_OUTPUT=".*secret.*" expect_run $WITH_FAILURE "$exe" vault init --gpg-keyfile < "$root/fixtures/tester.sec.asc"
 }
 
 

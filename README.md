@@ -6,7 +6,9 @@
 
  * [x] **setup rust workspace for clear dependency separation**
  * [x] **setup CI for linux and OSX**
- * [x] **standalone deployables without additional dependencies for OSX and Linux**
+ * [ ] **standalone deployables without additional dependencies for**
+   * [ ] OSX
+   * [ ] MUSL Linux
  * [x] **shell completions**
  * [ ] **complete a happy journey with**
    * [ ] adding a new user
