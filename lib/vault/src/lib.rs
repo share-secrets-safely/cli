@@ -69,6 +69,28 @@ pub fn do_it(ctx: Context) -> Result<(), Error> {
                     x => Err(format_err!("Found {} viable keys, which is ambiguous. Please specify one with the key-id argument.", x)),
                 }
             }
+            (None, Some(keyfile)) => {
+                let mut ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
+                //                ctx.add_key_list_mode(keylist);
+                let mut data = gpgme::Data::load(keyfile.to_str().expect("utf8 filename"))
+                    .context(format!(
+                        "Key file '{}' could not be loaded",
+                        keyfile.display()
+                    ))?;
+                println!("ident={:?}", data.identify());
+                data.set_encoding(gpgme::data::Encoding::Url)?;
+                println!("encoding={:?}", data.encoding());
+                let keys = ctx.read_keys(data)
+                    .context(format!(
+                        "Failed to read keys from data in '{}'",
+                        keyfile.display()
+                    ))?
+                    .filter_map(Result::ok);
+                for key in keys {
+                    println!("KEY = {:?}", key)
+                }
+                Ok(())
+            }
             _ => unimplemented!("TBD - handle all cases and return Error otherwise"),
         },
         VaultCommand::List => {
