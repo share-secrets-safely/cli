@@ -1,4 +1,13 @@
 FROM clux/muslrust:stable
 
 RUN apt-get update
-RUN apt-get install -y libgpgme11-dev=1.6.0-1 libgpg-error-dev=1.21-2ubuntu1 autoconf=2.69-9
+RUN apt-get install -y autoconf=2.69-9 gettext=0.19.7-2ubuntu3
+
+ENV GETTEXT_VERSION=0.19.3
+
+RUN curl -sL https://ftp.gnu.org/gnu/gettext/gettext-${GETTEXT_VERSION}.tar.gz -o gettext-${GETTEXT_VERSION}.tar.gz
+RUN tar -xf gettext-${GETTEXT_VERSION}.tar.gz
+RUN cd gettext-${GETTEXT_VERSION} && ./configure --without-emacs --disable-java --disable-c++ --enable-fast-install
+RUN cd gettext-${GETTEXT_VERSION} make -j2 > /dev/null && make install > /dev/null 
+
+
