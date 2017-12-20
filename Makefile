@@ -50,7 +50,7 @@ build-linux-musl: build-musl-image
 	docker run -e GPGME_LIB_PATH=$(CONTAINER_LIB_DIR) -e DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl -e GPG_ERROR_LIB_PATH=$(CONTAINER_LIB_DIR) -e GPG_ERROR_LIBS=gpg-error -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl
 
 build-linux-libc: build-libc-image
-	docker run -e GPGME_LIB_PATH=$(CONTAINER_LIB_DIR) -e DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl -e GPG_ERROR_LIB_PATH=$(CONTAINER_LIB_DIR) -e GPG_ERROR_LIBS=gpg-error -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo build --target=x86_64-unknown-linux-gnu
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo build --target=x86_64-unknown-linux-gnu
 	
 clean-linux-musl: build-musl-image
 	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo clean
