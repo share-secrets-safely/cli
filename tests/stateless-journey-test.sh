@@ -12,11 +12,6 @@ SUCCESSFULLY=0
 
 title "'vault' subcommand"
 
-with "no existing configuration file" && {
-    it "fails even though a default was defined" && \
-      WITH_OUTPUT="error.*s3-vault.yml" expect_run $WITH_FAILURE "$exe" vault
-}
-
 with "a minimal vault configuration file" && {
   it "succeeds even if there is no further argument" && \
       echo 'users:' | expect_run $SUCCESSFULLY "$exe" vault -c -
