@@ -43,7 +43,7 @@ before_install:
       export PATH=${HOME}/.local/bin:$PATH
       export LD_LIBRARY_PATH=${HOME}/.local/lib:$LD_LIBRARY_PATH
   - | 
-    if [[ "$TRAVIS_OS_NAME" == "osx ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install gpgme gettext
       brew link --force gettext
     fi
