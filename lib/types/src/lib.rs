@@ -1,11 +1,6 @@
-use std::path::PathBuf;
-
 #[derive(Debug, Clone)]
 pub enum VaultCommand {
-    Init {
-        gpg_keyfile_path: Option<PathBuf>,
-        gpg_key_id: Option<String>,
-    },
+    Init { gpg_key_ids: Vec<String> },
     List,
 }
 

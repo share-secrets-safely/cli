@@ -8,17 +8,19 @@ root="$(cd "${0%/*}" && pwd)"
 source "$root/../utilities.sh"
 
 WITH_FAILURE=1
+SUCCESSFULLY=0
 
 title "'vault init' - without any gpg information"
 
 with "no available gpg key and no key" && {
     it "fails as it cannot identify the user" && \
-      WITH_OUTPUT=".*specify.*key file.*" expect_run $WITH_FAILURE "$exe" vault init
+      WITH_OUTPUT="Please create one and try again" expect_run $WITH_FAILURE "$exe" vault init
 }
 
-with "a gpg secret key provided" && {
-    it "fails because secret keys must not be used" && \
-      WITH_OUTPUT=".*secret.*" expect_run $WITH_FAILURE "$exe" vault init --gpg-keyfile "$root/fixtures/tester.sec.asc"
+with "a single gpg secret key available" && {
+    gpg --import "$root/fixtures/tester.sec.asc"
+    it "succeeds as the key is not ambiguous" && \
+      WITH_OUTPUT="vault initialized at '$PWD'" expect_run $SUCCESSFULLY "$exe" vault init 
 }
 
 

@@ -51,48 +51,24 @@ impl Vault {
 pub fn do_it(ctx: Context) -> Result<(), Error> {
     use types::VaultCommand;
     match ctx.command {
-        VaultCommand::Init {
-            gpg_keyfile_path,
-            gpg_key_id,
-        } => match (gpg_key_id, gpg_keyfile_path) {
-            (None, None) => {
-                let mut ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
-                let keys: Vec<_> = ctx.find_secret_keys(&Vec::<String>::new())?
-                    .filter_map(Result::ok)
-                    .collect();
-                match keys.len() {
-                    1 => {
-                        let _key = &keys[0];
+        VaultCommand::Init { gpg_key_ids } => {
+            let mut ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
+            let keys: Vec<_> = ctx.find_secret_keys(&gpg_key_ids)?
+                .filter_map(Result::ok)
+                .collect();
+            match keys.len() {
+                0 => Err(err_msg(
+                    "No existing GPG key found for which you have a secret key. Please create one and try again.",
+                )),
+                x => {
+                    if x > 1 && gpg_key_ids.len() == 0 {
+                        Err(format_err!("Found {} viable keys for key-ids {:?}, which is ambiguous. Please specify one with the --gpg-key-id argument.", x, gpg_key_ids))
+                    } else {
                         Ok(())
-                    },
-                    0 => Err(err_msg("No existing secret GPG key found. Please create one, or specify a key file.")),
-                    x => Err(format_err!("Found {} viable keys, which is ambiguous. Please specify one with the key-id argument.", x)),
+                    }
                 }
             }
-            (None, Some(keyfile)) => {
-                let mut ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
-                //                ctx.add_key_list_mode(keylist);
-                let mut data = gpgme::Data::load(keyfile.to_str().expect("utf8 filename"))
-                    .context(format!(
-                        "Key file '{}' could not be loaded",
-                        keyfile.display()
-                    ))?;
-                println!("ident={:?}", data.identify());
-                data.set_encoding(gpgme::data::Encoding::Url)?;
-                println!("encoding={:?}", data.encoding());
-                let keys = ctx.read_keys(data)
-                    .context(format!(
-                        "Failed to read keys from data in '{}'",
-                        keyfile.display()
-                    ))?
-                    .filter_map(Result::ok);
-                for key in keys {
-                    println!("KEY = {:?}", key)
-                }
-                Ok(())
-            }
-            _ => unimplemented!("TBD - handle all cases and return Error otherwise"),
-        },
+        }
         VaultCommand::List => {
             Vault::from_file(&ctx.vault_path).context("Could not deserialize vault information")?;
             Ok(())

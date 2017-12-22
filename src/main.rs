@@ -67,8 +67,10 @@ fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
 fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::Init {
-            gpg_keyfile_path: args.value_of("gpg-keyfile").map(Into::into),
-            gpg_key_id: args.value_of("gpg-key-id").map(Into::into),
+            gpg_key_ids: match args.values_of("gpg-key-id") {
+                Some(v) => v.map(Into::into).collect(),
+                None => Vec::new(),
+            },
         },
         ..ctx
     })
@@ -129,35 +131,20 @@ fn main() {
                 .subcommand(
                     App::new("init")
                         .about(
-                            "If neither --gpg-keyfile nor --gpg-key-id are set, we will use the \
-                             only key that you have a secret key for.\
+                            "If --gpg-key-id is unset, we will use the \
+                             only key that you have a secret key for, assuming it is yours.\
                              If you have multiple keys, the --gpg-key-id must be specified \
-                             to make the input \
-                             unambiguous.",
+                             to make the input unambiguous.",
                         )
                         .arg(
                             Arg::with_name("gpg-key-id")
                                 .long("gpg-key-id")
+                                .multiple(true)
                                 .short("i")
                                 .required(false)
                                 .takes_value(true)
                                 .value_name("userid")
-                                .help(
-                                    "The key-id of the public key identifying your own user \
-                                     identifying the your own user.",
-                                ),
-                        )
-                        .arg(
-                            Arg::with_name("gpg-keyfile")
-                                .short("k")
-                                .long("gpg-keyfile")
-                                .required(false)
-                                .takes_value(true)
-                                .value_name("keyfile")
-                                .help(
-                                    "Path to a keyfile exported with 'gpg --export --armor ...' \
-                                     identifying the your own user.",
-                                ),
+                                .help("The key-id of the public key identifying your own user(s)."),
                         ),
                 )
                 .arg(
