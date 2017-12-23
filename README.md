@@ -7,14 +7,15 @@
  * [x] **setup rust workspace for clear dependency separation**
  * [x] **setup CI for linux and OSX**
  * [ ] **standalone deployables without additional dependencies for**
-   * [ ] OSX
+   * [ ] OSX (static binary)
+   * [ ] Debian Linux (ubuntu trusty, static libc binary)
    * [ ] MUSL Linux
  * [x] **shell completions**
  * [ ] **complete a happy journey with**
    * [ ] adding a new user
-   * [ ] create a partition
    * [ ] add contents
    * [ ] add another user and re-encrypt parition content
+   * [ ] support for multiple vaults
  * ...and many more when the boxes above are ticked :D
 
 ## Project Goals

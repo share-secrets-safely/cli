@@ -64,9 +64,11 @@ fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
         command: VaultCommand::List,
     })
 }
+
 fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::Init {
+            gpg_keys_dir: required_arg(args, "gpg-keys-dir")?,
             gpg_key_ids: match args.values_of("gpg-key-id") {
                 Some(v) => v.map(Into::into).collect(),
                 None => Vec::new(),
@@ -139,8 +141,21 @@ fn main() {
                              to make the input unambiguous.",
                         )
                         .arg(
+                            Arg::with_name("gpg-keys-dir")
+                                .long("gpg-keys-dir")
+                                .short("k")
+                                .required(false)
+                                .takes_value(true)
+                                .value_name("directory")
+                                .help(
+                                    "The directory to hold the public keys identified by \
+                                     --gpg-key-id, with signatures.",
+                                ),
+                        )
+                        .arg(
                             Arg::with_name("gpg-key-id")
                                 .long("gpg-key-id")
+                                .default_value(".gpg-keys")
                                 .multiple(true)
                                 .short("i")
                                 .required(false)

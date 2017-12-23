@@ -67,7 +67,11 @@ impl Vault {
     }
 }
 
-pub fn init(gpg_key_ids: Vec<String>, vault_path: &str) -> Result<String, Error> {
+pub fn init(
+    gpg_key_ids: Vec<String>,
+    gpg_keys_dir: &str,
+    vault_path: &str,
+) -> Result<String, Error> {
     let mut gpg_ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
     let keys: Vec<_> = gpg_ctx
         .find_secret_keys(&gpg_key_ids)?
@@ -83,7 +87,7 @@ pub fn init(gpg_key_ids: Vec<String>, vault_path: &str) -> Result<String, Error>
             } else {
                 let vault = Vault {
                     at: at_default(),
-                    gpg_keys: Some(String::from(".gpg-keys")),
+                    gpg_keys: Some(gpg_keys_dir.to_owned()),
                     recipients: String::from(".recipients"),
                 };
                 vault.to_file(vault_path)?;
@@ -96,8 +100,12 @@ pub fn init(gpg_key_ids: Vec<String>, vault_path: &str) -> Result<String, Error>
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
 pub fn do_it(ctx: Context) -> Result<String, Error> {
+    use types::VaultCommand;
     match ctx.command {
-        VaultCommand::Init { gpg_key_ids } => init(gpg_key_ids, &ctx.vault_path),
+        VaultCommand::Init {
+            gpg_key_ids,
+            gpg_keys_dir,
+        } => init(gpg_key_ids, &gpg_keys_dir, &ctx.vault_path),
         VaultCommand::List => {
             Vault::from_file(&ctx.vault_path)?;
             Ok(String::new())
