@@ -104,7 +104,7 @@ pub fn init(
     let vault = Vault {
         at: at_default(),
         gpg_keys: Some(gpg_keys_dir.to_owned()),
-        recipients: String::from(".recipients"),
+        recipients: String::from(".gpg-id"),
     };
     vault.to_file(vault_path)?;
 

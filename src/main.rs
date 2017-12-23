@@ -158,7 +158,7 @@ fn main() {
                         .arg(
                             Arg::with_name("recipients-file-path")
                                 .long("recipients-file")
-                                .default_value(".recipients")
+                                .default_value(".gpg-id")
                                 .short("r")
                                 .required(false)
                                 .takes_value(true)

@@ -1,4 +1,4 @@
 ---
 at: "."
 gpg_keys: ".gpg-keys"
-recipients: ".recipients"
+recipients: ".gpg-id"
