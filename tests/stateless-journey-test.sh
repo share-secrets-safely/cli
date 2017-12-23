@@ -14,7 +14,7 @@ title "'vault' subcommand"
 
 with "a minimal vault configuration file" && {
   it "succeeds even if there is no further argument" && \
-      echo 'users:' | expect_run $SUCCESSFULLY "$exe" vault -c -
+      echo 'at: ' | expect_run $SUCCESSFULLY "$exe" vault -c -
 }
 
 title "'extract' subcommand"

@@ -131,7 +131,9 @@ fn main() {
                 .subcommand(
                     App::new("init")
                         .about(
-                            "If --gpg-key-id is unset, we will use the \
+                            "Initialize the vault in the current directory. \
+                             \
+                             If --gpg-key-id is unset, we will use the \
                              only key that you have a secret key for, assuming it is yours.\
                              If you have multiple keys, the --gpg-key-id must be specified \
                              to make the input unambiguous.",
@@ -175,7 +177,7 @@ fn main() {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
-                _ => usage_and_exit(&args),
+                _ => context,
             };
             vault::do_it(context)
         }

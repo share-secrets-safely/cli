@@ -27,6 +27,17 @@ function it () {
   echo 1>&2 -n "${YELLOW}${CONTEXT}${GREEN}[it] $*"
 }
 
+function fail () {
+  echo 1>&2 "$RED" "$@"
+  exit 1
+}
+
+function expect_match () {
+  local expected=${1:?}
+  local actual=${2:?}
+  expect_run 0 diff "$expected" "$actual"
+}
+
 function expect_run () {
   local expected_exit_code=$1
   shift
@@ -46,7 +57,8 @@ function expect_run () {
     echo 1>&2 "$GREEN" " - OK"
   else
     echo 1>&2 "$RED" " - FAIL"
-    echo 1>&2 "Expected actual status $actual_exit_code to be $expected_exit_code"
+    echo 1>&2 "${WHITE}\$" "$@"
+    echo 1>&2 "$RED" "Expected actual status $actual_exit_code to be $expected_exit_code"
     echo 1>&2 "$output"
     exit $IT_COUNT
   fi
