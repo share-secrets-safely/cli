@@ -4,26 +4,6 @@ use std::path::{Path, PathBuf};
 use std::fmt;
 
 #[derive(Debug, Fail)]
-pub enum ExportKeysError {
-    CreateDirectory {
-        #[cause] cause: io::Error,
-        path: PathBuf,
-    },
-}
-
-impl fmt::Display for ExportKeysError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            &ExportKeysError::CreateDirectory { ref path, .. } => writeln!(
-                f,
-                "Failed to create directory '{}' to store public gpg keys",
-                path.display()
-            ),
-        }
-    }
-}
-
-#[derive(Debug, Fail)]
 pub enum VaultError {
     ReadFile {
         #[cause] cause: io::Error,

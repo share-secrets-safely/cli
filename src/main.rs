@@ -157,6 +157,7 @@ fn main() {
                         .arg(
                             Arg::with_name("gpg-keys-dir")
                                 .long("gpg-keys-dir")
+                                .default_value(".gpg-keys")
                                 .short("k")
                                 .required(false)
                                 .takes_value(true)
@@ -169,7 +170,6 @@ fn main() {
                         .arg(
                             Arg::with_name("gpg-key-id")
                                 .long("gpg-key-id")
-                                .default_value(".gpg-keys")
                                 .multiple(true)
                                 .short("i")
                                 .required(false)

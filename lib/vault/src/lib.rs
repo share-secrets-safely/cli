@@ -10,13 +10,16 @@ extern crate serde_derive;
 extern crate serde_yaml;
 
 mod error;
+mod util;
+
+use util::write_at;
 
 use std::path::{Path, PathBuf};
-use error::{ExportKeysError, IOMode, VaultError};
+use error::{IOMode, VaultError};
 
-use gpgme::{Context as GpgContext, Protocol};
-use failure::{err_msg, Error};
-use std::fs::{File, OpenOptions};
+use gpgme::{Context as GpgContext, Key, Protocol};
+use failure::{err_msg, Error, ResultExt};
+use std::fs::{create_dir_all, File};
 use std::io::{stdin, Read, Write};
 
 pub use types::VaultContext as Context;
@@ -51,12 +54,8 @@ impl Vault {
     }
 
     fn to_file(&self, path: &Path) -> Result<(), VaultError> {
-        let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(path)
-            .map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))?;
+        let mut file =
+            write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))?;
         serde_yaml::to_writer(&file, self)
             .map_err(|cause| VaultError::Serialization {
                 cause,
@@ -68,23 +67,24 @@ impl Vault {
     }
 }
 
-fn export_keys_with_signatures(
-    _gpg_key_ids: Vec<String>,
-    _gpg_keys_dir: &Path,
-) -> Result<(), ExportKeysError> {
-    Ok(())
-}
-
 pub fn init(
     gpg_key_ids: Vec<String>,
     gpg_keys_dir: &Path,
     vault_path: &Path,
 ) -> Result<String, Error> {
     let mut gpg_ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
-    let keys: Vec<_> = gpg_ctx
-        .find_secret_keys(&gpg_key_ids)?
-        .filter_map(Result::ok)
-        .collect();
+    let keys = {
+        let mut keys_iter = gpg_ctx.find_secret_keys(&gpg_key_ids)?;
+        let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
+
+        if keys_iter.finish()?.is_truncated() {
+            return Err(format_err!(
+                "The key list was truncated unexpectedly, while iterating it"
+            ));
+        }
+        keys
+    };
+
     match keys.len() {
         0 => Err(err_msg(
             "No existing GPG key found for which you have a secret key. Please create one and try again.",
@@ -99,7 +99,33 @@ pub fn init(
                     recipients: String::from(".recipients"),
                 };
                 vault.to_file(vault_path)?;
-                export_keys_with_signatures(gpg_key_ids, gpg_keys_dir)?;
+
+                if !gpg_keys_dir.is_dir() {
+                    create_dir_all(gpg_keys_dir).context(format!(
+                        "Failed to create directory at '{}' for exporting public gpg keys to.",
+                        gpg_keys_dir.display()
+                    ))?;
+                }
+
+                gpg_ctx.set_armor(true);
+
+                let mut output = Vec::new();
+                let mode = gpgme::ExportMode::empty();
+                for key in keys {
+                    let key: Key = key;
+                    let key_path = gpg_keys_dir.join(
+                        key.fingerprint()
+                           .map_err(|e| e.map(Into::into).unwrap_or(err_msg("Fingerprint extraction failed")))?
+                    );
+                    gpg_ctx.export_keys([key].iter(), mode, &mut output)
+                       .context(format!(
+                           "Failed to export at least one public key with signatures."
+                       ))?;
+                    write_at(&key_path)
+                        .and_then(|mut f| f.write_all(&output))
+                        .context(format!("Could not write public key file at '{}'", key_path.display()))?;
+                    output.clear();
+                }
                 Ok(format!("vault initialized at '{}'", vault_path.display()))
             }
         }

@@ -33,6 +33,7 @@ with "a single gpg secret key available" && {
 }
 
 # TODO: - test actual content of directory and file
+#       - assure signatures are exported too (should be, but needs test)
 #       - non-empty directory
 #       - specify vault by .gpg-id file
 
