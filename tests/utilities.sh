@@ -24,7 +24,7 @@ function without_context() {
 
 function it () {
   IT_COUNT=$(( IT_COUNT + 1 ))
-  echo 1>&2 -n "${YELLOW}${CONTEXT}${GREEN}[it] $*"
+  echo 1>&2 -n "${YELLOW}${CONTEXT}${GREEN}[it] $(echo "$@" | sed -e 's/  //g')"
 }
 
 function fail () {

@@ -23,11 +23,12 @@ mkdir /sandbox && cd /sandbox || exit
 with "a single gpg secret key available" && {
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
-      expected_vault=./s3-vault.yml
-      WITH_OUTPUT="vault initialized at '$expected_vault'" expect_run $SUCCESSFULLY "$exe" vault init
+      WITH_OUTPUT="vault initialized at './s3-vault.yml'" expect_run $SUCCESSFULLY "$exe" vault init
     }
-    it "creates a valid vault configuration file" && {
-      expect_match "$fixture/default-vault.yml" $expected_vault
+    it "creates a valid vault configuration file, \
+        exports the public portion of the key to the correct spot and \
+        writes the list of recipients" && {
+      expect_match "$fixture/vault-init-single-user" .
     }
 }
 
