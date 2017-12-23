@@ -18,9 +18,9 @@ with "no available gpg key and no key" && {
 }
 
 with "a single gpg secret key available" && {
-    gpg --import "$root/fixtures/tester.sec.asc"
+    gpg --import "$root/fixtures/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && \
-      WITH_OUTPUT="vault initialized at '$PWD'" expect_run $SUCCESSFULLY "$exe" vault init 
+      WITH_OUTPUT="vault initialized at './s3-vault.yml'" expect_run $SUCCESSFULLY "$exe" vault init 
 }
 
 

@@ -82,7 +82,7 @@ fn extraction_context_from(args: &ArgMatches) -> Result<ExtractionContext, Error
     })
 }
 
-fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error> {
+fn generate_completions(mut app: App, args: &ArgMatches) -> Result<String, Error> {
     let shell = args.value_of("shell")
         .ok_or(err_msg("expected 'shell' argument"))
         .map(|s| {
@@ -98,7 +98,7 @@ fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error> {
                 .map_err(Into::into)
         })?;
     app.gen_completions_to(CLI_NAME, shell, &mut stdout());
-    Ok(())
+    Ok(String::new())
 }
 
 fn usage_and_exit(args: &ArgMatches) -> ! {
@@ -185,5 +185,9 @@ fn main() {
         }
         _ => usage_and_exit(&matches),
     };
-    ok_or_exit(res);
+
+    let msg = ok_or_exit(res);
+    if msg.len() > 0 {
+        ok_or_exit(writeln!(stdout(), "{}", msg));
+    }
 }

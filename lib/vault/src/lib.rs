@@ -48,12 +48,13 @@ impl Vault {
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
-pub fn do_it(ctx: Context) -> Result<(), Error> {
+pub fn do_it(ctx: Context) -> Result<String, Error> {
     use types::VaultCommand;
     match ctx.command {
         VaultCommand::Init { gpg_key_ids } => {
-            let mut ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
-            let keys: Vec<_> = ctx.find_secret_keys(&gpg_key_ids)?
+            let mut gpg_ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
+            let keys: Vec<_> = gpg_ctx
+                .find_secret_keys(&gpg_key_ids)?
                 .filter_map(Result::ok)
                 .collect();
             match keys.len() {
@@ -64,14 +65,14 @@ pub fn do_it(ctx: Context) -> Result<(), Error> {
                     if x > 1 && gpg_key_ids.len() == 0 {
                         Err(format_err!("Found {} viable keys for key-ids {:?}, which is ambiguous. Please specify one with the --gpg-key-id argument.", x, gpg_key_ids))
                     } else {
-                        Ok(())
+                        Ok(format!("vault initialized at '{}'", ctx.vault_path))
                     }
                 }
             }
         }
         VaultCommand::List => {
             Vault::from_file(&ctx.vault_path).context("Could not deserialize vault information")?;
-            Ok(())
+            Ok(String::new())
         }
     }
 }
