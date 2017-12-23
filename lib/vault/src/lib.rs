@@ -9,10 +9,14 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_yaml;
 
+mod error;
+
+use error::{IOMode, VaultError};
+
 use gpgme::{Context as GpgContext, Protocol};
 use failure::{err_msg, Error};
 use std::fs::{File, OpenOptions};
-use std::io::{self, stdin, Read, Write};
+use std::io::{stdin, Read, Write};
 
 pub use types::VaultContext as Context;
 
@@ -31,58 +35,13 @@ struct Vault {
     #[serde(default = "recipients_default")] recipients: String,
 }
 
-#[derive(Debug, Fail)]
-#[fail(display = "The top-level error related to handling the vault.")]
-enum VaultError {
-    #[fail(display = "Could not access vault configuration file for reading '{}'", path)]
-    ReadFile {
-        #[cause] cause: io::Error,
-        path: String,
-    },
-    #[fail(display = "Could not open vault configuration file for writing '{}'", path)]
-    WriteFile {
-        #[cause] cause: io::Error,
-        path: String,
-    },
-    #[fail(display = "Could not deserialize vault configuration file at '{}'", path)]
-    Deserialization {
-        #[cause] cause: serde_yaml::Error,
-        path: String,
-    },
-    #[fail(display = "Could not serialize vault configuration file to '{}'", path)]
-    Serialization {
-        #[cause] cause: serde_yaml::Error,
-        path: String,
-    },
-}
-
-enum IO {
-    Read,
-    Write,
-}
-
-impl VaultError {
-    fn from_io_err(cause: io::Error, path: &str, mode: IO) -> Self {
-        match mode {
-            IO::Write => VaultError::WriteFile {
-                cause,
-                path: path.to_owned(),
-            },
-            IO::Read => VaultError::ReadFile {
-                cause,
-                path: path.to_owned(),
-            },
-        }
-    }
-}
-
 impl Vault {
     fn from_file(path: &str) -> Result<Vault, VaultError> {
         let reader: Box<Read> = if path == "-" {
             Box::new(stdin())
         } else {
             Box::new(File::open(path)
-                .map_err(|cause| VaultError::from_io_err(cause, path, IO::Read))?)
+                .map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Read))?)
         };
         serde_yaml::from_reader(reader).map_err(|cause| VaultError::Deserialization {
             cause,
@@ -96,7 +55,7 @@ impl Vault {
             .write(true)
             .truncate(true)
             .open(path)
-            .map_err(|cause| VaultError::from_io_err(cause, path, IO::Write))
+            .map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))
             .and_then(|mut w| {
                 serde_yaml::to_writer(&w, self)
                     .map_err(|cause| VaultError::Serialization {
@@ -104,7 +63,8 @@ impl Vault {
                         path: path.to_owned(),
                     })
                     .and_then(|_| {
-                        writeln!(w).map_err(|cause| VaultError::from_io_err(cause, path, IO::Write))
+                        writeln!(w)
+                            .map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))
                     })
             })
     }
