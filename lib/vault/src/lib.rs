@@ -11,7 +11,7 @@ extern crate serde_yaml;
 
 mod error;
 
-use error::{IOMode, VaultError};
+use error::{ExportKeysError, IOMode, VaultError};
 
 use gpgme::{Context as GpgContext, Protocol};
 use failure::{err_msg, Error};
@@ -67,6 +67,13 @@ impl Vault {
     }
 }
 
+fn export_keys_with_signatures(
+    _gpg_key_ids: Vec<String>,
+    _gpg_keys_dir: &str,
+) -> Result<(), ExportKeysError> {
+    Ok(())
+}
+
 pub fn init(
     gpg_key_ids: Vec<String>,
     gpg_keys_dir: &str,
@@ -91,6 +98,7 @@ pub fn init(
                     recipients: String::from(".recipients"),
                 };
                 vault.to_file(vault_path)?;
+                export_keys_with_signatures(gpg_key_ids, gpg_keys_dir)?;
                 Ok(format!("vault initialized at '{}'", vault_path))
             }
         }

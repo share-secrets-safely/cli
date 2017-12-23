@@ -3,6 +3,16 @@ use std::io;
 
 #[derive(Debug, Fail)]
 #[fail(display = "The top-level error related to handling the vault.")]
+pub enum ExportKeysError {
+    #[fail(display = "Could not create directory at '{}'", path)]
+    CreateDirectory {
+        #[cause] cause: io::Error,
+        path: String,
+    },
+}
+
+#[derive(Debug, Fail)]
+#[fail(display = "The top-level error related to handling the vault.")]
 pub enum VaultError {
     #[fail(display = "Could not access vault configuration file for reading '{}'", path)]
     ReadFile {
