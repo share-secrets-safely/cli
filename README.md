@@ -12,7 +12,7 @@
    * [ ] MUSL Linux
  * [x] **shell completions**
  * [ ] **complete a happy journey with**
-   * [ ] adding a new user
+   * [x] initialize a new vault
    * [ ] add contents
    * [ ] add another user and re-encrypt parition content
    * [ ] support for multiple vaults
