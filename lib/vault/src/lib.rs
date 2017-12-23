@@ -11,6 +11,7 @@ extern crate serde_yaml;
 
 mod error;
 
+use std::path::{Path, PathBuf};
 use error::{ExportKeysError, IOMode, VaultError};
 
 use gpgme::{Context as GpgContext, Protocol};
@@ -31,13 +32,13 @@ fn at_default() -> String {
 #[derive(Deserialize, Serialize, Debug)]
 struct Vault {
     #[serde(default = "at_default")] at: String,
-    gpg_keys: Option<String>,
+    gpg_keys: Option<PathBuf>,
     #[serde(default = "recipients_default")] recipients: String,
 }
 
 impl Vault {
-    fn from_file(path: &str) -> Result<Vault, VaultError> {
-        let reader: Box<Read> = if path == "-" {
+    fn from_file(path: &Path) -> Result<Vault, VaultError> {
+        let reader: Box<Read> = if path == Path::new("-") {
             Box::new(stdin())
         } else {
             Box::new(File::open(path)
@@ -49,7 +50,7 @@ impl Vault {
         })
     }
 
-    fn to_file(&self, path: &str) -> Result<(), VaultError> {
+    fn to_file(&self, path: &Path) -> Result<(), VaultError> {
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -69,15 +70,15 @@ impl Vault {
 
 fn export_keys_with_signatures(
     _gpg_key_ids: Vec<String>,
-    _gpg_keys_dir: &str,
+    _gpg_keys_dir: &Path,
 ) -> Result<(), ExportKeysError> {
     Ok(())
 }
 
 pub fn init(
     gpg_key_ids: Vec<String>,
-    gpg_keys_dir: &str,
-    vault_path: &str,
+    gpg_keys_dir: &Path,
+    vault_path: &Path,
 ) -> Result<String, Error> {
     let mut gpg_ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
     let keys: Vec<_> = gpg_ctx
@@ -99,7 +100,7 @@ pub fn init(
                 };
                 vault.to_file(vault_path)?;
                 export_keys_with_signatures(gpg_key_ids, gpg_keys_dir)?;
-                Ok(format!("vault initialized at '{}'", vault_path))
+                Ok(format!("vault initialized at '{}'", vault_path.display()))
             }
         }
     }

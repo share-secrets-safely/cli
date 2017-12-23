@@ -15,10 +15,24 @@ use std::path::Path;
 use std::process;
 use std::str::FromStr;
 use std::convert::Into;
+use std::ffi::OsStr;
 
 const CLI_NAME: &'static str = "s3";
 
-fn required_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
+fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
+where
+    T: From<&'a OsStr>,
+{
+    match args.value_of_os(name).map(Into::into) {
+        Some(t) => Ok(t),
+        None => Err(format_err!(
+            "BUG: expected clap argument '{}' to be set",
+            name
+        )),
+    }
+}
+
+fn _required_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
     T: FromStr,
     <T as FromStr>::Err: 'static + ::std::error::Error + Send + Sync,
@@ -60,7 +74,7 @@ where
 
 fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
-        vault_path: required_arg(args, "config-file")?,
+        vault_path: required_os_arg(args, "config-file")?,
         command: VaultCommand::List,
     })
 }
@@ -68,7 +82,7 @@ fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
 fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::Init {
-            gpg_keys_dir: required_arg(args, "gpg-keys-dir")?,
+            gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,
             gpg_key_ids: match args.values_of("gpg-key-id") {
                 Some(v) => v.map(Into::into).collect(),
                 None => Vec::new(),
@@ -80,7 +94,7 @@ fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext,
 
 fn extraction_context_from(args: &ArgMatches) -> Result<ExtractionContext, Error> {
     Ok(ExtractionContext {
-        file_path: required_arg(args, "file")?,
+        file_path: required_os_arg(args, "file")?,
     })
 }
 

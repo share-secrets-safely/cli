@@ -1,39 +1,74 @@
 use serde_yaml;
 use std::io;
+use std::path::{Path, PathBuf};
+use std::fmt;
 
 #[derive(Debug, Fail)]
-#[fail(display = "The top-level error related to handling the vault.")]
 pub enum ExportKeysError {
-    #[fail(display = "Could not create directory at '{}'", path)]
     CreateDirectory {
         #[cause] cause: io::Error,
-        path: String,
+        path: PathBuf,
     },
 }
 
+impl fmt::Display for ExportKeysError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            &ExportKeysError::CreateDirectory { ref path, .. } => writeln!(
+                f,
+                "Failed to create directory '{}' to store public gpg keys",
+                path.display()
+            ),
+        }
+    }
+}
+
 #[derive(Debug, Fail)]
-#[fail(display = "The top-level error related to handling the vault.")]
 pub enum VaultError {
-    #[fail(display = "Could not access vault configuration file for reading '{}'", path)]
     ReadFile {
         #[cause] cause: io::Error,
-        path: String,
+        path: PathBuf,
     },
-    #[fail(display = "Could not open vault configuration file for writing '{}'", path)]
     WriteFile {
         #[cause] cause: io::Error,
-        path: String,
+        path: PathBuf,
     },
-    #[fail(display = "Could not deserialize vault configuration file at '{}'", path)]
     Deserialization {
         #[cause] cause: serde_yaml::Error,
-        path: String,
+        path: PathBuf,
     },
-    #[fail(display = "Could not serialize vault configuration file to '{}'", path)]
     Serialization {
         #[cause] cause: serde_yaml::Error,
-        path: String,
+        path: PathBuf,
     },
+}
+
+impl fmt::Display for VaultError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::VaultError::*;
+        match self {
+            &Serialization { ref path, .. } => writeln!(
+                f,
+                "Failed to serialize vault configuration file at '{}'",
+                path.display()
+            ),
+            &Deserialization { ref path, .. } => writeln!(
+                f,
+                "Failed to deserialize vault configuration file at '{}'",
+                path.display()
+            ),
+            &WriteFile { ref path, .. } => writeln!(
+                f,
+                "Failed to write vault configuration file at '{}'",
+                path.display()
+            ),
+            &ReadFile { ref path, .. } => writeln!(
+                f,
+                "Failed to create vault configuration file at '{}'",
+                path.display()
+            ),
+        }
+    }
 }
 
 pub enum IOMode {
@@ -42,7 +77,7 @@ pub enum IOMode {
 }
 
 impl VaultError {
-    pub fn from_io_err(cause: io::Error, path: &str, mode: IOMode) -> Self {
+    pub fn from_io_err(cause: io::Error, path: &Path, mode: IOMode) -> Self {
         match mode {
             IOMode::Write => VaultError::WriteFile {
                 cause,
