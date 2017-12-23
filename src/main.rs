@@ -82,6 +82,7 @@ fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
 fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::Init {
+            recipients_file: required_os_arg(args, "recipients-file-path")?,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,
             gpg_key_ids: match args.values_of("gpg-key-id") {
                 Some(v) => v.map(Into::into).collect(),
@@ -155,6 +156,19 @@ fn main() {
                              to make the input unambiguous.",
                         )
                         .arg(
+                            Arg::with_name("recipients-file-path")
+                                .long("recipients-file")
+                                .default_value(".recipients")
+                                .short("r")
+                                .required(false)
+                                .takes_value(true)
+                                .value_name("path")
+                                .help(
+                                    "The directory to hold the public keys identified by \
+                                     --gpg-key-id, with signatures.",
+                                ),
+                        )
+                        .arg(
                             Arg::with_name("gpg-keys-dir")
                                 .long("gpg-keys-dir")
                                 .default_value(".gpg-keys")
@@ -182,6 +196,7 @@ fn main() {
                     Arg::with_name("config-file")
                         .short("c")
                         .required(true)
+                        .value_name("path")
                         .help("Path to the vault configuration file.")
                         .default_value("./s3-vault.yml"),
                 ),

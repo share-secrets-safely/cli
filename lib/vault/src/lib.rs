@@ -17,7 +17,7 @@ use util::write_at;
 use std::path::{Path, PathBuf};
 use error::{IOMode, VaultError};
 
-use gpgme::{Context as GpgContext, Key, Protocol};
+use gpgme::{Context as GpgContext, Protocol};
 use failure::{err_msg, Error, ResultExt};
 use std::fs::{create_dir_all, File};
 use std::io::{stdin, Read, Write};
@@ -70,6 +70,7 @@ impl Vault {
 pub fn init(
     gpg_key_ids: Vec<String>,
     gpg_keys_dir: &Path,
+    recipients_file: &Path,
     vault_path: &Path,
 ) -> Result<String, Error> {
     let mut gpg_ctx = GpgContext::from_protocol(Protocol::OpenPgp)?;
@@ -111,12 +112,21 @@ pub fn init(
 
                 let mut output = Vec::new();
                 let mode = gpgme::ExportMode::empty();
+                let mut recipients = write_at(recipients_file)
+                    .context(format!(
+                        "Failed to open recipients file at '{}'",
+                        recipients_file.display()
+                    ))?;
                 for key in keys {
-                    let key: Key = key;
-                    let key_path = gpg_keys_dir.join(
-                        key.fingerprint()
-                           .map_err(|e| e.map(Into::into).unwrap_or(err_msg("Fingerprint extraction failed")))?
-                    );
+                    let key_path = {
+                        let fingerprint = key.fingerprint()
+                                             .map_err(|e| e.map(Into::into)
+                                                           .unwrap_or(err_msg("Fingerprint extraction failed")
+                                                           ))?;
+                        writeln!(recipients, "{}", fingerprint)
+                            .context(format!("Could not append fingerprint to file at '{}'", recipients_file.display()))?;
+                        gpg_keys_dir.join(fingerprint)
+                    };
                     gpg_ctx.export_keys([key].iter(), mode, &mut output)
                        .context(format!(
                            "Failed to export at least one public key with signatures."
@@ -126,6 +136,8 @@ pub fn init(
                         .context(format!("Could not write public key file at '{}'", key_path.display()))?;
                     output.clear();
                 }
+                recipients.flush()
+                    .context(format!("Failed to flush recipients file at '{}'", recipients_file.display()))?;
                 Ok(format!("vault initialized at '{}'", vault_path.display()))
             }
         }
@@ -140,7 +152,13 @@ pub fn do_it(ctx: Context) -> Result<String, Error> {
         VaultCommand::Init {
             gpg_key_ids,
             gpg_keys_dir,
-        } => init(gpg_key_ids, &gpg_keys_dir, &ctx.vault_path),
+            recipients_file,
+        } => init(
+            gpg_key_ids,
+            &gpg_keys_dir,
+            &recipients_file,
+            &ctx.vault_path,
+        ),
         VaultCommand::List => {
             Vault::from_file(&ctx.vault_path)?;
             Ok(String::new())
