@@ -13,6 +13,15 @@ function title () {
   echo "$WHITE-----------------------------------------------------"
 }
 
+function sandboxed () {
+  sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
+  echo 1>&2 "$WHITE<--  begin sandbox -->"
+  # shellcheck disable=2064
+  trap "popd >/dev/null && echo 1>&2 '$WHITE<-- end sandbox -->'" EXIT
+  pushd "$sandbox_tempdir" >/dev/null \
+   || fail "Could not change directory into temporary directory."
+}
+
 function with () {
     CONTEXT="[with] $* "
 }
@@ -32,9 +41,12 @@ function fail () {
   exit 1
 }
 
-function expect_match () {
+function expect_snapshot () {
   local expected=${1:?}
   local actual=${2:?}
+  if ! [ -e "$expected" ]; then
+    cp -R $actual $expected
+  fi
   expect_run 0 diff "$expected" "$actual"
 }
 

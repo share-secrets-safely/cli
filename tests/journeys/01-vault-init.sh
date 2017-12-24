@@ -19,8 +19,8 @@ with "no available gpg key and no key" && {
 }
 
 fixture="$root/fixtures"
-mkdir /sandbox && cd /sandbox || exit
-with "a single gpg secret key available" && {
+(sandboxed && {
+  with "a single gpg secret key available" && {
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
       WITH_OUTPUT="vault initialized at './s3-vault.yml'" expect_run $SUCCESSFULLY "$exe" vault init
@@ -28,29 +28,57 @@ with "a single gpg secret key available" && {
     it "creates a valid vault configuration file, \
         exports the public portion of the key to the correct spot and \
         writes the list of recipients" && {
-      expect_match "$fixture/vault-init-single-user" .
+      expect_snapshot "$fixture/vault-init-single-user" .
     }
-}
-
-with "an existing vault configuration file" && {
-  it "fails as it cannot possibly overwrite anything" && {
-    WITH_OUTPUT="Cannot.*overwrite.*s3-vault.yml.*" expect_run $WITH_FAILURE "$exe" vault init
   }
-}
-
-with "an existing gpg-keys directory" && {
-  it "fails as it cannot possibly overwrite anything" && {
-    WITH_OUTPUT="Cannot.*export.*keys.*\.gpg-keys" expect_run $WITH_FAILURE "$exe" vault -c a-different-file.yml init
+  
+  with "an existing vault configuration file" && {
+    it "fails as it cannot possibly overwrite anything" && {
+      WITH_OUTPUT="Cannot.*overwrite.*s3-vault.yml.*" expect_run $WITH_FAILURE "$exe" vault init
+    }
   }
-}
-
-with "an existing recipients file" && {
-  it "fails as it cannot possibly overwrite anything" && {
-    WITH_OUTPUT="Cannot.*write.*\.gpg-id.*" expect_run $WITH_FAILURE "$exe" vault -c a-different-file-too.yml init -k some-nonexisting-directory
+  
+  with "an existing gpg-keys directory" && {
+    it "fails as it cannot possibly overwrite anything" && {
+      WITH_OUTPUT="Cannot.*export.*keys.*\.gpg-keys" expect_run $WITH_FAILURE "$exe" vault -c a-different-file.yml init
+    }
   }
-}
+  
+  with "an existing recipients file" && {
+    it "fails as it cannot possibly overwrite anything" && {
+      WITH_OUTPUT="Cannot.*write.*\.gpg-id.*" expect_run $WITH_FAILURE "$exe" vault -c a-different-file-too.yml init -k some-nonexisting-directory
+    }
+  }
+})
 
-# TODO: - assure signatures are exported too (should be, but needs test)
+(sandboxed && {
+  with "a gpg key signed by others" && {
+    gpg --import "$fixture/c.sec.asc" &>/dev/null
+    it "fails as it can't decide which gpg key to export" && {
+      WITH_OUTPUT="Found 2 viable keys for key-ids" expect_run $WITH_FAILURE "$exe" vault init
+    }
+    with "a selected gpg key" && {
+      it "succeeds as it just follow instructions" && {
+        WITH_OUTPUT="vault initialized at './s3-vault.yml'" expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com
+      }
+      
+      it "creates a valid vault configuration file, \
+          exports the public portion of the selected key with signatures and \
+          writes the list of recipients" && {
+        expect_snapshot "$fixture/vault-init-single-user-with-multiple-signatures" .
+      }
+    }
+  }
+})
 
-
-
+(sandboxed && {
+  with "a multiple selected gpg keys" && {
+    it "succeeds as it just follow instructions" && {
+      WITH_OUTPUT="vault initialized at './s3-vault.yml'" expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com --gpg-key-id tester@example.com
+    }
+    
+    it "creates the expected folder structure" && {
+      expect_snapshot "$fixture/vault-init-multiple-users" .
+    }
+  }
+})

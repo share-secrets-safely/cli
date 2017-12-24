@@ -35,10 +35,13 @@ pub fn init(
 
     if keys.len() > 1 && gpg_key_ids.is_empty() {
         return Err(format_err!(
-            "Found {} viable keys for key-ids {:?}, which is ambiguous. \
+            "Found {} viable keys for key-ids ({:?}), which is ambiguous. \
              Please specify one with the --gpg-key-id argument.",
             keys.len(),
-            gpg_key_ids
+            keys.iter()
+                .flat_map(|k| k.user_ids())
+                .map(|u| u.id().unwrap_or("[none]"))
+                .collect::<Vec<_>>(),
         ));
     };
 
