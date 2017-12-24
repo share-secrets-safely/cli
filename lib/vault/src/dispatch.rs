@@ -13,7 +13,7 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             gpg_keys_dir,
             recipients_file,
         } => init(
-            gpg_key_ids,
+            &gpg_key_ids,
             &gpg_keys_dir,
             &recipients_file,
             &ctx.vault_path,

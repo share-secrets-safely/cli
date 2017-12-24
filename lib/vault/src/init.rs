@@ -9,31 +9,31 @@ use std::io::Write;
 use types::Vault;
 
 pub fn init(
-    gpg_key_ids: Vec<String>,
+    gpg_key_ids: &[String],
     gpg_keys_dir: &Path,
     recipients_file: &Path,
     vault_path: &Path,
 ) -> Result<String, Error> {
     let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
     let keys = {
-        let mut keys_iter = gpg_ctx.find_secret_keys(&gpg_key_ids)?;
+        let mut keys_iter = gpg_ctx.find_secret_keys(gpg_key_ids)?;
         let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
 
         if keys_iter.finish()?.is_truncated() {
-            return Err(format_err!(
-                "The key list was truncated unexpectedly, while iterating it"
+            return Err(err_msg(
+                "The key list was truncated unexpectedly, while iterating it",
             ));
         }
         keys
     };
 
-    if keys.len() == 0 {
+    if keys.is_empty() {
         return Err(err_msg(
             "No existing GPG key found for which you have a secret key. Please create one and try again.",
         ));
     }
 
-    if keys.len() > 1 && gpg_key_ids.len() == 0 {
+    if keys.len() > 1 && gpg_key_ids.is_empty() {
         return Err(format_err!(
             "Found {} viable keys for key-ids {:?}, which is ambiguous. \
              Please specify one with the --gpg-key-id argument.",
@@ -88,7 +88,7 @@ pub fn init(
         let key_path = {
             let fingerprint = key.fingerprint().map_err(|e| {
                 e.map(Into::into)
-                    .unwrap_or(err_msg("Fingerprint extraction failed"))
+                    .unwrap_or_else(|| err_msg("Fingerprint extraction failed"))
             })?;
             writeln!(recipients, "{}", fingerprint).context(format!(
                 "Could not append fingerprint to file at '{}'",
@@ -98,8 +98,8 @@ pub fn init(
         };
         gpg_ctx
             .export_keys([key].iter(), mode, &mut output)
-            .context(format!(
-                "Failed to export at least one public key with signatures."
+            .context(err_msg(
+                "Failed to export at least one public key with signatures.",
             ))?;
         write_at(&key_path)
             .and_then(|mut f| f.write_all(&output))

@@ -36,7 +36,7 @@ impl Vault {
             Box::new(stdin())
         } else {
             Box::new(File::open(path)
-                .map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Read))?)
+                .map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
         };
         serde_yaml::from_reader(reader).map_err(|cause| VaultError::Deserialization {
             cause,
@@ -49,14 +49,14 @@ impl Vault {
             return Err(VaultError::ConfigurationFileExists(path.to_owned()));
         }
         let mut file =
-            write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))?;
+            write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
         serde_yaml::to_writer(&file, self)
             .map_err(|cause| VaultError::Serialization {
                 cause,
                 path: path.to_owned(),
             })
             .and_then(|_| {
-                writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))
+                writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))
             })
     }
 }

@@ -17,7 +17,7 @@ use std::str::FromStr;
 use std::convert::Into;
 use std::ffi::OsStr;
 
-const CLI_NAME: &'static str = "s3";
+const CLI_NAME: &str = "s3";
 
 fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
@@ -32,7 +32,7 @@ where
     }
 }
 
-fn _required_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
+fn _required_arg<T>(args: &ArgMatches, name: &'static str) -> Result<T, Error>
 where
     T: FromStr,
     <T as FromStr>::Err: 'static + ::std::error::Error + Send + Sync,
@@ -101,7 +101,7 @@ fn extraction_context_from(args: &ArgMatches) -> Result<ExtractionContext, Error
 
 fn generate_completions(mut app: App, args: &ArgMatches) -> Result<String, Error> {
     let shell = args.value_of("shell")
-        .ok_or(err_msg("expected 'shell' argument"))
+        .ok_or_else(|| err_msg("expected 'shell' argument"))
         .map(|s| {
             Path::new(s)
                 .file_name()
@@ -136,7 +136,7 @@ fn main() {
                          $SHELL variable.",
                     );
                     if let Ok(shell) = shell.as_ref() {
-                        arg.default_value(&shell)
+                        arg.default_value(shell)
                     } else {
                         arg
                     }
@@ -216,7 +216,7 @@ fn main() {
     let matches: ArgMatches = app.get_matches();
 
     let res = match matches.subcommand() {
-        ("completions", Some(args)) => generate_completions(appc, &args),
+        ("completions", Some(args)) => generate_completions(appc, args),
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
@@ -233,7 +233,7 @@ fn main() {
     };
 
     let msg = ok_or_exit(res);
-    if msg.len() > 0 {
+    if !msg.is_empty() {
         ok_or_exit(writeln!(stdout(), "{}", msg));
     }
 }
