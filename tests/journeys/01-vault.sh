@@ -11,7 +11,7 @@ source "$root/../utilities.sh"
 WITH_FAILURE=1
 SUCCESSFULLY=0
 
-title "'vault init' - without any gpg information"
+title "'vault init'"
 
 with "no available gpg key and no key" && {
     it "fails as it cannot identify the user" && \
@@ -80,6 +80,28 @@ snapshot="$root/fixtures/snapshots"
     
     it "creates the expected folder structure" && {
       expect_snapshot "$snapshot/vault-init-multiple-users" .
+    }
+  }
+})
+
+
+title "'vault add'"
+
+(sandboxed && {
+  with "a vault initialized for a single recipient" && {
+    ( set -e
+      gpg --batch --yes --delete-secret-keys 905E53FE2FC0A500100AB80B056F92A52DF04D4E
+      "$exe" vault init
+    ) > /dev/null
+    
+    when "adding new resource from stdin" && {
+      it "succeeds" && {
+        WITH_OUTPUT="Added './from-stdin'" expect_run $SUCCESSFULLY "$exe" vault add content -:from-stdin
+      }
+      
+      it "creates an encrypted file" && {
+        expect_exists ./from-stdin.gpg
+      }
     }
   }
 })

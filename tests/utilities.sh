@@ -26,6 +26,10 @@ function with () {
     CONTEXT="[with] $* "
 }
 
+function when () {
+    CONTEXT="[when] $* "
+}
+
 function without_context() {
     # shellcheck disable=SC2034
     CONTEXT=""
@@ -39,6 +43,10 @@ function it () {
 function fail () {
   echo 1>&2 "$RED" "$@"
   exit 1
+}
+
+function expect_exists () {
+  expect_run 0 test -e "${1:?}"
 }
 
 function expect_snapshot () {
