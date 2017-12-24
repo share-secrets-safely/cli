@@ -32,10 +32,25 @@ with "a single gpg secret key available" && {
     }
 }
 
-# TODO: - test actual content of directory and file
-#       - assure signatures are exported too (should be, but needs test)
-#       - non-empty directory
-#       - specify vault by .gpg-id file
+with "an existing vault configuration file" && {
+  it "fails as it cannot possibly overwrite anything" && {
+    WITH_OUTPUT="Cannot.*overwrite.*s3-vault.yml.*" expect_run $WITH_FAILURE "$exe" vault init
+  }
+}
+
+with "an existing gpg-keys directory" && {
+  it "fails as it cannot possibly overwrite anything" && {
+    WITH_OUTPUT="Cannot.*export.*keys.*\.gpg-keys" expect_run $WITH_FAILURE "$exe" vault -c a-different-file.yml init
+  }
+}
+
+with "an existing recipients file" && {
+  it "fails as it cannot possibly overwrite anything" && {
+    WITH_OUTPUT="Cannot.*write.*\.gpg-id.*" expect_run $WITH_FAILURE "$exe" vault -c a-different-file-too.yml init -k some-nonexisting-directory
+  }
+}
+
+# TODO: - assure signatures are exported too (should be, but needs test)
 
 
 

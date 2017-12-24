@@ -5,6 +5,7 @@ use std::fmt;
 
 #[derive(Debug, Fail)]
 pub enum VaultError {
+    ConfigurationFileExists(PathBuf),
     ReadFile {
         #[cause] cause: io::Error,
         path: PathBuf,
@@ -27,6 +28,11 @@ impl fmt::Display for VaultError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::VaultError::*;
         match self {
+            &ConfigurationFileExists(ref path) => writeln!(
+                f,
+                "Cannot overwrite vault configuration file as it already exists at '{}'",
+                path.display()
+            ),
             &Serialization { ref path, .. } => writeln!(
                 f,
                 "Failed to serialize vault configuration file at '{}'",

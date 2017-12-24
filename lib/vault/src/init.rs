@@ -49,7 +49,21 @@ pub fn init(
     };
     vault.to_file(vault_path)?;
 
-    if !gpg_keys_dir.is_dir() {
+    if gpg_keys_dir.is_dir() {
+        let num_entries = gpg_keys_dir
+            .read_dir()
+            .context(format!(
+                "Failed to open directory '{}' to see if it is empty.",
+                gpg_keys_dir.display()
+            ))?
+            .count();
+        if num_entries > 0 {
+            return Err(format_err!(
+                "Cannot export keys into existing, non-empty directory at '{}'",
+                gpg_keys_dir.display()
+            ));
+        }
+    } else {
         create_dir_all(gpg_keys_dir).context(format!(
             "Failed to create directory at '{}' for exporting public gpg keys to.",
             gpg_keys_dir.display()
@@ -60,6 +74,12 @@ pub fn init(
 
     let mut output = Vec::new();
     let mode = gpgme::ExportMode::empty();
+    if recipients_file.is_file() {
+        return Err(format_err!(
+            "Cannot write recipients into existing file at '{}'",
+            recipients_file.display()
+        ));
+    }
     let mut recipients = write_at(recipients_file).context(format!(
         "Failed to open recipients file at '{}'",
         recipients_file.display()

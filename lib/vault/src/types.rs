@@ -45,6 +45,9 @@ impl Vault {
     }
 
     pub fn to_file(&self, path: &Path) -> Result<(), VaultError> {
+        if path.exists() {
+            return Err(VaultError::ConfigurationFileExists(path.to_owned()));
+        }
         let mut file =
             write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, IOMode::Write))?;
         serde_yaml::to_writer(&file, self)
