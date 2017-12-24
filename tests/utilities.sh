@@ -45,7 +45,7 @@ function expect_snapshot () {
   local expected=${1:?}
   local actual=${2:?}
   if ! [ -e "$expected" ]; then
-    cp -R $actual $expected
+    cp -R "$actual" "$expected"
   fi
   expect_run 0 diff "$expected" "$actual"
 }

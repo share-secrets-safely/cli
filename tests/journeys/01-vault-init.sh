@@ -19,6 +19,7 @@ with "no available gpg key and no key" && {
 }
 
 fixture="$root/fixtures"
+snapshot="$root/fixtures/snapshots"
 (sandboxed && {
   with "a single gpg secret key available" && {
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
@@ -28,7 +29,7 @@ fixture="$root/fixtures"
     it "creates a valid vault configuration file, \
         exports the public portion of the key to the correct spot and \
         writes the list of recipients" && {
-      expect_snapshot "$fixture/vault-init-single-user" .
+      expect_snapshot "$snapshot/vault-init-single-user" .
     }
   }
   
@@ -65,7 +66,7 @@ fixture="$root/fixtures"
       it "creates a valid vault configuration file, \
           exports the public portion of the selected key with signatures and \
           writes the list of recipients" && {
-        expect_snapshot "$fixture/vault-init-single-user-with-multiple-signatures" .
+        expect_snapshot "$snapshot/vault-init-single-user-with-multiple-signatures" .
       }
     }
   }
@@ -78,7 +79,7 @@ fixture="$root/fixtures"
     }
     
     it "creates the expected folder structure" && {
-      expect_snapshot "$fixture/vault-init-multiple-users" .
+      expect_snapshot "$snapshot/vault-init-multiple-users" .
     }
   }
 })

@@ -197,7 +197,7 @@ fn main() {
                         .short("c")
                         .required(true)
                         .value_name("path")
-                        .help("Path to the vault configuration file.")
+                        .help("Path to the vault configuration YAML file.")
                         .default_value("./s3-vault.yml"),
                 ),
         )
