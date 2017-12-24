@@ -5,7 +5,7 @@ YELLOW="$(tput setaf 3)"
 GREEN="$(tput setaf 2)"
 RED="$(tput setaf 1)"
 IT_COUNT=0
-CONTEXT=
+CONTEXT=( )
 
 function title () {
   echo "$WHITE-----------------------------------------------------"
@@ -23,21 +23,20 @@ function sandboxed () {
 }
 
 function with () {
-    CONTEXT="[with] $* "
+    CONTEXT+=("[with] $*")
 }
 
 function when () {
-    CONTEXT="[when] $* "
+    CONTEXT+=("[when] $*")
 }
 
-function without_context() {
-    # shellcheck disable=SC2034
-    CONTEXT=""
+function end() {
+  unset 'CONTEXT[${#CONTEXT[@]}-1]'
 }
 
 function it () {
   IT_COUNT=$(( IT_COUNT + 1 ))
-  echo 1>&2 -n "${YELLOW}${CONTEXT}${GREEN}[it] ${*//  /}"
+  echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${GREEN} [it] ${*//  /}"
 }
 
 function fail () {
