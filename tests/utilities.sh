@@ -15,9 +15,8 @@ function title () {
 
 function sandboxed () {
   sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
-  echo 1>&2 "$WHITE<--  begin sandbox -->"
   # shellcheck disable=2064
-  trap "popd >/dev/null && echo 1>&2 '$WHITE<-- end sandbox -->'" EXIT
+  trap "popd >/dev/null" EXIT
   pushd "$sandbox_tempdir" >/dev/null \
    || fail "Could not change directory into temporary directory."
 }

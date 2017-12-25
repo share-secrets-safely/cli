@@ -22,6 +22,8 @@ title "'vault init'"
 fixture="$root/fixtures"
 snapshot="$root/fixtures/snapshots"
 (sandboxed
+  title "'vault init' - overwrite protection"
+
   (with "a single gpg secret key available"
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
@@ -58,6 +60,7 @@ snapshot="$root/fixtures/snapshots"
 )
 
 (sandboxed
+  title "'vault init' - multiple gpg keys available"
   (with "a gpg key signed by others"
     gpg --import "$fixture/c.sec.asc" &>/dev/null
     it "fails as it can't decide which gpg key to export" && {
@@ -80,6 +83,7 @@ snapshot="$root/fixtures/snapshots"
 )
 
 (sandboxed
+  title "'vault init' - use multiple secret keys"
   (with "a multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
       WITH_OUTPUT="vault initialized at './s3-vault.yml'" \
@@ -93,9 +97,9 @@ snapshot="$root/fixtures/snapshots"
 )
 
 
-title "'vault add'"
 
 (sandboxed 
+  title "'vault add'"
   (with "a vault initialized for a single recipient"
     ( set -e
       gpg --batch --yes --delete-secret-keys 905E53FE2FC0A500100AB80B056F92A52DF04D4E
