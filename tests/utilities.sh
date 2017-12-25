@@ -68,6 +68,7 @@ function expect_run () {
     if [[ -n "${WITH_OUTPUT-}" ]]; then
         if ! echo "$output" | tr '\n' ' ' | grep -qE "$WITH_OUTPUT"; then
             echo 1>&2 "$RED" " - FAIL"
+            echo 1>&2 "${WHITE}\$" "$@"
             echo 1>&2 "Output did not match '$WITH_OUTPUT'"
             echo 1>&2 "$output"
             exit $IT_COUNT

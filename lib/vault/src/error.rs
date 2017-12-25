@@ -50,7 +50,7 @@ impl fmt::Display for VaultError {
             ),
             ReadFile { ref path, .. } => writeln!(
                 f,
-                "Failed to create vault configuration file at '{}'",
+                "Failed to read vault configuration file at '{}'",
                 path.display()
             ),
         }

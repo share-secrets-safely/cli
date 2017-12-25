@@ -84,7 +84,7 @@ fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
 fn vault_resource_add_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::ResourceAdd {
-            specs: match args.values_of("url") {
+            specs: match args.values_of("spec") {
                 Some(v) => v.map(|s| s.try_into()).collect::<Result<_, _>>()?,
                 None => Vec::new(),
             },
@@ -191,7 +191,7 @@ fn main() {
         .arg(
             Arg::with_name("spec")
                 .required(true)
-                .multiple(true)
+                .multiple(false)
                 .takes_value(true)
                 .value_name("spec")
                 .help("A specification identifying a mapping from a source file to be stored \

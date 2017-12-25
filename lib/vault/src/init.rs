@@ -16,7 +16,7 @@ pub fn init(
 ) -> Result<String, Error> {
     let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
     let keys = {
-        let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
+        let mut keys_iter = gpg_ctx.find_secret_keys(gpg_key_ids)?;
         let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
 
         if keys_iter.finish()?.is_truncated() {

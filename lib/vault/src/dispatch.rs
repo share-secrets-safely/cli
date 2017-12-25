@@ -19,7 +19,9 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             &recipients_file,
             &ctx.vault_path,
         ),
-        VaultCommand::ResourceAdd { specs } => resource::add(&ctx.vault_path, &specs),
+        VaultCommand::ResourceAdd { specs } => {
+            resource::add(Vault::from_file(&ctx.vault_path)?, &specs)
+        }
         VaultCommand::List => {
             Vault::from_file(&ctx.vault_path)?;
             Ok(String::new())
