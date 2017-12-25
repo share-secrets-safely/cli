@@ -21,7 +21,7 @@ pub enum VaultCommand {
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultSpec {
-    src: PathBuf,
+    src: Option<PathBuf>,
     dst: PathBuf,
 }
 
@@ -46,14 +46,11 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
     fn try_from(input: &'a str) -> Result<Self, Self::Err> {
         const SEPARATOR: char = ':';
         let validate = |src: &'a str| {
-            if src.is_empty() {
-                Err(VaultSpecError(format!(
-                    "'{}' does not contain a source.",
-                    input
-                )))
+            Ok(if src.is_empty() {
+                None
             } else {
-                Ok(src)
-            }
+                Some(PathBuf::from(src))
+            })
         };
         let validate_dst = |p: PathBuf| {
             if p.is_absolute() {
@@ -69,15 +66,21 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
         let mut splits = input.splitn(2, SEPARATOR);
         Ok(match (splits.next(), splits.next()) {
             (Some(src), None) => VaultSpec {
-                src: PathBuf::from(validate(src)?),
+                src: validate(src)?,
                 dst: validate_dst(PathBuf::from(src)).map_err(|mut e| {
                     e.0.push_str(" Try specifying the destination explicitly.");
                     e
                 })?,
             },
             (Some(src), Some(dst)) => VaultSpec {
-                src: PathBuf::from(validate(src)?),
+                src: validate(src)?,
                 dst: validate_dst(PathBuf::from(if dst.is_empty() {
+                    if src.is_empty() {
+                        return Err(VaultSpecError(format!(
+                            "'{}' does not contain a destination.",
+                            input
+                        )));
+                    }
                     src
                 } else if dst.contains(SEPARATOR) {
                     return Err(VaultSpecError(format!(
@@ -114,7 +117,7 @@ mod tests_vault_spec {
         assert_eq!(
             VaultSpec::try_from(invalid),
             Err(VaultSpecError(format!(
-                "'{}' does not contain a source.",
+                "'{}' must not contain more than one colon.",
                 invalid
             )))
         )
@@ -125,7 +128,7 @@ mod tests_vault_spec {
         assert_eq!(
             VaultSpec::try_from(invalid),
             Err(VaultSpecError(format!(
-                "'{}' does not contain a source.",
+                "'{}' does not contain a destination.",
                 invalid
             )))
         )
@@ -142,11 +145,22 @@ mod tests_vault_spec {
         )
     }
     #[test]
+    fn it_is_ok_to_not_specify_a_source_to_signal_stdin() {
+        assert_eq!(
+            VaultSpec::try_from(":other/path"),
+            Ok(VaultSpec {
+                src: None,
+                dst: PathBuf::from("other/path"),
+            })
+        )
+    }
+
+    #[test]
     fn it_is_created_from_relative_source_and_relative_destination() {
         assert_eq!(
             VaultSpec::try_from("relative/path:other/path"),
             Ok(VaultSpec {
-                src: PathBuf::from("relative/path"),
+                src: Some(PathBuf::from("relative/path")),
                 dst: PathBuf::from("other/path"),
             })
         )
@@ -158,7 +172,7 @@ mod tests_vault_spec {
         assert_eq!(
             VaultSpec::try_from("relative/path:"),
             Ok(VaultSpec {
-                src: PathBuf::from("relative/path"),
+                src: Some(PathBuf::from("relative/path")),
                 dst: PathBuf::from("relative/path"),
             })
         )
@@ -168,7 +182,7 @@ mod tests_vault_spec {
         assert_eq!(
             VaultSpec::try_from("relative/path"),
             Ok(VaultSpec {
-                src: PathBuf::from("relative/path"),
+                src: Some(PathBuf::from("relative/path")),
                 dst: PathBuf::from("relative/path"),
             })
         )

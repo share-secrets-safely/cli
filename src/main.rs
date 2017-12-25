@@ -195,10 +195,10 @@ fn main() {
                 .takes_value(true)
                 .value_name("spec")
                 .help("A specification identifying a mapping from a source file to be stored \
-                in a location of the vault. It takes the form '<src>[:<dst>]', where \
+                in a location of the vault. It takes the form '<src>:<dst>', where \
                 '<src>' is equivalent to '<src>:<src>'.\
                 <dst> should be vault-relative paths, whereas <src> must point to a readable file \
-                and can be '-' to read from standard input."),
+                and can be empty to read from standard input, such as in ':<dst>'."),
         );
     let resource = App::new("resource")
         .alias("contents")

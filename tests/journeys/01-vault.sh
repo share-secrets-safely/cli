@@ -111,7 +111,7 @@ snapshot="$root/fixtures/snapshots"
     (when "adding new resource from stdin"
       it "succeeds" && {
         WITH_OUTPUT="Added './from-stdin'" \
-        expect_run $SUCCESSFULLY "$exe" vault resource add --  -:from-stdin
+        expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
       }
       
       it "creates an encrypted file" && {
@@ -123,7 +123,7 @@ snapshot="$root/fixtures/snapshots"
       
       it "fails as it won't overwrite existing resources" && {
         WITH_OUTPUT="Added './from-stdin'" \
-        expect_run $WITH_FAILURE "$exe" vault contents add -- -:from-stdin
+        expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
       }
       
       it "does not change the previous file" && {
