@@ -39,6 +39,10 @@ function fail () {
   exit 1
 }
 
+function expect_equals () {
+  expect_run 0 test -eq "${1:?}" "${2:?}"
+}
+
 function expect_exists () {
   expect_run 0 test -e "${1:?}"
 }
@@ -56,6 +60,7 @@ function expect_run () {
   local expected_exit_code=$1
   shift
   local output=
+  set +e
   output="$("$@" 2>&1)"
 
   local actual_exit_code=$?
@@ -76,4 +81,5 @@ function expect_run () {
     echo 1>&2 "$output"
     exit $IT_COUNT
   fi
+  set -e
 }

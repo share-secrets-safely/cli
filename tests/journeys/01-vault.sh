@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -u
+set -eu
 exe=${1:?First argument is the executable under test}
 
 root="$(cd "${0%/*}" && pwd)"
@@ -102,18 +102,32 @@ snapshot="$root/fixtures/snapshots"
   title "'vault add'"
   (with "a vault initialized for a single recipient"
     ( set -e
-      gpg --batch --yes --delete-secret-keys 905E53FE2FC0A500100AB80B056F92A52DF04D4E
+      KEY=905E53FE2FC0A500100AB80B056F92A52DF04D4E
+      gpg --batch --yes --delete-secret-keys $KEY
+      gpg --batch --yes --delete-keys $KEY
       "$exe" vault init
     ) > /dev/null
     
     (when "adding new resource from stdin"
       it "succeeds" && {
         WITH_OUTPUT="Added './from-stdin'" \
-        expect_run $SUCCESSFULLY "$exe" vault add content -:from-stdin
+        expect_run $SUCCESSFULLY "$exe" vault content add -:from-stdin
       }
       
       it "creates an encrypted file" && {
         expect_exists ./from-stdin.gpg
+      }
+    )
+    (when "adding the same resource from stdin"
+      previous_resource_id=$(md5sum ./from-stdin.gpg)
+      
+      it "fails as it won't overwrite existing resources" && {
+        WITH_OUTPUT="Added './from-stdin'" \
+        expect_run $WITH_FAILURE "$exe" vault content add -:from-stdin
+      }
+      
+      it "does not change the previous file" && {
+        expect_equals "$previous_resource_id" "$(md5sum ./from-stdin.gpg)"
       }
     )
   )
