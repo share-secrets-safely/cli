@@ -1,13 +1,96 @@
+extern crate conv;
+extern crate failure;
+
+use conv::TryFrom;
+use std::fmt;
+
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum VaultCommand {
+    ResourceAdd {
+        specs: Vec<VaultSpec>,
+    },
     Init {
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
         recipients_file: PathBuf,
     },
     List,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct VaultSpec {
+    src: PathBuf,
+    dst: PathBuf,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct VaultSpecError(String);
+
+impl fmt::Display for VaultSpecError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+impl ::std::error::Error for VaultSpecError {
+    fn description(&self) -> &str {
+        "The vault spec was invalid"
+    }
+}
+
+impl<'a> TryFrom<&'a str> for VaultSpec {
+    type Err = VaultSpecError;
+
+    fn try_from(input: &'a str) -> Result<Self, Self::Err> {
+        const SEPARATOR: char = ':';
+        let validate = |src: &'a str| {
+            if src.is_empty() {
+                Err(VaultSpecError(format!(
+                    "'{}' does not contain a source.",
+                    input
+                )))
+            } else {
+                Ok(src)
+            }
+        };
+        let validate_dst = |p: PathBuf| {
+            if p.is_absolute() {
+                return Err(VaultSpecError(format!(
+                    "'{}' must not have an absolute destination.",
+                    input
+                )));
+            } else {
+                Ok(p)
+            }
+        };
+
+        let mut splits = input.splitn(2, SEPARATOR);
+        Ok(match (splits.next(), splits.next()) {
+            (Some(src), None) => VaultSpec {
+                src: PathBuf::from(validate(src)?),
+                dst: validate_dst(PathBuf::from(src)).map_err(|mut e| {
+                    e.0.push_str(" Try specifying the destination explicitly.");
+                    e
+                })?,
+            },
+            (Some(src), Some(dst)) => VaultSpec {
+                src: PathBuf::from(validate(src)?),
+                dst: validate_dst(PathBuf::from(if dst.is_empty() {
+                    src
+                } else if dst.contains(SEPARATOR) {
+                    return Err(VaultSpecError(format!(
+                        "'{}' must not contain more than one colon.",
+                        input
+                    )));
+                } else {
+                    dst
+                }))?,
+            },
+            _ => unimplemented!(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -19,4 +102,99 @@ pub struct VaultContext {
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct ExtractionContext {
     pub file_path: PathBuf,
+}
+
+#[cfg(test)]
+mod tests_vault_spec {
+    use super::*;
+
+    #[test]
+    fn it_cannot_have_just_a_multiple_separator() {
+        let invalid = ":::";
+        assert_eq!(
+            VaultSpec::try_from(invalid),
+            Err(VaultSpecError(format!(
+                "'{}' does not contain a source.",
+                invalid
+            )))
+        )
+    }
+    #[test]
+    fn it_cannot_have_just_a_separator() {
+        let invalid = ":";
+        assert_eq!(
+            VaultSpec::try_from(invalid),
+            Err(VaultSpecError(format!(
+                "'{}' does not contain a source.",
+                invalid
+            )))
+        )
+    }
+    #[test]
+    fn it_cannot_have_more_than_one_separator() {
+        let invalid = "relative/path:other/path:yet/another/path";
+        assert_eq!(
+            VaultSpec::try_from(invalid),
+            Err(VaultSpecError(format!(
+                "'{}' must not contain more than one colon.",
+                invalid
+            )))
+        )
+    }
+    #[test]
+    fn it_is_created_from_relative_source_and_relative_destination() {
+        assert_eq!(
+            VaultSpec::try_from("relative/path:other/path"),
+            Ok(VaultSpec {
+                src: PathBuf::from("relative/path"),
+                dst: PathBuf::from("other/path"),
+            })
+        )
+    }
+
+    #[test]
+    fn it_is_created_from_relative_source_fills_destination_with_source_when_using_a_single_colon()
+    {
+        assert_eq!(
+            VaultSpec::try_from("relative/path:"),
+            Ok(VaultSpec {
+                src: PathBuf::from("relative/path"),
+                dst: PathBuf::from("relative/path"),
+            })
+        )
+    }
+    #[test]
+    fn it_is_created_from_relative_source_fills_destination_with_source() {
+        assert_eq!(
+            VaultSpec::try_from("relative/path"),
+            Ok(VaultSpec {
+                src: PathBuf::from("relative/path"),
+                dst: PathBuf::from("relative/path"),
+            })
+        )
+    }
+
+    #[test]
+    fn it_does_not_allow_an_absolute_destination_even_if_it_is_inferred() {
+        let invalid = "/absolute/path";
+        assert_eq!(
+            VaultSpec::try_from(invalid),
+            Err(VaultSpecError(format!(
+                "'{}' must not have an absolute destination. Try specifying the destination explicitly.",
+                invalid
+            )))
+        )
+    }
+
+    #[test]
+    fn it_does_not_allow_an_absolute_destination() {
+        let invalid = "relative/path:/absolute/path";
+        assert_eq!(
+            VaultSpec::try_from(invalid),
+            Err(VaultSpecError(format!(
+                "'{}' must not have an absolute destination.",
+                invalid
+            )))
+        )
+    }
 }

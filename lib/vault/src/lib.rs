@@ -14,6 +14,7 @@ mod util;
 mod types;
 mod dispatch;
 mod init;
+mod resource;
 
 pub use init::init;
 pub use dispatch::do_it;
