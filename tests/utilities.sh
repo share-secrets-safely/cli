@@ -30,10 +30,6 @@ function when () {
     CONTEXT+=("[when] $*")
 }
 
-function end() {
-  unset 'CONTEXT[${#CONTEXT[@]}-1]'
-}
-
 function it () {
   IT_COUNT=$(( IT_COUNT + 1 ))
   echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${GREEN} [it] ${*//  /}"
