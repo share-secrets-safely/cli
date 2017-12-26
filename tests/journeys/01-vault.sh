@@ -10,6 +10,9 @@ source "$root/../utilities.sh"
 
 WITH_FAILURE=1
 SUCCESSFULLY=0
+C_FPR=905E53FE2FC0A500100AB80B056F92A52DF04D4E
+TESTER_FPR=D6339718E9B58FCE3C66C78AAA5B7BF150F48332
+
 
 title "'vault init'"
 
@@ -97,21 +100,26 @@ snapshot="$root/fixtures/snapshots"
 )
 
 
+function trust_key () {
+  {
+    gpg --export-ownertrust
+    echo "${1:?}:6:"
+  } | gpg --import-ownertrust
+}
 
 (sandboxed 
   title "'vault add'"
   (with "a vault initialized for a single recipient"
-    ( set -e
-      KEY=905E53FE2FC0A500100AB80B056F92A52DF04D4E
-      gpg --batch --yes --delete-secret-keys $KEY
-      gpg --batch --yes --delete-keys $KEY
+    ( gpg --batch --yes --delete-secret-keys $C_FPR
+      gpg --batch --yes --delete-keys $C_FPR
+      trust_key $TESTER_FPR
       "$exe" vault init
-    ) > /dev/null
+    ) &> /dev/null
     
     (when "adding new resource from stdin"
       it "succeeds" && {
         WITH_OUTPUT="Added './from-stdin'" \
-        expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
+        echo hi | expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
       }
       
       it "creates an encrypted file" && {
@@ -119,11 +127,11 @@ snapshot="$root/fixtures/snapshots"
       }
     )
     (when "adding the same resource from stdin"
-      previous_resource_id=$(md5sum ./from-stdin.gpg)
+      previous_resource_id="$(md5sum ./from-stdin.gpg)"
       
       it "fails as it won't overwrite existing resources" && {
         WITH_OUTPUT="Added './from-stdin'" \
-        expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
+        echo hi | expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
       }
       
       it "does not change the previous file" && {

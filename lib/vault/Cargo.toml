@@ -10,6 +10,7 @@ gpgme = { version = "0.6.1", default-features = false, features = ["v1_8_0"] }
 serde = "1.0.24"
 serde_derive = "1.0.24"
 serde_yaml = "0.7.3"
+itertools = "0.7.4"
 
 [dependencies.s3-types]
 path = "../types"

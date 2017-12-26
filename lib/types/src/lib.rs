@@ -1,10 +1,27 @@
 extern crate conv;
+#[macro_use]
 extern crate failure;
 
 use conv::TryFrom;
 use std::fmt;
+use std::fs::{File, OpenOptions};
+use std::io::{stdin, Read};
 
-use std::path::PathBuf;
+use failure::{Error, ResultExt};
+use std::path::{Path, PathBuf};
+
+pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
+    let file_name = path.file_name()
+        .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
+    Ok(path.parent()
+        .expect("path with filename to have a root")
+        .join(format!(
+            "{}.gpg",
+            file_name
+                .to_str()
+                .expect("filename to be decodable with UTF8")
+        )))
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum VaultCommand {
@@ -34,9 +51,58 @@ impl fmt::Display for VaultSpecError {
     }
 }
 
+impl fmt::Display for VaultSpec {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let empty = PathBuf::new();
+        write!(
+            f,
+            "{}:{}",
+            self.src.as_ref().unwrap_or_else(|| &empty).display(),
+            self.dst.display()
+        )
+    }
+}
+
 impl ::std::error::Error for VaultSpecError {
     fn description(&self) -> &str {
         "The vault spec was invalid"
+    }
+}
+
+impl VaultSpec {
+    pub fn source(&self) -> Option<&Path> {
+        self.src.as_ref().map(|s| s.as_ref())
+    }
+
+    pub fn destination(&self) -> &Path {
+        &self.dst
+    }
+
+    pub fn open_output(&self, root: &Path) -> Result<File, Error> {
+        let output_file = root.join(gpg_output_filename(&self.dst)?);
+        if output_file.exists() {
+            return Err(format_err!(
+                "Refusing to overwrite existing file at '{}'",
+                output_file.display()
+            ));
+        }
+        Ok(OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(&output_file)
+            .context(format!(
+                "Could not open destination file at '{}' for writing.",
+                output_file.display()
+            ))?)
+    }
+
+    pub fn open_input(&self) -> Result<Box<Read>, Error> {
+        Ok(match self.src {
+            Some(ref p) => Box::new(File::open(p)
+                .context(format!("Could not open input file at '{}'", p.display()))?),
+            None => Box::new(stdin()),
+        })
     }
 }
 
@@ -63,6 +129,9 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
             }
         };
 
+        if input.is_empty() {
+            return Err(VaultSpecError("An empty spec is invalid.".into()));
+        }
         let mut splits = input.splitn(2, SEPARATOR);
         Ok(match (splits.next(), splits.next()) {
             (Some(src), None) => VaultSpec {
@@ -91,7 +160,7 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                     dst
                 }))?,
             },
-            _ => unimplemented!(),
+            _ => unreachable!(),
         })
     }
 }
@@ -122,6 +191,7 @@ mod tests_vault_spec {
             )))
         )
     }
+
     #[test]
     fn it_cannot_have_just_a_separator() {
         let invalid = ":";
@@ -133,6 +203,7 @@ mod tests_vault_spec {
             )))
         )
     }
+
     #[test]
     fn it_cannot_have_more_than_one_separator() {
         let invalid = "relative/path:other/path:yet/another/path";
@@ -144,6 +215,7 @@ mod tests_vault_spec {
             )))
         )
     }
+
     #[test]
     fn it_is_ok_to_not_specify_a_source_to_signal_stdin() {
         assert_eq!(
@@ -177,6 +249,7 @@ mod tests_vault_spec {
             })
         )
     }
+
     #[test]
     fn it_is_created_from_relative_source_fills_destination_with_source() {
         assert_eq!(
@@ -201,6 +274,14 @@ mod tests_vault_spec {
     }
 
     #[test]
+    fn it_handles_an_empty_string_too() {
+        assert_eq!(
+            VaultSpec::try_from(""),
+            Err(VaultSpecError(format!("An empty spec is invalid.",)))
+        )
+    }
+
+    #[test]
     fn it_does_not_allow_an_absolute_destination() {
         let invalid = "relative/path:/absolute/path";
         assert_eq!(
@@ -210,5 +291,19 @@ mod tests_vault_spec {
                 invalid
             )))
         )
+    }
+
+    #[test]
+    fn it_displays_itself_properly() {
+        for &(ref input, ref expected) in [
+            (":path", ":path"),
+            ("src:dst", "src:dst"),
+            ("src", "src:src"),
+            ("src:", "src:src"),
+        ].iter()
+        {
+            let s = VaultSpec::try_from(*input).unwrap();
+            assert_eq!(&format!("{}", s), expected)
+        }
     }
 }

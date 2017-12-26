@@ -40,7 +40,7 @@ function fail () {
 }
 
 function expect_equals () {
-  expect_run 0 test -eq "${1:?}" "${2:?}"
+  expect_run 0 test "${1:?}" = "${2:?}"
 }
 
 function expect_exists () {

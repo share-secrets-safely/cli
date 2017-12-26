@@ -3,6 +3,7 @@ extern crate failure;
 #[macro_use]
 extern crate failure_derive;
 extern crate gpgme;
+extern crate itertools;
 extern crate s3_types;
 extern crate serde;
 #[macro_use]
