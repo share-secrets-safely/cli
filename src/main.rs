@@ -34,7 +34,7 @@ where
     }
 }
 
-fn _required_arg<T>(args: &ArgMatches, name: &'static str) -> Result<T, Error>
+fn required_arg<T>(args: &ArgMatches, name: &'static str) -> Result<T, Error>
 where
     T: FromStr,
     <T as FromStr>::Err: 'static + ::std::error::Error + Send + Sync,
@@ -77,6 +77,7 @@ where
 fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         vault_path: required_os_arg(args, "config-file")?,
+        vault_id: required_arg(args, "vault-id")?,
         command: VaultCommand::List,
     })
 }
@@ -197,7 +198,7 @@ fn main() {
                 .help("A specification identifying a mapping from a source file to be stored \
                 in a location of the vault. It takes the form '<src>:<dst>', where \
                 '<src>' is equivalent to '<src>:<src>'.\
-                <dst> should be vault-relative paths, whereas <src> must point to a readable file \
+                <dst> should be vault-relative paths, whereas <src> must point tel a readable file \
                 and can be empty to read from standard input, such as in ':<dst>'."),
         );
     let resource = App::new("resource")
@@ -208,6 +209,14 @@ fn main() {
         .about("a variety of vault interactions")
         .subcommand(init)
         .subcommand(resource)
+        .arg(
+            Arg::with_name("vault-id")
+                .short("i")
+                .required(false)
+                .value_name("id")
+                .help("Either an index into the vaults list, or the name of the vault.")
+                .default_value("0"),
+        )
         .arg(
             Arg::with_name("config-file")
                 .short("c")

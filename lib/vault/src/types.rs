@@ -14,8 +14,9 @@ pub fn at_default() -> PathBuf {
     PathBuf::from(".")
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub struct Vault {
+    pub name: Option<String>,
     #[serde(default = "at_default")] pub at: PathBuf,
     pub gpg_keys: Option<PathBuf>,
     #[serde(default = "recipients_default")] pub recipients: PathBuf,
@@ -24,6 +25,7 @@ pub struct Vault {
 impl Default for Vault {
     fn default() -> Self {
         Vault {
+            name: None,
             at: at_default(),
             gpg_keys: None,
             recipients: recipients_default(),
@@ -31,18 +33,44 @@ impl Default for Vault {
     }
 }
 
+fn split_documents<R: Read>(mut r: R) -> Result<Vec<String>, Error> {
+    use yaml_rust::{YamlEmitter, YamlLoader};
+
+    let mut buf = String::new();
+    r.read_to_string(&mut buf)?;
+
+    let docs = YamlLoader::load_from_str(&buf).context(format!("YAML deserialization failed"))?;
+    Ok(docs.iter()
+        .map(|d| {
+            let mut out_str = String::new();
+            {
+                let mut emitter = YamlEmitter::new(&mut out_str);
+                emitter
+                    .dump(d)
+                    .expect("dumping a valid yaml into a string to work");
+            }
+            out_str
+        })
+        .collect())
+}
+
 impl Vault {
-    pub fn from_file(path: &Path) -> Result<Vault, VaultError> {
+    pub fn from_file(path: &Path) -> Result<Vec<Vault>, Error> {
         let reader: Box<Read> = if path == Path::new("-") {
             Box::new(stdin())
         } else {
             Box::new(File::open(path)
                 .map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
         };
-        serde_yaml::from_reader(reader).map_err(|cause| VaultError::Deserialization {
-            cause,
-            path: path.to_owned(),
-        })
+        Ok(split_documents(reader)?
+            .iter()
+            .map(|s| {
+                serde_yaml::from_str(&s).map_err(|cause| VaultError::Deserialization {
+                    cause,
+                    path: path.to_owned(),
+                })
+            })
+            .collect::<Result<_, _>>()?)
     }
 
     pub fn to_file(&self, path: &Path) -> Result<(), VaultError> {
@@ -77,5 +105,63 @@ impl Vault {
             "Could not read all recipients from file at '{}'",
             recipients_file_path.display()
         ))?)
+    }
+}
+
+pub trait VaultExt {
+    fn select(&self, vault_id: &str) -> Result<Vault, Error>;
+}
+
+impl VaultExt for Vec<Vault> {
+    fn select(&self, vault_id: &str) -> Result<Vault, Error> {
+        let idx: Result<usize, _> = vault_id.parse();
+        Ok(match idx {
+            Ok(idx) => self.get(idx)
+                .ok_or_else(|| format_err!("Vault index {} is out of bounds.", idx))?,
+            Err(_) => self.iter()
+                .find(|v| match v.name {
+                    Some(ref name) if name == vault_id => true,
+                    _ => false,
+                })
+                .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
+        }.clone())
+    }
+}
+
+#[cfg(test)]
+mod tests_vault_ext {
+    use super::*;
+
+    #[test]
+    fn it_selects_by_name() {
+        let vault = Vault {
+            name: Some("foo".into()),
+            ..Default::default()
+        };
+        let v = vec![vault.clone()];
+        assert_eq!(v.select("foo").unwrap(), vault)
+    }
+
+    #[test]
+    fn it_selects_by_index() {
+        let v = vec![Vault::default()];
+        assert!(v.select("0").is_ok())
+    }
+
+    #[test]
+    fn it_errors_if_name_is_unknown() {
+        let v = Vec::<Vault>::new();
+        assert_eq!(
+            format!("{}", v.select("foo").unwrap_err()),
+            "Vault name 'foo' is unknown."
+        )
+    }
+    #[test]
+    fn it_errors_if_index_is_out_of_bounds() {
+        let v = Vec::<Vault>::new();
+        assert_eq!(
+            format!("{}", v.select("0").unwrap_err()),
+            "Vault index 0 is out of bounds."
+        )
     }
 }

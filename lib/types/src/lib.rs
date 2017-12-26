@@ -168,6 +168,7 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultContext {
     pub vault_path: PathBuf,
+    pub vault_id: String,
     pub command: VaultCommand,
 }
 

@@ -1,4 +1,5 @@
 ---
+name: ~
 at: "."
 gpg_keys: ".gpg-keys"
 recipients: ".gpg-id"

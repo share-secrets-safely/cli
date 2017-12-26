@@ -1,4 +1,4 @@
-use types::Vault;
+use types::{Vault, VaultExt};
 use s3_types::VaultContext;
 use failure::Error;
 use init::init;
@@ -19,9 +19,10 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             &recipients_file,
             &ctx.vault_path,
         ),
-        VaultCommand::ResourceAdd { specs } => {
-            resource::add(Vault::from_file(&ctx.vault_path)?, &specs)
-        }
+        VaultCommand::ResourceAdd { specs } => resource::add(
+            Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)?,
+            &specs,
+        ),
         VaultCommand::List => {
             Vault::from_file(&ctx.vault_path)?;
             Ok(String::new())
