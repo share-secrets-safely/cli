@@ -1,5 +1,5 @@
 use s3_types::VaultSpec;
-use types::Vault;
+use vault::Vault;
 use failure::{err_msg, Error, ResultExt};
 use util::UserIdFingerprint;
 use std::io::Write;

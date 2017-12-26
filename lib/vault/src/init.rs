@@ -7,7 +7,7 @@ use itertools::join;
 use failure::{err_msg, Error, ResultExt};
 use std::fs::create_dir_all;
 use std::io::Write;
-use types::Vault;
+use vault::Vault;
 
 impl Vault {
     pub fn init(

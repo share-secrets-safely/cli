@@ -123,6 +123,11 @@ version = "0.3.54"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "glob"
+version = "0.2.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "gpg-error"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -258,6 +263,7 @@ version = "0.1.0"
 dependencies = [
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure_derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "glob 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "gpgme 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "s3-types 0.1.0",
@@ -402,6 +408,7 @@ dependencies = [
 "checksum failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "934799b6c1de475a012a02dab0ace1ace43789ee4b99bcfbf1a2e3e8ced5de82"
 "checksum failure_derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c7cdda555bb90c9bb67a3b670a0f42de8e73f5981524123ad8578aafec8ddb8b"
 "checksum gcc 0.3.54 (registry+https://github.com/rust-lang/crates.io-index)" = "5e33ec290da0d127825013597dbdfc28bee4964690c7ce1166cbc2a7bd08b1bb"
+"checksum glob 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)" = "8be18de09a56b60ed0edf84bc9df007e30040691af7acd1c41874faac5895bfb"
 "checksum gpg-error 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c732e7f1b15b2e2a3c8be3ccdc8d645d3c22628901252318931fa54c1e13e08f"
 "checksum gpgme 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "5fc2e61d152f17dd930a994847b3db34dfa7218604f62b7a286584e9496f9f4f"
 "checksum gpgme-sys 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "2d74388e31e4d70dbfacc01e61a253f8a4db6a6b30b859f1993d32fcba6d7838"

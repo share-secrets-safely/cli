@@ -1,7 +1,8 @@
-use types::{Vault, VaultExt};
+use vault::{Vault, VaultExt};
 use s3_types::VaultContext;
 use failure::Error;
 use resource;
+use std::io::stdout;
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
@@ -36,7 +37,11 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             &specs,
         ),
         VaultCommand::List => {
-            Vault::from_file(&ctx.vault_path)?;
+            let stdout = stdout();
+            let mut lock = stdout.lock();
+            Vault::from_file(&ctx.vault_path)?
+                .select(&ctx.vault_id)?
+                .list(&mut lock)?;
             Ok(String::new())
         }
     }

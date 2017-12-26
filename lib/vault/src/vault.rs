@@ -3,8 +3,10 @@ use std::fs::File;
 use std::io::{stdin, BufRead, BufReader, Read, Write};
 use serde_yaml;
 use util::write_at;
+use itertools::join;
 use error::{IOMode, VaultError};
 use failure::{Error, ResultExt};
+use glob::glob;
 
 pub fn recipients_default() -> PathBuf {
     PathBuf::from(".gpg-id")
@@ -28,7 +30,7 @@ impl Default for Vault {
         Vault {
             name: None,
             at: at_default(),
-            resolved_at: Default::default(),
+            resolved_at: at_default(),
             gpg_keys: None,
             recipients: recipients_default(),
         }
@@ -72,12 +74,18 @@ impl Vault {
                         cause,
                         path: path.to_owned(),
                     })
-                    .map(|mut v: Vault| {
+                    .and_then(|mut v: Vault| {
                         if v.at.is_relative() {
-                            v.resolved_at =
-                                path.parent().expect("path to point to file").join(&v.at);
+                            v.resolved_at = path.parent()
+                                .expect("path to point to file")
+                                .join(&v.at)
+                                .canonicalize()
+                                .map_err(|cause| VaultError::ReadFile {
+                                    cause,
+                                    path: path.to_owned(),
+                                })?
                         }
-                        v
+                        Ok(v)
                     })
             })
             .collect::<Result<_, _>>()?)
@@ -116,6 +124,36 @@ impl Vault {
             recipients_file_path.display()
         ))?)
     }
+
+    pub fn url(&self) -> String {
+        format!(
+            "s3v://{}{}",
+            self.name
+                .as_ref()
+                .map(|s| format!("{}@", s))
+                .unwrap_or_else(String::new),
+            self.resolved_at.display()
+        )
+    }
+
+    pub fn list(&self, w: &mut Write) -> Result<(), Error> {
+        fn strip_ext(p: &Path) -> String {
+            let cow = p.to_string_lossy();
+            let tokens = cow.split('.');
+            let all_expect_last = tokens.count().checked_sub(1).expect("at least two tokens");
+            let tokens = cow.split('.');
+            join(tokens.take(all_expect_last), ".")
+        }
+        writeln!(w, "{}", self.url())?;
+        for entry in glob(&format!("{}/**/*", self.resolved_at.display()))
+            .expect("valid pattern")
+            .filter_map(Result::ok)
+            .filter(|p| p.to_string_lossy().ends_with(".gpg"))
+        {
+            writeln!(w, "{}", strip_ext(&entry))?;
+        }
+        Ok(())
+    }
 }
 
 pub trait VaultExt {
@@ -135,6 +173,24 @@ impl VaultExt for Vec<Vault> {
                 })
                 .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
         }.clone())
+    }
+}
+
+#[cfg(test)]
+mod tests_vault {
+    use super::*;
+
+    #[test]
+    fn it_print_the_name_in_the_url_if_there_is_none() {
+        let mut v = Vault::default();
+        v.name = Some("name".into());
+        assert_eq!(v.url(), "s3v://name@.")
+    }
+
+    #[test]
+    fn it_does_not_print_the_name_in_the_url_if_there_is_none() {
+        let v = Vault::default();
+        assert_eq!(v.url(), "s3v://.")
     }
 }
 

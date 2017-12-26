@@ -12,6 +12,7 @@ serde_derive = "1.0.24"
 serde_yaml = "0.7.3"
 itertools = "0.7.4"
 yaml-rust = "0.4.0"
+glob = "0.2.11"
 
 [dependencies.s3-types]
 path = "../types"

@@ -143,7 +143,7 @@ function trust_key () {
       }
       
       it "shows the single file without gpg suffix" && {
-        WITH_OUTPUT="foo bar" \
+        WITH_OUTPUT="s3v://..*from-stdin" \
         expect_run $SUCCESSFULLY "$exe" vault ls
       }
     )
@@ -161,3 +161,5 @@ function trust_key () {
     )
   )
 )
+
+# TODO: add actual file to vault and assure it will always be inside of the vault
