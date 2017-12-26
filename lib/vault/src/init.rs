@@ -51,11 +51,18 @@ pub fn init(
 
     let vault = Vault {
         gpg_keys: Some(gpg_keys_dir.to_owned()),
+        recipients: recipients_file.to_owned(),
+        resolved_at: vault_path
+            .parent()
+            .map(ToOwned::to_owned)
+            .ok_or_else(|| format_err!(""))?,
         name,
         ..Default::default()
     };
     vault.to_file(vault_path)?;
 
+    let gpg_keys_dir = vault.absolute_path(gpg_keys_dir);
+    let recipients_file = vault.absolute_path(recipients_file);
     if gpg_keys_dir.is_dir() {
         let num_entries = gpg_keys_dir
             .read_dir()
@@ -71,7 +78,7 @@ pub fn init(
             ));
         }
     } else {
-        create_dir_all(gpg_keys_dir).context(format!(
+        create_dir_all(&gpg_keys_dir).context(format!(
             "Failed to create directory at '{}' for exporting public gpg keys to.",
             gpg_keys_dir.display()
         ))?;
@@ -87,7 +94,7 @@ pub fn init(
             recipients_file.display()
         ));
     }
-    let mut recipients = write_at(recipients_file).context(format!(
+    let mut recipients = write_at(&recipients_file).context(format!(
         "Failed to open recipients file at '{}'",
         recipients_file.display()
     ))?;

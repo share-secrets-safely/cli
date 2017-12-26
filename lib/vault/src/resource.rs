@@ -8,7 +8,7 @@ use gpgme;
 
 pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
     let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
-    let recipients = vault.recipients()?;
+    let recipients = vault.recipients_list()?;
     if recipients.is_empty() {
         return Err(format_err!(
             "No recipients found in recipients file at '{}'",
@@ -57,7 +57,7 @@ pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
         let mut output = Vec::new();
         ctx.encrypt(&keys, input, &mut output)
             .context(format!("Failed to encrypt {}", spec))?;
-        spec.open_output(&vault.at)?
+        spec.open_output(&vault.resolved_at)?
             .write_all(&output)
             .context(format!(
                 "Failed to write all encrypted data to '{}'",

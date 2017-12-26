@@ -186,6 +186,9 @@ fn main() {
                 .help("The key-id of the public key identifying your own user(s)."),
         );
 
+    let list = App::new("list")
+        .alias("ls")
+        .about("List the vault's content.");
     let add_resource = App::new("add")
         .alias("insert")
         .about("Add a new resource to the vault.")
@@ -209,6 +212,7 @@ fn main() {
         .about("a variety of vault interactions")
         .subcommand(init)
         .subcommand(resource)
+        .subcommand(list)
         .arg(
             Arg::with_name("vault-id")
                 .short("i")

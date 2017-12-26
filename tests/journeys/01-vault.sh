@@ -125,6 +125,11 @@ function trust_key () {
       it "creates an encrypted file" && {
         expect_exists ./from-stdin.gpg
       }
+      
+      it "shows the single file without gpg suffix" && {
+        WITH_OUTPUT="foo bar" \
+        expect_run $SUCCESSFULLY "$exe" vault ls
+      }
     )
     (when "adding the same resource from stdin"
       previous_resource_id="$(md5sum ./from-stdin.gpg)"

@@ -17,6 +17,7 @@ pub fn at_default() -> PathBuf {
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub struct Vault {
     pub name: Option<String>,
+    #[serde(skip)] pub resolved_at: PathBuf,
     #[serde(default = "at_default")] pub at: PathBuf,
     pub gpg_keys: Option<PathBuf>,
     #[serde(default = "recipients_default")] pub recipients: PathBuf,
@@ -27,6 +28,7 @@ impl Default for Vault {
         Vault {
             name: None,
             at: at_default(),
+            resolved_at: Default::default(),
             gpg_keys: None,
             recipients: recipients_default(),
         }
@@ -65,10 +67,18 @@ impl Vault {
         Ok(split_documents(reader)?
             .iter()
             .map(|s| {
-                serde_yaml::from_str(&s).map_err(|cause| VaultError::Deserialization {
-                    cause,
-                    path: path.to_owned(),
-                })
+                serde_yaml::from_str(&s)
+                    .map_err(|cause| VaultError::Deserialization {
+                        cause,
+                        path: path.to_owned(),
+                    })
+                    .map(|mut v: Vault| {
+                        if v.at.is_relative() {
+                            v.resolved_at =
+                                path.parent().expect("path to point to file").join(&v.at);
+                        }
+                        v
+                    })
             })
             .collect::<Result<_, _>>()?)
     }
@@ -89,11 +99,11 @@ impl Vault {
             })
     }
 
-    fn absolute_path(&self, path: &Path) -> PathBuf {
-        self.at.join(path)
+    pub fn absolute_path(&self, path: &Path) -> PathBuf {
+        self.resolved_at.join(path)
     }
 
-    pub fn recipients(&self) -> Result<Vec<String>, Error> {
+    pub fn recipients_list(&self) -> Result<Vec<String>, Error> {
         let recipients_file_path = self.absolute_path(&self.recipients);
         let rfile = File::open(&recipients_file_path)
             .map(BufReader::new)
