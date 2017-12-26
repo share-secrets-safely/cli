@@ -143,7 +143,7 @@ function trust_key () {
       }
       
       it "shows the single file without gpg suffix" && {
-        WITH_OUTPUT="s3v://..*from-stdin" \
+        WITH_OUTPUT="s3v://.*from-stdin" \
         expect_run $SUCCESSFULLY "$exe" vault ls
       }
     )

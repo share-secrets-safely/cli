@@ -76,14 +76,9 @@ impl Vault {
                     })
                     .and_then(|mut v: Vault| {
                         if v.at.is_relative() {
-                            v.resolved_at = path.parent()
+                            v.resolved_at = normalize(&path.parent()
                                 .expect("path to point to file")
-                                .join(&v.at)
-                                .canonicalize()
-                                .map_err(|cause| VaultError::ReadFile {
-                                    cause,
-                                    path: path.to_owned(),
-                                })?
+                                .join(&v.at))
                         }
                         Ok(v)
                     })
@@ -145,8 +140,12 @@ impl Vault {
             join(tokens.take(all_expect_last), ".")
         }
         writeln!(w, "{}", self.url())?;
-        for entry in glob(&format!("{}/**/*", self.resolved_at.display()))
-            .expect("valid pattern")
+        for entry in glob(self.resolved_at.join("**/*.gpg").to_str().ok_or_else(|| {
+            format_err!(
+                "Could not decode path '{}' as UTF8",
+                self.resolved_at.display()
+            )
+        })?).expect("valid pattern")
             .filter_map(Result::ok)
             .filter(|p| p.to_string_lossy().ends_with(".gpg"))
         {
@@ -173,6 +172,36 @@ impl VaultExt for Vec<Vault> {
                 })
                 .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
         }.clone())
+    }
+}
+
+fn normalize(p: &Path) -> PathBuf {
+    use std::path::Component;
+    p.components().fold(PathBuf::new(), |mut p, c| {
+        match c {
+            Component::CurDir => {}
+            _ => p.push(c.as_os_str()),
+        }
+        p
+    })
+}
+#[cfg(test)]
+mod tests_utils {
+    use super::*;
+
+    #[test]
+    fn it_will_always_remove_current_dirs_including_the_first_one() {
+        assert_eq!(
+            format!("{}", normalize(Path::new("./././a")).display()),
+            "a"
+        )
+    }
+    #[test]
+    fn it_does_not_alter_parent_dirs() {
+        assert_eq!(
+            format!("{}", normalize(Path::new("./../.././a")).display()),
+            "../../a"
+        )
     }
 }
 
