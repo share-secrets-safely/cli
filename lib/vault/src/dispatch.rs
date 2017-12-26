@@ -1,7 +1,6 @@
 use types::{Vault, VaultExt};
 use s3_types::VaultContext;
 use failure::Error;
-use init::init;
 use resource;
 
 /// A universal handler which delegates all functionality based on the provided Context
@@ -13,19 +12,25 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             gpg_key_ids,
             gpg_keys_dir,
             recipients_file,
-        } => init(
-            &gpg_key_ids,
-            &gpg_keys_dir,
-            &recipients_file,
-            &ctx.vault_path,
-            {
-                let r: Result<usize, _> = ctx.vault_id.parse();
-                match r {
-                    Err(_) => Some(ctx.vault_id),
-                    Ok(_) => None,
-                }
-            },
-        ),
+        } => {
+            Vault::init(
+                &gpg_key_ids,
+                &gpg_keys_dir,
+                &recipients_file,
+                &ctx.vault_path,
+                {
+                    let r: Result<usize, _> = ctx.vault_id.parse();
+                    match r {
+                        Err(_) => Some(ctx.vault_id),
+                        Ok(_) => None,
+                    }
+                },
+            )?;
+            Ok(format!(
+                "vault initialized at '{}'",
+                ctx.vault_path.display()
+            ))
+        }
         VaultCommand::ResourceAdd { specs } => resource::add(
             Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)?,
             &specs,

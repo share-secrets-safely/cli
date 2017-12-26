@@ -18,5 +18,5 @@ mod dispatch;
 mod init;
 mod resource;
 
-pub use init::init;
+pub use types::Vault;
 pub use dispatch::do_it;
