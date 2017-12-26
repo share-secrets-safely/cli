@@ -13,9 +13,10 @@
  * [x] **shell completions**
  * [ ] **complete a happy journey with**
    * [x] initialize a new vault
-   * [ ] add contents
-   * [ ] add another user and re-encrypt parition content
+   * [x] add contents
    * [ ] support for multiple vaults
+   * [ ] show vault contents
+   * [ ] add another user and re-encrypt parition content
  * ...and many more when the boxes above are ticked :D
 
 ## Project Goals

@@ -118,8 +118,8 @@ function trust_key () {
     
     (when "adding new resource from stdin"
       it "succeeds" && {
-        WITH_OUTPUT="Added './from-stdin'" \
-        echo hi | expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
+        echo hi | WITH_OUTPUT="Added 'from-stdin'" \
+        expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
       }
       
       it "creates an encrypted file" && {
@@ -130,8 +130,8 @@ function trust_key () {
       previous_resource_id="$(md5sum ./from-stdin.gpg)"
       
       it "fails as it won't overwrite existing resources" && {
-        WITH_OUTPUT="Added './from-stdin'" \
-        echo hi | expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
+        echo hi | WITH_OUTPUT="Refusing to overwrite existing file at" \
+        expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
       }
       
       it "does not change the previous file" && {

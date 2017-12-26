@@ -42,6 +42,7 @@ pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
         return Err(err_msg(msg.join("\n")));
     }
 
+    let mut encrypted = Vec::new();
     for spec in specs {
         let input = {
             let mut buf = Vec::new();
@@ -62,9 +63,10 @@ pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
                 "Failed to write all encrypted data to '{}'",
                 spec.destination().display(),
             ))?;
+        encrypted.push(spec.destination());
     }
     Ok(format!(
-        "Successfully added [{}] to the vault",
-        join(specs, ", ")
+        "Added {}.",
+        join(encrypted.iter().map(|p| format!("'{}'", p.display())), ", ")
     ))
 }

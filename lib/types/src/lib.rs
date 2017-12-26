@@ -10,7 +10,7 @@ use std::io::{stdin, Read};
 use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
 
-pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
+fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
     let file_name = path.file_name()
         .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
     Ok(path.parent()
@@ -19,7 +19,7 @@ pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
             "{}.gpg",
             file_name
                 .to_str()
-                .expect("filename to be decodable with UTF8")
+                .expect("filename to be decodeable with UTF8")
         )))
 }
 
