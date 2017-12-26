@@ -63,6 +63,22 @@ snapshot="$root/fixtures/snapshots"
 )
 
 (sandboxed
+  title "'vault init' - with absolute vault directory"
+  vault_dir=vault/location
+  mkdir -p $vault_dir
+  vault_dir=$PWD/$vault_dir
+  (with "a an absolute vault directory"
+    it "succeeds" && {
+      expect_run $SUCCESSFULLY "$exe" vault --config-file "$vault_dir/vault.yml" \
+        init --gpg-keys-dir keys --recipients-file recipients
+    }
+    it "creates the correct folder structure" && {
+      expect_snapshot "$snapshot/vault-init-single-user-absolute-directory" "$vault_dir"
+    }
+  )
+)
+
+(sandboxed
   title "'vault init' - multiple gpg keys available"
   (with "a gpg key signed by others"
     gpg --import "$fixture/c.sec.asc" &>/dev/null
