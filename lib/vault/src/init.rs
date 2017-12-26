@@ -17,6 +17,16 @@ impl Vault {
         vault_path: &Path,
         name: Option<String>,
     ) -> Result<Self, Error> {
+        let vault = Vault {
+            gpg_keys: Some(gpg_keys_dir.to_owned()),
+            recipients: recipients_file.to_owned(),
+            resolved_at: vault_path.parent().map(ToOwned::to_owned).ok_or_else(|| {
+                format_err!("The vault directory '{}' is invalid.", vault_path.display())
+            })?,
+            name,
+            ..Default::default()
+        };
+
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let keys = {
             let mut keys_iter = gpg_ctx.find_secret_keys(gpg_key_ids)?;
@@ -49,17 +59,7 @@ impl Vault {
                 )
             ));
         };
-
-        let vault = Vault {
-            gpg_keys: Some(gpg_keys_dir.to_owned()),
-            recipients: recipients_file.to_owned(),
-            resolved_at: vault_path
-                .parent()
-                .map(ToOwned::to_owned)
-                .ok_or_else(|| format_err!(""))?,
-            name,
-            ..Default::default()
-        };
+        vault.to_file(vault_path)?;
 
         let gpg_keys_dir = vault.absolute_path(gpg_keys_dir);
         let recipients_file = vault.absolute_path(recipients_file);
@@ -127,7 +127,6 @@ impl Vault {
             "Failed to flush recipients file at '{}'",
             recipients_file.display()
         ))?;
-        vault.to_file(vault_path)?;
         Ok(vault)
     }
 }

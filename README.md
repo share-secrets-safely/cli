@@ -16,6 +16,7 @@
    * [x] add contents
    * [x] support for multiple vaults
    * [ ] show vault contents
+   * [ ] decrypt vault contents
    * [ ] add another user and re-encrypt parition content
  * ...and many more when the boxes above are ticked :D
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -u -o pipefail
+set -eu -o pipefail
 exe=${1:?First argument is the executable under test}
 
 root="$(cd "${0%/*}" && pwd)"
@@ -15,6 +15,13 @@ title "'vault' subcommand"
 (with "a minimal vault configuration file"
   it "succeeds even if there is no further argument" && \
       echo 'at: ' | expect_run $SUCCESSFULLY "$exe" vault -c -
+)
+
+title "'vault init' subcommand"
+
+(with "an invalid vault path"
+  it "fails" && \
+      WITH_OUTPUT="The vault directory '/' is invalid." expect_run $WITH_FAILURE "$exe" vault -c / init
 )
 
 title "'extract' subcommand"
