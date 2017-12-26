@@ -70,10 +70,10 @@ snapshot="$root/fixtures/snapshots"
       WITH_OUTPUT="Found 2 viable keys for key-ids" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
-    (with "a selected gpg key"
+    (with "a selected gpg key (and a vault name)"
       it "succeeds as it just follow instructions" && {
         WITH_OUTPUT="vault initialized at './s3-vault.yml'" \
-        expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com
+        expect_run $SUCCESSFULLY "$exe" vault --vault-id vault-name init --gpg-key-id c@example.com
       }
       
       it "creates a valid vault configuration file, \

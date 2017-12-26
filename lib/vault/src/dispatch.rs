@@ -18,6 +18,13 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             &gpg_keys_dir,
             &recipients_file,
             &ctx.vault_path,
+            {
+                let r: Result<usize, _> = ctx.vault_id.parse();
+                match r {
+                    Err(_) => Some(ctx.vault_id),
+                    Ok(_) => None,
+                }
+            },
         ),
         VaultCommand::ResourceAdd { specs } => resource::add(
             Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)?,

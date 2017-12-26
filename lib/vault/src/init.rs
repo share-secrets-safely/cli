@@ -14,6 +14,7 @@ pub fn init(
     gpg_keys_dir: &Path,
     recipients_file: &Path,
     vault_path: &Path,
+    name: Option<String>,
 ) -> Result<String, Error> {
     let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
     let keys = {
@@ -48,10 +49,10 @@ pub fn init(
         ));
     };
 
-    let vault = {
-        let mut v = Vault::default();
-        v.gpg_keys = Some(gpg_keys_dir.to_owned());
-        v
+    let vault = Vault {
+        gpg_keys: Some(gpg_keys_dir.to_owned()),
+        name,
+        ..Default::default()
     };
     vault.to_file(vault_path)?;
 

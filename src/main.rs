@@ -212,6 +212,7 @@ fn main() {
         .arg(
             Arg::with_name("vault-id")
                 .short("i")
+                .long("vault-id")
                 .required(false)
                 .value_name("id")
                 .help("Either an index into the vaults list, or the name of the vault.")
@@ -219,6 +220,7 @@ fn main() {
         )
         .arg(
             Arg::with_name("config-file")
+                .long("config-file")
                 .short("c")
                 .required(true)
                 .value_name("path")
