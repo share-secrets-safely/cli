@@ -43,7 +43,7 @@ fn split_documents<R: Read>(mut r: R) -> Result<Vec<String>, Error> {
     let mut buf = String::new();
     r.read_to_string(&mut buf)?;
 
-    let docs = YamlLoader::load_from_str(&buf).context(format!("YAML deserialization failed"))?;
+    let docs = YamlLoader::load_from_str(&buf).context("YAML deserialization failed")?;
     Ok(docs.iter()
         .map(|d| {
             let mut out_str = String::new();
@@ -69,7 +69,7 @@ impl Vault {
         Ok(split_documents(reader)?
             .iter()
             .map(|s| {
-                serde_yaml::from_str(&s)
+                serde_yaml::from_str(s)
                     .map_err(|cause| VaultError::Deserialization {
                         cause,
                         path: path.to_owned(),

@@ -33,7 +33,7 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             ))
         }
         VaultCommand::ResourceAdd { specs } => resource::add(
-            Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)?,
+            &Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)?,
             &specs,
         ),
         VaultCommand::List => {

@@ -6,7 +6,7 @@ use std::io::Write;
 use itertools::join;
 use gpgme;
 
-pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
+pub fn add(vault: &Vault, specs: &[VaultSpec]) -> Result<String, Error> {
     let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
     let recipients = vault.recipients_list()?;
     if recipients.is_empty() {
@@ -38,7 +38,7 @@ pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
         msg.push("All recipients:".into());
         msg.push(recipients.join(", "));
         msg.push("All recipients found in gpg database".into());
-        msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(&k))));
+        msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
         return Err(err_msg(msg.join("\n")));
     }
 
@@ -50,7 +50,7 @@ pub fn add(vault: Vault, specs: &[VaultSpec]) -> Result<String, Error> {
                 "Could not read all input from '{}' into buffer",
                 spec.source()
                     .map(|s| format!("{}", s.display()))
-                    .unwrap_or("<stdin>".into())
+                    .unwrap_or_else(||"<stdin>".into())
             ))?;
             buf
         };
