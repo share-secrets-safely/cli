@@ -63,6 +63,7 @@ fn main() {
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
                 ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
                 ("show", Some(args)) => ok_or_exit(vault_resource_show(context, args)),
+                ("edit", Some(args)) => ok_or_exit(vault_resource_edit(context, args)),
                 _ => context,
             };
             vault::do_it(context)

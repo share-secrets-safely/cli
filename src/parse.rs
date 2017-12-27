@@ -54,6 +54,16 @@ pub fn vault_resource_show(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
     })
 }
 
+pub fn vault_resource_edit(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::ResourceEdit {
+            spec: required_os_arg(args, "path")?,
+            editor: required_os_arg(args, "editor")?,
+        },
+        ..ctx
+    })
+}
+
 pub fn vault_resource_add_from(
     ctx: VaultContext,
     args: &ArgMatches,

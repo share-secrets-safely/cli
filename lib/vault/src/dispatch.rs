@@ -36,6 +36,12 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             ))
         }
         &VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(&specs),
+        &VaultCommand::ResourceEdit {
+            ref spec,
+            ref editor,
+        } => vault_from(&ctx)?
+            .edit(&spec, &editor)
+            .map(|_| String::new()),
         s @ &VaultCommand::List | s @ &VaultCommand::ResourceShow { .. } => {
             let vault = vault_from(&ctx)?;
             let stdout = stdout();

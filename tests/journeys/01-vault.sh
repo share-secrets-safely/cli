@@ -146,7 +146,7 @@ function trust_key () {
 
 
 (sandboxed 
-  title "'vault add'"
+  title "'vault add', 'show' and 'edit'"
   (with "a vault initialized for a single recipient"
     ( gpg --batch --yes --delete-secret-keys $C_FPR
       gpg --batch --yes --delete-keys $C_FPR
@@ -197,6 +197,28 @@ function trust_key () {
         WITH_SNAPSHOT="$snapshot/vault-unknown-resource-show" \
         expect_run $WITH_FAILURE "$exe" vault show some-unknown-resource
       }
+    )
+    (when "editing a known resource"
+      (with "a custom editor"
+        editor=my-editor.sh
+        (
+          cat <<'EDITOR' > $editor
+#!/bin/bash -e
+file_to_edit=${1:?}
+echo "$file_to_edit"
+echo "ho" > $file_to_edit
+EDITOR
+          chmod +x "$editor"
+        )
+        it "succeeds" && {
+          EDITOR="$editor" \
+          expect_run $SUCCESSFULLY "$exe" vault edit from-stdin
+        }
+        it "changes the file accordingly" && {
+          WITH_SNAPSHOT="$snapshot/vault-edit-changed-file" \
+          expect_run $SUCCESSFULLY "$exe" vault show from-stdin
+        }
+      )
     )
   )
 )

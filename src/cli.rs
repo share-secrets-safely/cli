@@ -3,6 +3,7 @@ use std::env;
 
 lazy_static! {
     static ref SHELL: Result<String, env::VarError> = env::var("SHELL");
+    static ref EDITOR: Result<String, env::VarError> = env::var("EDITOR");
 }
 
 pub struct CLI<'a, 'b>
@@ -70,18 +71,33 @@ where
         let list = App::new("list")
             .alias("ls")
             .about("List the vault's content.");
-        let show_resource = App::new("show").about("Decrypt a resource").arg(
-            Arg::with_name("path")
-                .required(true)
-                .multiple(false)
+        let resource_path = Arg::with_name("path")
+            .required(true)
+            .multiple(false)
+            .takes_value(true)
+            .value_name("path")
+            .help(
+                "Either a vault-relative path to the file as displayed by 'vault show',\
+                 a vault-relative path with the '.gpg' suffix, or an absolute \
+                 path with or without the '.gpg' suffix.",
+            );
+        let edit_resource = App::new("edit").arg(
+            Arg::with_name("editor")
+                .long("editor")
+                .short("e")
+                .required(false)
                 .takes_value(true)
-                .value_name("path")
-                .help(
-                    "Either a vault-relative path to the file as displayed by 'vault show',\
-                     a vault-relative path with the '.gpg' suffix, or an absolute \
-                     path with or without the '.gpg' suffix.",
-                ),
+                .default_value(EDITOR.as_ref().map(String::as_str).unwrap_or("vim"))
+                .help("The path to your editor program. It receives the decrypted content as first \
+                argument and is expected to write the changes back to that file before quitting."))
+            .arg(resource_path.clone()).about(
+                "Edit a resource. This will decrypt the resource to \
+                 a temporary file, open up the $EDITOR you have specified, and re-encrypt the \
+                 changed content before deleting it on disk.",
         );
+        let show_resource = App::new("show")
+            .about("Decrypt a resource")
+            .arg(resource_path);
         let add_resource = App::new("add")
             .alias("insert")
             .about("Add a new resource to the vault.")
@@ -102,6 +118,7 @@ where
             .subcommand(init)
             .subcommand(add_resource)
             .subcommand(show_resource)
+            .subcommand(edit_resource)
             .subcommand(list)
             .arg(
                 Arg::with_name("vault-id")

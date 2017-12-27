@@ -12,6 +12,10 @@ use std::fs::File;
 use s3_types::gpg_output_filename;
 
 impl Vault {
+    pub fn edit(&self, _path: &Path, _editor: &Path) -> Result<(), Error> {
+        bail!("TBD")
+    }
+
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<(), Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let gpg_path = gpg_output_filename(path)?;
