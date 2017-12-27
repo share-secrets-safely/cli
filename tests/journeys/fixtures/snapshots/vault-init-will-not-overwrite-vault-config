@@ -1,0 +1,1 @@
+error: Cannot overwrite vault configuration file as it already exists at './s3-vault.yml'

@@ -11,6 +11,7 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 title "'vault' subcommand"
+snapshot="$root/journeys/fixtures/snapshots/stateless"
 
 (with "a minimal vault configuration file"
   it "succeeds even if there is no further argument" && \
@@ -21,14 +22,14 @@ title "'vault init' subcommand"
 
 (with "an invalid vault path"
   it "fails" && \
-      WITH_OUTPUT="The vault directory '/' is invalid." expect_run $WITH_FAILURE "$exe" vault -c / init
+      WITH_SNAPSHOT="$snapshot/invalid-vault-path" expect_run $WITH_FAILURE "$exe" vault -c / init
 )
 
 title "'extract' subcommand"
 
 (with "no data file to read from"
     it "fails" && \
-      expect_run $WITH_FAILURE "$exe" extract
+      WITH_SNAPSHOT="$snapshot/no-data-file" expect_run $WITH_FAILURE "$exe" extract
 )
 
 title "'completions' subcommand"
@@ -45,6 +46,6 @@ title "'completions' subcommand"
 
 (with "an unsupported shell"
     it "fails with a suitable error" && \
-    WITH_OUTPUT=".*foobar.*unsupported" expect_run $WITH_FAILURE "$exe" completions foobar
+    WITH_SNAPSHOT="$snapshot/unsupported-shell" expect_run $WITH_FAILURE "$exe" completions foobar
 )
 

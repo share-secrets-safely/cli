@@ -147,7 +147,6 @@ impl Vault {
             )
         })?).expect("valid pattern")
             .filter_map(Result::ok)
-            .filter(|p| p.to_string_lossy().ends_with(".gpg"))
         {
             writeln!(w, "{}", strip_ext(&entry))?;
         }

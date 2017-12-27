@@ -65,7 +65,19 @@ function expect_run () {
 
   local actual_exit_code=$?
   if [[ "$actual_exit_code" == "$expected_exit_code" ]]; then
-    if [[ -n "${WITH_OUTPUT-}" ]]; then
+    if [[ -n "${WITH_SNAPSHOT-}" ]]; then
+      local expected="$WITH_SNAPSHOT"
+      if ! [ -f "$expected" ]; then
+        echo -n "$output" > "$expected" || exit $IT_COUNT
+      fi
+      if ! diff "$expected" <(echo -n "$output"); then
+        echo 1>&2 "$RED" " - FAIL"
+        echo 1>&2 "${WHITE}\$" "$@"
+        echo 1>&2 "Output snapshot did not match snapshot at '$expected'"
+        echo 1>&2 "$output"
+        exit $IT_COUNT
+      fi
+    elif [[ -n "${WITH_OUTPUT-}" ]]; then
         if ! echo "$output" | tr '\n' ' ' | grep -qE "$WITH_OUTPUT"; then
             echo 1>&2 "$RED" " - FAIL"
             echo 1>&2 "${WHITE}\$" "$@"

@@ -23,14 +23,14 @@ title "'vault init'"
 )
 
 fixture="$root/fixtures"
-snapshot="$root/fixtures/snapshots"
+snapshot="$fixture/snapshots"
 (sandboxed
   title "'vault init' - overwrite protection"
 
   (with "a single gpg secret key available"
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
-      WITH_OUTPUT="vault initialized at './s3-vault.yml'" \
+      WITH_SNAPSHOT="$snapshot/successful-vault-init" \
       expect_run $SUCCESSFULLY "$exe" vault init
     }
     it "creates a valid vault configuration file, \
@@ -42,21 +42,21 @@ snapshot="$root/fixtures/snapshots"
   
   (with "an existing vault configuration file"
     it "fails as it cannot possibly overwrite anything" && {
-      WITH_OUTPUT="Cannot.*overwrite.*s3-vault.yml.*" \
+      WITH_SNAPSHOT="$snapshot/vault-init-will-not-overwrite-vault-config" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
   )
   
   (with "an existing gpg-keys directory"
     it "fails as it cannot possibly overwrite anything" && {
-      WITH_OUTPUT="Cannot.*export.*keys.*\.gpg-keys" \
+      WITH_SNAPSHOT="$snapshot/vault-init-will-not-write-into-existing-nonempty-directory" \
       expect_run $WITH_FAILURE "$exe" vault -c a-different-file.yml init
     }
   )
   
   (with "an existing recipients file"
     it "fails as it cannot possibly overwrite anything" && {
-      WITH_OUTPUT="Cannot.*write.*\.gpg-id.*" \
+      WITH_SNAPSHOT="$snapshot/vault-init-will-overwrite-recipients-file" \
       expect_run $WITH_FAILURE "$exe" vault -c a-different-file-too.yml init -k some-nonexisting-directory
     }
   )
@@ -83,12 +83,12 @@ snapshot="$root/fixtures/snapshots"
   (with "a gpg key signed by others"
     gpg --import "$fixture/c.sec.asc" &>/dev/null
     it "fails as it can't decide which gpg key to export" && {
-      WITH_OUTPUT="Found 2 viable keys for key-ids" \
+      WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-viable-keys" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
     (with "a selected gpg key (and a vault name)"
       it "succeeds as it just follow instructions" && {
-        WITH_OUTPUT="vault initialized at './s3-vault.yml'" \
+        WITH_SNAPSHOT="$snapshot/vault-init-with-key-specified-explicitly" \
         expect_run $SUCCESSFULLY "$exe" vault --vault-id vault-name init --gpg-key-id c@example.com
       }
       
@@ -105,7 +105,7 @@ snapshot="$root/fixtures/snapshots"
   title "'vault init' - use multiple secret keys"
   (with "a multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
-      WITH_OUTPUT="vault initialized at './s3-vault.yml'" \
+      WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-specified-keys" \
       expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com --gpg-key-id tester@example.com
     }
     
@@ -134,7 +134,7 @@ function trust_key () {
     
     (when "adding new resource from stdin"
       it "succeeds" && {
-        echo hi | WITH_OUTPUT="Added 'from-stdin'" \
+        echo hi | WITH_SNAPSHOT="$snapshot/vault-resource-add-from-stdin" \
         expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
       }
       
@@ -143,7 +143,7 @@ function trust_key () {
       }
       
       it "shows the single file without gpg suffix" && {
-        WITH_OUTPUT="s3v://.*from-stdin" \
+        WITH_SNAPSHOT="$snapshot/vault-ls-with-single-resource" \
         expect_run $SUCCESSFULLY "$exe" vault ls
       }
     )
@@ -151,7 +151,7 @@ function trust_key () {
       previous_resource_id="$(md5sum ./from-stdin.gpg)"
       
       it "fails as it won't overwrite existing resources" && {
-        echo hi | WITH_OUTPUT="Refusing to overwrite existing file at" \
+        echo hi | WITH_SNAPSHOT="$snapshot/vault-resource-add-overwrite-protection" \
         expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
       }
       
