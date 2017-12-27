@@ -17,7 +17,7 @@
    * [x] support for multiple vaults
    * [x] list vault contents
    * [x] decrypt vault contents
-   * [ ] edit vault contents
+   * [x] edit vault contents
    * [ ] add another user and re-encrypt parition content
  * [ ] **installable from crates.io**
  * ...and many more when the boxes above are ticked :D

@@ -45,6 +45,12 @@ pub enum VaultCommand {
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum FileSuffix {
+    AppendGpg,
+    Unchanged,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum WriteMode {
     AllowOverwrite,
     RefuseOverwrite,
@@ -101,8 +107,16 @@ impl VaultSpec {
         &self.dst
     }
 
-    pub fn open_output(&self, root: &Path, mode: WriteMode) -> Result<File, Error> {
-        let output_file = root.join(gpg_output_filename(&self.dst)?);
+    pub fn open_output_in(
+        &self,
+        root: &Path,
+        mode: WriteMode,
+        suffix: FileSuffix,
+    ) -> Result<File, Error> {
+        let output_file = match suffix {
+            FileSuffix::AppendGpg => root.join(gpg_output_filename(&self.dst)?),
+            FileSuffix::Unchanged => root.join(&self.dst),
+        };
         if mode.refuse_overwrite() && output_file.exists() {
             return Err(format_err!(
                 "Refusing to overwrite existing file at '{}'",

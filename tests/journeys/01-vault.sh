@@ -205,7 +205,7 @@ function trust_key () {
           cat <<'EDITOR' > "$editor"
 #!/bin/bash -e
 file_to_edit=${1:?}
-echo "$file_to_edit" > /tmp/filepath-with-decrypted-content
+echo -n "$file_to_edit" > /tmp/filepath-with-decrypted-content
 echo "ho" > $file_to_edit
 EDITOR
           chmod +x "$editor"
@@ -216,9 +216,24 @@ EDITOR
         }
         it "changes the file accordingly" && {
           WITH_SNAPSHOT="$snapshot/vault-edit-changed-file" \
-          expect_run $SUCCESSFULLY "$exe" vault show from-stdin
+          expect_run $SUCCESSFULLY "$exe" vault show from-stdin.gpg
+        }
+        it "removes the file with decrypted content" && {
+          expect_run $WITH_FAILURE test -f "$(cat /tmp/filepath-with-decrypted-content)"
         }
       )
+    )
+    (when "editing an unknown resource"
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/vault-unknown-resource-edit" \
+        expect_run $WITH_FAILURE "$exe" vault edit some-unknown-resource
+      }
+    )
+    (with "an editor program that does not exist in path"
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/vault-known-resource-edit-editor-not-in-path" \
+        expect_run $WITH_FAILURE "$exe" vault edit --editor foo from-stdin
+      }
     )
   )
 )

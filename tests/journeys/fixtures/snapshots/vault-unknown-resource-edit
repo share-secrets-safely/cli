@@ -1,0 +1,4 @@
+error: Failed to decrypt file at 'some-unknown-resource'.
+Caused by: 
+ 2: Could not open input file at './some-unknown-resource.gpg' for reading. Tried './some-unknown-resource' as well.
+ 1: No such file or directory (os error 2)

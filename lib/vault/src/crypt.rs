@@ -14,7 +14,7 @@ use std::process::Command;
 use mktemp::Temp;
 use util::write_at;
 use std::path::PathBuf;
-use s3_types::WriteMode;
+use s3_types::{FileSuffix, WriteMode};
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path) -> Result<(), Error> {
@@ -49,10 +49,14 @@ impl Vault {
             &[
                 VaultSpec {
                     src: Some(tempfile_path),
-                    dst: decrypted_file_path,
+                    dst: decrypted_file_path.canonicalize().context(format!(
+                        "Could not obtain absolute path for '{}'",
+                        decrypted_file_path.display()
+                    ))?,
                 },
             ],
             WriteMode::AllowOverwrite,
+            FileSuffix::Unchanged,
         ).context("Failed to re-encrypt edited content")?;
         Ok(())
     }
@@ -80,7 +84,12 @@ impl Vault {
         Ok(path_for_decryption)
     }
 
-    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode) -> Result<String, Error> {
+    pub fn encrypt(
+        &self,
+        specs: &[VaultSpec],
+        mode: WriteMode,
+        suffix: FileSuffix,
+    ) -> Result<String, Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let recipients = self.recipients_list()?;
         if recipients.is_empty() {
@@ -131,7 +140,7 @@ impl Vault {
             let mut output = Vec::new();
             ctx.encrypt(&keys, input, &mut output)
                 .context(format!("Failed to encrypt {}", spec))?;
-            spec.open_output(&self.resolved_at, mode)?
+            spec.open_output_in(&self.resolved_at, mode, suffix)?
                 .write_all(&output)
                 .context(format!(
                     "Failed to write all encrypted data to '{}'",

@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::fs::File;
-use std::io::{stdin, BufRead, BufReader, Read, Write};
+use std::io::{self, stdin, BufRead, BufReader, Read, Write};
+use std::env::{current_dir, set_current_dir};
 use serde_yaml;
 use util::write_at;
 use itertools::join;
@@ -16,6 +17,25 @@ pub fn at_default() -> PathBuf {
     PathBuf::from(".")
 }
 
+struct ResetCWD {
+    cwd: Result<PathBuf, io::Error>,
+}
+impl ResetCWD {
+    fn new(next_cwd: &Path) -> Result<Self, io::Error> {
+        let prev_cwd = current_dir();
+        set_current_dir(next_cwd)?;
+        Ok(ResetCWD { cwd: prev_cwd })
+    }
+}
+
+impl Drop for ResetCWD {
+    fn drop(&mut self) {
+        self.cwd
+            .as_ref()
+            .map(|cwd| ::std::env::set_current_dir(cwd))
+            .ok();
+    }
+}
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub struct Vault {
     pub name: Option<String>,
@@ -60,7 +80,8 @@ fn split_documents<R: Read>(mut r: R) -> Result<Vec<String>, Error> {
 
 impl Vault {
     pub fn from_file(path: &Path) -> Result<Vec<Vault>, Error> {
-        let reader: Box<Read> = if path == Path::new("-") {
+        let path_is_stdin = path == Path::new("-");
+        let reader: Box<Read> = if path_is_stdin {
             Box::new(stdin())
         } else {
             Box::new(File::open(path)
@@ -75,11 +96,11 @@ impl Vault {
                         path: path.to_owned(),
                     })
                     .and_then(|mut v: Vault| {
-                        if v.at.is_relative() {
-                            v.resolved_at = normalize(&path.parent()
-                                .expect("path to point to file")
-                                .join(&v.at))
-                        }
+                        v.resolved_at = if v.at.is_relative() {
+                            normalize(&path.parent().expect("path to point to file").join(&v.at))
+                        } else {
+                            v.at.clone()
+                        };
                         Ok(v)
                     })
             })
@@ -103,9 +124,6 @@ impl Vault {
     }
 
     pub fn absolute_path(&self, path: &Path) -> PathBuf {
-        if path.is_absolute() {
-            return path.to_owned();
-        }
         self.resolved_at.join(path)
     }
 
@@ -143,12 +161,12 @@ impl Vault {
             join(tokens.take(all_expect_last), ".")
         }
         writeln!(w, "{}", self.url())?;
-        for entry in glob(self.resolved_at.join("**/*.gpg").to_str().ok_or_else(|| {
-            format_err!(
-                "Could not decode path '{}' as UTF8",
-                self.resolved_at.display()
-            )
-        })?).expect("valid pattern")
+        let _change_cwd = ResetCWD::new(&self.resolved_at).context(format!(
+            "Failed to temporarily change the working directory to '{}'",
+            self.resolved_at.display()
+        ))?;
+        for entry in glob("**/*.gpg")
+            .expect("valid pattern")
             .filter_map(Result::ok)
         {
             writeln!(w, "{}", strip_ext(&entry))?;
@@ -179,13 +197,17 @@ impl VaultExt for Vec<Vault> {
 
 fn normalize(p: &Path) -> PathBuf {
     use std::path::Component;
-    p.components().fold(PathBuf::new(), |mut p, c| {
+    let mut p = p.components().fold(PathBuf::new(), |mut p, c| {
         match c {
             Component::CurDir => {}
             _ => p.push(c.as_os_str()),
         }
         p
-    })
+    });
+    if p.components().count() == 0 {
+        p = PathBuf::from(".");
+    }
+    p
 }
 #[cfg(test)]
 mod tests_utils {

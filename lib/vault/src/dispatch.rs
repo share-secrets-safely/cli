@@ -5,6 +5,7 @@ use s3_types::VaultContext;
 use failure::Error;
 use std::io::stdout;
 use s3_types::WriteMode;
+use s3_types::FileSuffix;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)
@@ -39,7 +40,7 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             ))
         }
         &VaultCommand::ResourceAdd { ref specs } => {
-            vault_from(&ctx)?.encrypt(&specs, WriteMode::RefuseOverwrite)
+            vault_from(&ctx)?.encrypt(&specs, WriteMode::RefuseOverwrite, FileSuffix::AppendGpg)
         }
         &VaultCommand::ResourceEdit {
             ref spec,
