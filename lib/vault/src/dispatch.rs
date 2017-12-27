@@ -1,7 +1,6 @@
 use vault::{Vault, VaultExt};
 use s3_types::VaultContext;
 use failure::Error;
-use resource;
 use std::io::stdout;
 
 /// A universal handler which delegates all functionality based on the provided Context
@@ -32,10 +31,9 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
                 ctx.vault_path.display()
             ))
         }
-        VaultCommand::ResourceAdd { specs } => resource::add(
-            &Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)?,
-            &specs,
-        ),
+        VaultCommand::ResourceAdd { specs } => Vault::from_file(&ctx.vault_path)?
+            .select(&ctx.vault_id)?
+            .add(&specs),
         VaultCommand::List => {
             let stdout = stdout();
             let mut lock = stdout.lock();
