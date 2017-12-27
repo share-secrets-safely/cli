@@ -70,6 +70,18 @@ where
         let list = App::new("list")
             .alias("ls")
             .about("List the vault's content.");
+        let show_resource = App::new("show").about("Decrypt a resource").arg(
+            Arg::with_name("path")
+                .required(true)
+                .multiple(false)
+                .takes_value(true)
+                .value_name("path")
+                .help(
+                    "Either a vault-relative path to the file as displayed by 'vault show',\
+                     a vault-relative path with the '.gpg' suffix, or an absolute \
+                     path with or without the '.gpg' suffix.",
+                ),
+        );
         let add_resource = App::new("add")
             .alias("insert")
             .about("Add a new resource to the vault.")
@@ -89,6 +101,7 @@ where
             .about("a variety of vault interactions")
             .subcommand(init)
             .subcommand(add_resource)
+            .subcommand(show_resource)
             .subcommand(list)
             .arg(
                 Arg::with_name("vault-id")

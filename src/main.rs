@@ -9,7 +9,7 @@ extern crate s3_extract as extract;
 extern crate s3_types;
 extern crate s3_vault as vault;
 
-mod types;
+mod cli;
 mod parse;
 
 use clap::ArgMatches;
@@ -17,7 +17,7 @@ use failure::Error;
 use std::io::{stderr, stdout, Write};
 use std::process;
 use std::convert::Into;
-use types::CLI;
+use cli::CLI;
 use parse::*;
 
 fn ok_or_exit<T, E>(r: Result<T, E>) -> T
@@ -62,6 +62,7 @@ fn main() {
             context = match args.subcommand() {
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
                 ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
+                ("show", Some(args)) => ok_or_exit(vault_resource_show(context, args)),
                 _ => context,
             };
             vault::do_it(context)

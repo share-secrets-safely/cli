@@ -26,6 +26,9 @@ fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum VaultCommand {
+    ResourceShow {
+        spec: PathBuf,
+    },
     ResourceAdd {
         specs: Vec<VaultSpec>,
     },

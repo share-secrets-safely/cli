@@ -131,6 +131,10 @@ impl Vault {
         )
     }
 
+    pub fn show(&self, _path: &Path, _w: &mut Write) -> Result<(), Error> {
+        bail!("TBD")
+    }
+
     pub fn list(&self, w: &mut Write) -> Result<(), Error> {
         fn strip_ext(p: &Path) -> String {
             let cow = p.to_string_lossy();

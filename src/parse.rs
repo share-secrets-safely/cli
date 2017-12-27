@@ -7,7 +7,7 @@ use std::path::Path;
 use std::str::FromStr;
 use std::convert::Into;
 use std::ffi::OsStr;
-use types::CLI;
+use cli::CLI;
 
 fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
@@ -42,6 +42,15 @@ pub fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
         vault_path: required_os_arg(args, "config-file")?,
         vault_id: required_arg(args, "vault-id")?,
         command: VaultCommand::List,
+    })
+}
+
+pub fn vault_resource_show(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::ResourceShow {
+            spec: required_os_arg(args, "path")?,
+        },
+        ..ctx
     })
 }
 
