@@ -50,7 +50,7 @@ pub fn add(vault: &Vault, specs: &[VaultSpec]) -> Result<String, Error> {
                 "Could not read all input from '{}' into buffer",
                 spec.source()
                     .map(|s| format!("{}", s.display()))
-                    .unwrap_or_else(||"<stdin>".into())
+                    .unwrap_or_else(|| "<stdin>".into())
             ))?;
             buf
         };

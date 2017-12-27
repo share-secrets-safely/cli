@@ -62,9 +62,17 @@ snapshot="$fixture/snapshots"
   )
 )
 
+function trust_key () {
+  {
+    gpg --export-ownertrust
+    echo "${1:?}:6:"
+  } | gpg --import-ownertrust
+}
+
 (sandboxed
   title "'vault init' - with absolute vault directory"
-  vault_dir=vault/location
+  subdir=location
+  vault_dir=vault/$subdir
   mkdir -p $vault_dir
   vault_dir=$PWD/$vault_dir
   (with "a an absolute vault directory"
@@ -75,6 +83,29 @@ snapshot="$fixture/snapshots"
     it "creates the correct folder structure" && {
       expect_snapshot "$snapshot/vault-init-single-user-absolute-directory" "$vault_dir"
     }
+    ( cd "$vault_dir/.."
+      echo 'content' > content
+      cd "$vault_dir"
+      trust_key $TESTER_FPR
+      
+      it "does not add resources which walk to the parent directory" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-failure" \
+        expect_run $WITH_FAILURE "$exe" \
+          vault -c vault.yml \
+          resource add ../content
+      }
+      
+      it "does add resource which walk to the parent directory if destination is specified" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-success" \
+        expect_run $SUCCESSFULLY "$exe" \
+          vault -c vault.yml \
+          resource add ../content:content
+      }
+      
+      it "creates an the encrypted file" && {
+        expect_exists content.gpg
+      }
+    )
   )
 )
 
@@ -116,19 +147,11 @@ snapshot="$fixture/snapshots"
 )
 
 
-function trust_key () {
-  {
-    gpg --export-ownertrust
-    echo "${1:?}:6:"
-  } | gpg --import-ownertrust
-}
-
 (sandboxed 
   title "'vault add'"
   (with "a vault initialized for a single recipient"
     ( gpg --batch --yes --delete-secret-keys $C_FPR
       gpg --batch --yes --delete-keys $C_FPR
-      trust_key $TESTER_FPR
       "$exe" vault init
     ) &> /dev/null
     
@@ -161,5 +184,3 @@ function trust_key () {
     )
   )
 )
-
-# TODO: add actual file to vault and assure it will always be inside of the vault

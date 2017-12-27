@@ -6,6 +6,7 @@ use conv::TryFrom;
 use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{stdin, Read};
+use std::path::Component;
 
 use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
@@ -120,10 +121,10 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
         };
         let validate_dst = |p: PathBuf| {
             if p.is_absolute() {
-                return Err(VaultSpecError(format!(
+                Err(VaultSpecError(format!(
                     "'{}' must not have an absolute destination.",
                     input
-                )));
+                )))
             } else {
                 Ok(p)
             }
@@ -136,10 +137,19 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
         Ok(match (splits.next(), splits.next()) {
             (Some(src), None) => VaultSpec {
                 src: validate(src)?,
-                dst: validate_dst(PathBuf::from(src)).map_err(|mut e| {
-                    e.0.push_str(" Try specifying the destination explicitly.");
-                    e
-                })?,
+                dst: {
+                    let dst = validate_dst(PathBuf::from(src)).map_err(|mut e| {
+                        e.0.push_str(" Try specifying the destination explicitly.");
+                        e
+                    })?;
+                    if dst.components().any(|c| match c {
+                        Component::ParentDir => true,
+                        _ => false,
+                    }) {
+                        return Err(VaultSpecError(format!("Relative parent directories in source '{}' need the destination set explicitly.", src)));
+                    };
+                    dst
+                },
             },
             (Some(src), Some(dst)) => VaultSpec {
                 src: validate(src)?,
@@ -270,6 +280,37 @@ mod tests_vault_spec {
             Err(VaultSpecError(format!(
                 "'{}' must not have an absolute destination. Try specifying the destination explicitly.",
                 invalid
+            )))
+        )
+    }
+
+    #[test]
+    fn it_do_allow_relative_parent_directories_if_destination_is_specified() {
+        assert_eq!(
+            VaultSpec::try_from("../relative:destination"),
+            Ok(VaultSpec {
+                src: Some(PathBuf::from("../relative")),
+                dst: PathBuf::from("destination"),
+            })
+        )
+    }
+    #[test]
+    fn it_does_allow_relative_parent_directories_in_destinations_if_that_is_what_the_user_wants() {
+        assert_eq!(
+            VaultSpec::try_from("../relative:../other"),
+            Ok(VaultSpec {
+                src: Some(PathBuf::from("../relative")),
+                dst: PathBuf::from("../other"),
+            })
+        )
+    }
+
+    #[test]
+    fn it_does_not_allow_relative_parent_directories() {
+        assert_eq!(
+            VaultSpec::try_from("../relative"),
+            Err(VaultSpecError(format!(
+                "Relative parent directories in source '../relative' need the destination set explicitly.",
             )))
         )
     }
