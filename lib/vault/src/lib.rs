@@ -17,7 +17,7 @@ mod util;
 mod vault;
 mod dispatch;
 mod init;
-mod resource;
+mod crypt;
 
 pub use vault::Vault;
 pub use dispatch::do_it;

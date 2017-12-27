@@ -5,9 +5,14 @@ use util::UserIdFingerprint;
 use std::io::Write;
 use itertools::join;
 use gpgme;
+use std::path::Path;
 
 impl Vault {
-    pub fn add(&self, specs: &[VaultSpec]) -> Result<String, Error> {
+    pub fn decrypt(&self, _path: &Path, _w: &mut Write) -> Result<(), Error> {
+        bail!("TBD")
+    }
+
+    pub fn encrypt(&self, specs: &[VaultSpec]) -> Result<String, Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let recipients = self.recipients_list()?;
         if recipients.is_empty() {

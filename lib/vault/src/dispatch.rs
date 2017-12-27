@@ -35,14 +35,14 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
                 ctx.vault_path.display()
             ))
         }
-        &VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.add(&specs),
+        &VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(&specs),
         s @ &VaultCommand::List | s @ &VaultCommand::ResourceShow { .. } => {
             let vault = vault_from(&ctx)?;
             let stdout = stdout();
             let mut lock = stdout.lock();
             match s {
                 &VaultCommand::List => vault.list(&mut lock),
-                &VaultCommand::ResourceShow { ref spec } => vault.show(spec, &mut lock),
+                &VaultCommand::ResourceShow { ref spec } => vault.decrypt(spec, &mut lock),
                 _ => unreachable!(),
             }.map(|_| String::new())
         }

@@ -156,7 +156,7 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
             },
             (Some(src), Some(dst)) => VaultSpec {
                 src: validate(src)?,
-                dst: validate_dst(PathBuf::from(if dst.is_empty() {
+                dst: PathBuf::from(if dst.is_empty() {
                     if src.is_empty() {
                         return Err(VaultSpecError(format!(
                             "'{}' does not contain a destination.",
@@ -171,7 +171,7 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                     )));
                 } else {
                     dst
-                }))?,
+                }),
             },
             _ => unreachable!(),
         })
@@ -188,6 +188,29 @@ pub struct VaultContext {
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct ExtractionContext {
     pub file_path: PathBuf,
+}
+
+#[cfg(test)]
+mod tests_gpg_output_filename {
+    use super::gpg_output_filename;
+    use std::path::Path;
+    use std::path::PathBuf;
+
+    #[test]
+    fn it_appends_the_gpg_suffix_to_file_names() {
+        assert_eq!(
+            gpg_output_filename(Path::new("a/file")).unwrap(),
+            PathBuf::from("a/file.gpg")
+        )
+    }
+
+    #[test]
+    fn it_appends_the_gpg_suffix_to_file_names_with_extension() {
+        assert_eq!(
+            gpg_output_filename(Path::new("a/file.ext")).unwrap(),
+            PathBuf::from("a/file.ext.gpg")
+        )
+    }
 }
 
 #[cfg(test)]
@@ -327,14 +350,14 @@ mod tests_vault_spec {
     }
 
     #[test]
-    fn it_does_not_allow_an_absolute_destination() {
+    fn it_does_allow_an_absolute_destination_if_it_is_specified() {
         let invalid = "relative/path:/absolute/path";
         assert_eq!(
             VaultSpec::try_from(invalid),
-            Err(VaultSpecError(format!(
-                "'{}' must not have an absolute destination.",
-                invalid
-            )))
+            Ok(VaultSpec {
+                src: Some(PathBuf::from("relative/path")),
+                dst: PathBuf::from("/absolute/path"),
+            })
         )
     }
 
