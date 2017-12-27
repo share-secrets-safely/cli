@@ -103,6 +103,9 @@ impl Vault {
     }
 
     pub fn absolute_path(&self, path: &Path) -> PathBuf {
+        if path.is_absolute() {
+            return path.to_owned();
+        }
         self.resolved_at.join(path)
     }
 

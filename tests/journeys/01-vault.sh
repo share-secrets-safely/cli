@@ -200,12 +200,12 @@ function trust_key () {
     )
     (when "editing a known resource"
       (with "a custom editor"
-        editor=my-editor.sh
+        editor="$PWD/my-editor.sh"
         (
-          cat <<'EDITOR' > $editor
+          cat <<'EDITOR' > "$editor"
 #!/bin/bash -e
 file_to_edit=${1:?}
-echo "$file_to_edit"
+echo "$file_to_edit" > /tmp/filepath-with-decrypted-content
 echo "ho" > $file_to_edit
 EDITOR
           chmod +x "$editor"

@@ -5,6 +5,7 @@ extern crate failure_derive;
 extern crate glob;
 extern crate gpgme;
 extern crate itertools;
+extern crate mktemp;
 extern crate s3_types;
 extern crate serde;
 #[macro_use]

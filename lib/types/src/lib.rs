@@ -44,10 +44,25 @@ pub enum VaultCommand {
     List,
 }
 
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum WriteMode {
+    AllowOverwrite,
+    RefuseOverwrite,
+}
+
+impl WriteMode {
+    pub fn refuse_overwrite(self) -> bool {
+        match self {
+            WriteMode::AllowOverwrite => false,
+            WriteMode::RefuseOverwrite => true,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultSpec {
-    src: Option<PathBuf>,
-    dst: PathBuf,
+    pub src: Option<PathBuf>,
+    pub dst: PathBuf,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -86,9 +101,9 @@ impl VaultSpec {
         &self.dst
     }
 
-    pub fn open_output(&self, root: &Path) -> Result<File, Error> {
+    pub fn open_output(&self, root: &Path, mode: WriteMode) -> Result<File, Error> {
         let output_file = root.join(gpg_output_filename(&self.dst)?);
-        if output_file.exists() {
+        if mode.refuse_overwrite() && output_file.exists() {
             return Err(format_err!(
                 "Refusing to overwrite existing file at '{}'",
                 output_file.display()

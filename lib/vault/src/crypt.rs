@@ -10,21 +10,66 @@ use gpgme;
 use std::path::Path;
 use std::fs::File;
 use s3_types::gpg_output_filename;
+use std::process::Command;
+use mktemp::Temp;
+use util::write_at;
+use std::path::PathBuf;
+use s3_types::WriteMode;
 
 impl Vault {
-    pub fn edit(&self, _path: &Path, _editor: &Path) -> Result<(), Error> {
-        bail!("TBD")
+    pub fn edit(&self, path: &Path, editor: &Path) -> Result<(), Error> {
+        let file = Temp::new_file().context("Could not create tempfile to decrypt to")?;
+        let tempfile_path = file.to_path_buf();
+        let decrypted_file_path = {
+            let mut decrypted_writer = write_at(&tempfile_path)
+                .context("Failed to open temporary file for writing decrypted content to")?;
+            self.decrypt(path, &mut decrypted_writer)
+                .context(format!("Failed to decrypt file at '{}'.", path.display()))?
+        };
+        let mut running_program = Command::new(editor)
+            .arg(&tempfile_path)
+            .stdin(::std::process::Stdio::inherit())
+            .stdout(::std::process::Stdio::inherit())
+            .stderr(::std::process::Stdio::inherit())
+            .spawn()
+            .context(format!(
+                "Failed to start editor program at '{}'",
+                editor.display()
+            ))?;
+        let status = running_program
+            .wait()
+            .context("Failed to wait for editor to exit.")?;
+        if !status.success() {
+            return Err(format_err!(
+                "Editor '{}' failed. Edit aborted.",
+                editor.display()
+            ));
+        }
+        self.encrypt(
+            &[
+                VaultSpec {
+                    src: Some(tempfile_path),
+                    dst: decrypted_file_path,
+                },
+            ],
+            WriteMode::AllowOverwrite,
+        ).context("Failed to re-encrypt edited content")?;
+        Ok(())
     }
 
-    pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<(), Error> {
+    pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
-        let gpg_path = gpg_output_filename(path)?;
-        let mut input = File::open(&gpg_path)
-            .or_else(|_| File::open(path))
+        let resolved_absolute_path = self.absolute_path(path);
+        let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
+        let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
+            .map(|f| (f, resolved_gpg_path.to_owned()))
+            .or_else(|_| {
+                File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned()))
+            })
             .context(format!(
                 "Could not open input file at '{}' for reading. Tried '{}' as well.",
-                gpg_path.display(),
-                path.display()
+                resolved_gpg_path.display(),
+                resolved_absolute_path.display()
             ))?;
         let mut output = Vec::new();
         ctx.decrypt(&mut input, &mut output)
@@ -32,10 +77,10 @@ impl Vault {
 
         w.write_all(&output)
             .context("Could not write out all decrypted data.")?;
-        Ok(())
+        Ok(path_for_decryption)
     }
 
-    pub fn encrypt(&self, specs: &[VaultSpec]) -> Result<String, Error> {
+    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode) -> Result<String, Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let recipients = self.recipients_list()?;
         if recipients.is_empty() {
@@ -86,7 +131,7 @@ impl Vault {
             let mut output = Vec::new();
             ctx.encrypt(&keys, input, &mut output)
                 .context(format!("Failed to encrypt {}", spec))?;
-            spec.open_output(&self.resolved_at)?
+            spec.open_output(&self.resolved_at, mode)?
                 .write_all(&output)
                 .context(format!(
                     "Failed to write all encrypted data to '{}'",

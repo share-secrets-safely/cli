@@ -1,7 +1,10 @@
+extern crate s3_types;
+
 use vault::{Vault, VaultExt};
 use s3_types::VaultContext;
 use failure::Error;
 use std::io::stdout;
+use s3_types::WriteMode;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)
@@ -35,7 +38,9 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
                 ctx.vault_path.display()
             ))
         }
-        &VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(&specs),
+        &VaultCommand::ResourceAdd { ref specs } => {
+            vault_from(&ctx)?.encrypt(&specs, WriteMode::RefuseOverwrite)
+        }
         &VaultCommand::ResourceEdit {
             ref spec,
             ref editor,
@@ -48,7 +53,9 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             let mut lock = stdout.lock();
             match s {
                 &VaultCommand::List => vault.list(&mut lock),
-                &VaultCommand::ResourceShow { ref spec } => vault.decrypt(spec, &mut lock),
+                &VaultCommand::ResourceShow { ref spec } => {
+                    vault.decrypt(spec, &mut lock).map(|_| ())
+                }
                 _ => unreachable!(),
             }.map(|_| String::new())
         }
