@@ -11,7 +11,7 @@ use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
 use std::path::Component;
 
-fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
+pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
     let file_name = path.file_name()
         .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
     Ok(path.parent()
@@ -115,6 +115,12 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
 
     fn try_from(input: &'a str) -> Result<Self, Self::Err> {
         const SEPARATOR: char = ':';
+        fn has_parent_component(p: &Path) -> bool {
+            p.components().any(|c| match c {
+                Component::ParentDir => true,
+                _ => false,
+            })
+        }
         let validate = |src: &'a str| {
             Ok(if src.is_empty() {
                 None
@@ -145,10 +151,7 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                         e.0.push_str(" Try specifying the destination explicitly.");
                         e
                     })?;
-                    if dst.components().any(|c| match c {
-                        Component::ParentDir => true,
-                        _ => false,
-                    }) {
+                    if has_parent_component(&dst) {
                         return Err(VaultSpecError(format!("Relative parent directories in source '{}' need the destination set explicitly.", src)));
                     };
                     dst

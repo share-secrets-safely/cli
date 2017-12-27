@@ -1,3 +1,5 @@
+extern crate s3_types;
+
 use s3_types::VaultSpec;
 use vault::Vault;
 use failure::{err_msg, Error, ResultExt};
@@ -6,10 +8,27 @@ use std::io::Write;
 use itertools::join;
 use gpgme;
 use std::path::Path;
+use std::fs::File;
+use s3_types::gpg_output_filename;
 
 impl Vault {
-    pub fn decrypt(&self, _path: &Path, _w: &mut Write) -> Result<(), Error> {
-        bail!("TBD")
+    pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<(), Error> {
+        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let gpg_path = gpg_output_filename(path)?;
+        let mut input = File::open(&gpg_path)
+            .or_else(|_| File::open(path))
+            .context(format!(
+                "Could not open input file at '{}' for reading. Tried '{}' as well.",
+                gpg_path.display(),
+                path.display()
+            ))?;
+        let mut output = Vec::new();
+        ctx.decrypt(&mut input, &mut output)
+            .context("Failed to decrypt data")?;
+
+        w.write_all(&output)
+            .context("Could not write out all decrypted data.")?;
+        Ok(())
     }
 
     pub fn encrypt(&self, specs: &[VaultSpec]) -> Result<String, Error> {
