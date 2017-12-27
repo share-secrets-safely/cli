@@ -180,5 +180,23 @@ function trust_key () {
         expect_equals "$previous_resource_id" "$(md5sum ./from-stdin.gpg)"
       }
     )
+    (when "showing the previously added resource"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-show" \
+        expect_run $SUCCESSFULLY "$exe" vault show from-stdin
+      }
+    )
+    (when "showing the previously added resource using the gpg suffix"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-show" \
+        expect_run $SUCCESSFULLY "$exe" vault show ./from-stdin.gpg
+      }
+    )
+    (when "showing an unknown resource"
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/vault-unknown-resource-show" \
+        expect_run $WITH_FAILURE "$exe" vault show some-unknown-resource
+      }
+    )
   )
 )

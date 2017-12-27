@@ -15,7 +15,7 @@
    * [x] initialize a new vault
    * [x] add contents
    * [x] support for multiple vaults
-   * [x] show vault contents
+   * [x] list vault contents
    * [ ] decrypt vault contents
    * [ ] edit vault contents
    * [ ] add another user and re-encrypt parition content

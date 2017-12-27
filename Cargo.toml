@@ -14,5 +14,6 @@ s3-vault = {path = "lib/vault", version = "~0.1.0"}
 s3-extract = {path = "lib/extract", version = "~0.1.0"}
 s3-types = {path = "lib/types", version = "~0.1.0"}
 conv = "0.3.3"
+lazy_static = "1.0.0"
 
 [workspace]
