@@ -6,10 +6,10 @@ use conv::TryFrom;
 use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{stdin, Read};
-use std::path::Component;
 
 use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
+use std::path::Component;
 
 fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
     let file_name = path.file_name()

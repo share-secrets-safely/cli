@@ -204,14 +204,10 @@ fn main() {
                 <dst> should be vault-relative paths, whereas <src> must point tel a readable file \
                 and can be empty to read from standard input, such as in ':<dst>'."),
         );
-    let resource = App::new("resource")
-        .alias("contents")
-        .about("Handle resources stored in your vault")
-        .subcommand(add_resource);
     let vault = App::new("vault")
         .about("a variety of vault interactions")
         .subcommand(init)
-        .subcommand(resource)
+        .subcommand(add_resource)
         .subcommand(list)
         .arg(
             Arg::with_name("vault-id")
@@ -267,10 +263,7 @@ fn main() {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
-                ("resource", Some(args)) => match args.subcommand() {
-                    ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
-                    _ => usage_and_exit(&matches),
-                },
+                ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
                 _ => context,
             };
             vault::do_it(context)

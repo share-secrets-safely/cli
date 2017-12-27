@@ -91,15 +91,13 @@ function trust_key () {
       it "does not add resources which walk to the parent directory" && {
         WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-failure" \
         expect_run $WITH_FAILURE "$exe" \
-          vault -c vault.yml \
-          resource add ../content
+          vault -c vault.yml add ../content
       }
       
       it "does add resource which walk to the parent directory if destination is specified" && {
         WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-success" \
         expect_run $SUCCESSFULLY "$exe" \
-          vault -c vault.yml \
-          resource add ../content:content
+          vault -c vault.yml add ../content:content
       }
       
       it "creates an the encrypted file" && {
@@ -134,7 +132,7 @@ function trust_key () {
 
 (sandboxed
   title "'vault init' - use multiple secret keys"
-  (with "a multiple selected gpg keys"
+  (with "multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
       WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-specified-keys" \
       expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com --gpg-key-id tester@example.com
@@ -158,7 +156,7 @@ function trust_key () {
     (when "adding new resource from stdin"
       it "succeeds" && {
         echo hi | WITH_SNAPSHOT="$snapshot/vault-resource-add-from-stdin" \
-        expect_run $SUCCESSFULLY "$exe" vault resource add :from-stdin
+        expect_run $SUCCESSFULLY "$exe" vault add :from-stdin
       }
       
       it "creates an encrypted file" && {
@@ -175,7 +173,7 @@ function trust_key () {
       
       it "fails as it won't overwrite existing resources" && {
         echo hi | WITH_SNAPSHOT="$snapshot/vault-resource-add-overwrite-protection" \
-        expect_run $WITH_FAILURE "$exe" vault contents add :from-stdin
+        expect_run $WITH_FAILURE "$exe" vault add :from-stdin
       }
       
       it "does not change the previous file" && {
