@@ -10,7 +10,6 @@ source "$root/../utilities.sh"
 
 WITH_FAILURE=1
 SUCCESSFULLY=0
-C_FPR=905E53FE2FC0A500100AB80B056F92A52DF04D4E
 TESTER_FPR=D6339718E9B58FCE3C66C78AAA5B7BF150F48332
 
 
@@ -62,20 +61,13 @@ snapshot="$fixture/snapshots"
   )
 )
 
-function trust_key () {
-  {
-    gpg --export-ownertrust
-    echo "${1:?}:6:"
-  } | gpg --import-ownertrust &>/dev/null
-}
-
 (sandboxed
   title "'vault init' - with absolute vault directory"
   subdir=location
   vault_dir=vault/$subdir
   mkdir -p $vault_dir
   vault_dir=$PWD/$vault_dir
-  gpg --import "$fixture/tester.sec.asc" &>/dev/null
+  import_user "$fixture/tester.sec.asc"
   
   (with "a an absolute vault directory"
     it "succeeds" && {
@@ -88,7 +80,6 @@ function trust_key () {
     (when "editing a file"
       editor="$PWD/my-simple-editor.sh"
       (
-        trust_key $TESTER_FPR
         cat <<'EDITOR' > "$editor"
 #!/bin/bash -e
 echo "made by simple editor" > ${1:?}
@@ -131,7 +122,6 @@ EDITOR
 (sandboxed
   title "'vault init' - multiple gpg keys available"
   gpg --import "$fixture/tester.sec.asc" "$fixture/c.sec.asc" &>/dev/null
-  trust_key $TESTER_FPR
   
   (with "a gpg key signed by others"
     it "fails as it can't decide which gpg key to export" && {
@@ -156,7 +146,6 @@ EDITOR
 (sandboxed
   title "'vault init' - use multiple secret keys"
   gpg --import "$fixture/tester.sec.asc" "$fixture/c.sec.asc" &>/dev/null
-  trust_key $TESTER_FPR
 
   
   (with "multiple selected gpg keys"
@@ -175,8 +164,7 @@ EDITOR
   title "'vault add', 'show' and 'edit'"
   (with "a vault initialized for a single recipient"
     {
-      gpg --import "$fixture/tester.sec.asc"
-      trust_key $TESTER_FPR
+      import_user "$fixture/tester.sec.asc"
       "$exe" vault init
     } &> /dev/null
     
@@ -282,5 +270,29 @@ EDITOR
 (sandboxed 
   title "'vault recipient add'"
   (with "a vault initialized for a single recipient and an existing secret"
+    { import_user "$fixture/tester.sec.asc"
+      "$exe" vault init
+      echo secret | "$exe" vault add :secret
+    } &>/dev/null
+    
+    (when "trying to decrypt with an unknown gpg user"
+      (as_user "$fixture/c.sec.asc"
+        it "fails" && {
+          WITH_SNAPSHOT="$snapshot/vault-show-failure-as-unknown-user" \
+          expect_run $WITH_FAILURE "$exe" vault show secret
+        }
+      )
+    )
+    
+    (when "adding a new recipient using the id of an already imported key"
+      it "succeeds" && {
+        echo hi
+      }
+      
+      it "re-encrypts all secrets to allow the new recipient to decode it" && {
+        echo hi
+      }
+      
+    )
   )
 )
