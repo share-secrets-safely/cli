@@ -94,16 +94,17 @@ impl Vault {
                         cause,
                         path: path.to_owned(),
                     })
-                    .and_then(|mut v: Vault| {
-                        v.resolved_at = if v.at.is_relative() {
-                            normalize(&path.parent().expect("path to point to file").join(&v.at))
-                        } else {
-                            v.at.clone()
-                        };
-                        Ok(v)
-                    })
+                    .map(|v: Vault| v.set_resolved_at(path))
             })
             .collect::<Result<_, _>>()?)
+    }
+
+    pub fn set_resolved_at(mut self, vault_file: &Path) -> Self {
+        self.resolved_at = normalize(&vault_file
+            .parent()
+            .expect("path to point to file")
+            .join(&self.at));
+        self
     }
 
     pub fn to_file(&self, path: &Path) -> Result<(), VaultError> {

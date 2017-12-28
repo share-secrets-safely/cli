@@ -71,13 +71,10 @@ impl Vault {
         let vault = Vault {
             gpg_keys: Some(gpg_keys_dir.to_owned()),
             recipients: recipients_file.to_owned(),
-            resolved_at: vault_path
-                .parent()
-                .map(ToOwned::to_owned)
-                .ok_or_else(|| format_err!("The vault directory '{}' is invalid.", vault_path.display()))?,
             name,
             at: at.to_owned(),
-        };
+            ..Default::default()
+        }.set_resolved_at(vault_path);
 
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let keys = {

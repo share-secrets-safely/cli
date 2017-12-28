@@ -1,1 +1,1 @@
-error: Cannot export keys into existing, non-empty directory at '.gpg-keys'
+error: Cannot export keys into existing, non-empty directory at './.gpg-keys'

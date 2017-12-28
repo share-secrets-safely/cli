@@ -65,21 +65,25 @@ snapshot="$fixture/snapshots"
     import_user "$fixture/tester.sec.asc"
   
     vault_dir=vault
-    mkdir -p $vault_dir/secrets
+    mkdir $vault_dir
     (with "a specified --at location and relative directories for keys and recipients"
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-init-will-overwrite-recipients-file" \
-        expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml init --at secrets -k ../etc/keys -r ../etc/recipients
+        WITH_SNAPSHOT="$snapshot/vault-init-with-at-argument" \
+        expect_run $SUCCESSFULLY "$exe" vault \
+          -c $vault_dir/vault.yml \
+          --vault-id customized \
+          init --at secrets -k ../etc/keys -r ../etc/recipients
       }
       
       it "creates the expected folder structure" && {
-        expect_snapshot "$snapshot/vault-init-change-at-location" .
+        expect_snapshot "$snapshot/vault-init-change-at-location-folder-structure" .
       }
     )
     
     (when "adding a secret"
+      mkdir -p $vault_dir/secrets
       it "succeeds" && {
-        echo hi | expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml :secret
+        echo hi | expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml add :secret
       }
       
       it "puts the file to the right spot" && {
@@ -319,8 +323,8 @@ EDITOR
         expect_run $SUCCESSFULLY "$exe" vault recipients add c@example.com
       }
       
-      it "exports the new recipients to the gpg-keys directory" && {
-        expect_snapshot "$snapshot/vault-recipient-add-c-keys-dir" .gpg-keys
+      it "sets up the metadata correctly" && {
+        expect_snapshot "$snapshot/vault-recipient-add-c-keys-dir" etc
       }
       
       it "re-encrypts all secrets to allow the new recipient to decode it" && {

@@ -1,0 +1,5 @@
+---
+name: customized
+at: secrets
+gpg_keys: "../etc/keys"
+recipients: "../etc/recipients"
