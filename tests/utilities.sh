@@ -81,7 +81,7 @@ function expect_snapshot () {
   if ! [ -e "$expected" ]; then
     cp -R "$actual" "$expected"
   fi
-  expect_run 0 diff "$expected" "$actual"
+  expect_run 0 diff -r "$expected" "$actual"
 }
 
 function expect_run () {
