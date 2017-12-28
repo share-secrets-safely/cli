@@ -195,7 +195,7 @@ impl Vault {
             name,
             at: at.to_owned(),
             ..Default::default()
-        }.set_resolved_at(vault_path);
+        }.set_resolved_at(vault_path)?;
 
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let keys = {

@@ -105,17 +105,18 @@ impl Vault {
                         cause,
                         path: path.to_owned(),
                     })
-                    .map(|v: Vault| v.set_resolved_at(path))
+                    .map_err(Into::into)
+                    .and_then(|v: Vault| v.set_resolved_at(path))
             })
             .collect::<Result<_, _>>()?)
     }
 
-    pub fn set_resolved_at(mut self, vault_file: &Path) -> Self {
+    pub fn set_resolved_at(mut self, vault_file: &Path) -> Result<Self, Error> {
         self.resolved_at = normalize(&vault_file
             .parent()
-            .expect("path to point to file")
+            .ok_or_else(|| format_err!("The vault file path '{}' is invalid.", vault_file.display()))?
             .join(&self.at));
-        self
+        Ok(self)
     }
 
     pub fn to_file(&self, path: &Path) -> Result<(), VaultError> {
