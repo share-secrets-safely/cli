@@ -3,8 +3,18 @@ authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "s3-extract"
 version = "0.1.0"
 
+description = "Extraction functions used by 'share-secrets-safely' CLI. Use it to extract data from YAML files."
+license = "LGPL-2.1"
+repository = "https://github.com/Byron/share-secrets-safely"
+homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/extract"
+documentation = "https://docs.rs/s3-extract"
+
+[badges]
+travis-ci = { repository = "Byron/share-secrets-safely" }
+
 [dependencies]
 failure = "0.1.1"
 
 [dependencies.s3-types]
 path = "../types"
+version = "0.1"
