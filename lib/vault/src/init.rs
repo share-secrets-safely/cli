@@ -10,22 +10,57 @@ use std::io::Write;
 use std::fmt;
 use vault::Vault;
 
-struct KeylistDisplay<'a>(&'a Vec<gpgme::Key>);
+struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
 impl<'a> fmt::Display for KeylistDisplay<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", join(self.0.iter().map(|k| KeyDisplay(k)), ", "))
+    }
+}
+struct KeyDisplay<'a>(&'a gpgme::Key);
+
+impl<'a> fmt::Display for KeyDisplay<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
             "{}",
-            join(
-                self.0
-                    .iter()
-                    .flat_map(|k| k.user_ids())
-                    .map(|u| u.id().unwrap_or("[none]")),
-                ", "
-            )
+            join(self.0.user_ids().map(|u| u.id().unwrap_or("[none]")), ", ")
         )
     }
+}
+
+fn fingerprint_of(key: &gpgme::Key) -> Result<String, Error> {
+    key.fingerprint()
+        .map_err(|e| {
+            e.map(Into::into)
+                .unwrap_or_else(|| err_msg("Fingerprint extraction failed"))
+        })
+        .map(ToOwned::to_owned)
+}
+
+fn export_key(
+    ctx: &mut gpgme::Context,
+    gpg_keys_dir: &Path,
+    key: &gpgme::Key,
+    buf: &mut Vec<u8>,
+) -> Result<String, Error> {
+    let fingerprint = fingerprint_of(key)?;
+    let key_path = gpg_keys_dir.join(&fingerprint);
+    ctx.export_keys(
+        [key].iter().map(|k| *k),
+        gpgme::ExportMode::empty(),
+        buf.clone(),
+    ).context(err_msg(
+        "Failed to export at least one public key with signatures.",
+    ))?;
+    write_at(&key_path)
+        .and_then(|mut f| f.write_all(&buf))
+        .context(format!(
+            "Could not write public key file at '{}'",
+            key_path.display()
+        ))?;
+    buf.clear();
+    Ok(fingerprint.to_owned())
 }
 
 impl Vault {
@@ -51,12 +86,40 @@ impl Vault {
             ));
         };
 
-        let output = Vec::<String>::new();
+        let mut output = Vec::new();
         if let Some(gpg_keys_dir) = self.gpg_keys.as_ref() {
-            let _gpg_keys_dir = self.absolute_path(gpg_keys_dir);
+            let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
+            let mut buf = Vec::new();
+            for key in keys.iter() {
+                let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
+                output.push(format!(
+                    "Exported key '{}' for user {}",
+                    fingerprint,
+                    KeyDisplay(&key)
+                ));
+            }
         }
 
-        let _recipients_file = self.absolute_path(&self.recipients);
+        let mut recipients = self.recipients_list()?;
+        for key in keys {
+            recipients.push(fingerprint_of(&key)?);
+            output.push(format!("Added recipient {}", KeyDisplay(&key)));
+        }
+        recipients.sort();
+        recipients.dedup();
+
+        let recipients_file = self.absolute_path(&self.recipients);
+        let mut writer = write_at(&recipients_file).context(format!(
+            "Failed to open recipients at '{}' file for writing",
+            recipients_file.display()
+        ))?;
+        for recipient in recipients.iter() {
+            writeln!(&mut writer, "{}", recipient).context(format!(
+                "Failed to write recipient '{}' to file at '{}'",
+                recipient,
+                recipients_file.display()
+            ))?
+        }
         Ok(output.join("\n"))
     }
 
@@ -131,7 +194,6 @@ impl Vault {
         gpg_ctx.set_armor(true);
 
         let mut output = Vec::new();
-        let mode = gpgme::ExportMode::empty();
         if recipients_file.is_file() {
             return Err(format_err!(
                 "Cannot write recipients into existing file at '{}'",
@@ -143,29 +205,12 @@ impl Vault {
             recipients_file.display()
         ))?;
         for key in keys {
-            let key_path = {
-                let fingerprint = key.fingerprint().map_err(|e| {
-                    e.map(Into::into)
-                        .unwrap_or_else(|| err_msg("Fingerprint extraction failed"))
-                })?;
-                writeln!(recipients, "{}", fingerprint).context(format!(
-                    "Could not append fingerprint to file at '{}'",
-                    recipients_file.display()
-                ))?;
-                gpg_keys_dir.join(fingerprint)
-            };
-            gpg_ctx
-                .export_keys([key].iter(), mode, &mut output)
-                .context(err_msg(
-                    "Failed to export at least one public key with signatures.",
-                ))?;
-            write_at(&key_path)
-                .and_then(|mut f| f.write_all(&output))
-                .context(format!(
-                    "Could not write public key file at '{}'",
-                    key_path.display()
-                ))?;
-            output.clear();
+            let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut output)?;
+
+            writeln!(recipients, "{}", fingerprint).context(format!(
+                "Could not append fingerprint to file at '{}'",
+                recipients_file.display()
+            ))?;
         }
         recipients.flush().context(format!(
             "Failed to flush recipients file at '{}'",
