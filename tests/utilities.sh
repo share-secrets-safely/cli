@@ -19,6 +19,8 @@ function sandboxed () {
   trap "popd >/dev/null" EXIT
   pushd "$sandbox_tempdir" >/dev/null \
    || fail "Could not change directory into temporary directory."
+  GNUPGHOME="$(mktemp -t gnupg-home.XXXX -d)"
+  export GNUPGHOME
 }
 
 function with () {

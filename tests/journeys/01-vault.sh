@@ -75,6 +75,8 @@ function trust_key () {
   vault_dir=vault/$subdir
   mkdir -p $vault_dir
   vault_dir=$PWD/$vault_dir
+  gpg --import "$fixture/tester.sec.asc" &>/dev/null
+  
   (with "a an absolute vault directory"
     it "succeeds" && {
       expect_run $SUCCESSFULLY "$exe" vault --config-file "$vault_dir/vault.yml" \
@@ -128,8 +130,10 @@ EDITOR
 
 (sandboxed
   title "'vault init' - multiple gpg keys available"
+  gpg --import "$fixture/tester.sec.asc" "$fixture/c.sec.asc" &>/dev/null
+  trust_key $TESTER_FPR
+  
   (with "a gpg key signed by others"
-    gpg --import "$fixture/c.sec.asc" &>/dev/null
     it "fails as it can't decide which gpg key to export" && {
       WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-viable-keys" \
       expect_run $WITH_FAILURE "$exe" vault init
@@ -151,6 +155,10 @@ EDITOR
 
 (sandboxed
   title "'vault init' - use multiple secret keys"
+  gpg --import "$fixture/tester.sec.asc" "$fixture/c.sec.asc" &>/dev/null
+  trust_key $TESTER_FPR
+
+  
   (with "multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
       WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-specified-keys" \
@@ -166,10 +174,11 @@ EDITOR
 (sandboxed 
   title "'vault add', 'show' and 'edit'"
   (with "a vault initialized for a single recipient"
-    ( gpg --batch --yes --delete-secret-keys $C_FPR
-      gpg --batch --yes --delete-keys $C_FPR
+    {
+      gpg --import "$fixture/tester.sec.asc"
+      trust_key $TESTER_FPR
       "$exe" vault init
-    ) &> /dev/null
+    } &> /dev/null
     
     (when "adding new resource from stdin"
       it "succeeds" && {
@@ -268,5 +277,10 @@ EDITOR
         expect_run $WITH_FAILURE "$exe" vault edit --editor foo from-stdin
       }
     )
+  )
+)
+(sandboxed 
+  title "'vault recipient add'"
+  (with "a vault initialized for a single recipient and an existing secret"
   )
 )
