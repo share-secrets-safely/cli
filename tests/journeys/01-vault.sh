@@ -76,7 +76,7 @@ snapshot="$fixture/snapshots"
       }
       
       it "creates the expected folder structure" && {
-        expect_snapshot "$snapshot/vault-init-change-at-location-folder-structure" .
+        expect_snapshot "$snapshot/vault-init-change-at-location-folder-structure" $vault_dir/etc
       }
     )
     
