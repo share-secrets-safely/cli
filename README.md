@@ -18,10 +18,17 @@
    * [x] list vault contents
    * [x] decrypt vault contents
    * [x] edit vault contents
-   * [ ] add another user and re-encrypt parition content
+   * [x] add another user and re-encrypt vault content
  * [ ] **installable from crates.io**
    * _Not working with the current version of 'gpgme', unfortunately_
  * ...and many more when the boxes above are ticked :D
+ 
+## Caveats
+
+ * Many crypto-operations store decrypted data in a temporary file. These touch
+   disk and currently might be picked up by attackers. A fix could be 'tempfile', 
+   which allows using a secure temporary file - however, it might make getting
+   MUSL builds impossible. Static builds should still be alright.
 
 ## Project Goals
 
