@@ -10,8 +10,6 @@ source "$root/../utilities.sh"
 
 WITH_FAILURE=1
 SUCCESSFULLY=0
-TESTER_FPR=D6339718E9B58FCE3C66C78AAA5B7BF150F48332
-
 
 title "'vault init'"
 
@@ -272,7 +270,7 @@ EDITOR
   (with "a vault initialized for a single recipient and an existing secret"
     { import_user "$fixture/tester.sec.asc"
       "$exe" vault init
-      echo secret | "$exe" vault add :secret
+      echo -n secret | "$exe" vault add :secret
     } &>/dev/null
     
     (when "trying to decrypt with an unknown gpg user"
@@ -285,14 +283,18 @@ EDITOR
     )
     
     (when "adding a new recipient using the id of an already imported key"
+      gpg --import "$fixture/c.pub.asc"
       it "succeeds" && {
-        echo hi
+        WITH_SNAPSHOT="$snapshot/vault-recipient-add-c" \
+        expect_run $SUCCESSFULLY "$exe" vault recipients add c@example.com
       }
       
       it "re-encrypts all secrets to allow the new recipient to decode it" && {
-        echo hi
+        (as_user "$fixture/c.sec.asc"
+          WITH_SNAPSHOT="$snapshot/vault-show-success-as-user-c" \
+          expect_run $SUCCESSFULLY "$exe" vault show secret
+        )
       }
-      
     )
   )
 )

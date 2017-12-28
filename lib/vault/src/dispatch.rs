@@ -16,6 +16,7 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
     use s3_types::VaultCommand;
     match &ctx.command {
+        &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?.add_recipients(gpg_key_ids),
         &VaultCommand::Init {
             ref gpg_key_ids,
             ref gpg_keys_dir,

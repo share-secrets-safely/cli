@@ -22,6 +22,12 @@ where
     }
 
     pub fn new() -> Self {
+        let gpg_key_id = Arg::with_name("gpg-key-id")
+            .multiple(true)
+            .required(false)
+            .takes_value(true)
+            .value_name("userid")
+            .help("The key-id of the public key identifying a recipient in your gpg keychain.");
         let init = App::new("init")
             .about(
                 "Initialize the vault in the current directory. \
@@ -57,16 +63,7 @@ where
                          --gpg-key-id, with signatures.",
                     ),
             )
-            .arg(
-                Arg::with_name("gpg-key-id")
-                    .long("gpg-key-id")
-                    .multiple(true)
-                    .short("i")
-                    .required(false)
-                    .takes_value(true)
-                    .value_name("userid")
-                    .help("The key-id of the public key identifying your own user(s)."),
-            );
+            .arg(gpg_key_id.clone().long("gpg-key-id").short("i"));
 
         let list = App::new("list")
             .alias("ls")
@@ -130,10 +127,19 @@ where
                          and can be empty to read from standard input, such as in ':<dst>'.",
                     ),
             );
+        let add_recipient = App::new("add")
+            .alias("insert")
+            .arg(gpg_key_id.required(true))
+            .about("Add a new recipient. This will re-encrypt all the vaults content.");
+        let recipients = App::new("recipients")
+            .alias("recipient")
+            .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
+            .subcommand(add_recipient);
         let vault = App::new("vault")
             .about("a variety of vault interactions")
             .subcommand(init)
             .subcommand(add_resource)
+            .subcommand(recipients)
             .subcommand(show_resource)
             .subcommand(edit_resource)
             .subcommand(list)

@@ -10,6 +10,10 @@ use std::io::Write;
 use vault::Vault;
 
 impl Vault {
+    pub fn add_recipients(&self, _gpg_key_ids: &[String]) -> Result<String, Error> {
+        Ok(String::new())
+    }
+
     pub fn init(
         gpg_key_ids: &[String],
         gpg_keys_dir: &Path,

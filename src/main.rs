@@ -60,6 +60,10 @@ fn main() {
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
+                ("recipients", Some(args)) => match args.subcommand() {
+                    ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
+                    _ => usage_and_exit(&matches),
+                },
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
                 ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
                 ("show", Some(args)) => ok_or_exit(vault_resource_show(context, args)),
