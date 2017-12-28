@@ -9,6 +9,7 @@ use error::{IOMode, VaultError};
 use failure::{Error, ResultExt};
 use glob::glob;
 
+pub const GPG_GLOB: &'static str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
     PathBuf::from(".gpg-id")
 }
@@ -17,13 +18,23 @@ pub fn at_default() -> PathBuf {
     PathBuf::from(".")
 }
 
-struct ResetCWD {
+pub fn strip_ext(p: &Path) -> String {
+    let cow = p.to_string_lossy();
+    let tokens = cow.split('.');
+    let all_expect_last = tokens.count().checked_sub(1).expect("at least two tokens");
+    let tokens = cow.split('.');
+    join(tokens.take(all_expect_last), ".")
+}
+pub struct ResetCWD {
     cwd: Result<PathBuf, io::Error>,
 }
 impl ResetCWD {
-    fn new(next_cwd: &Path) -> Result<Self, io::Error> {
+    pub fn new(next_cwd: &Path) -> Result<Self, Error> {
         let prev_cwd = current_dir();
-        set_current_dir(next_cwd)?;
+        set_current_dir(next_cwd).context(format!(
+            "Failed to temporarily change the working directory to '{}'",
+            next_cwd.display()
+        ))?;
         Ok(ResetCWD { cwd: prev_cwd })
     }
 }
@@ -150,19 +161,9 @@ impl Vault {
     }
 
     pub fn list(&self, w: &mut Write) -> Result<(), Error> {
-        fn strip_ext(p: &Path) -> String {
-            let cow = p.to_string_lossy();
-            let tokens = cow.split('.');
-            let all_expect_last = tokens.count().checked_sub(1).expect("at least two tokens");
-            let tokens = cow.split('.');
-            join(tokens.take(all_expect_last), ".")
-        }
         writeln!(w, "{}", self.url())?;
-        let _change_cwd = ResetCWD::new(&self.resolved_at).context(format!(
-            "Failed to temporarily change the working directory to '{}'",
-            self.resolved_at.display()
-        ))?;
-        for entry in glob("**/*.gpg")
+        let _change_cwd = ResetCWD::new(&self.resolved_at)?;
+        for entry in glob(GPG_GLOB)
             .expect("valid pattern")
             .filter_map(Result::ok)
         {

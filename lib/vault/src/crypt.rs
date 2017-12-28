@@ -81,8 +81,7 @@ impl Vault {
         Ok(path_for_decryption)
     }
 
-    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode, dst_mode: Destination) -> Result<String, Error> {
-        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+    pub fn recipient_keys(&self, ctx: &mut gpgme::Context) -> Result<Vec<gpgme::Key>, Error> {
         let recipients = self.recipients_list()?;
         if recipients.is_empty() {
             return Err(format_err!(
@@ -116,6 +115,12 @@ impl Vault {
             msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
             return Err(err_msg(msg.join("\n")));
         }
+        Ok(keys)
+    }
+
+    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode, dst_mode: Destination) -> Result<String, Error> {
+        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let keys = self.recipient_keys(&mut ctx)?;
 
         let mut encrypted = Vec::new();
         for spec in specs {

@@ -1,3 +1,5 @@
+extern crate glob;
+
 use gpgme;
 use util::write_at;
 
@@ -8,7 +10,10 @@ use failure::{err_msg, Error, ResultExt};
 use std::fs::create_dir_all;
 use std::io::Write;
 use std::fmt;
-use vault::Vault;
+use vault::{Vault, GPG_GLOB};
+use glob::glob;
+use vault::ResetCWD;
+use vault::strip_ext;
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -120,6 +125,42 @@ impl Vault {
                 recipient,
                 recipients_file.display()
             ))?
+        }
+
+        let keys = self.recipient_keys(&mut gpg_ctx)?;
+
+        let _change_cwd = ResetCWD::new(&self.resolved_at)?;
+        let mut ibuf = Vec::<u8>::new();
+        let mut obuf = Vec::new();
+
+        for encrypted_file_path in glob(GPG_GLOB)
+            .expect("valid pattern")
+            .filter_map(Result::ok)
+        {
+            self.decrypt(&encrypted_file_path, &mut ibuf)?;
+            gpg_ctx
+                .encrypt(&keys, &mut ibuf, &mut obuf)
+                .context(format!(
+                    "Failed to re-encrypt {}.",
+                    encrypted_file_path.display()
+                ))?;
+            ibuf.clear();
+            write_at(&encrypted_file_path)
+                .context(format!(
+                    "Could not open '{}' to write encrypted data",
+                    encrypted_file_path.display()
+                ))
+                .and_then(|mut w| {
+                    w.write_all(&mut obuf).context(format!(
+                        "Failed to write out encrypted data to '{}'",
+                        encrypted_file_path.display()
+                    ))
+                })?;
+            obuf.clear();
+            output.push(format!(
+                "Re-encrypted '{}' for new recipients",
+                strip_ext(&encrypted_file_path)
+            ));
         }
         Ok(output.join("\n"))
     }
