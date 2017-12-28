@@ -4,8 +4,9 @@ use s3_types::VaultSpec;
 use vault::Vault;
 use failure::{err_msg, Error, ResultExt};
 use util::UserIdFingerprint;
-use std::io::Write;
+use std::io::{self, Write};
 use itertools::join;
+use error::FailExt;
 use gpgme;
 use std::path::Path;
 use std::fs::File;
@@ -24,7 +25,11 @@ impl Vault {
             let mut decrypted_writer = write_at(&tempfile_path)
                 .context("Failed to open temporary file for writing decrypted content to")?;
             self.decrypt(path, &mut decrypted_writer)
-                .context(format!("Failed to decrypt file at '{}'.", path.display()))?
+                .context(format!("Failed to decrypt file at '{}'.", path.display()))
+                .or_else(|err| match err.first_cause_of::<io::Error>() {
+                    Some(_) => gpg_output_filename(path).map(|p| self.absolute_path(&p)),
+                    None => Err(err.into()),
+                })?
         };
         let mut running_program = Command::new(editor)
             .arg(&tempfile_path)
@@ -49,10 +54,7 @@ impl Vault {
             &[
                 VaultSpec {
                     src: Some(tempfile_path),
-                    dst: decrypted_file_path.canonicalize().context(format!(
-                        "Could not obtain absolute path for '{}'",
-                        decrypted_file_path.display()
-                    ))?,
+                    dst: decrypted_file_path,
                 },
             ],
             WriteMode::AllowOverwrite,

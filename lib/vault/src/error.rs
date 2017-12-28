@@ -1,7 +1,10 @@
+extern crate failure;
+
 use serde_yaml;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::fmt;
+use failure::Fail;
 
 #[derive(Debug, Fail)]
 pub enum VaultError {
@@ -74,5 +77,18 @@ impl VaultError {
                 path: path.to_owned(),
             },
         }
+    }
+}
+
+pub trait FailExt {
+    fn first_cause_of<T: Fail>(&self) -> Option<&T>;
+}
+
+impl<F> FailExt for F
+where
+    F: Fail,
+{
+    fn first_cause_of<T: Fail>(&self) -> Option<&T> {
+        self.causes().filter_map(|c| c.downcast_ref::<T>()).next()
     }
 }

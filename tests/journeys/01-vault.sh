@@ -198,18 +198,18 @@ function trust_key () {
         expect_run $WITH_FAILURE "$exe" vault show some-unknown-resource
       }
     )
-    (when "editing a known resource"
-      (with "a custom editor"
-        editor="$PWD/my-editor.sh"
-        (
-          cat <<'EDITOR' > "$editor"
+    
+    editor="$PWD/my-editor.sh"
+    cat <<'EDITOR' > "$editor"
 #!/bin/bash -e
 file_to_edit=${1:?}
 echo -n "$file_to_edit" > /tmp/filepath-with-decrypted-content
 echo "ho" > $file_to_edit
 EDITOR
-          chmod +x "$editor"
-        )
+    chmod +x "$editor"
+    
+    (when "editing a known resource"
+      (with "a custom editor"
         it "succeeds" && {
           EDITOR="$editor" \
           expect_run $SUCCESSFULLY "$exe" vault edit from-stdin
@@ -223,12 +223,25 @@ EDITOR
         }
       )
     )
-    (when "editing an unknown resource"
-      it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-unknown-resource-edit" \
-        expect_run $WITH_FAILURE "$exe" vault edit some-unknown-resource
+    (when "editing a new resource with a custom editor"
+      it "creates the new resource" && {
+        EDITOR="$editor" \
+        expect_run $SUCCESSFULLY "$exe" vault edit new-edited-file
+      }
+      it "changes creates file accordingly" && {
+        WITH_SNAPSHOT="$snapshot/vault-edit-changed-file" \
+        expect_run $SUCCESSFULLY "$exe" vault show new-edited-file
+      }
+      it "removes the file with decrypted content" && {
+        expect_run $WITH_FAILURE test -f "$(cat /tmp/filepath-with-decrypted-content)"
       }
     )
+    # (when "editing an unknown resource"
+    #   it "fails" && {
+    #     WITH_SNAPSHOT="$snapshot/vault-unknown-resource-edit" \
+    #     expect_run $WITH_FAILURE "$exe" vault edit --no-create some-unknown-resource
+    #   }
+    # )
     (with "an editor program that does not exist in path"
       it "fails" && {
         WITH_SNAPSHOT="$snapshot/vault-known-resource-edit-editor-not-in-path" \
@@ -237,3 +250,5 @@ EDITOR
     )
   )
 )
+
+# TODO: editing a new secret creates it. As it's mostly for interactive use, its ok
