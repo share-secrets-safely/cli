@@ -1,4 +1,5 @@
 extern crate glob;
+extern crate mktemp;
 
 use gpgme;
 use util::write_at;
@@ -7,13 +8,12 @@ use std::path::Path;
 
 use itertools::join;
 use failure::{err_msg, Error, ResultExt};
-use std::fs::create_dir_all;
+use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::fmt;
-use vault::{Vault, GPG_GLOB};
+use vault::{strip_ext, ResetCWD, Vault, GPG_GLOB};
 use glob::glob;
-use vault::ResetCWD;
-use vault::strip_ext;
+use mktemp::Temp;
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -129,7 +129,6 @@ impl Vault {
 
         let keys = self.recipient_keys(&mut gpg_ctx)?;
 
-        let mut ibuf = Vec::<u8>::new();
         let mut obuf = Vec::new();
 
         let files_to_reencrypt: Vec<_> = {
@@ -140,19 +139,28 @@ impl Vault {
                 .collect()
         };
         for encrypted_file_path in files_to_reencrypt {
-            self.decrypt(&encrypted_file_path, &mut ibuf)
-                .context(format!(
-                    "Could not decrypt '{}' to re-encrypt for new recipients.",
-                    encrypted_file_path.display()
-                ))?;
-            gpg_ctx
-                .encrypt(&keys, &mut ibuf, &mut obuf)
-                .context(format!(
-                    "Failed to re-encrypt {}.",
-                    encrypted_file_path.display()
-                ))?;
-            ibuf.clear();
-            write_at(&encrypted_file_path)
+            let tempfile = Temp::new_file().context(format!(
+                "Failed to create temporary file to hold decrypted '{}'",
+                encrypted_file_path.display()
+            ))?;
+            {
+                let mut plain_writer = write_at(&tempfile.to_path_buf())?;
+                self.decrypt(&encrypted_file_path, &mut plain_writer)
+                    .context(format!(
+                        "Could not decrypt '{}' to re-encrypt for new recipients.",
+                        encrypted_file_path.display()
+                    ))?;
+            }
+            {
+                let mut plain_reader = File::open(tempfile.to_path_buf())?;
+                gpg_ctx
+                    .encrypt(&keys, &mut plain_reader, &mut obuf)
+                    .context(format!(
+                        "Failed to re-encrypt {}.",
+                        encrypted_file_path.display()
+                    ))?;
+            }
+            write_at(&self.absolute_path(&encrypted_file_path))
                 .context(format!(
                     "Could not open '{}' to write encrypted data",
                     encrypted_file_path.display()
@@ -163,6 +171,7 @@ impl Vault {
                         encrypted_file_path.display()
                     ))
                 })?;
+
             obuf.clear();
             output.push(format!(
                 "Re-encrypted '{}' for new recipients",
