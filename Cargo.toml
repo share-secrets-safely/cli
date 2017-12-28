@@ -8,6 +8,7 @@ license = "LGPL-2.1"
 repository = "https://github.com/Byron/share-secrets-safely"
 homepage = "https://github.com/Byron/share-secrets-safely"
 documentation = "https://docs.rs/s3-cli"
+readme = "README.md"
 
 [badges]
 travis-ci = { repository = "Byron/share-secrets-safely" }
