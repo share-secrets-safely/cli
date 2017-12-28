@@ -129,15 +129,22 @@ impl Vault {
 
         let keys = self.recipient_keys(&mut gpg_ctx)?;
 
-        let _change_cwd = ResetCWD::new(&self.resolved_at)?;
         let mut ibuf = Vec::<u8>::new();
         let mut obuf = Vec::new();
 
-        for encrypted_file_path in glob(GPG_GLOB)
-            .expect("valid pattern")
-            .filter_map(Result::ok)
-        {
-            self.decrypt(&encrypted_file_path, &mut ibuf)?;
+        let files_to_reencrypt: Vec<_> = {
+            let _change_cwd = ResetCWD::new(&self.resolved_at)?;
+            glob(GPG_GLOB)
+                .expect("valid pattern")
+                .filter_map(Result::ok)
+                .collect()
+        };
+        for encrypted_file_path in files_to_reencrypt {
+            self.decrypt(&encrypted_file_path, &mut ibuf)
+                .context(format!(
+                    "Could not decrypt '{}' to re-encrypt for new recipients.",
+                    encrypted_file_path.display()
+                ))?;
             gpg_ctx
                 .encrypt(&keys, &mut ibuf, &mut obuf)
                 .context(format!(
