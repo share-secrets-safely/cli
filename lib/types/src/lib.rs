@@ -46,8 +46,8 @@ pub enum VaultCommand {
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub enum FileSuffix {
-    AppendGpg,
+pub enum Destination {
+    ReolveAndAppendGpg,
     Unchanged,
 }
 
@@ -114,10 +114,10 @@ impl VaultSpec {
         &self.dst
     }
 
-    pub fn open_output_in(&self, root: &Path, mode: WriteMode, suffix: FileSuffix) -> Result<File, Error> {
-        let output_file = match suffix {
-            FileSuffix::AppendGpg => root.join(gpg_output_filename(&self.dst)?),
-            FileSuffix::Unchanged => root.join(&self.dst),
+    pub fn open_output_in(&self, root: &Path, mode: WriteMode, dst_mode: Destination) -> Result<File, Error> {
+        let output_file = match dst_mode {
+            Destination::ReolveAndAppendGpg => root.join(gpg_output_filename(&self.dst)?),
+            Destination::Unchanged => self.dst.to_owned(),
         };
         if mode.refuse_overwrite() && output_file.exists() {
             return Err(format_err!(

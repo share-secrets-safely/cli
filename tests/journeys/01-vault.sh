@@ -66,7 +66,7 @@ function trust_key () {
   {
     gpg --export-ownertrust
     echo "${1:?}:6:"
-  } | gpg --import-ownertrust
+  } | gpg --import-ownertrust &>/dev/null
 }
 
 (sandboxed
@@ -83,10 +83,29 @@ function trust_key () {
     it "creates the correct folder structure" && {
       expect_snapshot "$snapshot/vault-init-single-user-absolute-directory" "$vault_dir"
     }
+    (when "editing a file"
+      editor="$PWD/my-simple-editor.sh"
+      (
+        trust_key $TESTER_FPR
+        cat <<'EDITOR' > "$editor"
+#!/bin/bash -e
+echo "made by simple editor" > ${1:?}
+EDITOR
+        chmod +x "$editor"
+      )
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/vault-edit-with-absolute-vault-directory" \
+        EDITOR="$editor" \
+        expect_run $SUCCESSFULLY "$exe" vault -c "$vault_dir/vault.yml" \
+          edit new-resource
+      }
+      it "creates an the newly edited encrypted file" && {
+        expect_exists "$vault_dir/new-resource.gpg"
+      }
+    )
     ( cd "$vault_dir/.."
       echo 'content' > content
       cd "$vault_dir"
-      trust_key $TESTER_FPR
       
       it "does not add resources which walk to the parent directory" && {
         WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-failure" \
@@ -144,7 +163,6 @@ function trust_key () {
   )
 )
 
-
 (sandboxed 
   title "'vault add', 'show' and 'edit'"
   (with "a vault initialized for a single recipient"
@@ -200,13 +218,15 @@ function trust_key () {
     )
     
     editor="$PWD/my-editor.sh"
-    cat <<'EDITOR' > "$editor"
+    (
+      cat <<'EDITOR' > "$editor"
 #!/bin/bash -e
 file_to_edit=${1:?}
 echo -n "$file_to_edit" > /tmp/filepath-with-decrypted-content
 echo "ho" > $file_to_edit
 EDITOR
-    chmod +x "$editor"
+      chmod +x "$editor"
+    )
     
     (when "editing a known resource"
       (with "a custom editor"
@@ -250,5 +270,3 @@ EDITOR
     )
   )
 )
-
-# TODO: editing a new secret creates it. As it's mostly for interactive use, its ok

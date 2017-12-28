@@ -12,15 +12,15 @@ use failure::{err_msg, Error, ResultExt};
 use util::UserIdFingerprint;
 use util::write_at;
 use error::FailExt;
-use s3_types::{gpg_output_filename, CreateMode, FileSuffix, VaultSpec, WriteMode};
+use s3_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 
 impl Vault {
-    pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<(), Error> {
-        let file = Temp::new_file().context("Could not create tempfile to decrypt to")?;
+    pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<String, Error> {
+        let file = Temp::new_file().context("Could not create tempfile to decrypt to.")?;
         let tempfile_path = file.to_path_buf();
         let decrypted_file_path = {
             let mut decrypted_writer =
-                write_at(&tempfile_path).context("Failed to open temporary file for writing decrypted content to")?;
+                write_at(&tempfile_path).context("Failed to open temporary file for writing decrypted content to.")?;
             self.decrypt(path, &mut decrypted_writer)
                 .context(format!("Failed to decrypt file at '{}'.", path.display()))
                 .or_else(|err| match (mode, err.first_cause_of::<io::Error>()) {
@@ -35,7 +35,7 @@ impl Vault {
             .stderr(::std::process::Stdio::inherit())
             .spawn()
             .context(format!(
-                "Failed to start editor program at '{}'",
+                "Failed to start editor program at '{}'.",
                 editor.display()
             ))?;
         let status = running_program
@@ -55,9 +55,9 @@ impl Vault {
                 },
             ],
             WriteMode::AllowOverwrite,
-            FileSuffix::Unchanged,
-        ).context("Failed to re-encrypt edited content")?;
-        Ok(())
+            Destination::Unchanged,
+        ).context("Failed to re-encrypt edited content.")?;
+        Ok(format!("Edited '{}'.", path.display()))
     }
 
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
@@ -74,19 +74,19 @@ impl Vault {
             ))?;
         let mut output = Vec::new();
         ctx.decrypt(&mut input, &mut output)
-            .context("Failed to decrypt data")?;
+            .context("Failed to decrypt data.")?;
 
         w.write_all(&output)
             .context("Could not write out all decrypted data.")?;
         Ok(path_for_decryption)
     }
 
-    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode, suffix: FileSuffix) -> Result<String, Error> {
+    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode, dst_mode: Destination) -> Result<String, Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let recipients = self.recipients_list()?;
         if recipients.is_empty() {
             return Err(format_err!(
-                "No recipients found in recipients file at '{}'",
+                "No recipients found in recipients file at '{}'.",
                 self.recipients.display()
             ));
         }
@@ -112,7 +112,7 @@ impl Vault {
             ];
             msg.push("All recipients:".into());
             msg.push(recipients.join(", "));
-            msg.push("All recipients found in gpg database".into());
+            msg.push("All recipients found in gpg database:".into());
             msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
             return Err(err_msg(msg.join("\n")));
         }
@@ -122,7 +122,7 @@ impl Vault {
             let input = {
                 let mut buf = Vec::new();
                 spec.open_input()?.read_to_end(&mut buf).context(format!(
-                    "Could not read all input from '{}' into buffer",
+                    "Could not read all input from '{}' into buffer.",
                     spec.source()
                         .map(|s| format!("{}", s.display()))
                         .unwrap_or_else(|| "<stdin>".into())
@@ -131,11 +131,11 @@ impl Vault {
             };
             let mut output = Vec::new();
             ctx.encrypt(&keys, input, &mut output)
-                .context(format!("Failed to encrypt {}", spec))?;
-            spec.open_output_in(&self.resolved_at, mode, suffix)?
+                .context(format!("Failed to encrypt {}.", spec))?;
+            spec.open_output_in(&self.resolved_at, mode, dst_mode)?
                 .write_all(&output)
                 .context(format!(
-                    "Failed to write all encrypted data to '{}'",
+                    "Failed to write all encrypted data to '{}'.",
                     spec.destination().display(),
                 ))?;
             encrypted.push(spec.destination());
