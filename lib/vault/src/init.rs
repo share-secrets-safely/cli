@@ -46,15 +46,16 @@ fn export_key(
 ) -> Result<String, Error> {
     let fingerprint = fingerprint_of(key)?;
     let key_path = gpg_keys_dir.join(&fingerprint);
+    ctx.set_armor(true);
     ctx.export_keys(
         [key].iter().map(|k| *k),
         gpgme::ExportMode::empty(),
-        buf.clone(),
+        &mut *buf,
     ).context(err_msg(
         "Failed to export at least one public key with signatures.",
     ))?;
     write_at(&key_path)
-        .and_then(|mut f| f.write_all(&buf))
+        .and_then(|mut f| f.write_all(buf))
         .context(format!(
             "Could not write public key file at '{}'",
             key_path.display()
@@ -190,8 +191,6 @@ impl Vault {
                 gpg_keys_dir.display()
             ))?;
         }
-
-        gpg_ctx.set_armor(true);
 
         let mut output = Vec::new();
         if recipients_file.is_file() {
