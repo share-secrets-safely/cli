@@ -45,8 +45,9 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
         &VaultCommand::ResourceEdit {
             ref spec,
             ref editor,
+            ref mode,
         } => vault_from(&ctx)?
-            .edit(&spec, &editor)
+            .edit(spec, editor, mode)
             .map(|_| String::new()),
         s @ &VaultCommand::List | s @ &VaultCommand::ResourceShow { .. } => {
             let vault = vault_from(&ctx)?;
@@ -54,9 +55,7 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             let mut lock = stdout.lock();
             match s {
                 &VaultCommand::List => vault.list(&mut lock),
-                &VaultCommand::ResourceShow { ref spec } => {
-                    vault.decrypt(spec, &mut lock).map(|_| ())
-                }
+                &VaultCommand::ResourceShow { ref spec } => vault.decrypt(spec, &mut lock).map(|_| ()),
                 _ => unreachable!(),
             }.map(|_| String::new())
         }

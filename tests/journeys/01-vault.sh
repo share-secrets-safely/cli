@@ -236,12 +236,12 @@ EDITOR
         expect_run $WITH_FAILURE test -f "$(cat /tmp/filepath-with-decrypted-content)"
       }
     )
-    # (when "editing an unknown resource"
-    #   it "fails" && {
-    #     WITH_SNAPSHOT="$snapshot/vault-unknown-resource-edit" \
-    #     expect_run $WITH_FAILURE "$exe" vault edit --no-create some-unknown-resource
-    #   }
-    # )
+    (when "editing an unknown resource"
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/vault-unknown-resource-edit" \
+        expect_run $WITH_FAILURE "$exe" vault edit --no-create some-unknown-resource
+      }
+    )
     (with "an editor program that does not exist in path"
       it "fails" && {
         WITH_SNAPSHOT="$snapshot/vault-known-resource-edit-editor-not-in-path" \

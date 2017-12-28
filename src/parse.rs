@@ -1,5 +1,7 @@
+extern crate s3_types;
+
 use conv::TryInto;
-use s3_types::{ExtractionContext, VaultCommand, VaultContext};
+use s3_types::{CreateMode, ExtractionContext, VaultCommand, VaultContext};
 use clap::{App, ArgMatches, Shell};
 use failure::{err_msg, Error, ResultExt};
 use std::io::stdout;
@@ -59,15 +61,16 @@ pub fn vault_resource_edit(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
         command: VaultCommand::ResourceEdit {
             spec: required_os_arg(args, "path")?,
             editor: required_os_arg(args, "editor")?,
+            mode: match args.is_present("no-create") {
+                true => CreateMode::NoCreate,
+                false => CreateMode::Create,
+            },
         },
         ..ctx
     })
 }
 
-pub fn vault_resource_add_from(
-    ctx: VaultContext,
-    args: &ArgMatches,
-) -> Result<VaultContext, Error> {
+pub fn vault_resource_add_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::ResourceAdd {
             specs: match args.values_of("spec") {

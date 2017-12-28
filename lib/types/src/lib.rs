@@ -29,6 +29,7 @@ pub enum VaultCommand {
     ResourceEdit {
         editor: PathBuf,
         spec: PathBuf,
+        mode: CreateMode,
     },
     ResourceShow {
         spec: PathBuf,
@@ -54,6 +55,12 @@ pub enum FileSuffix {
 pub enum WriteMode {
     AllowOverwrite,
     RefuseOverwrite,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum CreateMode {
+    Create,
+    NoCreate,
 }
 
 impl WriteMode {
@@ -107,12 +114,7 @@ impl VaultSpec {
         &self.dst
     }
 
-    pub fn open_output_in(
-        &self,
-        root: &Path,
-        mode: WriteMode,
-        suffix: FileSuffix,
-    ) -> Result<File, Error> {
+    pub fn open_output_in(&self, root: &Path, mode: WriteMode, suffix: FileSuffix) -> Result<File, Error> {
         let output_file = match suffix {
             FileSuffix::AppendGpg => root.join(gpg_output_filename(&self.dst)?),
             FileSuffix::Unchanged => root.join(&self.dst),
@@ -136,8 +138,7 @@ impl VaultSpec {
 
     pub fn open_input(&self) -> Result<Box<Read>, Error> {
         Ok(match self.src {
-            Some(ref p) => Box::new(File::open(p)
-                .context(format!("Could not open input file at '{}'", p.display()))?),
+            Some(ref p) => Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?),
             None => Box::new(stdin()),
         })
     }
@@ -185,7 +186,10 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                         e
                     })?;
                     if has_parent_component(&dst) {
-                        return Err(VaultSpecError(format!("Relative parent directories in source '{}' need the destination set explicitly.", src)));
+                        return Err(VaultSpecError(format!(
+                            "Relative parent directories in source '{}' need the destination set explicitly.",
+                            src
+                        )));
                     };
                     dst
                 },
@@ -312,8 +316,7 @@ mod tests_vault_spec {
     }
 
     #[test]
-    fn it_is_created_from_relative_source_fills_destination_with_source_when_using_a_single_colon()
-    {
+    fn it_is_created_from_relative_source_fills_destination_with_source_when_using_a_single_colon() {
         assert_eq!(
             VaultSpec::try_from("relative/path:"),
             Ok(VaultSpec {

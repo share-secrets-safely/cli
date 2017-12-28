@@ -81,20 +81,35 @@ where
                  a vault-relative path with the '.gpg' suffix, or an absolute \
                  path with or without the '.gpg' suffix.",
             );
-        let edit_resource = App::new("edit").arg(
-            Arg::with_name("editor")
-                .long("editor")
-                .short("e")
-                .required(false)
-                .takes_value(true)
-                .default_value(EDITOR.as_ref().map(String::as_str).unwrap_or("vim"))
-                .help("The path to your editor program. It receives the decrypted content as first \
-                argument and is expected to write the changes back to that file before quitting."))
-            .arg(resource_path.clone()).about(
+        let edit_resource = App::new("edit")
+            .arg(
+                Arg::with_name("no-create")
+                    .long("no-create")
+                    .required(false)
+                    .help(
+                        "If set, the resource you are editing must exist. \
+                         Otherwise it will be created on the fly, allowing you to \
+                         add new resources by editing them.",
+                    ),
+            )
+            .arg(
+                Arg::with_name("editor")
+                    .long("editor")
+                    .short("e")
+                    .required(false)
+                    .takes_value(true)
+                    .default_value(EDITOR.as_ref().map(String::as_str).unwrap_or("vim"))
+                    .help(
+                        "The path to your editor program. It receives the decrypted content as first \
+                         argument and is expected to write the changes back to that file before quitting.",
+                    ),
+            )
+            .arg(resource_path.clone())
+            .about(
                 "Edit a resource. This will decrypt the resource to \
                  a temporary file, open up the $EDITOR you have specified, and re-encrypt the \
                  changed content before deleting it on disk.",
-        );
+            );
         let show_resource = App::new("show")
             .about("Decrypt a resource")
             .arg(resource_path);
@@ -107,11 +122,13 @@ where
                     .multiple(false)
                     .takes_value(true)
                     .value_name("spec")
-                    .help("A specification identifying a mapping from a source file to be stored \
-            in a location of the vault. It takes the form '<src>:<dst>', where \
-            '<src>' is equivalent to '<src>:<src>'.\
-            <dst> should be vault-relative paths, whereas <src> must point tel a readable file \
-            and can be empty to read from standard input, such as in ':<dst>'."),
+                    .help(
+                        "A specification identifying a mapping from a source file to be stored \
+                         in a location of the vault. It takes the form '<src>:<dst>', where \
+                         '<src>' is equivalent to '<src>:<src>'.\
+                         <dst> should be vault-relative paths, whereas <src> must point tel a readable file \
+                         and can be empty to read from standard input, such as in ':<dst>'.",
+                    ),
             );
         let vault = App::new("vault")
             .about("a variety of vault interactions")

@@ -1,34 +1,31 @@
 extern crate s3_types;
 
-use s3_types::VaultSpec;
+use std::io::{self, Write};
+use std::path::{Path, PathBuf};
+use std::fs::File;
+use std::process::Command;
+use mktemp::Temp;
+use itertools::join;
+use gpgme;
 use vault::Vault;
 use failure::{err_msg, Error, ResultExt};
 use util::UserIdFingerprint;
-use std::io::{self, Write};
-use itertools::join;
-use error::FailExt;
-use gpgme;
-use std::path::Path;
-use std::fs::File;
-use s3_types::gpg_output_filename;
-use std::process::Command;
-use mktemp::Temp;
 use util::write_at;
-use std::path::PathBuf;
-use s3_types::{FileSuffix, WriteMode};
+use error::FailExt;
+use s3_types::{gpg_output_filename, CreateMode, FileSuffix, VaultSpec, WriteMode};
 
 impl Vault {
-    pub fn edit(&self, path: &Path, editor: &Path) -> Result<(), Error> {
+    pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<(), Error> {
         let file = Temp::new_file().context("Could not create tempfile to decrypt to")?;
         let tempfile_path = file.to_path_buf();
         let decrypted_file_path = {
-            let mut decrypted_writer = write_at(&tempfile_path)
-                .context("Failed to open temporary file for writing decrypted content to")?;
+            let mut decrypted_writer =
+                write_at(&tempfile_path).context("Failed to open temporary file for writing decrypted content to")?;
             self.decrypt(path, &mut decrypted_writer)
                 .context(format!("Failed to decrypt file at '{}'.", path.display()))
-                .or_else(|err| match err.first_cause_of::<io::Error>() {
-                    Some(_) => gpg_output_filename(path).map(|p| self.absolute_path(&p)),
-                    None => Err(err.into()),
+                .or_else(|err| match (mode, err.first_cause_of::<io::Error>()) {
+                    (&CreateMode::Create, Some(_)) => gpg_output_filename(path).map(|p| self.absolute_path(&p)),
+                    _ => Err(err.into()),
                 })?
         };
         let mut running_program = Command::new(editor)
@@ -69,9 +66,7 @@ impl Vault {
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
             .map(|f| (f, resolved_gpg_path.to_owned()))
-            .or_else(|_| {
-                File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned()))
-            })
+            .or_else(|_| File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned())))
             .context(format!(
                 "Could not open input file at '{}' for reading. Tried '{}' as well.",
                 resolved_gpg_path.display(),
@@ -86,12 +81,7 @@ impl Vault {
         Ok(path_for_decryption)
     }
 
-    pub fn encrypt(
-        &self,
-        specs: &[VaultSpec],
-        mode: WriteMode,
-        suffix: FileSuffix,
-    ) -> Result<String, Error> {
+    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode, suffix: FileSuffix) -> Result<String, Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let recipients = self.recipients_list()?;
         if recipients.is_empty() {

@@ -84,8 +84,7 @@ impl Vault {
         let reader: Box<Read> = if path_is_stdin {
             Box::new(stdin())
         } else {
-            Box::new(File::open(path)
-                .map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
+            Box::new(File::open(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
         };
         Ok(split_documents(reader)?
             .iter()
@@ -111,16 +110,13 @@ impl Vault {
         if path.exists() {
             return Err(VaultError::ConfigurationFileExists(path.to_owned()));
         }
-        let mut file =
-            write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
+        let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
         serde_yaml::to_writer(&file, self)
             .map_err(|cause| VaultError::Serialization {
                 cause,
                 path: path.to_owned(),
             })
-            .and_then(|_| {
-                writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))
-            })
+            .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))
     }
 
     pub fn absolute_path(&self, path: &Path) -> PathBuf {
