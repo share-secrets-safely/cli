@@ -3,6 +3,15 @@ authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "s3-vault"
 version = "0.1.0"
 
+description = "Vault functionality used by 'share-secrets-safely' CLI. Use it to interact with GPG based vaults."
+license = "LGPL-2.1"
+repository = "https://github.com/Byron/share-secrets-safely"
+homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/vault"
+documentation = "https://docs.rs/s3-vault"
+
+[badges]
+travis-ci = { repository = "Byron/share-secrets-safely" }
+
 [dependencies]
 failure = "0.1.1"
 failure_derive = "0.1.1"
@@ -17,3 +26,4 @@ mktemp = "0.3.1"
 
 [dependencies.s3-types]
 path = "../types"
+version = "0.1"
