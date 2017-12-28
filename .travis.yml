@@ -25,23 +25,6 @@ addons:
       - libgpg-error-dev=1.12-0.2ubuntu1
 
 before_install:
-  - |
-      curl -sL https://ftp.gnu.org/gnu/automake/automake-${AUTOMAKE_VERSION}.tar.gz -o automake-${AUTOMAKE_VERSION}.tar.gz
-      tar -xf automake-${AUTOMAKE_VERSION}.tar.gz
-      pushd automake-${AUTOMAKE_VERSION}
-      ./configure --prefix=${HOME}/.local >/dev/null
-      make -j2 >/dev/null
-      make install >/dev/null
-      popd
-      curl -sL https://ftp.gnu.org/gnu/gettext/gettext-${GETTEXT_VERSION}.tar.gz -o gettext-${GETTEXT_VERSION}.tar.gz
-      tar -xf gettext-${GETTEXT_VERSION}.tar.gz
-      pushd gettext-${GETTEXT_VERSION}
-      ./configure --without-emacs --disable-java --disable-c++ --enable-fast-install --prefix=${HOME}/.local >/dev/null
-      make -j2 >/dev/null
-      make install >/dev/null
-      popd
-      export PATH=${HOME}/.local/bin:$PATH
-      export LD_LIBRARY_PATH=${HOME}/.local/lib:$LD_LIBRARY_PATH
   - | 
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install gpgme gettext
