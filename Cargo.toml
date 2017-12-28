@@ -3,6 +3,15 @@ authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "s3-cli"
 version = "0.1.0"
 
+description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults."
+license = "LGPL-2.1"
+repository = "https://github.com/Byron/share-secrets-safely"
+homepage = "https://github.com/Byron/share-secrets-safely"
+documentation = "https://docs.rs/s3-cli"
+
+[badges]
+travis-ci = { repository = "Byron/share-secrets-safely" }
+
 [[bin]]
 name = "s3"
 path = "src/main.rs"
