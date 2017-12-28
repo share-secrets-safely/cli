@@ -58,6 +58,36 @@ snapshot="$fixture/snapshots"
     }
   )
 )
+(sandboxed
+  title "'vault init' - with change '--at' location"
+
+  (with "a single gpg secret key"
+    import_user "$fixture/tester.sec.asc"
+  
+    vault_dir=vault
+    mkdir -p $vault_dir/secrets
+    (with "a specified --at location and relative directories for keys and recipients"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/vault-init-will-overwrite-recipients-file" \
+        expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml init --at secrets -k ../etc/keys -r ../etc/recipients
+      }
+      
+      it "creates the expected folder structure" && {
+        expect_snapshot "$snapshot/vault-init-change-at-location" .
+      }
+    )
+    
+    (when "adding a secret"
+      it "succeeds" && {
+        echo hi | expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml :secret
+      }
+      
+      it "puts the file to the right spot" && {
+        expect_exists $vault_dir/secrets/secret.gpg
+      }
+    )
+  )
+)
 
 (sandboxed
   title "'vault init' - with absolute vault directory"
@@ -269,7 +299,7 @@ EDITOR
   title "'vault recipient add'"
   (with "a vault initialized for a single recipient and an existing secret"
     { import_user "$fixture/tester.sec.asc"
-      "$exe" vault init
+      "$exe" vault init --at secrets --gpg-keys-dir ../etc/keys --recipients-file ../etc/recipients
       echo -n secret | "$exe" vault add :secret
     } &>/dev/null
     
@@ -283,10 +313,14 @@ EDITOR
     )
     
     (when "adding a new recipient using the id of an already imported key"
-      gpg --import "$fixture/c.pub.asc"
+      gpg --import "$fixture/c.pub.asc" &>/dev/null
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-c" \
         expect_run $SUCCESSFULLY "$exe" vault recipients add c@example.com
+      }
+      
+      it "exports the new recipients to the gpg-keys directory" && {
+        expect_snapshot "$snapshot/vault-recipient-add-c-keys-dir" .gpg-keys
       }
       
       it "re-encrypts all secrets to allow the new recipient to decode it" && {

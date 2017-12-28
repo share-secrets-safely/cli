@@ -7,11 +7,57 @@ use itertools::join;
 use failure::{err_msg, Error, ResultExt};
 use std::fs::create_dir_all;
 use std::io::Write;
+use std::fmt;
 use vault::Vault;
 
+struct KeylistDisplay<'a>(&'a Vec<gpgme::Key>);
+
+impl<'a> fmt::Display for KeylistDisplay<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            join(
+                self.0
+                    .iter()
+                    .flat_map(|k| k.user_ids())
+                    .map(|u| u.id().unwrap_or("[none]")),
+                ", "
+            )
+        )
+    }
+}
+
 impl Vault {
-    pub fn add_recipients(&self, _gpg_key_ids: &[String]) -> Result<String, Error> {
-        Ok(String::new())
+    pub fn add_recipients(&self, gpg_key_ids: &[String]) -> Result<String, Error> {
+        let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let keys = {
+            let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
+            let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
+
+            if keys_iter.finish()?.is_truncated() {
+                return Err(err_msg(
+                    "The key list was truncated unexpectedly, while iterating it",
+                ));
+            }
+            keys
+        };
+        if keys.len() != gpg_key_ids.len() {
+            return Err(format_err!(
+                "Found {} viable keys for key-ids ({}), for {} given user ids.",
+                keys.len(),
+                KeylistDisplay(&keys),
+                gpg_key_ids.len()
+            ));
+        };
+
+        let output = Vec::<String>::new();
+        if let Some(gpg_keys_dir) = self.gpg_keys.as_ref() {
+            let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
+        }
+
+        let recipients_file = self.absolute_path(&self.recipients);
+        Ok(output.join("\n"))
     }
 
     pub fn init(
@@ -56,12 +102,7 @@ impl Vault {
                 "Found {} viable keys for key-ids ({}), which is ambiguous. \
                  Please specify one with the --gpg-key-id argument.",
                 keys.len(),
-                join(
-                    keys.iter()
-                        .flat_map(|k| k.user_ids())
-                        .map(|u| u.id().unwrap_or("[none]")),
-                    ", "
-                )
+                KeylistDisplay(&keys)
             ));
         };
         vault.to_file(vault_path)?;
