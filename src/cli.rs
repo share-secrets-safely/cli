@@ -38,6 +38,16 @@ where
                  to make the input unambiguous.",
             )
             .arg(
+                Arg::with_name("at")
+                    .long("at")
+                    .short("a")
+                    .default_value(".")
+                    .required(false)
+                    .takes_value(true)
+                    .value_name("path")
+                    .help("The location which is the root of all vault content."),
+            )
+            .arg(
                 Arg::with_name("recipients-file-path")
                     .long("recipients-file")
                     .default_value(".gpg-id")

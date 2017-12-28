@@ -53,14 +53,15 @@ impl Vault {
 
         let output = Vec::<String>::new();
         if let Some(gpg_keys_dir) = self.gpg_keys.as_ref() {
-            let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
+            let _gpg_keys_dir = self.absolute_path(gpg_keys_dir);
         }
 
-        let recipients_file = self.absolute_path(&self.recipients);
+        let _recipients_file = self.absolute_path(&self.recipients);
         Ok(output.join("\n"))
     }
 
     pub fn init(
+        at: &Path,
         gpg_key_ids: &[String],
         gpg_keys_dir: &Path,
         recipients_file: &Path,
@@ -75,7 +76,7 @@ impl Vault {
                 .map(ToOwned::to_owned)
                 .ok_or_else(|| format_err!("The vault directory '{}' is invalid.", vault_path.display()))?,
             name,
-            ..Default::default()
+            at: at.to_owned(),
         };
 
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;

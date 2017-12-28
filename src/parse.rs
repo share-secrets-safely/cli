@@ -98,6 +98,7 @@ pub fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultCont
     Ok(VaultContext {
         command: VaultCommand::Init {
             recipients_file: required_os_arg(args, "recipients-file-path")?,
+            at: required_os_arg(args, "at")?,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,
             gpg_key_ids: match args.values_of("gpg-key-id") {
                 Some(v) => v.map(Into::into).collect(),

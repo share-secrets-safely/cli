@@ -21,8 +21,10 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             ref gpg_key_ids,
             ref gpg_keys_dir,
             ref recipients_file,
+            ref at,
         } => {
             Vault::init(
+                &at,
                 &gpg_key_ids,
                 &gpg_keys_dir,
                 &recipients_file,
