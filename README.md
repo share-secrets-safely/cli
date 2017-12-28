@@ -20,6 +20,7 @@
    * [x] edit vault contents
    * [ ] add another user and re-encrypt parition content
  * [ ] **installable from crates.io**
+   * _Not working with the current version of 'gpgme', unfortunately_
  * ...and many more when the boxes above are ticked :D
 
 ## Project Goals
