@@ -4,12 +4,6 @@ LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/s3
 MUSL_IMAGE=clux/muslrust:stable
 MY_LIBC_IMAGE=s3_libc:stable
 MY_MUSL_IMAGE=s3_musl:stable
-CONTAINER_LIB_DIR=/usr/lib/x86_64-linux-gnu
-ifeq ($(shell uname -s),Darwin)
-GPG_LIB_DIR=/usr/local/lib
-else
-GPG_LIB_DIR=$(CONTAINER_LIB_DIR)
-endif
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 
 help:
@@ -33,7 +27,7 @@ help:
 always:
 
 $(EXE): always
-	GPGME_LIB_PATH=$(GPG_LIB_DIR) DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl GPG_ERROR_LIB_PATH=$(GPG_LIB_DIR) GPG_ERROR_LIBS=gpg-error cargo build --all-features
+	cargo build --all-features
 
 $(MUSL_EXE): build-linux-musl
 	
@@ -54,7 +48,7 @@ build-musl-image:
 	docker build -t $(MY_MUSL_IMAGE) - < etc/docker/Dockerfile.musl-build
 
 build-linux-musl: build-musl-image
-	docker run -e GPGME_LIB_PATH=$(CONTAINER_LIB_DIR) -e DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl -e GPG_ERROR_LIB_PATH=$(CONTAINER_LIB_DIR) -e GPG_ERROR_LIBS=gpg-error -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl
 
 build-linux-libc: build-libc-image
 	docker run $(CARGO_CACHE_ARGS) -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo build --target=x86_64-unknown-linux-gnu
