@@ -26,7 +26,7 @@ function import_user () {
   gpg --import "$key" &>/dev/null
   
   local fpr
-  fpr="$(gpg --list-secret-keys --with-colons | grep fpr | head -1)"
+  fpr="$(gpg --list-secret-keys --with-colons --with-fingerprint | grep fpr | head -1)"
   fpr=${fpr:12:40}
   trust_key "$fpr"
 }

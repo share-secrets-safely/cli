@@ -33,8 +33,8 @@ $(MUSL_EXE): build-linux-musl
 	
 $(LIBC_EXE): build-linux-libc
 
-stateful-journey-tests: $(LIBC_EXE)
-	tests/stateful-journey-test.sh $< $(MY_LIBC_IMAGE)
+stateful-journey-tests: $(MUSL_EXE)
+	tests/stateful-journey-test.sh $< $(MY_MUSL_IMAGE)
 
 stateless-journey-tests: $(EXE)
 	tests/stateless-journey-test.sh $<

@@ -1,8 +1,5 @@
 FROM rust:latest
 
-# RUN apt-get update
-# RUN apt-get install -y libgettextpo-dev
-
 RUN apt-get update
 RUN apt-get install -y autoconf
 
