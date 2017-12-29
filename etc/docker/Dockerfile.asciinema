@@ -1,0 +1,6 @@
+FROM alpine:latest
+
+RUN apk --no-cache add bash gnupg python3 curl asciinema
+
+RUN adduser -D max
+
