@@ -2,3 +2,4 @@
 /.docker-cargo-cache
 .DS_Store
 target/
+s3-*.tar.gz

@@ -1,5 +1,6 @@
 EXE=target/debug/s3
 RELEASE_EXE=target/release/s3
+RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/s3
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/s3
 LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/s3
 MUSL_IMAGE=clux/muslrust:stable
@@ -9,20 +10,22 @@ CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 
 help:
 	$(info Available Targets)
-	$(info ---------------------------------------------------------------------------------------------------------------)
+	$(info - Testing -----------------------------------------------------------------------------------------------------)
+	$(info lint-scripts           | Run journey tests using a pre-built linux binary)
 	$(info journey-tests           | Run all journey tests using a pre-built binary)
 	$(info stateful-journey-tests  | Run only stateful journeys in docker)
 	$(info stateless-journey-tests | Run only stateless journey)
-	$(info - Development -------------------------------------------------------------------------------------------------)
+	$(info - Deployment  -------------------------------------------------------------------------------------------------)
 	$(info tag-release            | Create a new release commit using the version in VERSION file)
+	$(info deployable-linux       | Archive usable for any more recent linux system)
+	$(info deployable-host        | Archive usable on your host)
+	$(info - Docker ------------------------------------------------------------------------------------------------------)
+	$(info build-linux-musl       | Build the binary via a docker based musl container)
+	$(info build-linux-libc       | Build the binary via a docker based libc container)
 	$(info build-musl-image       | Build our musl build image)
 	$(info build-libc-image       | Build our libc build image)
-	$(info build-linux-musl       | Build the binary via a docker based musl container)
-	$(info release-linux-musl     | Build the release binary via a docker based musl container)
-	$(info build-linux-libc       | Build the binary via a docker based libc container)
 	$(info interactive-linux-musl | The interactive version of the above (MUSL))
 	$(info interactive-linux-libc | The interactive version of the above (libc))
-	$(info lint-scripts           | Run journey tests using a pre-built linux binary)
 	$(info ---------------------------------------------------------------------------------------------------------------)
 
 always:
@@ -34,6 +37,14 @@ $(RELEASE_EXE): always
 	cargo build --all-features --release
 	
 $(MUSL_EXE): build-linux-musl
+	
+$(RELEASE_MUSL_EXE): release-linux-musl
+
+deployable-linux: $(RELEASE_MUSL_EXE)
+	tar czf s3-cli-linux-musl-x86_64.tar.gz -C $(dir $<) $(notdir $<)
+
+deployable-host: $(RELEASE_EXE)
+	tar czf s3-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
 	
 $(LIBC_EXE): build-linux-libc
 	
