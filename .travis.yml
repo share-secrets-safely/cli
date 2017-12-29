@@ -11,11 +11,7 @@ language: rust
 
 rust:
   - stable
-
-matrix:
-  allow_failures:
-    - rust: nightly
-
+  
 cache: cargo
 
 addons:
@@ -33,13 +29,33 @@ before_install:
       brew link --force gettext
     fi
 
-
 script:
   - cargo doc
   - cargo test --all
   # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
   - | 
-    if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then 
-        make lint-scripts;
-        make journey-tests;
+    if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then 
+        make lint-scripts
+        make journey-tests
+        make release-linux-musl
+    else
+        make target/release/s3
     fi
+    
+deploy:
+  - provider: releases
+    api_key:
+      secure: N9lPHcUcU83Oz1DGaxg3UUV6Qu1UmbaP0zI3pc+NbouPeheR0PDlAf4nUsUX/1e4qCQ3aLQblRBmPQpAqypr3BZClZEvR0qkmV2UGtJyQICF/SfWS1Gte073HLg/sbT9fc5Ja+PkMieRONSB8LWEFWtoiR61mNYq+rJAu2YhrqhDSMs35ETh5cSSxZv565xxMG8vb30Us1L2FHL0PlBlgi5QLpkWuj0NFMq2sY+rhcMCFsnPH6HDZh0wwLifdAMFYyoWEvU9TVhFFfjIG0LIPigbFF5iv6l9tyLH2pl6w5Zf3n2JNc7VGMADe+rSo78/8vOf4IWSsfJQNzibENZV02qzq5K1IfAOzvdtnHmAlpWXuCFEuy/KLXxwOOkgXbd4VGajC59f14ujO5H13JxcU/D3lJnDuWdOo/RAecupiZXGhq5bwswfiGPIb4GRCW8bTqLDOLRyzYavhj7tJ1Eb+Fa4w6JtRwAoCAPG+5Bew895CT2KwZVoFh5W4FIZOfAzfmxKyxXp4KYPvBoxH2iXq5ZlZd/8KzZecos5XwiHuq73n1gfmkSbKMCZBXMFDyP5yrXJr61mnuULCYL/+PVo2P3gtx1gn56KgLpIhVIInbzu6W1TLyXb3Xg2m52vwYLV0rlyIFz0QDuoeu0errTRlUlu5RMFrSQE7N5v+ZR8rvE=
+    file: target/release/s3
+    on:
+      repo: Byron/share-secrets-safely
+      tags: true
+      condition: $TRAVIS_OS_NAME = osx
+  - provider: releases
+    api_key:
+      secure: N9lPHcUcU83Oz1DGaxg3UUV6Qu1UmbaP0zI3pc+NbouPeheR0PDlAf4nUsUX/1e4qCQ3aLQblRBmPQpAqypr3BZClZEvR0qkmV2UGtJyQICF/SfWS1Gte073HLg/sbT9fc5Ja+PkMieRONSB8LWEFWtoiR61mNYq+rJAu2YhrqhDSMs35ETh5cSSxZv565xxMG8vb30Us1L2FHL0PlBlgi5QLpkWuj0NFMq2sY+rhcMCFsnPH6HDZh0wwLifdAMFYyoWEvU9TVhFFfjIG0LIPigbFF5iv6l9tyLH2pl6w5Zf3n2JNc7VGMADe+rSo78/8vOf4IWSsfJQNzibENZV02qzq5K1IfAOzvdtnHmAlpWXuCFEuy/KLXxwOOkgXbd4VGajC59f14ujO5H13JxcU/D3lJnDuWdOo/RAecupiZXGhq5bwswfiGPIb4GRCW8bTqLDOLRyzYavhj7tJ1Eb+Fa4w6JtRwAoCAPG+5Bew895CT2KwZVoFh5W4FIZOfAzfmxKyxXp4KYPvBoxH2iXq5ZlZd/8KzZecos5XwiHuq73n1gfmkSbKMCZBXMFDyP5yrXJr61mnuULCYL/+PVo2P3gtx1gn56KgLpIhVIInbzu6W1TLyXb3Xg2m52vwYLV0rlyIFz0QDuoeu0errTRlUlu5RMFrSQE7N5v+ZR8rvE=
+    file: target/x86_64-unknown-linux-musl/release/s3
+    on:
+      repo: Byron/share-secrets-safely
+      tags: true
+      condition: $TRAVIS_OS_NAME != osx
