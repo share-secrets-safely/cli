@@ -2,6 +2,34 @@
 
 `share-secrets-safely` is a GPG based solution for managing shared secrets.
 
+## Installation
+
+### Via [Releases][releases]
+
+Navigate to the [releases page][releases] and download a release binary suitable
+for your system. A full example *for linux* looks like this:
+
+```bash
+curl -o s3.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.0/s3-linux-musl-x86_64.tar.gz
+tar -xzf s3.tar.gz
+# run s3 - please feel free to put it into your PATH
+./s3
+```
+
+### Via [Cargo][rustup]
+
+If you already have `cargo` available, installation is as easy as the following:
+
+```bash
+cargo install s3-cli
+```
+
+This installation should be preferred as it makes updating the binary much easier.
+If you don't have `cargo` yet, you can install it via [instructions on rustup.rs][rustup].
+
+[releases]: https://github.com/Byron/share-secrets-safely/releases
+[rustup]: http://rustup.rs
+
 ## Features
 
  * **easy access to GPG cryptography**
