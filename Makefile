@@ -17,8 +17,6 @@ help:
 	$(info build-libc-image       | Build our libc build image)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
 	$(info build-linux-libc       | Build the binary via a docker based libc container)
-	$(info clean-linux-musl       | Runs cargo clean in the musl container)
-	$(info clean-linux-libc       | Runs cargo clean in the libc container)
 	$(info interactive-linux-musl | The interactive version of the above (MUSL))
 	$(info interactive-linux-libc | The interactive version of the above (libc))
 	$(info lint-scripts           | Run journey tests using a pre-built linux binary)
@@ -52,12 +50,6 @@ build-linux-musl: build-musl-image
 
 build-linux-libc: build-libc-image
 	docker run $(CARGO_CACHE_ARGS) -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo build --target=x86_64-unknown-linux-gnu
-	
-clean-linux-musl: build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo clean
-
-clean-linux-libc: build-libc-image
-	docker run $(CARGO_CACHE_ARGS) -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo clean
 	
 interactive-linux-musl: build-musl-image
 	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE)

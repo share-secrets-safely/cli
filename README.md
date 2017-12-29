@@ -6,10 +6,9 @@
 
  * [x] **setup rust workspace for clear dependency separation**
  * [x] **setup CI for linux and OSX**
- * [ ] **standalone deployables without additional dependencies for**
-   * [ ] OSX (static binary)
-   * [ ] Debian Linux (ubuntu trusty, static libc binary)
-   * [ ] MUSL Linux
+ * [x] **standalone deployables without additional dependencies for**
+   * [x] OSX (static binary) - _just gettext is still dynamically linked :(_
+   * [x] MUSL Linux
  * [x] **shell completions**
  * [ ] **complete a happy journey with**
    * [x] initialize a new vault
@@ -19,6 +18,7 @@
    * [x] decrypt vault contents
    * [x] edit vault contents
    * [x] add another user and re-encrypt vault content
+   * [ ] remove a user and re-encrypt vault content
  * [ ] **installable from crates.io**
    * _Not working with the current version of 'gpgme', unfortunately_
  * ...and many more when the boxes above are ticked :D
