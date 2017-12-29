@@ -1,7 +1,7 @@
 [package]
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "s3-vault"
-version = "0.1.0"
+version = "1.0.0"
 
 description = "Vault functionality used by 'share-secrets-safely' CLI. Use it to interact with GPG based vaults."
 license = "LGPL-2.1"
@@ -26,4 +26,4 @@ mktemp = "0.3.1"
 
 [dependencies.s3-types]
 path = "../types"
-version = "0.1"
+version = "1.0.0"

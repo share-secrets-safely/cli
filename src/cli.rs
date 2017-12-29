@@ -194,6 +194,7 @@ where
             });
         let app: App = app_from_crate!()
             .name(CLI::name())
+            .version(include_str!("../VERSION"))
             .subcommand(vault)
             .subcommand(completions)
             .subcommand(extract);

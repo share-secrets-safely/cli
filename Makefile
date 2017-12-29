@@ -14,6 +14,7 @@ help:
 	$(info stateful-journey-tests  | Run only stateful journeys in docker)
 	$(info stateless-journey-tests | Run only stateless journey)
 	$(info - Development -------------------------------------------------------------------------------------------------)
+	$(info tag-release            | Create a new release commit using the version in VERSION file)
 	$(info build-musl-image       | Build our musl build image)
 	$(info build-libc-image       | Build our libc build image)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
@@ -35,6 +36,9 @@ $(RELEASE_EXE): always
 $(MUSL_EXE): build-linux-musl
 	
 $(LIBC_EXE): build-linux-libc
+	
+tag-release: bin/tag-release.sh VERSION
+	bin/tag-release.sh $$(cat VERSION)
 
 stateful-journey-tests: $(MUSL_EXE)
 	tests/stateful-journey-test.sh $< $(MY_MUSL_IMAGE)
