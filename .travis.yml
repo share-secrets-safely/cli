@@ -37,9 +37,13 @@ script:
     if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then 
         make lint-scripts
         make journey-tests
-        make release-linux-musl
+        if [ -n "$TRAVIS_TAG" ]; then
+          make release-linux-musl
+        fi
     else
-        make target/release/s3
+        if [ -n "$TRAVIS_TAG" ]; then
+          make target/release/s3
+        fi
     fi
     
 deploy:
@@ -58,4 +62,4 @@ deploy:
     on:
       repo: Byron/share-secrets-safely
       tags: true
-      condition: $TRAVIS_OS_NAME != osx
+      condition: $TRAVIS_OS_NAME = linux
