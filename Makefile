@@ -4,8 +4,12 @@ LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/s3
 MUSL_IMAGE=clux/muslrust:stable
 MY_LIBC_IMAGE=s3_libc:stable
 MY_MUSL_IMAGE=s3_musl:stable
-OSX_BREW_LIB_DIR=/usr/local/lib
 CONTAINER_LIB_DIR=/usr/lib/x86_64-linux-gnu
+ifeq ($(shell uname -s),Darwin)
+GPG_LIB_DIR=/usr/local/lib
+else
+GPG_LIB_DIR=$(CONTAINER_LIB_DIR)
+endif
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 
 help:
@@ -29,7 +33,7 @@ help:
 always:
 
 $(EXE): always
-	GPGME_LIB_PATH=$(OSX_BREW_LIB_DIR) DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl GPG_ERROR_LIB_PATH=$(OSX_BREW_LIB_DIR) GPG_ERROR_LIBS=gpg-error cargo build --all-features
+	GPGME_LIB_PATH=$(GPG_LIB_DIR) DEP_GPG_ERROR_ROOT=x86_64-unknown-linux-musl GPG_ERROR_LIB_PATH=$(GPG_LIB_DIR) GPG_ERROR_LIBS=gpg-error cargo build --all-features
 
 $(MUSL_EXE): build-linux-musl
 	
