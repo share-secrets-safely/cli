@@ -37,8 +37,8 @@ $(MUSL_EXE): build-linux-musl
 	
 $(LIBC_EXE): build-linux-libc
 	
-tag-release: bin/tag-release.sh VERSION
-	bin/tag-release.sh $$(cat VERSION)
+tag-release: bin/tag-release.sh release.md VERSION
+	bin/tag-release.sh $$(cat VERSION) release.md
 
 stateful-journey-tests: $(MUSL_EXE)
 	tests/stateful-journey-test.sh $< $(MY_MUSL_IMAGE)
