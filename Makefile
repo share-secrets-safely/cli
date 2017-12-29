@@ -1,4 +1,5 @@
 EXE=target/debug/s3
+RELEASE_EXE=target/release/s3
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/s3
 LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/s3
 MUSL_IMAGE=clux/muslrust:stable
@@ -16,6 +17,7 @@ help:
 	$(info build-musl-image       | Build our musl build image)
 	$(info build-libc-image       | Build our libc build image)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
+	$(info release-linux-musl     | Build the release binary via a docker based musl container)
 	$(info build-linux-libc       | Build the binary via a docker based libc container)
 	$(info interactive-linux-musl | The interactive version of the above (MUSL))
 	$(info interactive-linux-libc | The interactive version of the above (libc))
@@ -27,6 +29,9 @@ always:
 $(EXE): always
 	cargo build --all-features
 
+$(RELEASE_EXE): always
+	cargo build --all-features --release
+	
 $(MUSL_EXE): build-linux-musl
 	
 $(LIBC_EXE): build-linux-libc
@@ -47,6 +52,9 @@ build-musl-image:
 
 build-linux-musl: build-musl-image
 	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl
+	
+release-linux-musl: build-musl-image
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl --release
 
 build-linux-libc: build-libc-image
 	docker run $(CARGO_CACHE_ARGS) -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo build --target=x86_64-unknown-linux-gnu

@@ -90,7 +90,7 @@ impl Vault {
             ));
         }
         let keys: Vec<gpgme::Key> = ctx.find_keys(&recipients)
-            .unwrap()
+            .context("Could not iterate keys for given recipients")?
             .filter_map(Result::ok)
             .filter(|k| k.can_encrypt())
             .collect();

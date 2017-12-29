@@ -121,7 +121,7 @@ pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<String, E
         .map(|s| {
             Path::new(s)
                 .file_name()
-                .map(|f| f.to_str().expect("os-string to str conversion failed"))
+                .map(|f| f.to_str().expect("os-string to str conversion to work for filename"))
                 .unwrap_or(s)
         })
         .and_then(|s| {
