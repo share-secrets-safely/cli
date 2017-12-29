@@ -15,7 +15,7 @@ travis-ci = { repository = "Byron/share-secrets-safely" }
 [dependencies]
 failure = "0.1.1"
 failure_derive = "0.1.1"
-gpgme = { version = "0.6.1", default-features = false, features = ["v1_8_0"] }
+gpgme = { version = "0.7.0" }
 serde = "1.0.24"
 serde_derive = "1.0.24"
 serde_yaml = "0.7.3"

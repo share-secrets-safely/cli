@@ -1,5 +1,14 @@
 FROM rust:latest
 
-RUN apt-get update
-RUN apt-get install -y  libgpgme-dev=1.8.0-3+b2
+# RUN apt-get update
+# RUN apt-get install -y libgettextpo-dev
 
+RUN apt-get update
+RUN apt-get install -y autoconf
+
+ENV GETTEXT_VERSION=0.19.3
+
+RUN curl -sL https://ftp.gnu.org/gnu/gettext/gettext-${GETTEXT_VERSION}.tar.gz -o /gettext-${GETTEXT_VERSION}.tar.gz
+RUN tar -xf /gettext-${GETTEXT_VERSION}.tar.gz
+RUN cd /gettext-${GETTEXT_VERSION} && ./configure --without-emacs --disable-java --disable-c++ --enable-fast-install
+RUN cd /gettext-${GETTEXT_VERSION} make -j2 > /dev/null && make install > /dev/null 

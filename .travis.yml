@@ -21,8 +21,7 @@ cache: cargo
 addons:
   apt:
     packages:
-      - libgpgme11-dev=1.4.3-0.1ubuntu5.1
-      - libgpg-error-dev=1.12-0.2ubuntu1
+      - libgettextpo-dev
 
 before_install:
   - | 
@@ -41,9 +40,3 @@ script:
         make lint-scripts;
         make journey-tests;
     fi
-
-env:
-  global:
-    - GPGME_DEBUG=9
-    - AUTOMAKE_VERSION=1.14.1
-    - GETTEXT_VERSION=0.19.3
