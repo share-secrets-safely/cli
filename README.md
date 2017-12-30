@@ -4,8 +4,9 @@
 
 Like [`pass`][pass], `s3` allows to setup a vault to store secrets, and share
 them with your team members and tooling.
-However, it wants to be a one-stop-shop in a single binary without any dependencies,
-while helping users to work with the `gpg` toolchain and workaround peculiarities.
+However, it wants to be a one-stop-shop in a single binary without any dependencies except
+for a `gpg` installation,
+helping users to work with the `gpg` toolchain and workaround peculiarities.
 
 [![asciicast](https://asciinema.org/a/154792.png)](https://asciinema.org/a/154792)
 
@@ -66,9 +67,10 @@ If you don't have `cargo` yet, you can install it via [instructions on rustup.rs
 
  * **a great user experience**
    * The user experience comes first when designing the tool, making it easy for newcomers while providing experts with all the knobs to tune
-   * deploy as *single binary*, no additional executables or dependencies are required to use all of the features
+   * deploy as *single binary*, without dynamically linked dependencies
  * **proven cryptography**
-   * Don't reinvent the wheel, use *gpg* for crypto
+   * Don't reinvent the wheel, use *gpg* for crypto. It's OK to require `gpg` to be installed
+     on the host
    * Thanks to *GPG* each user is identified separately through their public key
  * **automation and scripting is easy**
    * storing structured secrets is as easy as making them available in shell scripts
@@ -136,7 +138,7 @@ encryption just didn't work. Right now, we are not much better than using `pass`
 In this iteration, we want to achieve that for all major user journeys, **no 
 gpg error remains unexplained**.
 
- * [ ] Suggest creating a gpg key if there is none.
+ * [x] Suggest creating a gpg key if there is none.
  * [ ] try encrypting on edit (before the edit) to fail fast
    * [ ] suggest to import keys or do it for the user
    * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
