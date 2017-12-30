@@ -3,9 +3,9 @@ extern crate s3_types;
 use vault::{Vault, VaultExt};
 use s3_types::VaultContext;
 use failure::Error;
-use std::io::stdout;
 use s3_types::WriteMode;
 use s3_types::Destination;
+use std::io::Write;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)
@@ -13,10 +13,12 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
-pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
+pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<String, Error> {
     use s3_types::VaultCommand;
     match &ctx.command {
-        &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?.add_recipients(gpg_key_ids),
+        &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?
+            .add_recipients(gpg_key_ids, output)
+            .map(|_| String::new()),
         &VaultCommand::Init {
             ref gpg_key_ids,
             ref gpg_keys_dir,
@@ -52,15 +54,9 @@ pub fn do_it(ctx: VaultContext) -> Result<String, Error> {
             ref editor,
             ref mode,
         } => vault_from(&ctx)?.edit(spec, editor, mode),
-        s @ &VaultCommand::List | s @ &VaultCommand::ResourceShow { .. } => {
-            let vault = vault_from(&ctx)?;
-            let stdout = stdout();
-            let mut lock = stdout.lock();
-            match s {
-                &VaultCommand::List => vault.list(&mut lock),
-                &VaultCommand::ResourceShow { ref spec } => vault.decrypt(spec, &mut lock).map(|_| ()),
-                _ => unreachable!(),
-            }.map(|_| String::new())
-        }
+        &VaultCommand::List => vault_from(&ctx)?.list(output).map(|_| String::new()),
+        &VaultCommand::ResourceShow { ref spec } => vault_from(&ctx)?
+            .decrypt(spec, output)
+            .map(|_| String::new()),
     }
 }

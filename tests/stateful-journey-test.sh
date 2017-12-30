@@ -12,7 +12,7 @@ function in_red() {
   echo "$RED" "$@"
 }
 
-find "$relative_root/journeys" -type f -name "*.sh" -maxdepth 1 | sort | \
+find "$relative_root/journeys" -maxdepth 1 -type f -name "*.sh" | sort | \
 while read -r journey; do
     make_journey_dockerfile="${journey%/*}/dockerfile-gen/${journey##*/}"
     journey_image="$image"

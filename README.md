@@ -112,7 +112,7 @@ well-known `{{handlebar}}` syntax.
 The first iteration only fulfilled the main journey. Now it's  time to fill the gaps
 and add a few more features to provide API symmetry.
 
- * [ ] Stream progress/output messages instead of aggregating them if all succeeded
+ * [x] Stream progress/output messages instead of aggregating them if all succeeded
    * For example, when adding a recipient, parts of the operation succeed, but 
      it is not visible if re-encryption fails.
  * [ ] `vault recipients`

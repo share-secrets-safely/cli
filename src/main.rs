@@ -70,7 +70,9 @@ fn main() {
                 ("edit", Some(args)) => ok_or_exit(vault_resource_edit(context, args)),
                 _ => context,
             };
-            vault::do_it(context)
+            let sout = stdout();
+            let mut lock = sout.lock();
+            vault::do_it(context, &mut lock)
         }
         ("extract", Some(args)) => {
             let context = ok_or_exit(extraction_context_from(args));

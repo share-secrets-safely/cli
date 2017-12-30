@@ -70,7 +70,7 @@ fn export_key(
 }
 
 impl Vault {
-    pub fn add_recipients(&self, gpg_key_ids: &[String]) -> Result<String, Error> {
+    pub fn add_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let keys = {
             let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
@@ -92,24 +92,24 @@ impl Vault {
             ));
         };
 
-        let mut output = Vec::new();
         if let Some(gpg_keys_dir) = self.gpg_keys.as_ref() {
             let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
             let mut buf = Vec::new();
             for key in keys.iter() {
                 let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
-                output.push(format!(
+                writeln!(
+                    output,
                     "Exported key '{}' for user {}",
                     fingerprint,
                     KeyDisplay(&key)
-                ));
+                ).ok();
             }
         }
 
         let mut recipients = self.recipients_list()?;
         for key in keys {
             recipients.push(fingerprint_of(&key)?);
-            output.push(format!("Added recipient {}", KeyDisplay(&key)));
+            writeln!(output, "Added recipient {}", KeyDisplay(&key)).ok();
         }
         recipients.sort();
         recipients.dedup();
@@ -173,12 +173,13 @@ impl Vault {
                 })?;
 
             obuf.clear();
-            output.push(format!(
+            writeln!(
+                output,
                 "Re-encrypted '{}' for new recipients",
                 strip_ext(&encrypted_file_path)
-            ));
+            ).ok();
         }
-        Ok(output.join("\n"))
+        Ok(())
     }
 
     pub fn init(
