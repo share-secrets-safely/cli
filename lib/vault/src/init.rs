@@ -213,7 +213,8 @@ impl Vault {
 
         if keys.is_empty() {
             return Err(err_msg(
-                "No existing GPG key found for which you have a secret key. Please create one and try again.",
+                "No existing GPG key found for which you have a secret key. \
+                 Please create one with 'gpg --gen-key' and try again.",
             ));
         }
 
