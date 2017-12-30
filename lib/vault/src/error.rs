@@ -5,6 +5,13 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::fmt;
 use failure::Fail;
+use gpgme;
+
+#[derive(Debug, Fail)]
+#[fail(display = "The content was not encrypted for you.")]
+pub struct DecryptError {
+    #[cause] pub cause: gpgme::Error,
+}
 
 #[derive(Debug, Fail)]
 pub enum VaultError {

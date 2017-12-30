@@ -13,7 +13,7 @@ extern crate serde_derive;
 extern crate serde_yaml;
 extern crate yaml_rust;
 
-mod error;
+pub mod error;
 mod util;
 mod vault;
 mod dispatch;

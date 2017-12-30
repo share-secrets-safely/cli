@@ -13,6 +13,7 @@ use util::UserIdFingerprint;
 use util::write_at;
 use error::FailExt;
 use s3_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
+use error::DecryptError;
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<String, Error> {
@@ -75,11 +76,11 @@ impl Vault {
         let mut output = Vec::new();
         ctx.decrypt(&mut input, &mut output)
             .map_err(|e: gpgme::Error| {
-                e.context(if e.code() == gpgme::Error::NO_SECKEY.code() {
-                    "The content was not encrypted for you."
+                if e.code() == gpgme::Error::NO_SECKEY.code() {
+                    Error::from(DecryptError { cause: e })
                 } else {
-                    "Failed to decrypt data."
-                })
+                    e.context("Failed to decrypt data.").into()
+                }
             })?;
 
         w.write_all(&output)
