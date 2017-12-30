@@ -1,8 +1,15 @@
 [![Build Status](https://travis-ci.org/Byron/share-secrets-safely.svg?branch=master)](https://travis-ci.org/Byron/share-secrets-safely)
 
-`share-secrets-safely` is a GPG based solution for managing shared secrets.
+`share-secrets-safely` is a solution for managing shared secrets in teams and build pipelines.
+
+Like [`pass`][pass], `s3` allows to setup a vault to store secrets, and share
+them with your team members and tooling.
+However, it wants to be a one-stop-shop in a single binary without any dependencies,
+while helping users to work with the `gpg` toolchain and workaround peculiarities.
 
 [![asciicast](https://asciinema.org/a/154792.png)](https://asciinema.org/a/154792)
+
+[pass]: https://www.passwordstore.org/
 
 ## Installation
 
