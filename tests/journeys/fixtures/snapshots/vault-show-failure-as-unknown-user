@@ -1,3 +1,4 @@
-error: Failed to decrypt data.
+error: Ask one of the existing recipients to import your public key using 's3 vault recipients add <your-userid>.'
 Caused by: 
+ 2: The content was not encrypted for you.
  1: No secret key (gpg error 17)

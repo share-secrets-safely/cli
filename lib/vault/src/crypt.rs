@@ -8,7 +8,7 @@ use mktemp::Temp;
 use itertools::join;
 use gpgme;
 use vault::Vault;
-use failure::{err_msg, Error, ResultExt};
+use failure::{err_msg, Error, Fail, ResultExt};
 use util::UserIdFingerprint;
 use util::write_at;
 use error::FailExt;
@@ -74,7 +74,13 @@ impl Vault {
             ))?;
         let mut output = Vec::new();
         ctx.decrypt(&mut input, &mut output)
-            .context("Failed to decrypt data.")?;
+            .map_err(|e: gpgme::Error| {
+                e.context(if e.code() == gpgme::Error::NO_SECKEY.code() {
+                    "The content was not encrypted for you."
+                } else {
+                    "Failed to decrypt data."
+                })
+            })?;
 
         w.write_all(&output)
             .context("Could not write out all decrypted data.")?;

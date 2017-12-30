@@ -3,6 +3,7 @@ extern crate clap;
 extern crate conv;
 #[macro_use]
 extern crate failure;
+extern crate gpgme;
 #[macro_use]
 extern crate lazy_static;
 extern crate s3_extract as extract;
@@ -19,6 +20,31 @@ use std::process;
 use std::convert::Into;
 use cli::CLI;
 use parse::*;
+
+fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
+    r.map_err(|e| {
+        let ctx_msg = match e.causes()
+            .filter_map(|c| c.downcast_ref::<gpgme::Error>())
+            .next()
+        {
+            Some(err) => if err.code() == gpgme::Error::NO_SECKEY.code() {
+                Some(format!(
+                    "Ask one of the existing recipients to import your public key \
+                     using '{} vault recipients add <your-userid>.'",
+                    CLI::name()
+                ))
+            } else {
+                None
+            },
+            None => None,
+        };
+        if let Some(msg) = ctx_msg {
+            e.context(msg).into()
+        } else {
+            e.into()
+        }
+    })
+}
 
 fn ok_or_exit<T, E>(r: Result<T, E>) -> T
 where
@@ -72,7 +98,7 @@ fn main() {
             };
             let sout = stdout();
             let mut lock = sout.lock();
-            vault::do_it(context, &mut lock)
+            add_vault_context((vault::do_it(context, &mut lock)))
         }
         ("extract", Some(args)) => {
             let context = ok_or_exit(extraction_context_from(args));
