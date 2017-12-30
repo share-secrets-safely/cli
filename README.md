@@ -13,6 +13,10 @@ while helping users to work with the `gpg` toolchain and workaround peculiaritie
 
 ## Installation
 
+Please note that in order to use `s3`, you will need a working [installation of `gpg`][gpg].
+
+[gpg]: https://www.gnupg.org/download/index.html#binary
+
 ### Via [Releases][releases]
 
 Navigate to the [releases page][releases] and download a release binary suitable
@@ -41,13 +45,23 @@ If you don't have `cargo` yet, you can install it via [instructions on rustup.rs
 [releases]: https://github.com/Byron/share-secrets-safely/releases
 [rustup]: http://rustup.rs
 
-## Features
+## Getting Started
 
- * **easy access to GPG cryptography**
- * **easy to deploy with just a single binary**
- * **compatible to pass**
- * **state-of-art command-line interface**
- 
+ * **s3 --help** - help yourself
+   * You can always use `--help` to learn about what the program can do. It is self-documenting.
+ * **s3 vault init** - create a new vault in the current directory
+ * **s3 vault add /path/to/file:file** - add an existing file to the vault 
+ * **s3 vault add :file** - read a secret from stdin
+ * **s3 vault recipients add name-of-mate** - add a recipient to the vault
+   * Note that the recipient is identified by the ID of a key already imported
+     into your gpg keychain.
+   * In order for secrets to be re-encrypted, you must trust the new key enough.
+     Either (_locally_) sign it, or trust it ultimately. Read more about the [web of trust][gpgweb].
+ * **s3 vault edit secret** - change a secret
+ * **s3 vault show secret** - print a secret to standard output
+
+[gpgweb]: https://www.gnupg.org/gph/en/manual/x547.html
+
 ## Project Goals
 
  * **a great user experience**
@@ -105,12 +119,15 @@ and add a few more features to provide API symmetry.
    * [ ] list
    * [ ] remove recipient(s) and re-encrypt
  * [ ] `vault remove` a resource
- * [ ] `vault add` force overwrite flag
+ * [ ] `vault add`
+   * [ ] force overwrite flag
+   * [ ] create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
  * [ ] `multi-vault`
    * _manage multiple vaults in a single vault configuration file_
    * _it is possible to share public keys, too, so you can implement partitions_
-
+ * [ ] it must be possible to turn off any automation introduced above
+ 
 ### UX - The next iteration
 
 GPG is cryptic, and it's usually entirely unclear to the uniniciated user why
@@ -159,6 +176,8 @@ gpg error remains unexplained**.
  * **test-first development**
    * protect against regression and make implementing features easy
    * user docker to test more elaborate user interactions
+   * keep it practical, knowing that the Rust compiler already has your back
+     for the mundane things, like unhappy code paths.
  * **safety first**
    * handle all errors, never unwrap
    * provide an error chain and make it easy to understand what went wrong.
