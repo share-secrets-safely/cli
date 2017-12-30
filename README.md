@@ -18,6 +18,8 @@ tar xzf s3.tar.gz
 ./s3
 ```
 
+Here is a [recording](https://asciinema.org/a/154794) of how this can look like.
+
 ### Via [Cargo][rustup]
 
 If you already have `cargo` available, installation is as easy as the following:
