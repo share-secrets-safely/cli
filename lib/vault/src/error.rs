@@ -1,11 +1,10 @@
-extern crate failure;
-
 use serde_yaml;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::fmt;
 use failure::Fail;
 use gpgme;
+use failure;
 
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]
@@ -87,7 +86,7 @@ impl VaultError {
     }
 }
 
-pub trait FailExt {
+pub trait FailExt: Fail {
     fn first_cause_of<T: Fail>(&self) -> Option<&T>;
 }
 
@@ -98,4 +97,8 @@ where
     fn first_cause_of<T: Fail>(&self) -> Option<&T> {
         self.causes().filter_map(|c| c.downcast_ref::<T>()).next()
     }
+}
+
+pub fn first_cause_of_type<T: Fail>(root: &failure::Error) -> Option<&T> {
+    root.causes().filter_map(|c| c.downcast_ref::<T>()).next()
 }
