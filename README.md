@@ -2,6 +2,8 @@
 
 `share-secrets-safely` is a GPG based solution for managing shared secrets.
 
+[![asciicast](https://asciinema.org/a/154792.png)](https://asciinema.org/a/154792)
+
 ## Installation
 
 ### Via [Releases][releases]
@@ -12,7 +14,7 @@ for your system. A full example *for linux* looks like this:
 ```bash
 curl -Lo s3.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.0/s3-linux-musl-x86_64.tar.gz
 tar xzf s3.tar.gz
-# run s3 - please feel free to put it into your PATH
+# run s3  - even better when in your PATH
 ./s3
 ```
 
@@ -87,11 +89,15 @@ well-known `{{handlebar}}` syntax.
 The first iteration only fulfilled the main journey. Now it's  time to fill the gaps
 and add a few more features to provide API symmetry.
 
+ * [ ] Stream progress/output messages instead of aggregating them if all succeeded
+   * For example, when adding a recipient, parts of the operation succeed, but 
+     it is not visible if re-encryption fails.
  * [ ] `vault recipients`
    * [ ] list
    * [ ] remove recipient(s) and re-encrypt
  * [ ] `vault remove` a resource
  * [ ] `vault add` force overwrite flag
+ * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
  * [ ] `multi-vault`
    * _manage multiple vaults in a single vault configuration file_
    * _it is possible to share public keys, too, so you can implement partitions_
@@ -171,7 +177,7 @@ As a prerequisite, you should be sure the build is green.
    * `docker build -t asciinema - < etc/docker/Dockerfile.asciinema`
  * drop into the image, possibly prepare it a little more
    * `docker run -it --rm asciinema`
-   * `chmod a+rw $(tty)` to allow changing to `su max` and allow `gpg --gen-key` to work.
+   * `chmod ga+rw $(tty)` to allow changing to `su max` and allow `gpg --gen-key` to work.
  * Start a local recording
    * `asciinema rec -w 1 -t "A tour of S3" s3-demo.json`
  * Possibly upload the recording
