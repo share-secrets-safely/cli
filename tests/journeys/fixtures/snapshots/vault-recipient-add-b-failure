@@ -1,0 +1,5 @@
+Exported key '7435ACDC03D55429C41637C4DB9831D842C18D28' for user user b <b@example.com>
+Added recipient user b <b@example.com>
+error: Failed to re-encrypt secret.gpg.
+Caused by: 
+ 1: Unusable public key (gpg error 53)

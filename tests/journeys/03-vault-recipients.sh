@@ -30,7 +30,7 @@ snapshot="$fixture/snapshots"
       )
     )
     
-    (when "adding a new recipient using the id of an already imported key"
+    (when "adding a new recipient using the id of an already imported and signed key"
       gpg --import "$fixture/c.pub.asc" &>/dev/null
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-c" \
@@ -47,6 +47,33 @@ snapshot="$fixture/snapshots"
           expect_run $SUCCESSFULLY "$exe" vault show secret
         )
       }
+    )
+    
+    (when "adding a new recipient using the id of an already imported and unsigned key"
+      gpg --import "$fixture/b.pub.asc" &>/dev/null
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/vault-recipient-add-b-failure" \
+        expect_run $WITH_FAILURE "$exe" vault recipients add b@example.com
+      }
+      
+      (when "signing the new key and adding the recipient"
+        gpg --sign-key --yes --batch b@example.com &>/dev/null
+        it "succeeds" && {
+          WITH_SNAPSHOT="$snapshot/vault-recipient-add-b-success-after-signing" \
+          expect_run $SUCCESSFULLY "$exe" vault recipients add b@example.com
+        }
+        
+        it "sets up the metadata correctly" && {
+          expect_snapshot "$snapshot/vault-recipient-add-b-recipients" etc/recipients
+        }
+        
+        it "re-encrypts all secrets to allow the new recipient to decode it" && {
+          (as_user "$fixture/b.sec.asc"
+            WITH_SNAPSHOT="$snapshot/vault-show-success-as-user-b" \
+            expect_run $SUCCESSFULLY "$exe" vault show secret
+          )
+        }
+      )
     )
   )
 )
