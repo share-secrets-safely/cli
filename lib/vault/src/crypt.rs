@@ -1,4 +1,4 @@
-extern crate s3_types;
+extern crate sheesy_types;
 
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -12,7 +12,7 @@ use failure::{err_msg, Error, Fail, ResultExt};
 use util::UserIdFingerprint;
 use util::write_at;
 use error::FailExt;
-use s3_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
+use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 use error::DecryptError;
 
 impl Vault {

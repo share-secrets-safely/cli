@@ -5,9 +5,9 @@ extern crate conv;
 extern crate failure;
 #[macro_use]
 extern crate lazy_static;
-extern crate s3_extract as extract;
-extern crate s3_types;
-extern crate s3_vault as vault;
+extern crate sheesy_extract as extract;
+extern crate sheesy_types;
+extern crate sheesy_vault as vault;
 
 mod cli;
 mod parse;

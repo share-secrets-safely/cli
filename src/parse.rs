@@ -1,7 +1,7 @@
-extern crate s3_types;
+extern crate sheesy_types;
 
 use conv::TryInto;
-use s3_types::{CreateMode, ExtractionContext, VaultCommand, VaultContext};
+use sheesy_types::{CreateMode, ExtractionContext, VaultCommand, VaultContext};
 use clap::{App, ArgMatches, Shell};
 use failure::{err_msg, Error, ResultExt};
 use std::io::stdout;

@@ -1,10 +1,10 @@
-extern crate s3_types;
+extern crate sheesy_types;
 
 use vault::{Vault, VaultExt};
-use s3_types::VaultContext;
+use sheesy_types::VaultContext;
 use failure::Error;
-use s3_types::WriteMode;
-use s3_types::Destination;
+use sheesy_types::WriteMode;
+use sheesy_types::Destination;
 use std::io::Write;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
@@ -14,7 +14,7 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
 pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<String, Error> {
-    use s3_types::VaultCommand;
+    use sheesy_types::VaultCommand;
     match &ctx.command {
         &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?
             .add_recipients(gpg_key_ids, output)

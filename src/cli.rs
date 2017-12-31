@@ -18,7 +18,7 @@ where
     'a: 'b,
 {
     pub fn name() -> &'static str {
-        "s3"
+        "sy"
     }
 
     pub fn new() -> Self {
@@ -169,7 +169,7 @@ where
                     .required(true)
                     .value_name("path")
                     .help("Path to the vault configuration YAML file.")
-                    .default_value("./s3-vault.yml"),
+                    .default_value("./sy-vault.yml"),
             );
         let extract = App::new("extract")
             .about("utilities to extract information from structured data files")

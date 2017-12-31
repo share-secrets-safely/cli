@@ -99,6 +99,7 @@ where
     }
 }
 
+// https://github.com/withoutboats/failure/pull/124
 pub fn first_cause_of_type<T: Fail>(root: &failure::Error) -> Option<&T> {
     root.causes().filter_map(|c| c.downcast_ref::<T>()).next()
 }

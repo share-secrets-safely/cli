@@ -1,13 +1,13 @@
 [package]
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-name = "s3-vault"
+name = "sheesy-vault"
 version = "1.0.0"
 
 description = "Vault functionality used by 'share-secrets-safely' CLI. Use it to interact with GPG based vaults."
 license = "LGPL-2.1"
 repository = "https://github.com/Byron/share-secrets-safely"
 homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/vault"
-documentation = "https://docs.rs/s3-vault"
+documentation = "https://docs.rs/sheesy-vault"
 
 [badges]
 travis-ci = { repository = "Byron/share-secrets-safely" }
@@ -24,6 +24,6 @@ yaml-rust = "0.4.0"
 glob = "0.2.11"
 mktemp = "0.3.1"
 
-[dependencies.s3-types]
+[dependencies.sheesy-types]
 path = "../types"
 version = "1.0.0"

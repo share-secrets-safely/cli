@@ -6,11 +6,11 @@ extern crate glob;
 extern crate gpgme;
 extern crate itertools;
 extern crate mktemp;
-extern crate s3_types;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
+extern crate sheesy_types;
 extern crate yaml_rust;
 
 pub mod error;

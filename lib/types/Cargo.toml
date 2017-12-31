@@ -1,12 +1,12 @@
 [package]
-name = "s3-types"
+name = "sheesy-types"
 version = "1.0.0"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "Types used by 'share-secrets-safely' crates."
 license = "LGPL-2.1"
 repository = "https://github.com/Byron/share-secrets-safely"
 homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/types"
-documentation = "https://docs.rs/s3-types"
+documentation = "https://docs.rs/sheesy-types"
 
 [badges]
 travis-ci = { repository = "Byron/share-secrets-safely" }

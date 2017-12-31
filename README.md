@@ -1,8 +1,9 @@
 [![Build Status](https://travis-ci.org/Byron/share-secrets-safely.svg?branch=master)](https://travis-ci.org/Byron/share-secrets-safely)
 
-`share-secrets-safely` is a solution for managing shared secrets in teams and build pipelines.
+**sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing 
+shared secrets in teams and build pipelines.
 
-Like [`pass`][pass], `s3` allows to setup a vault to store secrets, and share
+Like [`pass`][pass], `sy` allows to setup a vault to store secrets, and share
 them with your team members and tooling.
 However, it wants to be a one-stop-shop in a single binary without any dependencies except
 for a `gpg` installation,
@@ -14,7 +15,7 @@ helping users to work with the `gpg` toolchain and workaround peculiarities.
 
 ## Installation
 
-Please note that in order to use `s3`, you will need a working [installation of `gpg`][gpg].
+Please note that in order to use `sy`, you will need a working [installation of `gpg`][gpg].
 
 [gpg]: https://www.gnupg.org/download/index.html#binary
 
@@ -24,10 +25,10 @@ Navigate to the [releases page][releases] and download a release binary suitable
 for your system. A full example *for linux* looks like this:
 
 ```bash
-curl -Lo s3.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.0/s3-linux-musl-x86_64.tar.gz
-tar xzf s3.tar.gz
-# run s3  - even better when in your PATH
-./s3
+curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.0/sy-linux-musl-x86_64.tar.gz
+tar xzf sy.tar.gz
+# run sy  - even better when in your PATH
+./sy
 ```
 
 Here is a [recording](https://asciinema.org/a/154794) of how this can look like.
@@ -37,7 +38,7 @@ Here is a [recording](https://asciinema.org/a/154794) of how this can look like.
 If you already have `cargo` available, installation is as easy as the following:
 
 ```bash
-cargo install s3-cli
+cargo install sy-cli
 ```
 
 This installation should be preferred as it makes updating the binary much easier.
@@ -48,18 +49,18 @@ If you don't have `cargo` yet, you can install it via [instructions on rustup.rs
 
 ## Getting Started
 
- * **s3 --help** - help yourself
+ * **sy --help** - help yourself
    * You can always use `--help` to learn about what the program can do. It is self-documenting.
- * **s3 vault init** - create a new vault in the current directory
- * **s3 vault add /path/to/file:file** - add an existing file to the vault 
- * **s3 vault add :file** - read a secret from stdin
- * **s3 vault recipients add name-of-mate** - add a recipient to the vault
+ * **sy vault init** - create a new vault in the current directory
+ * **sy vault add /path/to/file:file** - add an existing file to the vault 
+ * **sy vault add :file** - read a secret from stdin
+ * **sy vault recipients add name-of-mate** - add a recipient to the vault
    * Note that the recipient is identified by the ID of a key already imported
      into your gpg keychain.
    * In order for secrets to be re-encrypted, you must trust the new key enough.
      Either (_locally_) sign it, or trust it ultimately. Read more about the [web of trust][gpgweb].
- * **s3 vault edit secret** - change a secret
- * **s3 vault show secret** - print a secret to standard output
+ * **sy vault edit secret** - change a secret
+ * **sy vault show secret** - print a secret to standard output
 
 [gpgweb]: https://www.gnupg.org/gph/en/manual/x547.html
 
@@ -94,7 +95,7 @@ If you don't have `cargo` yet, you can install it via [instructions on rustup.rs
 
 ### Add the `pass` subcommand
 
-`s3` aims to be as usable as possible, and breaks compatiblity were needed to
+`sy` aims to be as usable as possible, and breaks compatiblity were needed to
 achieve that. However, to allow people to leverage its improved portability
 thanks to it being self-contained, it should be possible to let it act as a
 stand-in for pass.
@@ -209,7 +210,7 @@ As a prerequisite, you should be sure the build is green.
    * `docker run -it --rm asciinema`
    * `chmod ga+rw $(tty)` to allow changing to `su max` and allow `gpg --gen-key` to work.
  * Start a local recording
-   * `asciinema rec -w 1 -t "A tour of S3" s3-demo.json`
+   * `asciinema rec -w 1 -t "A tour of sy" sy-demo.json`
  * Possibly upload the recording
    * `asciinema auth`
-   * `asciinema upload s3-demo.json`
+   * `asciinema upload sy-demo.json`

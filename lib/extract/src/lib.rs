@@ -1,5 +1,5 @@
 extern crate failure;
-extern crate s3_types as types;
+extern crate sheesy_types as types;
 
 use failure::Error;
 

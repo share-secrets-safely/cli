@@ -1,20 +1,20 @@
 [package]
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-name = "s3-cli"
+name = "sheesy-cli"
 version = "1.0.0"
 
 description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults."
 license = "LGPL-2.1"
 repository = "https://github.com/Byron/share-secrets-safely"
 homepage = "https://github.com/Byron/share-secrets-safely"
-documentation = "https://docs.rs/s3-cli"
+documentation = "https://docs.rs/shessy-cli"
 readme = "README.md"
 
 [badges]
 travis-ci = { repository = "Byron/share-secrets-safely" }
 
 [[bin]]
-name = "s3"
+name = "sy"
 path = "src/main.rs"
 
 [dependencies]
@@ -23,15 +23,15 @@ failure = "~0.1.1"
 conv = "0.3.3"
 lazy_static = "1.0.0"
 
-[dependencies.s3-types]
+[dependencies.sheesy-types]
 path = "lib/types"
 version = "1.0.0"
 
-[dependencies.s3-extract]
+[dependencies.sheesy-extract]
 path = "lib/extract"
 version = "1.0.0"
 
-[dependencies.s3-vault]
+[dependencies.sheesy-vault]
 path = "lib/vault"
 version = "1.0.0"
 

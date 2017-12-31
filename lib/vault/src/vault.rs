@@ -152,7 +152,7 @@ impl Vault {
 
     pub fn url(&self) -> String {
         format!(
-            "s3v://{}{}",
+            "syv://{}{}",
             self.name
                 .as_ref()
                 .map(|s| format!("{}@", s))
@@ -236,13 +236,13 @@ mod tests_vault {
     fn it_print_the_name_in_the_url_if_there_is_none() {
         let mut v = Vault::default();
         v.name = Some("name".into());
-        assert_eq!(v.url(), "s3v://name@.")
+        assert_eq!(v.url(), "syv://name@.")
     }
 
     #[test]
     fn it_does_not_print_the_name_in_the_url_if_there_is_none() {
         let v = Vault::default();
-        assert_eq!(v.url(), "s3v://.")
+        assert_eq!(v.url(), "syv://.")
     }
 }
 

@@ -1,11 +1,11 @@
-EXE=target/debug/s3
-RELEASE_EXE=target/release/s3
-RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/s3
-MUSL_EXE=target/x86_64-unknown-linux-musl/debug/s3
-LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/s3
+EXE=target/debug/sy
+RELEASE_EXE=target/release/sy
+RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
+MUSL_EXE=target/x86_64-unknown-linux-musl/debug/sy
+LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/sy
 MUSL_IMAGE=clux/muslrust:stable
-MY_LIBC_IMAGE=s3_libc:stable
-MY_MUSL_IMAGE=s3_musl:stable
+MY_LIBC_IMAGE=sheesy_libc:stable
+MY_MUSL_IMAGE=sheesy_musl:stable
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 
 help:
@@ -41,10 +41,10 @@ $(MUSL_EXE): build-linux-musl
 $(RELEASE_MUSL_EXE): release-linux-musl
 
 deployable-linux: $(RELEASE_MUSL_EXE)
-	tar czf s3-cli-linux-musl-x86_64.tar.gz -C $(dir $<) $(notdir $<)
+	tar czf sy-cli-linux-musl-x86_64.tar.gz -C $(dir $<) $(notdir $<)
 
 deployable-host: $(RELEASE_EXE)
-	tar czf s3-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
+	tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
 	
 $(LIBC_EXE): build-linux-libc
 	
