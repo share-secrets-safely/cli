@@ -44,6 +44,7 @@ deployable-linux: $(RELEASE_MUSL_EXE)
 	tar czf sy-cli-linux-musl-x86_64.tar.gz -C $(dir $<) $(notdir $<)
 
 deployable-host: $(RELEASE_EXE)
+	echo tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
 	tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
 	
 $(LIBC_EXE): build-linux-libc
