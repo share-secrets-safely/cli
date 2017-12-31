@@ -1,5 +1,5 @@
 Exported key '7435ACDC03D55429C41637C4DB9831D842C18D28' for user user b <b@example.com>
 Added recipient user b <b@example.com>
-error: Failed to re-encrypt secret.gpg.
+error: At least one recipient you try to encrypt for is untrusted. Consider (locally) signing the key with `gpg --sign-key <recipient>` or ultimately trusting them.
 Caused by: 
  1: Unusable public key (gpg error 53)

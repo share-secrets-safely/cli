@@ -14,6 +14,7 @@ use std::fmt;
 use vault::{strip_ext, ResetCWD, Vault, GPG_GLOB};
 use glob::glob;
 use mktemp::Temp;
+use error::EncryptionError;
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -155,10 +156,12 @@ impl Vault {
                 let mut plain_reader = File::open(tempfile.to_path_buf())?;
                 gpg_ctx
                     .encrypt(&keys, &mut plain_reader, &mut obuf)
-                    .context(format!(
-                        "Failed to re-encrypt {}.",
-                        encrypted_file_path.display()
-                    ))?;
+                    .map_err(|e| {
+                        EncryptionError::caused_by(
+                            e,
+                            format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
+                        )
+                    })?;
             }
             write_at(&self.absolute_path(&encrypted_file_path))
                 .context(format!(

@@ -8,8 +8,36 @@ use failure;
 
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]
-pub struct DecryptError {
+pub struct DecryptionError {
     #[cause] pub cause: gpgme::Error,
+}
+
+impl DecryptionError {
+    pub fn caused_by(err: gpgme::Error, alternative_text: &'static str) -> failure::Error {
+        if err.code() == gpgme::Error::NO_SECKEY.code() {
+            failure::Error::from(DecryptionError { cause: err })
+        } else {
+            err.context(alternative_text).into()
+        }
+    }
+}
+
+#[derive(Debug, Fail)]
+#[fail(display = "At least one recipient you try to encrypt for is untrusted. \
+                  Consider (locally) signing the key with `gpg --sign-key <recipient>` \
+                  or ultimately trusting them.")]
+pub struct EncryptionError {
+    #[cause] pub cause: gpgme::Error,
+}
+
+impl EncryptionError {
+    pub fn caused_by(err: gpgme::Error, alternative_text: String) -> failure::Error {
+        if err.code() == gpgme::Error::UNUSABLE_PUBKEY.code() {
+            failure::Error::from(EncryptionError { cause: err })
+        } else {
+            err.context(alternative_text).into()
+        }
+    }
 }
 
 #[derive(Debug, Fail)]

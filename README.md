@@ -145,6 +145,7 @@ gpg error remains unexplained**.
    * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
    * [ ] possibly allow the user (locally sign) recipients
    * [ ] possibly allow to disable ownertrust using 'always-trust'
+   * [ ] list recipients which are unusable when encryption fails.
  * [ ] it must be possible to turn off any automation introduced above
  * [ ] certain configuration flags should be persisted with the vault configuration
 

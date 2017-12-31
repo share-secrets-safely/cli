@@ -8,12 +8,12 @@ use mktemp::Temp;
 use itertools::join;
 use gpgme;
 use vault::Vault;
-use failure::{err_msg, Error, Fail, ResultExt};
+use failure::{err_msg, Error, ResultExt};
 use util::UserIdFingerprint;
 use util::write_at;
 use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
-use error::DecryptError;
+use error::{DecryptionError, EncryptionError};
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<String, Error> {
@@ -75,13 +75,7 @@ impl Vault {
             ))?;
         let mut output = Vec::new();
         ctx.decrypt(&mut input, &mut output)
-            .map_err(|e: gpgme::Error| {
-                if e.code() == gpgme::Error::NO_SECKEY.code() {
-                    Error::from(DecryptError { cause: e })
-                } else {
-                    e.context("Failed to decrypt data.").into()
-                }
-            })?;
+            .map_err(|e: gpgme::Error| DecryptionError::caused_by(e, "Failed to decrypt data."))?;
 
         w.write_all(&output)
             .context("Could not write out all decrypted data.")?;
@@ -143,7 +137,7 @@ impl Vault {
             };
             let mut output = Vec::new();
             ctx.encrypt(&keys, input, &mut output)
-                .context(format!("Failed to encrypt {}.", spec))?;
+                .map_err(|e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into()))?;
             spec.open_output_in(&self.resolved_at, mode, dst_mode)?
                 .write_all(&output)
                 .context(format!(

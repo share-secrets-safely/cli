@@ -19,11 +19,11 @@ use std::process;
 use std::convert::Into;
 use cli::CLI;
 use parse::*;
-use vault::error::{first_cause_of_type, DecryptError};
+use vault::error::{first_cause_of_type, DecryptionError};
 
 fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
     r.map_err(|e| {
-        let ctx_msg = match first_cause_of_type::<DecryptError>(&e) {
+        let ctx = match first_cause_of_type::<DecryptionError>(&e) {
             Some(_err) => Some(format!(
                 "Ask one of the existing recipients to import your public key \
                  using '{} vault recipients add <your-userid>.'",
@@ -31,11 +31,10 @@ fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
             )),
             None => None,
         };
-        if let Some(msg) = ctx_msg {
-            e.context(msg).into()
-        } else {
-            e.into()
-        }
+        (e, ctx)
+    }).map_err(|(e, msg)| match msg {
+        Some(msg) => e.context(msg).into(),
+        None => e.into(),
     })
 }
 
