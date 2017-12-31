@@ -1,3 +1,5 @@
+extern crate mktemp;
+
 use serde_yaml;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -5,6 +7,10 @@ use std::fmt;
 use failure::Fail;
 use gpgme;
 use failure;
+use mktemp::Temp;
+use util::write_at;
+use std::fs::File;
+use util::UserIdFingerprint;
 
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]
@@ -23,17 +29,59 @@ impl DecryptionError {
 }
 
 #[derive(Debug, Fail)]
-#[fail(display = "At least one recipient you try to encrypt for is untrusted. \
-                  Consider (locally) signing the key with `gpg --sign-key <recipient>` \
-                  or ultimately trusting them.")]
 pub struct EncryptionError {
     #[cause] pub cause: gpgme::Error,
+    pub offending_recipients: Vec<String>,
+}
+
+impl fmt::Display for EncryptionError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "At least one recipient you try to encrypt for is untrusted. \
+             Consider (locally) signing the key with `gpg --sign-key <recipient>` \
+             or ultimately trusting them."
+        )?;
+        for info in self.offending_recipients.iter() {
+            write!(f, "\n{}", info)?;
+        }
+        Ok(())
+    }
+}
+
+fn find_offending_keys(ctx: &mut gpgme::Context, keys: &[gpgme::Key]) -> Result<Vec<String>, failure::Error> {
+    let mut output = Vec::new();
+    let mut obuf = Vec::<u8>::new();
+    let temp = Temp::new_file()?;
+    let temp_path = temp.to_path_buf();
+    {
+        let _ibuf = write_at(&temp_path)?;
+    }
+    let mut ibuf = File::open(&temp_path)?;
+    for key in keys {
+        if let Err(err) = ctx.encrypt(Some(key), &mut ibuf, &mut obuf) {
+            output.push(format!(
+                "Could not encrypt for recipient {} with error: {}",
+                UserIdFingerprint(key),
+                err
+            ));
+        }
+    }
+    Ok(output)
 }
 
 impl EncryptionError {
-    pub fn caused_by(err: gpgme::Error, alternative_text: String) -> failure::Error {
+    pub fn caused_by(
+        err: gpgme::Error,
+        alternative_text: String,
+        ctx: &mut gpgme::Context,
+        keys: &[gpgme::Key],
+    ) -> failure::Error {
         if err.code() == gpgme::Error::UNUSABLE_PUBKEY.code() {
-            failure::Error::from(EncryptionError { cause: err })
+            failure::Error::from(EncryptionError {
+                cause: err,
+                offending_recipients: find_offending_keys(ctx, keys).unwrap(),
+            })
         } else {
             err.context(alternative_text).into()
         }

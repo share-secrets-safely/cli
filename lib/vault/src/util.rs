@@ -3,6 +3,7 @@ use std::path::Path;
 use std::fs::{self, OpenOptions};
 use std::fmt;
 use itertools::join;
+use failure::{self, err_msg};
 use gpgme;
 
 pub fn write_at(path: &Path) -> io::Result<fs::File> {
@@ -23,4 +24,13 @@ impl<'a> fmt::Display for UserIdFingerprint<'a> {
             join(self.0.user_ids().map(|u| u.id().unwrap_or("[none]")), ", ")
         )
     }
+}
+
+pub fn fingerprint_of(key: &gpgme::Key) -> Result<String, failure::Error> {
+    key.fingerprint()
+        .map_err(|e| {
+            e.map(Into::into)
+                .unwrap_or_else(|| err_msg("Fingerprint extraction failed"))
+        })
+        .map(ToOwned::to_owned)
 }

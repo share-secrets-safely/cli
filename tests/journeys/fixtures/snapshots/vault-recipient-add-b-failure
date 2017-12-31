@@ -1,5 +1,6 @@
 Exported key '7435ACDC03D55429C41637C4DB9831D842C18D28' for user user b <b@example.com>
 Added recipient user b <b@example.com>
 error: At least one recipient you try to encrypt for is untrusted. Consider (locally) signing the key with `gpg --sign-key <recipient>` or ultimately trusting them.
+Could not encrypt for recipient 7435ACDC03D55429C41637C4DB9831D842C18D28 (user b <b@example.com>) with error: Unusable public key (gpg error 53)
 Caused by: 
  1: Unusable public key (gpg error 53)

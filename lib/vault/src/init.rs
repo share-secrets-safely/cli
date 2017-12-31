@@ -15,6 +15,7 @@ use vault::{strip_ext, ResetCWD, Vault, GPG_GLOB};
 use glob::glob;
 use mktemp::Temp;
 use error::EncryptionError;
+use util::fingerprint_of;
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -33,15 +34,6 @@ impl<'a> fmt::Display for KeyDisplay<'a> {
             join(self.0.user_ids().map(|u| u.id().unwrap_or("[none]")), ", ")
         )
     }
-}
-
-fn fingerprint_of(key: &gpgme::Key) -> Result<String, Error> {
-    key.fingerprint()
-        .map_err(|e| {
-            e.map(Into::into)
-                .unwrap_or_else(|| err_msg("Fingerprint extraction failed"))
-        })
-        .map(ToOwned::to_owned)
 }
 
 fn export_key(
@@ -160,6 +152,8 @@ impl Vault {
                         EncryptionError::caused_by(
                             e,
                             format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
+                            &mut gpg_ctx,
+                            &keys,
                         )
                     })?;
             }
