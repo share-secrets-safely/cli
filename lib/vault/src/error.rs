@@ -30,18 +30,13 @@ impl DecryptionError {
 
 #[derive(Debug, Fail)]
 pub struct EncryptionError {
-    #[cause] pub cause: gpgme::Error,
+    pub msg: String,
     pub offending_recipients: Vec<String>,
 }
 
 impl fmt::Display for EncryptionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "At least one recipient you try to encrypt for is untrusted. \
-             Consider (locally) signing the key with `gpg --sign-key <recipient>` \
-             or ultimately trusting them."
-        )?;
+        write!(f, "{}", self.msg)?;
         for info in self.offending_recipients.iter() {
             write!(f, "\n{}", info)?;
         }
@@ -77,14 +72,20 @@ impl EncryptionError {
         ctx: &mut gpgme::Context,
         keys: &[gpgme::Key],
     ) -> failure::Error {
-        if err.code() == gpgme::Error::UNUSABLE_PUBKEY.code() {
-            failure::Error::from(EncryptionError {
-                cause: err,
-                offending_recipients: find_offending_keys(ctx, keys).unwrap(),
-            })
-        } else {
-            err.context(alternative_text).into()
-        }
+        failure::Error::from(EncryptionError {
+            msg: if err.code() == gpgme::Error::UNUSABLE_PUBKEY.code() {
+                "At least one recipient you try to encrypt for is untrusted. \
+                 Consider (locally) signing the key with `gpg --sign-key <recipient>` \
+                 or ultimately trusting them."
+                    .into()
+            } else {
+                alternative_text
+            },
+            offending_recipients: match find_offending_keys(ctx, keys) {
+                Ok(v) => v,
+                Err(e) => return e,
+            },
+        })
     }
 }
 
