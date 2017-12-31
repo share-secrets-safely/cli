@@ -1,3 +1,8 @@
+## V1.0.1: The very first release - with a new name!
+
+`s3` now officially is `sy` on the command-line, and spelled `sheesy`. Crates
+were renamed accordingly, too.
+
 ## V1.0.0: The very first release!
 
 This is the first usable version, providing only the minimal amount of features.
