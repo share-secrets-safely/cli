@@ -75,5 +75,14 @@ snapshot="$fixture/snapshots"
         }
       )
     )
+    (when "missing a key to encrypt for"
+      gpg --delete-key --yes --batch b@example.com
+      
+      it "fails as it doesn't find the required public key at all - it needs to be imported" && {
+        echo ho | \
+        WITH_SNAPSHOT="$snapshot/vault-show-failure-encrypt-new-secret-missing-pub-key" \
+        expect_run $WITH_FAILURE "$exe" vault add :other-secret
+      }
+    )
   )
 )

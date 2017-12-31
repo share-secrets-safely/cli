@@ -83,25 +83,32 @@ impl Vault {
     }
 
     pub fn recipient_keys(&self, ctx: &mut gpgme::Context) -> Result<Vec<gpgme::Key>, Error> {
-        let recipients = self.recipients_list()?;
-        if recipients.is_empty() {
+        let recipients_fprs = self.recipients_list()?;
+        if recipients_fprs.is_empty() {
             return Err(format_err!(
                 "No recipients found in recipients file at '{}'.",
                 self.recipients.display()
             ));
         }
-        let keys: Vec<gpgme::Key> = ctx.find_keys(&recipients)
+        let keys: Vec<gpgme::Key> = ctx.find_keys(&recipients_fprs)
             .context("Could not iterate keys for given recipients")?
             .filter_map(Result::ok)
             .filter(|k| k.can_encrypt())
             .collect();
-        if keys.len() != recipients.len() {
-            let diff = recipients.len() - keys.len();
+        if keys.len() != recipients_fprs.len() {
+            let diff = recipients_fprs.len() - keys.len();
             let mut msg = vec![
                 if diff > 0 {
                     format!(
-                        "Didn't find a key for {} recipients in the gpg database.",
-                        diff
+                        "Didn't find a key for {} recipients in the gpg database.{}",
+                        diff,
+                        match self.gpg_keys.as_ref() {
+                            Some(dir) => format!(
+                                " This might mean it wasn't imported yet from '{}'",
+                                self.absolute_path(dir).display()
+                            ),
+                            None => String::new(),
+                        }
                     )
                 } else {
                     format!(
@@ -111,7 +118,7 @@ impl Vault {
                 },
             ];
             msg.push("All recipients:".into());
-            msg.push(recipients.join(", "));
+            msg.push(recipients_fprs.join(", "));
             msg.push("All recipients found in gpg database:".into());
             msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
             return Err(err_msg(msg.join("\n")));
