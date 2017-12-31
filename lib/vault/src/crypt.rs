@@ -14,6 +14,7 @@ use util::write_at;
 use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 use error::{DecryptionError, EncryptionError};
+use util::fingerprint_of;
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<String, Error> {
@@ -99,26 +100,41 @@ impl Vault {
             let diff = recipients_fprs.len() - keys.len();
             let mut msg = vec![
                 if diff > 0 {
-                    format!(
-                        "Didn't find a key for {} recipients in the gpg database.{}",
+                    let existing_fprs: Vec<_> = keys.iter()
+                        .map(|k| fingerprint_of(k))
+                        .flat_map(Result::ok)
+                        .collect();
+                    let missing_fprs = recipients_fprs.iter().fold(Vec::new(), |mut m, f| {
+                        if existing_fprs.iter().all(|of| of != f) {
+                            m.push(f);
+                        }
+                        m
+                    });
+                    let mut msg = format!(
+                        "Didn't find the key for {} recipient(s) in the gpg database.{}",
                         diff,
                         match self.gpg_keys.as_ref() {
                             Some(dir) => format!(
-                                " This might mean it wasn't imported yet from '{}'",
+                                " This might mean it wasn't imported yet from '{}'.",
                                 self.absolute_path(dir).display()
                             ),
                             None => String::new(),
                         }
-                    )
+                    );
+                    msg.push_str("\nThe following recipient(s) could not be found in the gpg key database:");
+                    for fpr in missing_fprs {
+                        msg.push_str("\n");
+                        msg.push_str(&fpr);
+                    }
+                    msg
                 } else {
                     format!(
-                        "Found {} additional keys to encrypt for, which is unexpected.",
-                        diff
+                        "Found {} additional keys to encrypt for, which may indicate an unusual recipients specification in the recipients file at '{}'",
+                        diff,
+                        self.absolute_path(&self.recipients).display()
                     )
                 },
             ];
-            msg.push("All recipients:".into());
-            msg.push(recipients_fprs.join(", "));
             msg.push("All recipients found in gpg database:".into());
             msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
             return Err(err_msg(msg.join("\n")));
