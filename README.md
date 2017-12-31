@@ -9,7 +9,7 @@ However, it wants to be a one-stop-shop in a single binary without any dependenc
 for a `gpg` installation,
 helping users to work with the `gpg` toolchain and workaround peculiarities.
 
-[![asciicast](https://asciinema.org/a/154792.png)](https://asciinema.org/a/154792)
+[![asciicast](https://asciinema.org/a/154953.png)](https://asciinema.org/a/154953)
 
 [pass]: https://www.passwordstore.org/
 
@@ -25,20 +25,20 @@ Navigate to the [releases page][releases] and download a release binary suitable
 for your system. A full example *for linux* looks like this:
 
 ```bash
-curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.0/sy-linux-musl-x86_64.tar.gz
+curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.1/sy-linux-musl-x86_64.tar.gz
 tar xzf sy.tar.gz
 # run sy  - even better when in your PATH
 ./sy
 ```
 
-Here is a [recording](https://asciinema.org/a/154794) of how this can look like.
+Here is a [recording](https://asciinema.org/a/154952) of how this can look like.
 
 ### Via [Cargo][rustup]
 
 If you already have `cargo` available, installation is as easy as the following:
 
 ```bash
-cargo install sy-cli
+cargo install sheesy-cli
 ```
 
 This installation should be preferred as it makes updating the binary much easier.
