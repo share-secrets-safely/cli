@@ -124,7 +124,22 @@ impl Vault {
                     msg.push_str("\nThe following recipient(s) could not be found in the gpg key database:");
                     for fpr in missing_fprs {
                         msg.push_str("\n");
-                        msg.push_str(&fpr);
+                        let key_path_info = match self.gpg_keys.as_ref() {
+                            Some(dir) => {
+                                let key_path = self.absolute_path(dir).join(&fpr);
+                                format!(
+                                    "{}'{}'",
+                                    if key_path.is_file() {
+                                        "Import key-file using 'gpg --import "
+                                    } else {
+                                        "Key-file does not exist at "
+                                    },
+                                    key_path.display()
+                                )
+                            }
+                            None => "No GPG keys directory".into(),
+                        };
+                        msg.push_str(&format!("{} ({})", &fpr, key_path_info));
                     }
                     msg
                 } else {
