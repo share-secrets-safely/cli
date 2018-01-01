@@ -21,12 +21,31 @@ snapshot="$fixture/snapshots"
       echo -n secret | "$exe" vault add :secret
     } &>/dev/null
     
-    (when "trying to decrypt with an unknown gpg user"
+    (with "an unknown user"
       (as_user "$fixture/c.sec.asc"
-        it "fails" && {
-          WITH_SNAPSHOT="$snapshot/vault-show-failure-as-unknown-user" \
-          expect_run $WITH_FAILURE "$exe" vault show secret
-        }
+        (when "trying to decrypt"
+          it "fails" && {
+            WITH_SNAPSHOT="$snapshot/vault-show-failure-as-unknown-user" \
+            expect_run $WITH_FAILURE "$exe" vault show secret
+          }
+        )
+        (when "trying to encrypt a new file"
+          { 
+            gpg --import 'secrets/../etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
+            gpg --sign-key --yes --batch tester@example.com
+          } &>/dev/null
+          
+          it "succeeds" && {
+            echo other-secret | \
+            WITH_SNAPSHOT="$snapshot/vault-add-success-as-unknown-user" \
+            expect_run $SUCCESSFULLY "$exe" vault add :new-secret
+          }
+          it "cannot be decrypted by yourself" && {
+            WITH_SNAPSHOT="$snapshot/vault-show-fail-for-new-secret-as-unknown-user" \
+            expect_run $WITH_FAILURE "$exe" vault show new-secret
+          }
+          rm secrets/new-secret.gpg
+        )
       )
     )
     

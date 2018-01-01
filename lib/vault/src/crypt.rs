@@ -150,8 +150,10 @@ impl Vault {
                     )
                 },
             ];
-            msg.push("All recipients found in gpg database:".into());
-            msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
+            if !keys.is_empty() {
+                msg.push("All recipients found in gpg database:".into());
+                msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
+            }
             return Err(err_msg(msg.join("\n")));
         }
         Ok(keys)
