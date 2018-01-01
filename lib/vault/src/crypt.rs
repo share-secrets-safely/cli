@@ -9,7 +9,7 @@ use itertools::join;
 use gpgme;
 use vault::Vault;
 use failure::{err_msg, Error, ResultExt};
-use util::UserIdFingerprint;
+use util::FingerprintUserId;
 use util::write_at;
 use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
@@ -152,7 +152,7 @@ impl Vault {
             ];
             if !keys.is_empty() {
                 msg.push("All recipients found in gpg database:".into());
-                msg.extend(keys.iter().map(|k| format!("{}", UserIdFingerprint(k))));
+                msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
             }
             return Err(err_msg(msg.join("\n")));
         }

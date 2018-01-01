@@ -20,6 +20,18 @@ impl<'a> fmt::Display for UserIdFingerprint<'a> {
         write!(
             f,
             "{} ({})",
+            join(self.0.user_ids().map(|u| u.id().unwrap_or("[none]")), ", "),
+            self.0.fingerprint().unwrap_or("[no fingerprint!]")
+        )
+    }
+}
+
+pub struct FingerprintUserId<'a>(pub &'a gpgme::Key);
+impl<'a> fmt::Display for FingerprintUserId<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{} ({})",
             self.0.fingerprint().unwrap_or("[no fingerprint!]"),
             join(self.0.user_ids().map(|u| u.id().unwrap_or("[none]")), ", ")
         )

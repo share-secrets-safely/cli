@@ -49,7 +49,10 @@ snapshot="$fixture/snapshots"
         (when "requesting membership"
           it "succeeds" && {
             WITH_SNAPSHOT="$snapshot/vault-recipients-init-single-secret-key" \
-            expect_run $WITH_FAILURE "$exe" vault recipient init
+            expect_run $SUCCESSFULLY "$exe" vault recipient init
+          }
+          it "exports only the public key" && {
+            expect_snapshot "$snapshot/vault-recipient-init-c-config-dir" etc
           }
         )
       )

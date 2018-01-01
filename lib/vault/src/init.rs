@@ -4,7 +4,7 @@ extern crate mktemp;
 use gpgme;
 use util::write_at;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use itertools::join;
 use failure::{err_msg, Error, ResultExt};
@@ -16,6 +16,7 @@ use glob::glob;
 use mktemp::Temp;
 use error::EncryptionError;
 use util::fingerprint_of;
+use util::UserIdFingerprint;
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -62,8 +63,65 @@ fn export_key(
     Ok(fingerprint.to_owned())
 }
 
+fn extract_at_least_one_secret_key(ctx: &mut gpgme::Context, gpg_key_ids: &[String]) -> Result<Vec<gpgme::Key>, Error> {
+    let keys = {
+        let mut keys_iter = ctx.find_secret_keys(gpg_key_ids)?;
+        let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
+
+        if keys_iter.finish()?.is_truncated() {
+            return Err(err_msg(
+                "The key list was truncated unexpectedly, while iterating it",
+            ));
+        }
+        keys
+    };
+
+    if keys.is_empty() {
+        return Err(err_msg(
+            "No existing GPG key found for which you have a secret key. \
+             Please create one with 'gpg --gen-key' and try again.",
+        ));
+    }
+
+    if keys.len() > 1 && gpg_key_ids.is_empty() {
+        return Err(format_err!(
+            "Found {} viable keys for key-ids ({}), which is ambiguous. \
+             Please specify one with the --gpg-key-id argument.",
+            keys.len(),
+            KeylistDisplay(&keys)
+        ));
+    };
+
+    Ok(keys)
+}
+
 impl Vault {
-    pub fn init_recipients(&self, _gpg_key_ids: &[String], _output: &mut Write) -> Result<(), Error> {
+    pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
+        let unknown_path = PathBuf::from("<unknown>");
+        let gpg_keys_dir = self.gpg_keys
+            .as_ref()
+            .map(|p| self.absolute_path(&p))
+            .ok_or_else(|| {
+                format_err!(
+                    "The vault at '{}' does not have a gpg_keys directory configured.",
+                    self.vault_path
+                        .as_ref()
+                        .unwrap_or_else(|| &unknown_path)
+                        .display()
+                )
+            })?;
+        let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
+
+        let mut buf = Vec::new();
+        for key in keys {
+            export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut buf)?;
+            writeln!(
+                output,
+                "Exported public key for {}.",
+                UserIdFingerprint(&key)
+            ).ok();
+        }
         Ok(())
     }
 
@@ -200,33 +258,7 @@ impl Vault {
         }.set_resolved_at(vault_path)?;
 
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
-        let keys = {
-            let mut keys_iter = gpg_ctx.find_secret_keys(gpg_key_ids)?;
-            let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
-
-            if keys_iter.finish()?.is_truncated() {
-                return Err(err_msg(
-                    "The key list was truncated unexpectedly, while iterating it",
-                ));
-            }
-            keys
-        };
-
-        if keys.is_empty() {
-            return Err(err_msg(
-                "No existing GPG key found for which you have a secret key. \
-                 Please create one with 'gpg --gen-key' and try again.",
-            ));
-        }
-
-        if keys.len() > 1 && gpg_key_ids.is_empty() {
-            return Err(format_err!(
-                "Found {} viable keys for key-ids ({}), which is ambiguous. \
-                 Please specify one with the --gpg-key-id argument.",
-                keys.len(),
-                KeylistDisplay(&keys)
-            ));
-        };
+        let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
         vault.to_file(vault_path)?;
 
         let gpg_keys_dir = vault.absolute_path(gpg_keys_dir);

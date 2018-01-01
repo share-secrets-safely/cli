@@ -51,6 +51,7 @@ impl Drop for ResetCWD {
 pub struct Vault {
     pub name: Option<String>,
     #[serde(skip)] pub resolved_at: PathBuf,
+    #[serde(skip)] pub vault_path: Option<PathBuf>,
     #[serde(default = "at_default")] pub at: PathBuf,
     pub gpg_keys: Option<PathBuf>,
     #[serde(default = "recipients_default")] pub recipients: PathBuf,
@@ -59,6 +60,7 @@ pub struct Vault {
 impl Default for Vault {
     fn default() -> Self {
         Vault {
+            vault_path: None,
             name: None,
             at: at_default(),
             resolved_at: at_default(),
@@ -116,6 +118,7 @@ impl Vault {
             .parent()
             .ok_or_else(|| format_err!("The vault file path '{}' is invalid.", vault_file.display()))?
             .join(&self.at));
+        self.vault_path = Some(vault_file.to_owned());
         Ok(self)
     }
 

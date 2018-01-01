@@ -10,7 +10,7 @@ use failure;
 use mktemp::Temp;
 use util::write_at;
 use std::fs::File;
-use util::UserIdFingerprint;
+use util::FingerprintUserId;
 
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]
@@ -57,7 +57,7 @@ fn find_offending_keys(ctx: &mut gpgme::Context, keys: &[gpgme::Key]) -> Result<
         if let Err(err) = ctx.encrypt(Some(key), &mut ibuf, &mut obuf) {
             output.push(format!(
                 "Could not encrypt for recipient {} with error: {}",
-                UserIdFingerprint(key),
+                FingerprintUserId(key),
                 err
             ));
         }
