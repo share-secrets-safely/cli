@@ -17,7 +17,7 @@ use error::{DecryptionError, EncryptionError};
 use util::fingerprint_of;
 
 impl Vault {
-    pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode) -> Result<String, Error> {
+    pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
         let file = Temp::new_file().context("Could not create tempfile to decrypt to.")?;
         let tempfile_path = file.to_path_buf();
         let decrypted_file_path = {
@@ -49,6 +49,7 @@ impl Vault {
                 editor.display()
             ));
         }
+        let mut zero = Vec::new();
         self.encrypt(
             &[
                 VaultSpec {
@@ -58,8 +59,10 @@ impl Vault {
             ],
             WriteMode::AllowOverwrite,
             Destination::Unchanged,
+            &mut zero,
         ).context("Failed to re-encrypt edited content.")?;
-        Ok(format!("Edited '{}'.", path.display()))
+        writeln!(output, "Edited '{}'.", path.display()).ok();
+        Ok(())
     }
 
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
@@ -159,7 +162,13 @@ impl Vault {
         Ok(keys)
     }
 
-    pub fn encrypt(&self, specs: &[VaultSpec], mode: WriteMode, dst_mode: Destination) -> Result<String, Error> {
+    pub fn encrypt(
+        &self,
+        specs: &[VaultSpec],
+        mode: WriteMode,
+        dst_mode: Destination,
+        output: &mut Write,
+    ) -> Result<(), Error> {
         let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let keys = self.recipient_keys(&mut ctx)?;
 
@@ -188,9 +197,11 @@ impl Vault {
                 ))?;
             encrypted.push(spec.destination());
         }
-        Ok(format!(
+        writeln!(
+            output,
             "Added {}.",
             join(encrypted.iter().map(|p| format!("'{}'", p.display())), ", ")
-        ))
+        ).ok();
+        Ok(())
     }
 }

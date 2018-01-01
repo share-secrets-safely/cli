@@ -80,20 +80,25 @@ fn main() {
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
-                ("recipients", Some(args)) => match args.subcommand() {
-                    ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
-                    ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
-                    _ => usage_and_exit(&matches),
-                },
+                ("recipients", Some(args)) => {
+                    context = ok_or_exit(vault_recipients_list(context, args));
+                    match args.subcommand() {
+                        ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
+                        ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
+                        ("list", Some(args)) => ok_or_exit(vault_recipients_list(context, args)),
+                        _ => usage_and_exit(&matches),
+                    }
+                }
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
                 ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
                 ("show", Some(args)) => ok_or_exit(vault_resource_show(context, args)),
                 ("edit", Some(args)) => ok_or_exit(vault_resource_edit(context, args)),
+                ("list", Some(args)) => ok_or_exit(vault_resource_list(context, args)),
                 _ => context,
             };
             let sout = stdout();
             let mut lock = sout.lock();
-            add_vault_context((vault::do_it(context, &mut lock)))
+            add_vault_context(vault::do_it(context, &mut lock))
         }
         ("extract", Some(args)) => {
             let context = ok_or_exit(extraction_context_from(args));
@@ -102,8 +107,5 @@ fn main() {
         _ => usage_and_exit(&matches),
     };
 
-    let msg = ok_or_exit(res);
-    if !msg.is_empty() {
-        ok_or_exit(writeln!(stdout(), "{}", msg));
-    }
+    ok_or_exit(res);
 }

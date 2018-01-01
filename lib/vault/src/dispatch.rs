@@ -13,15 +13,12 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
-pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<String, Error> {
+pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     use sheesy_types::VaultCommand;
     match &ctx.command {
-        &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?
-            .add_recipients(gpg_key_ids, output)
-            .map(|_| String::new()),
-        &VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?
-            .init_recipients(gpg_key_ids, output)
-            .map(|_| String::new()),
+        &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?.add_recipients(gpg_key_ids, output),
+        &VaultCommand::RecipientsList => vault_from(&ctx)?.list_recipients(output),
+        &VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
         &VaultCommand::Init {
             ref gpg_key_ids,
             ref gpg_keys_dir,
@@ -42,24 +39,25 @@ pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<String, Error> {
                     }
                 },
             )?;
-            Ok(format!(
+            writeln!(
+                output,
                 "vault initialized at '{}'",
                 ctx.vault_path.display()
-            ))
+            ).ok();
+            Ok(())
         }
         &VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(
             &specs,
             WriteMode::RefuseOverwrite,
             Destination::ReolveAndAppendGpg,
+            output,
         ),
         &VaultCommand::ResourceEdit {
             ref spec,
             ref editor,
             ref mode,
-        } => vault_from(&ctx)?.edit(spec, editor, mode),
-        &VaultCommand::List => vault_from(&ctx)?.list(output).map(|_| String::new()),
-        &VaultCommand::ResourceShow { ref spec } => vault_from(&ctx)?
-            .decrypt(spec, output)
-            .map(|_| String::new()),
+        } => vault_from(&ctx)?.edit(spec, editor, mode, output),
+        &VaultCommand::List => vault_from(&ctx)?.list(output),
+        &VaultCommand::ResourceShow { ref spec } => vault_from(&ctx)?.decrypt(spec, output).map(|_| ()),
     }
 }

@@ -47,6 +47,13 @@ pub fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     })
 }
 
+pub fn vault_recipients_list(ctx: VaultContext, _args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::RecipientsList,
+        ..ctx
+    })
+}
+
 pub fn vault_recipients_init(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsInit {
@@ -76,6 +83,13 @@ pub fn vault_resource_show(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
         command: VaultCommand::ResourceShow {
             spec: required_os_arg(args, "path")?,
         },
+        ..ctx
+    })
+}
+
+pub fn vault_resource_list(ctx: VaultContext, _args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::List,
         ..ctx
     })
 }
@@ -127,7 +141,7 @@ pub fn extraction_context_from(args: &ArgMatches) -> Result<ExtractionContext, E
     })
 }
 
-pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<String, Error> {
+pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error> {
     let shell = args.value_of("shell")
         .ok_or_else(|| err_msg("expected 'shell' argument"))
         .map(|s| {
@@ -146,5 +160,5 @@ pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<String, E
                 .map_err(Into::into)
         })?;
     app.gen_completions_to(CLI::name(), shell, &mut stdout());
-    Ok(String::new())
+    Ok(())
 }

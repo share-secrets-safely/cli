@@ -147,10 +147,14 @@ where
             .alias("insert")
             .arg(gpg_key_id.required(true))
             .about("Add a new recipient. This will re-encrypt all the vaults content.");
+        let list_recipient = App::new("list")
+            .alias("ls")
+            .about("List the vaults recipients as identified by the recipients file.");
         let recipients = App::new("recipients")
             .alias("recipient")
             .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
             .subcommand(add_recipient)
+            .subcommand(list_recipient)
             .subcommand(init_recipient);
         let vault = App::new("vault")
             .about("a variety of vault interactions")

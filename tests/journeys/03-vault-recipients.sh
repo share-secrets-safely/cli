@@ -54,6 +54,10 @@ snapshot="$fixture/snapshots"
           it "exports only the public key" && {
             expect_snapshot "$snapshot/vault-recipient-init-c-config-dir" etc
           }
+          it "lists only the recipients already in the vaults recipients file" && {
+            WITH_SNAPSHOT="$snapshot/vault-recipients-list-after-requesting-membership" \
+            expect_run $SUCCESSFULLY "$exe" vault recipients 
+          }
         )
       )
     )
