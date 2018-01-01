@@ -25,8 +25,10 @@ fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
     r.map_err(|e| {
         let ctx = match first_cause_of_type::<DecryptionError>(&e) {
             Some(_err) => Some(format!(
-                "Ask one of the existing recipients to import your public key \
+                "Export your public key using '{} vault recipient init', then \
+                 ask one of the existing recipients to import your public key \
                  using '{} vault recipients add <your-userid>.'",
+                CLI::name(),
                 CLI::name()
             )),
             None => None,

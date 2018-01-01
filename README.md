@@ -147,6 +147,7 @@ gpg error remains unexplained**.
    * [ ] possibly allow to disable ownertrust using 'always-trust'
  * [x] list recipients which are unusable when re-encryption fails (lack of trust)
  * [x] list recipients which are not available in the gpg key database.
+ * [x] allow future recipients to export their key to the right spot.
  * [ ] it must be possible to turn off any automation introduced above
  * [ ] certain configuration flags should be persisted with the vault configuration
 
