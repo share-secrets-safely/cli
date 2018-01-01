@@ -43,6 +43,9 @@ pub enum VaultCommand {
         at: PathBuf,
         recipients_file: PathBuf,
     },
+    RecipientsInit {
+        gpg_key_ids: Vec<String>,
+    },
     RecipientsAdd {
         gpg_key_ids: Vec<String>,
     },

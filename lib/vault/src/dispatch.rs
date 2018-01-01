@@ -19,6 +19,9 @@ pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<String, Error> {
         &VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?
             .add_recipients(gpg_key_ids, output)
             .map(|_| String::new()),
+        &VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?
+            .init_recipients(gpg_key_ids, output)
+            .map(|_| String::new()),
         &VaultCommand::Init {
             ref gpg_key_ids,
             ref gpg_keys_dir,

@@ -47,6 +47,18 @@ pub fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     })
 }
 
+pub fn vault_recipients_init(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::RecipientsInit {
+            gpg_key_ids: match args.values_of("gpg-key-id") {
+                Some(v) => v.map(Into::into).collect(),
+                None => Vec::new(),
+            },
+        },
+        ..ctx
+    })
+}
+
 pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsAdd {

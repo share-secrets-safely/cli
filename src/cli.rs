@@ -137,6 +137,12 @@ where
                          and can be empty to read from standard input, such as in ':<dst>'.",
                     ),
             );
+        let init_recipient = App::new("init").arg(gpg_key_id.clone()).about(
+            "Add your single (or the given) recipient key to the vault by exporting the public \
+             key and storing it in the vaults local gpg key database. \
+             Afterwards someone able to decrypt the vault contents can re-encrypt the content for \
+             you.",
+        );
         let add_recipient = App::new("add")
             .alias("insert")
             .arg(gpg_key_id.required(true))
@@ -144,7 +150,8 @@ where
         let recipients = App::new("recipients")
             .alias("recipient")
             .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
-            .subcommand(add_recipient);
+            .subcommand(add_recipient)
+            .subcommand(init_recipient);
         let vault = App::new("vault")
             .about("a variety of vault interactions")
             .subcommand(init)

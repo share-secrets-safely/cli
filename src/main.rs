@@ -80,6 +80,7 @@ fn main() {
             context = match args.subcommand() {
                 ("recipients", Some(args)) => match args.subcommand() {
                     ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
+                    ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
                     _ => usage_and_exit(&matches),
                 },
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),

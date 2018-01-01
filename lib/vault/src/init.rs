@@ -63,6 +63,10 @@ fn export_key(
 }
 
 impl Vault {
+    pub fn init_recipients(&self, _gpg_key_ids: &[String], _output: &mut Write) -> Result<(), Error> {
+        Ok(())
+    }
+
     pub fn add_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
         let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
         let keys = {

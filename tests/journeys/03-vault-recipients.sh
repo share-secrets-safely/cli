@@ -46,6 +46,12 @@ snapshot="$fixture/snapshots"
           }
           rm secrets/new-secret.gpg
         )
+        (when "requesting membership"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/vault-recipients-init-single-secret-key" \
+            expect_run $WITH_FAILURE "$exe" vault recipient init
+          }
+        )
       )
     )
     
