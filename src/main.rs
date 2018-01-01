@@ -80,15 +80,12 @@ fn main() {
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
-                ("recipients", Some(args)) => {
-                    context = ok_or_exit(vault_recipients_list(context, args));
-                    match args.subcommand() {
-                        ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
-                        ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
-                        ("list", Some(args)) => ok_or_exit(vault_recipients_list(context, args)),
-                        _ => usage_and_exit(&matches),
-                    }
-                }
+                ("recipients", Some(args)) => match args.subcommand() {
+                    ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
+                    ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
+                    ("list", Some(args)) => ok_or_exit(vault_recipients_list(context, args)),
+                    _ => ok_or_exit(vault_recipients_list(context, args)),
+                },
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
                 ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
                 ("show", Some(args)) => ok_or_exit(vault_resource_show(context, args)),

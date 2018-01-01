@@ -119,7 +119,8 @@ and add a few more features to provide API symmetry.
    * For example, when adding a recipient, parts of the operation succeed, but 
      it is not visible if re-encryption fails.
  * [ ] `vault recipients`
-   * [ ] list
+   * [x] list
+   * [x] init
    * [ ] remove recipient(s) and re-encrypt
  * [ ] `vault remove` a resource
  * [ ] `vault add`

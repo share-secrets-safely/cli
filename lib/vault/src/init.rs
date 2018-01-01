@@ -16,7 +16,7 @@ use glob::glob;
 use mktemp::Temp;
 use error::EncryptionError;
 use util::fingerprint_of;
-use util::UserIdFingerprint;
+use util::{FingerprintUserId, UserIdFingerprint};
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -125,7 +125,11 @@ impl Vault {
         Ok(())
     }
 
-    pub fn list_recipients(&self, _output: &mut Write) -> Result<(), Error> {
+    pub fn list_recipients(&self, output: &mut Write) -> Result<(), Error> {
+        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        for key in self.recipient_keys(&mut ctx)? {
+            writeln!(output, "{}", FingerprintUserId(&key)).ok();
+        }
         Ok(())
     }
 

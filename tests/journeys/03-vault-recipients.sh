@@ -79,6 +79,11 @@ snapshot="$fixture/snapshots"
           expect_run $SUCCESSFULLY "$exe" vault show secret
         )
       }
+          
+      it "lists the new recipient as well" && {
+        WITH_SNAPSHOT="$snapshot/vault-recipients-list-after-adding-c-successfully" \
+        expect_run $SUCCESSFULLY "$exe" vault recipients list
+      }
     )
     
     (when "adding a new recipient using the id of an already imported and unsigned key"
