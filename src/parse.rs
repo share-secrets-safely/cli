@@ -99,9 +99,10 @@ pub fn vault_resource_edit(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
         command: VaultCommand::ResourceEdit {
             spec: required_os_arg(args, "path")?,
             editor: required_os_arg(args, "editor")?,
-            mode: match args.is_present("no-create") {
-                true => CreateMode::NoCreate,
-                false => CreateMode::Create,
+            mode: if args.is_present("no-create") {
+                CreateMode::NoCreate
+            } else {
+                CreateMode::Create
             },
         },
         ..ctx

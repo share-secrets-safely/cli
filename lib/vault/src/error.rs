@@ -37,7 +37,7 @@ pub struct EncryptionError {
 impl fmt::Display for EncryptionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.msg)?;
-        for info in self.offending_recipients.iter() {
+        for info in &self.offending_recipients {
             write!(f, "\n{}", info)?;
         }
         Ok(())

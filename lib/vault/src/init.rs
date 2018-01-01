@@ -100,7 +100,7 @@ impl Vault {
         let unknown_path = PathBuf::from("<unknown>");
         let gpg_keys_dir = self.gpg_keys
             .as_ref()
-            .map(|p| self.absolute_path(&p))
+            .map(|p| self.absolute_path(p))
             .ok_or_else(|| {
                 format_err!(
                     "The vault at '{}' does not have a gpg_keys directory configured.",
@@ -158,13 +158,13 @@ impl Vault {
         if let Some(gpg_keys_dir) = self.gpg_keys.as_ref() {
             let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
             let mut buf = Vec::new();
-            for key in keys.iter() {
+            for key in &keys {
                 let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
                 writeln!(
                     output,
                     "Exported key '{}' for user {}",
                     fingerprint,
-                    KeyDisplay(&key)
+                    KeyDisplay(key)
                 ).ok();
             }
         }
@@ -182,7 +182,7 @@ impl Vault {
             "Failed to open recipients at '{}' file for writing",
             recipients_file.display()
         ))?;
-        for recipient in recipients.iter() {
+        for recipient in &recipients {
             writeln!(&mut writer, "{}", recipient).context(format!(
                 "Failed to write recipient '{}' to file at '{}'",
                 recipient,
@@ -233,7 +233,7 @@ impl Vault {
                     encrypted_file_path.display()
                 ))
                 .and_then(|mut w| {
-                    w.write_all(&mut obuf).context(format!(
+                    w.write_all(&obuf).context(format!(
                         "Failed to write out encrypted data to '{}'",
                         encrypted_file_path.display()
                     ))

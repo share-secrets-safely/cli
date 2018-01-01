@@ -9,7 +9,7 @@ use error::{IOMode, VaultError};
 use failure::{Error, ResultExt};
 use glob::glob;
 
-pub const GPG_GLOB: &'static str = "**/*.gpg";
+pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
     PathBuf::from(".gpg-id")
 }
@@ -41,10 +41,7 @@ impl ResetCWD {
 
 impl Drop for ResetCWD {
     fn drop(&mut self) {
-        self.cwd
-            .as_ref()
-            .map(|cwd| ::std::env::set_current_dir(cwd))
-            .ok();
+        self.cwd.as_ref().map(set_current_dir).ok();
     }
 }
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]

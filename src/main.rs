@@ -36,7 +36,7 @@ fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
         (e, ctx)
     }).map_err(|(e, msg)| match msg {
         Some(msg) => e.context(msg).into(),
-        None => e.into(),
+        None => e,
     })
 }
 
