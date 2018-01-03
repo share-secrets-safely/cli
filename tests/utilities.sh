@@ -4,7 +4,6 @@ WHITE="$(tput setaf 9)"
 YELLOW="$(tput setaf 3)"
 GREEN="$(tput setaf 2)"
 RED="$(tput setaf 1)"
-IT_COUNT=0
 CONTEXT=( )
 
 function title () {
@@ -58,7 +57,6 @@ function when () {
 }
 
 function it () {
-  IT_COUNT=$(( IT_COUNT + 1 ))
   echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${GREEN} [it] ${*//  /}"
 }
 
@@ -96,14 +94,14 @@ function expect_run () {
     if [[ -n "${WITH_SNAPSHOT-}" ]]; then
       local expected="$WITH_SNAPSHOT"
       if ! [ -f "$expected" ]; then
-        echo -n "$output" > "$expected" || exit $IT_COUNT
+        echo -n "$output" > "$expected" || exit 1
       fi
       if ! diff "$expected" <(echo -n "$output"); then
         echo 1>&2 "$RED" " - FAIL"
         echo 1>&2 "${WHITE}\$" "$@"
         echo 1>&2 "Output snapshot did not match snapshot at '$expected'"
         echo 1>&2 "$output"
-        exit $IT_COUNT
+        exit 1
       fi
     elif [[ -n "${WITH_OUTPUT-}" ]]; then
         if ! echo "$output" | tr '\n' ' ' | grep -qE "$WITH_OUTPUT"; then
@@ -111,7 +109,7 @@ function expect_run () {
             echo 1>&2 "${WHITE}\$" "$@"
             echo 1>&2 "Output did not match '$WITH_OUTPUT'"
             echo 1>&2 "$output"
-            exit $IT_COUNT
+            exit 1
         fi
     fi
     echo 1>&2 "$GREEN" " - OK"
@@ -120,7 +118,7 @@ function expect_run () {
     echo 1>&2 "${WHITE}\$" "$@"
     echo 1>&2 "$RED" "Expected actual status $actual_exit_code to be $expected_exit_code"
     echo 1>&2 "$output"
-    exit $IT_COUNT
+    exit 1
   fi
   set -e
 }
