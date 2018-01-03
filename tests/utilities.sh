@@ -103,14 +103,6 @@ function expect_run () {
         echo 1>&2 "$output"
         exit 1
       fi
-    elif [[ -n "${WITH_OUTPUT-}" ]]; then
-        if ! echo "$output" | tr '\n' ' ' | grep -qE "$WITH_OUTPUT"; then
-            echo 1>&2 "$RED" " - FAIL"
-            echo 1>&2 "${WHITE}\$" "$@"
-            echo 1>&2 "Output did not match '$WITH_OUTPUT'"
-            echo 1>&2 "$output"
-            exit 1
-        fi
     fi
     echo 1>&2 "$GREEN" " - OK"
   else
