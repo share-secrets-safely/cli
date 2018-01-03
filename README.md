@@ -140,6 +140,7 @@ encryption just didn't work. Right now, we are not much better than using `pass`
 In this iteration, we want to achieve that for all major user journeys, **no 
 gpg error remains unexplained**.
 
+ * [ ] Suggest installing GPG if there is none
  * [x] Suggest creating a gpg key if there is none.
  * [ ] try encrypting on edit (before the edit) to fail fast
    * [ ] suggest to import keys or do it for the user
