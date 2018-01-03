@@ -15,6 +15,7 @@ use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 use error::{DecryptionError, EncryptionError};
 use util::fingerprint_of;
+use util::new_context;
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
@@ -66,7 +67,7 @@ impl Vault {
     }
 
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
-        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let mut ctx = new_context()?;
         let resolved_absolute_path = self.absolute_path(path);
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
@@ -169,7 +170,7 @@ impl Vault {
         dst_mode: Destination,
         output: &mut Write,
     ) -> Result<(), Error> {
-        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let mut ctx = new_context()?;
         let keys = self.recipient_keys(&mut ctx)?;
 
         let mut encrypted = Vec::new();

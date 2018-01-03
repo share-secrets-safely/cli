@@ -17,6 +17,7 @@ use mktemp::Temp;
 use error::EncryptionError;
 use util::fingerprint_of;
 use util::{FingerprintUserId, UserIdFingerprint};
+use util::new_context;
 
 struct KeylistDisplay<'a>(&'a [gpgme::Key]);
 
@@ -110,7 +111,7 @@ impl Vault {
                         .display()
                 )
             })?;
-        let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let mut gpg_ctx = new_context()?;
         let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
 
         let mut buf = Vec::new();
@@ -126,7 +127,7 @@ impl Vault {
     }
 
     pub fn list_recipients(&self, output: &mut Write) -> Result<(), Error> {
-        let mut ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let mut ctx = new_context()?;
         for key in self.recipient_keys(&mut ctx)? {
             writeln!(output, "{}", FingerprintUserId(&key)).ok();
         }
@@ -134,7 +135,7 @@ impl Vault {
     }
 
     pub fn add_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
-        let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let mut gpg_ctx = new_context()?;
         let keys = {
             let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
             let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
@@ -265,7 +266,7 @@ impl Vault {
             ..Default::default()
         }.set_resolved_at(vault_path)?;
 
-        let mut gpg_ctx = gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)?;
+        let mut gpg_ctx = new_context()?;
         let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
         vault.to_file(vault_path)?;
 

@@ -46,3 +46,7 @@ pub fn fingerprint_of(key: &gpgme::Key) -> Result<String, failure::Error> {
         })
         .map(ToOwned::to_owned)
 }
+
+pub fn new_context() -> Result<gpgme::Context, gpgme::Error> {
+    gpgme::Context::from_protocol(gpgme::Protocol::OpenPgp)
+}
