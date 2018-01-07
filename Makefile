@@ -41,9 +41,11 @@ $(MUSL_EXE): build-linux-musl
 $(RELEASE_MUSL_EXE): release-linux-musl
 
 deployable-linux: $(RELEASE_MUSL_EXE)
+	strip --strip-all $<
 	tar czf sy-cli-linux-musl-x86_64.tar.gz -C $(dir $<) $(notdir $<)
 
 deployable-host: $(RELEASE_EXE)
+	strip $<
 	echo tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
 	tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
 	
