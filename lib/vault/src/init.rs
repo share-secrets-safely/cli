@@ -1,255 +1,19 @@
 extern crate glob;
 extern crate mktemp;
 
-use gpgme;
 use util::write_at;
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-use itertools::join;
-use failure::{err_msg, Error, ResultExt};
-use std::fs::{create_dir_all, File};
+use failure::{Error, ResultExt};
+use std::fs::create_dir_all;
 use std::io::Write;
-use std::fmt;
-use vault::{strip_ext, ResetCWD, Vault, GPG_GLOB};
-use glob::glob;
-use mktemp::Temp;
-use error::EncryptionError;
-use util::fingerprint_of;
-use util::{FingerprintUserId, UserIdFingerprint};
+use vault::Vault;
 use util::new_context;
-
-struct KeylistDisplay<'a>(&'a [gpgme::Key]);
-
-impl<'a> fmt::Display for KeylistDisplay<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", join(self.0.iter().map(|k| KeyDisplay(k)), ", "))
-    }
-}
-struct KeyDisplay<'a>(&'a gpgme::Key);
-
-impl<'a> fmt::Display for KeyDisplay<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            join(self.0.user_ids().map(|u| u.id().unwrap_or("[none]")), ", ")
-        )
-    }
-}
-
-fn export_key(
-    ctx: &mut gpgme::Context,
-    gpg_keys_dir: &Path,
-    key: &gpgme::Key,
-    buf: &mut Vec<u8>,
-) -> Result<String, Error> {
-    let fingerprint = fingerprint_of(key)?;
-    let key_path = gpg_keys_dir.join(&fingerprint);
-    ctx.set_armor(true);
-    ctx.export_keys(
-        [key].iter().map(|k| *k),
-        gpgme::ExportMode::empty(),
-        &mut *buf,
-    ).context(err_msg(
-        "Failed to export at least one public key with signatures.",
-    ))?;
-    write_at(&key_path)
-        .and_then(|mut f| f.write_all(buf))
-        .context(format!(
-            "Could not write public key file at '{}'",
-            key_path.display()
-        ))?;
-    buf.clear();
-    Ok(fingerprint.to_owned())
-}
-
-fn extract_at_least_one_secret_key(ctx: &mut gpgme::Context, gpg_key_ids: &[String]) -> Result<Vec<gpgme::Key>, Error> {
-    let keys = {
-        let mut keys_iter = ctx.find_secret_keys(gpg_key_ids)?;
-        let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
-
-        if keys_iter.finish()?.is_truncated() {
-            return Err(err_msg(
-                "The key list was truncated unexpectedly, while iterating it",
-            ));
-        }
-        keys
-    };
-
-    if keys.is_empty() {
-        return Err(err_msg(
-            "No existing GPG key found for which you have a secret key. \
-             Please create one with 'gpg --gen-key' and try again.",
-        ));
-    }
-
-    if keys.len() > 1 && gpg_key_ids.is_empty() {
-        return Err(format_err!(
-            "Found {} viable keys for key-ids ({}), which is ambiguous. \
-             Please specify one with the --gpg-key-id argument.",
-            keys.len(),
-            KeylistDisplay(&keys)
-        ));
-    };
-
-    Ok(keys)
-}
+use util::extract_at_least_one_secret_key;
+use util::export_key;
 
 impl Vault {
-    pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
-        let unknown_path = PathBuf::from("<unknown>");
-        let gpg_keys_dir = self.gpg_keys
-            .as_ref()
-            .map(|p| self.absolute_path(p))
-            .ok_or_else(|| {
-                format_err!(
-                    "The vault at '{}' does not have a gpg_keys directory configured.",
-                    self.vault_path
-                        .as_ref()
-                        .unwrap_or_else(|| &unknown_path)
-                        .display()
-                )
-            })?;
-        let mut gpg_ctx = new_context()?;
-        let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
-
-        let mut buf = Vec::new();
-        for key in keys {
-            export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut buf)?;
-            writeln!(
-                output,
-                "Exported public key for {}.",
-                UserIdFingerprint(&key)
-            ).ok();
-        }
-        Ok(())
-    }
-
-    pub fn list_recipients(&self, output: &mut Write) -> Result<(), Error> {
-        let mut ctx = new_context()?;
-        for key in self.recipient_keys(&mut ctx)? {
-            writeln!(output, "{}", FingerprintUserId(&key)).ok();
-        }
-        Ok(())
-    }
-
-    pub fn add_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
-        let mut gpg_ctx = new_context()?;
-        let keys = {
-            let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
-            let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
-
-            if keys_iter.finish()?.is_truncated() {
-                return Err(err_msg(
-                    "The key list was truncated unexpectedly, while iterating it",
-                ));
-            }
-            keys
-        };
-        if keys.len() != gpg_key_ids.len() {
-            return Err(format_err!(
-                "Found {} viable keys for key-ids ({}), for {} given user ids.",
-                keys.len(),
-                KeylistDisplay(&keys),
-                gpg_key_ids.len()
-            ));
-        };
-
-        if let Some(gpg_keys_dir) = self.gpg_keys.as_ref() {
-            let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
-            let mut buf = Vec::new();
-            for key in &keys {
-                let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
-                writeln!(
-                    output,
-                    "Exported key '{}' for user {}",
-                    fingerprint,
-                    KeyDisplay(key)
-                ).ok();
-            }
-        }
-
-        let mut recipients = self.recipients_list()?;
-        for key in keys {
-            recipients.push(fingerprint_of(&key)?);
-            writeln!(output, "Added recipient {}", KeyDisplay(&key)).ok();
-        }
-        recipients.sort();
-        recipients.dedup();
-
-        let recipients_file = self.absolute_path(&self.recipients);
-        let mut writer = write_at(&recipients_file).context(format!(
-            "Failed to open recipients at '{}' file for writing",
-            recipients_file.display()
-        ))?;
-        for recipient in &recipients {
-            writeln!(&mut writer, "{}", recipient).context(format!(
-                "Failed to write recipient '{}' to file at '{}'",
-                recipient,
-                recipients_file.display()
-            ))?
-        }
-
-        let keys = self.recipient_keys(&mut gpg_ctx)?;
-
-        let mut obuf = Vec::new();
-
-        let files_to_reencrypt: Vec<_> = {
-            let _change_cwd = ResetCWD::new(&self.resolved_at)?;
-            glob(GPG_GLOB)
-                .expect("valid pattern")
-                .filter_map(Result::ok)
-                .collect()
-        };
-        for encrypted_file_path in files_to_reencrypt {
-            let tempfile = Temp::new_file().context(format!(
-                "Failed to create temporary file to hold decrypted '{}'",
-                encrypted_file_path.display()
-            ))?;
-            {
-                let mut plain_writer = write_at(&tempfile.to_path_buf())?;
-                self.decrypt(&encrypted_file_path, &mut plain_writer)
-                    .context(format!(
-                        "Could not decrypt '{}' to re-encrypt for new recipients.",
-                        encrypted_file_path.display()
-                    ))?;
-            }
-            {
-                let mut plain_reader = File::open(tempfile.to_path_buf())?;
-                gpg_ctx
-                    .encrypt(&keys, &mut plain_reader, &mut obuf)
-                    .map_err(|e| {
-                        EncryptionError::caused_by(
-                            e,
-                            format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
-                            &mut gpg_ctx,
-                            &keys,
-                        )
-                    })?;
-            }
-            write_at(&self.absolute_path(&encrypted_file_path))
-                .context(format!(
-                    "Could not open '{}' to write encrypted data",
-                    encrypted_file_path.display()
-                ))
-                .and_then(|mut w| {
-                    w.write_all(&obuf).context(format!(
-                        "Failed to write out encrypted data to '{}'",
-                        encrypted_file_path.display()
-                    ))
-                })?;
-
-            obuf.clear();
-            writeln!(
-                output,
-                "Re-encrypted '{}' for new recipients",
-                strip_ext(&encrypted_file_path)
-            ).ok();
-        }
-        Ok(())
-    }
-
     pub fn init(
         at: &Path,
         gpg_key_ids: &[String],
@@ -309,7 +73,8 @@ impl Vault {
 
             writeln!(recipients, "{}", fingerprint).context(format!(
                 "Could not append fingerprint to file at '{}'",
-                recipients_file.display()
+                recipients_file
+                    .display()
             ))?;
         }
         recipients.flush().context(format!(

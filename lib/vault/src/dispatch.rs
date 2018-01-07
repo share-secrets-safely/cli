@@ -46,12 +46,14 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             ).ok();
             Ok(())
         }
-        VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(
-            specs,
-            WriteMode::RefuseOverwrite,
-            Destination::ReolveAndAppendGpg,
-            output,
-        ),
+        VaultCommand::ResourceAdd { ref specs } => {
+            vault_from(&ctx)?.encrypt(
+                specs,
+                WriteMode::RefuseOverwrite,
+                Destination::ReolveAndAppendGpg,
+                output,
+            )
+        }
         VaultCommand::ResourceEdit {
             ref spec,
             ref editor,
@@ -67,18 +69,19 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
 pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     inner_do_it(ctx, output).map_err(|failure| {
         let gpg_error_code = match first_cause_of_type::<gpgme::Error>(&failure) {
-                Some(gpg_err) => { Some(gpg_err.code())
-                }
-                None => None // failure.into(),
-            };
+            Some(gpg_err) => Some(gpg_err.code()),
+            None => None, // failure.into(),
+        };
         match gpg_error_code {
-            Some(code) if code == gpgme::Error::UNSUPPORTED_PROTOCOL.code() => failure
-                .context(
-                    "The GNU Privacy Guard (GPG) is not available on your system. \
+            Some(code) if code == gpgme::Error::UNSUPPORTED_PROTOCOL.code() => {
+                failure
+                    .context(
+                        "The GNU Privacy Guard (GPG) is not available on your system. \
                      Please install it and try again. \
                      See https://www.gnupg.org for more information.",
-                )
-                .into(),
+                    )
+                    .into()
+            }
             _ => failure.into(),
         }
     })

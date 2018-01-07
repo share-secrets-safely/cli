@@ -17,6 +17,7 @@ pub mod error;
 mod util;
 mod vault;
 mod dispatch;
+mod recipients;
 mod init;
 mod crypt;
 

@@ -80,9 +80,7 @@ pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<Vaul
 
 pub fn vault_resource_show(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
-        command: VaultCommand::ResourceShow {
-            spec: required_os_arg(args, "path")?,
-        },
+        command: VaultCommand::ResourceShow { spec: required_os_arg(args, "path")? },
         ..ctx
     })
 }
@@ -149,8 +147,9 @@ pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error
             Path::new(s)
                 .file_name()
                 .map(|f| {
-                    f.to_str()
-                        .expect("os-string to str conversion to work for filename")
+                    f.to_str().expect(
+                        "os-string to str conversion to work for filename",
+                    )
                 })
                 .unwrap_or(s)
         })

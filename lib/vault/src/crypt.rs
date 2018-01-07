@@ -19,11 +19,14 @@ use util::new_context;
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
-        let file = Temp::new_file().context("Could not create tempfile to decrypt to.")?;
+        let file = Temp::new_file().context(
+            "Could not create tempfile to decrypt to.",
+        )?;
         let tempfile_path = file.to_path_buf();
         let decrypted_file_path = {
-            let mut decrypted_writer =
-                write_at(&tempfile_path).context("Failed to open temporary file for writing decrypted content to.")?;
+            let mut decrypted_writer = write_at(&tempfile_path).context(
+                "Failed to open temporary file for writing decrypted content to.",
+            )?;
             self.decrypt(path, &mut decrypted_writer)
                 .context(format!("Failed to decrypt file at '{}'.", path.display()))
                 .or_else(|err| match (mode, err.first_cause_of::<io::Error>()) {
@@ -41,9 +44,9 @@ impl Vault {
                 "Failed to start editor program at '{}'.",
                 editor.display()
             ))?;
-        let status = running_program
-            .wait()
-            .context("Failed to wait for editor to exit.")?;
+        let status = running_program.wait().context(
+            "Failed to wait for editor to exit.",
+        )?;
         if !status.success() {
             return Err(format_err!(
                 "Editor '{}' failed. Edit aborted.",
@@ -72,18 +75,24 @@ impl Vault {
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
             .map(|f| (f, resolved_gpg_path.to_owned()))
-            .or_else(|_| File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned())))
+            .or_else(|_| {
+                File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned()))
+            })
             .context(format!(
                 "Could not open input file at '{}' for reading. Tried '{}' as well.",
                 resolved_gpg_path.display(),
                 resolved_absolute_path.display()
             ))?;
         let mut output = Vec::new();
-        ctx.decrypt(&mut input, &mut output)
-            .map_err(|e: gpgme::Error| DecryptionError::caused_by(e, "Failed to decrypt data."))?;
+        ctx.decrypt(&mut input, &mut output).map_err(
+            |e: gpgme::Error| {
+                DecryptionError::caused_by(e, "Failed to decrypt data.")
+            },
+        )?;
 
-        w.write_all(&output)
-            .context("Could not write out all decrypted data.")?;
+        w.write_all(&output).context(
+            "Could not write out all decrypted data.",
+        )?;
         Ok(path_for_decryption)
     }
 
@@ -118,14 +127,18 @@ impl Vault {
                         "Didn't find the key for {} recipient(s) in the gpg database.{}",
                         diff,
                         match self.gpg_keys.as_ref() {
-                            Some(dir) => format!(
-                                " This might mean it wasn't imported yet from '{}'.",
-                                self.absolute_path(dir).display()
-                            ),
+                            Some(dir) => {
+                                format!(
+                                    " This might mean it wasn't imported yet from '{}'.",
+                                    self.absolute_path(dir).display()
+                                )
+                            }
                             None => String::new(),
                         }
                     );
-                    msg.push_str("\nThe following recipient(s) could not be found in the gpg key database:");
+                    msg.push_str(
+                        "\nThe following recipient(s) could not be found in the gpg key database:",
+                    );
                     for fpr in missing_fprs {
                         msg.push_str("\n");
                         let key_path_info = match self.gpg_keys.as_ref() {
@@ -148,7 +161,8 @@ impl Vault {
                     msg
                 } else {
                     format!(
-                        "Found {} additional keys to encrypt for, which may indicate an unusual recipients specification in the recipients file at '{}'",
+                        "Found {} additional keys to encrypt for, which may indicate an unusual \
+                        recipients specification in the recipients file at '{}'",
                         diff,
                         self.absolute_path(&self.recipients).display()
                     )
@@ -186,10 +200,11 @@ impl Vault {
                 buf
             };
             let mut output = Vec::new();
-            ctx.encrypt(&keys, input, &mut output)
-                .map_err(|e: gpgme::Error| {
+            ctx.encrypt(&keys, input, &mut output).map_err(
+                |e: gpgme::Error| {
                     EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys)
-                })?;
+                },
+            )?;
             spec.open_output_in(&self.resolved_at, mode, dst_mode)?
                 .write_all(&output)
                 .context(format!(

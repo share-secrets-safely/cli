@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 use std::fs::File;
-use std::io::{self, stdin, BufRead, BufReader, Read, Write};
+use std::io::{self, stdin, Read, Write};
 use std::env::{current_dir, set_current_dir};
 use serde_yaml;
 use util::write_at;
@@ -47,11 +47,15 @@ impl Drop for ResetCWD {
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub struct Vault {
     pub name: Option<String>,
-    #[serde(skip)] pub resolved_at: PathBuf,
-    #[serde(skip)] pub vault_path: Option<PathBuf>,
-    #[serde(default = "at_default")] pub at: PathBuf,
+    #[serde(skip)]
+    pub resolved_at: PathBuf,
+    #[serde(skip)]
+    pub vault_path: Option<PathBuf>,
+    #[serde(default = "at_default")]
+    pub at: PathBuf,
     pub gpg_keys: Option<PathBuf>,
-    #[serde(default = "recipients_default")] pub recipients: PathBuf,
+    #[serde(default = "recipients_default")]
+    pub recipients: PathBuf,
 }
 
 impl Default for Vault {
@@ -73,19 +77,23 @@ fn split_documents<R: Read>(mut r: R) -> Result<Vec<String>, Error> {
     let mut buf = String::new();
     r.read_to_string(&mut buf)?;
 
-    let docs = YamlLoader::load_from_str(&buf).context("YAML deserialization failed")?;
-    Ok(docs.iter()
-        .map(|d| {
-            let mut out_str = String::new();
-            {
-                let mut emitter = YamlEmitter::new(&mut out_str);
-                emitter
-                    .dump(d)
-                    .expect("dumping a valid yaml into a string to work");
-            }
-            out_str
-        })
-        .collect())
+    let docs = YamlLoader::load_from_str(&buf).context(
+        "YAML deserialization failed",
+    )?;
+    Ok(
+        docs.iter()
+            .map(|d| {
+                let mut out_str = String::new();
+                {
+                    let mut emitter = YamlEmitter::new(&mut out_str);
+                    emitter.dump(d).expect(
+                        "dumping a valid yaml into a string to work",
+                    );
+                }
+                out_str
+            })
+            .collect(),
+    )
 }
 
 impl Vault {
@@ -94,15 +102,19 @@ impl Vault {
         let reader: Box<Read> = if path_is_stdin {
             Box::new(stdin())
         } else {
-            Box::new(File::open(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
+            Box::new(File::open(path).map_err(|cause| {
+                VaultError::from_io_err(cause, path, &IOMode::Read)
+            })?)
         };
         Ok(split_documents(reader)?
             .iter()
             .map(|s| {
                 serde_yaml::from_str(s)
-                    .map_err(|cause| VaultError::Deserialization {
-                        cause,
-                        path: path.to_owned(),
+                    .map_err(|cause| {
+                        VaultError::Deserialization {
+                            cause,
+                            path: path.to_owned(),
+                        }
                     })
                     .map_err(Into::into)
                     .and_then(|v: Vault| v.set_resolved_at(path))
@@ -113,7 +125,9 @@ impl Vault {
     pub fn set_resolved_at(mut self, vault_file: &Path) -> Result<Self, Error> {
         self.resolved_at = normalize(&vault_file
             .parent()
-            .ok_or_else(|| format_err!("The vault file path '{}' is invalid.", vault_file.display()))?
+            .ok_or_else(|| {
+                format_err!("The vault file path '{}' is invalid.", vault_file.display())
+            })?
             .join(&self.at));
         self.vault_path = Some(vault_file.to_owned());
         Ok(self)
@@ -123,31 +137,23 @@ impl Vault {
         if path.exists() {
             return Err(VaultError::ConfigurationFileExists(path.to_owned()));
         }
-        let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
+        let mut file = write_at(path).map_err(|cause| {
+            VaultError::from_io_err(cause, path, &IOMode::Write)
+        })?;
         serde_yaml::to_writer(&file, self)
-            .map_err(|cause| VaultError::Serialization {
-                cause,
-                path: path.to_owned(),
+            .map_err(|cause| {
+                VaultError::Serialization {
+                    cause,
+                    path: path.to_owned(),
+                }
             })
-            .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))
+            .and_then(|_| {
+                writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))
+            })
     }
 
     pub fn absolute_path(&self, path: &Path) -> PathBuf {
         self.resolved_at.join(path)
-    }
-
-    pub fn recipients_list(&self) -> Result<Vec<String>, Error> {
-        let recipients_file_path = self.absolute_path(&self.recipients);
-        let rfile = File::open(&recipients_file_path)
-            .map(BufReader::new)
-            .context(format!(
-                "Could not open recipients file at '{}' for reading",
-                recipients_file_path.display()
-            ))?;
-        Ok(rfile.lines().collect::<Result<_, _>>().context(format!(
-            "Could not read all recipients from file at '{}'",
-            recipients_file_path.display()
-        ))?)
     }
 
     pub fn url(&self) -> String {
@@ -164,9 +170,9 @@ impl Vault {
     pub fn list(&self, w: &mut Write) -> Result<(), Error> {
         writeln!(w, "{}", self.url())?;
         let _change_cwd = ResetCWD::new(&self.resolved_at)?;
-        for entry in glob(GPG_GLOB)
-            .expect("valid pattern")
-            .filter_map(Result::ok)
+        for entry in glob(GPG_GLOB).expect("valid pattern").filter_map(
+            Result::ok,
+        )
         {
             writeln!(w, "{}", strip_ext(&entry))?;
         }
@@ -181,16 +187,23 @@ pub trait VaultExt {
 impl VaultExt for Vec<Vault> {
     fn select(&self, vault_id: &str) -> Result<Vault, Error> {
         let idx: Result<usize, _> = vault_id.parse();
-        Ok(match idx {
-            Ok(idx) => self.get(idx)
-                .ok_or_else(|| format_err!("Vault index {} is out of bounds.", idx))?,
-            Err(_) => self.iter()
-                .find(|v| match v.name {
-                    Some(ref name) if name == vault_id => true,
-                    _ => false,
-                })
-                .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
-        }.clone())
+        Ok(
+            match idx {
+                Ok(idx) => {
+                    self.get(idx).ok_or_else(|| {
+                        format_err!("Vault index {} is out of bounds.", idx)
+                    })?
+                }
+                Err(_) => {
+                    self.iter()
+                        .find(|v| match v.name {
+                            Some(ref name) if name == vault_id => true,
+                            _ => false,
+                        })
+                        .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?
+                }
+            }.clone(),
+        )
     }
 }
 

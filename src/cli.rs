@@ -27,7 +27,9 @@ where
             .required(false)
             .takes_value(true)
             .value_name("userid")
-            .help("The key-id of the public key identifying a recipient in your gpg keychain.");
+            .help(
+                "The key-id of the public key identifying a recipient in your gpg keychain.",
+            );
         let init = App::new("init")
             .about(
                 "Initialize the vault in the current directory. \
@@ -75,9 +77,9 @@ where
             )
             .arg(gpg_key_id.clone().long("gpg-key-id").short("i"));
 
-        let list = App::new("list")
-            .alias("ls")
-            .about("List the vault's content.");
+        let list = App::new("list").alias("ls").about(
+            "List the vault's content.",
+        );
         let resource_path = Arg::with_name("path")
             .required(true)
             .multiple(false)
@@ -117,9 +119,9 @@ where
                  a temporary file, open up the $EDITOR you have specified, and re-encrypt the \
                  changed content before deleting it on disk.",
             );
-        let show_resource = App::new("show")
-            .about("Decrypt a resource")
-            .arg(resource_path);
+        let show_resource = App::new("show").about("Decrypt a resource").arg(
+            resource_path,
+        );
         let add_resource = App::new("add")
             .alias("insert")
             .about("Add a new resource to the vault.")
@@ -146,13 +148,17 @@ where
         let add_recipient = App::new("add")
             .alias("insert")
             .arg(gpg_key_id.required(true))
-            .about("Add a new recipient. This will re-encrypt all the vaults content.");
-        let list_recipient = App::new("list")
-            .alias("ls")
-            .about("List the vaults recipients as identified by the recipients file.");
+            .about(
+                "Add a new recipient. This will re-encrypt all the vaults content.",
+            );
+        let list_recipient = App::new("list").alias("ls").about(
+            "List the vaults recipients as identified by the recipients file.",
+        );
         let recipients = App::new("recipients")
             .alias("recipient")
-            .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
+            .about(
+                "Interact with recipients of a vault. They can encrypt and decrypt its contents.",
+            )
             .subcommand(add_recipient)
             .subcommand(list_recipient)
             .subcommand(init_recipient);
@@ -170,7 +176,9 @@ where
                     .long("vault-id")
                     .required(false)
                     .value_name("id")
-                    .help("Either an index into the vaults list, or the name of the vault.")
+                    .help(
+                        "Either an index into the vaults list, or the name of the vault.",
+                    )
                     .default_value("0"),
             )
             .arg(
@@ -183,13 +191,12 @@ where
                     .default_value("./sy-vault.yml"),
             );
         let extract = App::new("extract")
-            .about("utilities to extract information from structured data files")
-            .arg(
-                Arg::with_name("file")
-                    .short("f")
-                    .required(true)
-                    .help("Path to the data file to read"),
-            );
+            .about(
+                "utilities to extract information from structured data files",
+            )
+            .arg(Arg::with_name("file").short("f").required(true).help(
+                "Path to the data file to read",
+            ));
         let completions = App::new("completions")
             .about("generate completions for supported shell")
             .arg({

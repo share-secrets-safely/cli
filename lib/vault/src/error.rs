@@ -15,7 +15,8 @@ use util::FingerprintUserId;
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]
 pub struct DecryptionError {
-    #[cause] pub cause: gpgme::Error,
+    #[cause]
+    pub cause: gpgme::Error,
 }
 
 impl DecryptionError {
@@ -93,19 +94,23 @@ impl EncryptionError {
 pub enum VaultError {
     ConfigurationFileExists(PathBuf),
     ReadFile {
-        #[cause] cause: io::Error,
+        #[cause]
+        cause: io::Error,
         path: PathBuf,
     },
     WriteFile {
-        #[cause] cause: io::Error,
+        #[cause]
+        cause: io::Error,
         path: PathBuf,
     },
     Deserialization {
-        #[cause] cause: serde_yaml::Error,
+        #[cause]
+        cause: serde_yaml::Error,
         path: PathBuf,
     },
     Serialization {
-        #[cause] cause: serde_yaml::Error,
+        #[cause]
+        cause: serde_yaml::Error,
         path: PathBuf,
     },
 }
@@ -114,31 +119,41 @@ impl fmt::Display for VaultError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::VaultError::*;
         match *self {
-            ConfigurationFileExists(ref path) => writeln!(
-                f,
-                "Cannot overwrite vault configuration file as it already exists at '{}'",
-                path.display()
-            ),
-            Serialization { ref path, .. } => writeln!(
-                f,
-                "Failed to serialize vault configuration file at '{}'",
-                path.display()
-            ),
-            Deserialization { ref path, .. } => writeln!(
-                f,
-                "Failed to deserialize vault configuration file at '{}'",
-                path.display()
-            ),
-            WriteFile { ref path, .. } => writeln!(
-                f,
-                "Failed to write vault configuration file at '{}'",
-                path.display()
-            ),
-            ReadFile { ref path, .. } => writeln!(
-                f,
-                "Failed to read vault configuration file at '{}'",
-                path.display()
-            ),
+            ConfigurationFileExists(ref path) => {
+                writeln!(
+                    f,
+                    "Cannot overwrite vault configuration file as it already exists at '{}'",
+                    path.display()
+                )
+            }
+            Serialization { ref path, .. } => {
+                writeln!(
+                    f,
+                    "Failed to serialize vault configuration file at '{}'",
+                    path.display()
+                )
+            }
+            Deserialization { ref path, .. } => {
+                writeln!(
+                    f,
+                    "Failed to deserialize vault configuration file at '{}'",
+                    path.display()
+                )
+            }
+            WriteFile { ref path, .. } => {
+                writeln!(
+                    f,
+                    "Failed to write vault configuration file at '{}'",
+                    path.display()
+                )
+            }
+            ReadFile { ref path, .. } => {
+                writeln!(
+                    f,
+                    "Failed to read vault configuration file at '{}'",
+                    path.display()
+                )
+            }
         }
     }
 }

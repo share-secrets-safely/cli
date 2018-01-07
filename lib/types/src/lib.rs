@@ -12,16 +12,19 @@ use std::path::{Path, PathBuf};
 use std::path::Component;
 
 pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
-    let file_name = path.file_name()
-        .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
-    Ok(path.parent()
-        .expect("path with filename to have a root")
-        .join(format!(
-            "{}.gpg",
-            file_name
-                .to_str()
-                .expect("filename to be decodeable with UTF8")
-        )))
+    let file_name = path.file_name().ok_or_else(|| {
+        format_err!("'{}' does not have a filename", path.display())
+    })?;
+    Ok(
+        path.parent()
+            .expect("path with filename to have a root")
+            .join(format!(
+                "{}.gpg",
+                file_name.to_str().expect(
+                    "filename to be decodeable with UTF8",
+                )
+            )),
+    )
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -31,12 +34,8 @@ pub enum VaultCommand {
         spec: PathBuf,
         mode: CreateMode,
     },
-    ResourceShow {
-        spec: PathBuf,
-    },
-    ResourceAdd {
-        specs: Vec<VaultSpec>,
-    },
+    ResourceShow { spec: PathBuf },
+    ResourceAdd { specs: Vec<VaultSpec> },
     Init {
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
@@ -44,12 +43,8 @@ pub enum VaultCommand {
         recipients_file: PathBuf,
     },
     RecipientsList,
-    RecipientsInit {
-        gpg_key_ids: Vec<String>,
-    },
-    RecipientsAdd {
-        gpg_key_ids: Vec<String>,
-    },
+    RecipientsInit { gpg_key_ids: Vec<String> },
+    RecipientsAdd { gpg_key_ids: Vec<String> },
     List,
 }
 
@@ -146,7 +141,10 @@ impl VaultSpec {
 
     pub fn open_input(&self) -> Result<Box<Read>, Error> {
         Ok(match self.src {
-            Some(ref p) => Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?),
+            Some(ref p) => Box::new(File::open(p).context(format!(
+                "Could not open input file at '{}'",
+                p.display()
+            ))?),
             None => Box::new(stdin()),
         })
     }
@@ -170,15 +168,13 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                 Some(PathBuf::from(src))
             })
         };
-        let validate_dst = |p: PathBuf| {
-            if p.is_absolute() {
-                Err(VaultSpecError(format!(
-                    "'{}' must not have an absolute destination.",
-                    input
-                )))
-            } else {
-                Ok(p)
-            }
+        let validate_dst = |p: PathBuf| if p.is_absolute() {
+            Err(VaultSpecError(format!(
+                "'{}' must not have an absolute destination.",
+                input
+            )))
+        } else {
+            Ok(p)
         };
 
         if input.is_empty() {
@@ -206,17 +202,15 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                 src: validate(src)?,
                 dst: PathBuf::from(if dst.is_empty() {
                     if src.is_empty() {
-                        return Err(VaultSpecError(format!(
-                            "'{}' does not contain a destination.",
-                            input
-                        )));
+                        return Err(VaultSpecError(
+                            format!("'{}' does not contain a destination.", input),
+                        ));
                     }
                     src
                 } else if dst.contains(SEPARATOR) {
-                    return Err(VaultSpecError(format!(
-                        "'{}' must not contain more than one colon.",
-                        input
-                    )));
+                    return Err(VaultSpecError(
+                        format!("'{}' must not contain more than one colon.", input),
+                    ));
                 } else {
                     dst
                 }),
@@ -282,10 +276,9 @@ mod tests_vault_spec {
         let invalid = ":";
         assert_eq!(
             VaultSpec::try_from(invalid),
-            Err(VaultSpecError(format!(
-                "'{}' does not contain a destination.",
-                invalid
-            )))
+            Err(VaultSpecError(
+                format!("'{}' does not contain a destination.", invalid),
+            ))
         )
     }
 
@@ -410,12 +403,13 @@ mod tests_vault_spec {
 
     #[test]
     fn it_displays_itself_properly() {
-        for &(ref input, ref expected) in [
-            (":path", ":path"),
-            ("src:dst", "src:dst"),
-            ("src", "src:src"),
-            ("src:", "src:src"),
-        ].iter()
+        for &(ref input, ref expected) in
+            [
+                (":path", ":path"),
+                ("src:dst", "src:dst"),
+                ("src", "src:src"),
+                ("src:", "src:src"),
+            ].iter()
         {
             let s = VaultSpec::try_from(*input).unwrap();
             assert_eq!(&format!("{}", s), expected)
