@@ -66,7 +66,7 @@ snapshot="$fixture/snapshots"
       gpg --import "$fixture/c.pub.asc" &>/dev/null
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-c" \
-        expect_run $SUCCESSFULLY "$exe" vault recipients add c@example.com
+        expect_run $SUCCESSFULLY "$exe" vault recipients add --verified c@example.com
       }
       
       it "sets up the metadata correctly" && {
@@ -88,16 +88,16 @@ snapshot="$fixture/snapshots"
     
     (when "adding a new recipient using the id of an already imported and unsigned key"
       gpg --import "$fixture/b.pub.asc" &>/dev/null
-      it "fails" && {
+      it "fails as it cannot encrypt for an unverified user" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-b-failure" \
-        expect_run $WITH_FAILURE "$exe" vault recipients add b@example.com
+        expect_run $WITH_FAILURE "$exe" vault recipients add --verified b@example.com
       }
       
       (when "signing the new key and adding the recipient"
         gpg --sign-key --yes --batch b@example.com &>/dev/null
-        it "succeeds" && {
+        it "succeeds in encrypting the vaults contents" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-b-success-after-signing" \
-          expect_run $SUCCESSFULLY "$exe" vault recipients add b@example.com
+          expect_run $SUCCESSFULLY "$exe" vault recipients add --verified b@example.com
         }
         
         it "sets up the metadata correctly" && {

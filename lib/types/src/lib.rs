@@ -44,7 +44,10 @@ pub enum VaultCommand {
     },
     RecipientsList,
     RecipientsInit { gpg_key_ids: Vec<String> },
-    RecipientsAdd { gpg_key_ids: Vec<String> },
+    RecipientsAdd {
+        gpg_key_ids: Vec<String>,
+        verified: bool,
+    },
     List,
 }
 

@@ -13,7 +13,10 @@ use util::{KeylistDisplay, export_key};
 use util::KeyDisplay;
 
 impl Vault {
-    pub fn add_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
+    pub fn add_recipients(&self, gpg_key_ids: &[String], verified: bool, output: &mut Write) -> Result<(), Error> {
+        if !verified {
+            unimplemented!("a key which is not verified")
+        }
         let mut gpg_ctx = new_context()?;
         let keys = {
             let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;

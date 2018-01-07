@@ -147,9 +147,27 @@ where
         );
         let add_recipient = App::new("add")
             .alias("insert")
+            .arg(
+                Arg::with_name("verified")
+                    .long("verified")
+                    .required(false)
+                    .help(
+                        "If specified, you indicate that the user id to be added truly belongs to a person you know \
+            and that you have verified that relationship already. \
+            You have used `gpg --sign-key <recipient>` or have set the owner trust to ultimate so that you \
+            can encrypt for the recipient.",
+                    ),
+            )
             .arg(gpg_key_id.required(true))
             .about(
-                "Add a new recipient. This will re-encrypt all the vaults content.",
+                "Add a new recipient. This will re-encrypt all the vaults content.\
+                \
+                If the '--verified' flag is unset, you will have to specify the fingerprint directly \
+                (as opposed to allowing the recipients email address or name) to indicate you have \
+                assured yourself that it actually belongs to the person.\
+                The respective key will then be imported for you, signed and re-exported to store \
+                you have verified the recipients, and to allow other to use the 'Web of Trust' \
+                for convenient encryption.",
             );
         let list_recipient = App::new("list").alias("ls").about(
             "List the vaults recipients as identified by the recipients file.",

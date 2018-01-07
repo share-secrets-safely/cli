@@ -16,7 +16,16 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     use sheesy_types::VaultCommand;
     match ctx.command {
-        VaultCommand::RecipientsAdd { ref gpg_key_ids } => vault_from(&ctx)?.add_recipients(gpg_key_ids, output),
+        VaultCommand::RecipientsAdd {
+            ref gpg_key_ids,
+            verified,
+        } => {
+            vault_from(&ctx)?.add_recipients(
+                gpg_key_ids,
+                verified,
+                output,
+            )
+        }
         VaultCommand::RecipientsList => vault_from(&ctx)?.list_recipients(output),
         VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
         VaultCommand::Init {
