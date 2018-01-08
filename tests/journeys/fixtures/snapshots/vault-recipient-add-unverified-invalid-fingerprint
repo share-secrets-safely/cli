@@ -1,0 +1,4 @@
+error: Fingerprint 'something-that-is-not-a-fingerprint' must only contain characters a-f, A-F and 0-9.
+Fingerprint 'also-invalid' must only contain characters a-f, A-F and 0-9.
+Fingerprint 'abc' must be between 8 and 40 characters long.
+Fingerprint '2CF6E0B51AAF73F09B1C21174D1DA68C88710E60ffffffff' must be between 8 and 40 characters long.

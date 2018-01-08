@@ -11,10 +11,42 @@ use util::fingerprint_of;
 use util::new_context;
 use util::{KeylistDisplay, export_key};
 use util::KeyDisplay;
+use itertools::Itertools;
+
+fn valid_fingerprint(id: &str) -> Result<&str, String> {
+    if id.len() < 8 || id.len() > 40 {
+        return Err(format!(
+            "Fingerprint '{}' must be between 8 and 40 characters long.",
+            id
+        ));
+    }
+
+    if id.chars().all(|c| match c {
+        'a'...'f' | 'A'...'F' | '0'...'9' => true,
+        _ => false,
+    })
+    {
+        Ok(id)
+    } else {
+        Err(format!(
+            "Fingerprint '{}' must only contain characters a-f, A-F and 0-9.",
+            id
+        ))
+    }
+}
 
 impl Vault {
     pub fn add_recipients(&self, gpg_key_ids: &[String], verified: bool, output: &mut Write) -> Result<(), Error> {
         if !verified {
+            let err = gpg_key_ids
+                .iter()
+                .map(|s| s.as_str())
+                .map(valid_fingerprint)
+                .filter_map(Result::err)
+                .join("\n");
+            if !err.is_empty() {
+                return Err(err_msg(err));
+            }
             unimplemented!("a key which is not verified")
         }
         let mut gpg_ctx = new_context()?;
