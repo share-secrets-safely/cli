@@ -15,7 +15,7 @@ snapshot="$root/journeys/fixtures/snapshots/stateless"
 
 (with "a minimal vault configuration file"
   it "succeeds even if there is no further argument" && \
-      echo 'at: .' | expect_run $SUCCESSFULLY "$exe" vault -c -
+      echo 'secrets: .' | expect_run $SUCCESSFULLY "$exe" vault -c -
 )
 
 title "'vault init' subcommand"

@@ -40,14 +40,14 @@ where
                  to make the input unambiguous.",
             )
             .arg(
-                Arg::with_name("at")
-                    .long("at")
-                    .short("a")
+                Arg::with_name("secrets-dir")
+                    .long("secrets")
+                    .short("s")
                     .default_value(".")
                     .required(false)
                     .takes_value(true)
                     .value_name("path")
-                    .help("The location which is the root of all vault content."),
+                    .help("The location at which the vaults secrets are stored."),
             )
             .arg(
                 Arg::with_name("recipients-file-path")

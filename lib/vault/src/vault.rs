@@ -14,7 +14,7 @@ pub fn recipients_default() -> PathBuf {
     PathBuf::from(".gpg-id")
 }
 
-pub fn at_default() -> PathBuf {
+pub fn secrets_default() -> PathBuf {
     PathBuf::from(".")
 }
 
@@ -51,8 +51,8 @@ pub struct Vault {
     pub resolved_at: PathBuf,
     #[serde(skip)]
     pub vault_path: Option<PathBuf>,
-    #[serde(default = "at_default")]
-    pub at: PathBuf,
+    #[serde(default = "secrets_default")]
+    pub secrets: PathBuf,
     pub gpg_keys: Option<PathBuf>,
     #[serde(default = "recipients_default")]
     pub recipients: PathBuf,
@@ -63,8 +63,8 @@ impl Default for Vault {
         Vault {
             vault_path: None,
             name: None,
-            at: at_default(),
-            resolved_at: at_default(),
+            secrets: secrets_default(),
+            resolved_at: secrets_default(),
             gpg_keys: None,
             recipients: recipients_default(),
         }
@@ -123,12 +123,9 @@ impl Vault {
     }
 
     pub fn set_resolved_at(mut self, vault_file: &Path) -> Result<Self, Error> {
-        self.resolved_at = normalize(&vault_file
-            .parent()
-            .ok_or_else(|| {
-                format_err!("The vault file path '{}' is invalid.", vault_file.display())
-            })?
-            .join(&self.at));
+        self.resolved_at = normalize(&vault_file.parent().ok_or_else(|| {
+            format_err!("The vault file path '{}' is invalid.", vault_file.display())
+        })?);
         self.vault_path = Some(vault_file.to_owned());
         Ok(self)
     }
@@ -153,9 +150,12 @@ impl Vault {
     }
 
     pub fn absolute_path(&self, path: &Path) -> PathBuf {
-        self.resolved_at.join(path)
+        normalize(&self.resolved_at.join(path))
     }
 
+    pub fn secrets_path(&self) -> PathBuf {
+        normalize(&self.absolute_path(&self.secrets))
+    }
     pub fn url(&self) -> String {
         format!(
             "syv://{}{}",
@@ -163,13 +163,13 @@ impl Vault {
                 .as_ref()
                 .map(|s| format!("{}@", s))
                 .unwrap_or_else(String::new),
-            self.resolved_at.display()
+            self.secrets_path().display()
         )
     }
 
     pub fn list(&self, w: &mut Write) -> Result<(), Error> {
         writeln!(w, "{}", self.url())?;
-        let _change_cwd = ResetCWD::new(&self.resolved_at)?;
+        let _change_cwd = ResetCWD::new(&self.secrets_path())?;
         for entry in glob(GPG_GLOB).expect("valid pattern").filter_map(
             Result::ok,
         )

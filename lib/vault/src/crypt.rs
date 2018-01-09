@@ -71,7 +71,7 @@ impl Vault {
 
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
         let mut ctx = new_context()?;
-        let resolved_absolute_path = self.absolute_path(path);
+        let resolved_absolute_path = self.secrets_path().join(path);
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
             .map(|f| (f, resolved_gpg_path.to_owned()))
@@ -188,6 +188,7 @@ impl Vault {
         let keys = self.recipient_keys(&mut ctx)?;
 
         let mut encrypted = Vec::new();
+        let secrets_path = self.secrets_path();
         for spec in specs {
             let input = {
                 let mut buf = Vec::new();
@@ -205,7 +206,7 @@ impl Vault {
                     EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys)
                 },
             )?;
-            spec.open_output_in(&self.resolved_at, mode, dst_mode)?
+            spec.open_output_in(&secrets_path, mode, dst_mode)?
                 .write_all(&output)
                 .context(format!(
                     "Failed to write all encrypted data to '{}'.",

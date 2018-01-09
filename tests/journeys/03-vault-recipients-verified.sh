@@ -15,11 +15,19 @@ fixture="$root/fixtures"
 snapshot="$fixture/snapshots"
 (sandboxed 
   title "'vault recipient add'"
-  (with "a vault initialized for a single recipient and an existing secret"
+  (with "a vault initialized for a single recipient and an existing secret and custom secrets dir"
     { import_user "$fixture/tester.sec.asc"
-      "$exe" vault init --at secrets --gpg-keys-dir ../etc/keys --recipients-file ../etc/recipients
+      mkdir secrets
+      "$exe" vault init --secrets ./secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
       echo -n secret | "$exe" vault add :secret
-    } &>/dev/null
+    }  &>/dev/null
+    
+    (when "listing the vault content"
+      it "looks as expected" && {
+        WITH_SNAPSHOT="$snapshot/vault-list-with-relative-secrets-dir" \
+        expect_run $SUCCESSFULLY "$exe" vault
+      }
+    )
     
     (with "an unknown user"
       (as_user "$fixture/c.sec.asc"
@@ -31,7 +39,7 @@ snapshot="$fixture/snapshots"
         )
         (when "trying to encrypt a new file"
           { 
-            gpg --import 'secrets/../etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
+            gpg --import './etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
             gpg --sign-key --yes --batch tester@example.com
           } &>/dev/null
           

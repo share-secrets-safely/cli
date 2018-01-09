@@ -1,5 +1,5 @@
 ---
 name: ~
-at: "."
+secrets: "."
 gpg_keys: keys
 recipients: recipients

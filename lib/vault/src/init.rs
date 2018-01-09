@@ -15,7 +15,7 @@ use util::export_key;
 
 impl Vault {
     pub fn init(
-        at: &Path,
+        secrets: &Path,
         gpg_key_ids: &[String],
         gpg_keys_dir: &Path,
         recipients_file: &Path,
@@ -26,7 +26,7 @@ impl Vault {
             gpg_keys: Some(gpg_keys_dir.to_owned()),
             recipients: recipients_file.to_owned(),
             name,
-            at: at.to_owned(),
+            secrets: secrets.to_owned(),
             ..Default::default()
         }.set_resolved_at(vault_path)?;
 

@@ -39,7 +39,7 @@ pub enum VaultCommand {
     Init {
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
-        at: PathBuf,
+        secrets: PathBuf,
         recipients_file: PathBuf,
     },
     RecipientsList,

@@ -24,7 +24,7 @@ title "'vault init' - without GPG"
 )
 
 (with "a valid vault configuration file"
-  echo "at: ." > sy-vault.yml
+  echo "secrets: ." > sy-vault.yml
   (with "an empty recipients file"
     touch .gpg-id
     (when "adding a new secret"

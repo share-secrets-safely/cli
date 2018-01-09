@@ -61,24 +61,24 @@ title "'vault init'"
 )
 
 (sandboxed
-  title "'vault init' - with change '--at' location"
+  title "'vault init' - with change '--secrets' location"
 
   (with "a single gpg secret key"
     import_user "$fixture/tester.sec.asc"
   
     vault_dir=vault
     mkdir $vault_dir
-    (with "a specified --at location and relative directories for keys and recipients"
+    (with "a specified --secrets location and relative directories for keys and recipients"
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/vault-init-with-at-argument" \
         expect_run $SUCCESSFULLY "$exe" vault \
           -c $vault_dir/vault.yml \
           --vault-id customized \
-          init --at secrets -k ../etc/keys -r ../etc/recipients
+          init --secrets secrets -k ./etc/keys -r ./etc/recipients
       }
       
       it "creates the expected folder structure" && {
-        expect_snapshot "$snapshot/vault-init-change-at-location-folder-structure" $vault_dir/etc
+        expect_snapshot "$snapshot/vault-init-change-secrets-location-folder-structure" $vault_dir/etc
       }
     )
     
@@ -90,6 +90,11 @@ title "'vault init'"
       
       it "puts the file to the right spot" && {
         expect_exists $vault_dir/secrets/secret.gpg
+      }
+      
+      it "lists the content as expected" && {
+        WITH_SNAPSHOT="$snapshot/vault-list-changed-secrets-location" \
+        expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml list
       }
     )
   )

@@ -16,14 +16,15 @@ snapshot="$fixture/snapshots"
   title "'vault recipient add unverified'"
   (with "a vault initialized for a single recipient and an existing secret"
     { import_user "$fixture/tester.sec.asc"
-      "$exe" vault init --at secrets --gpg-keys-dir ../etc/keys --recipients-file ../etc/recipients
+      mkdir secrets
+      "$exe" vault init --secrets secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
       echo -n secret | "$exe" vault add :secret
     } &>/dev/null
     
     (with "some invalid fingerprints and a few valid ones"
       it "won't make any change" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-unverified-invalid-fingerprint" \
-        expect_run $WITH_FAILURE $exe vault recipient add something-that-is-not-a-fingerprint \
+        expect_run $WITH_FAILURE "$exe" vault recipient add something-that-is-not-a-fingerprint \
             also-invalid \
             abc \
             abc1f7d1 \

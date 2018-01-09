@@ -1,3 +1,20 @@
+## V2.0.0: Better user onboarding experience
+
+### Improvements
+
+ * `vault list` now produces precise URLs
+
+### Breaking Changes
+
+The breaking change requiring a major version increment is changes to the `sy-vault.yml` file.
+
+ * The `at` field is now called `secrets`
+ * `recipients` and `gpg-keys` paths are no relative to the `sy-vault.yml` file, not relative to the
+   `secrets` directory.
+ * The '--at/-a' flag of `sy vault` is now `--secrets/-s`
+
+These improvements make handling paths consistent and less suprising.
+
 ## V1.0.1: The very first release - with a new name!
 
 `s3` now officially is `sy` on the command-line, and spelled `sheesy`. Crates

@@ -20,12 +20,12 @@ fn valid_fingerprint(id: &str) -> Result<&str, String> {
             id
         ));
     }
-
-    if id.chars().all(|c| match c {
+    let has_only_fingerprint_chars = id.chars().all(|c| match c {
         'a'...'f' | 'A'...'F' | '0'...'9' => true,
         _ => false,
-    })
-    {
+    });
+
+    if has_only_fingerprint_chars {
         Ok(id)
     } else {
         Err(format!(
@@ -110,8 +110,9 @@ impl Vault {
 
         let mut obuf = Vec::new();
 
+        let secrets_dir = self.secrets_path();
         let files_to_reencrypt: Vec<_> = {
-            let _change_cwd = ResetCWD::new(&self.resolved_at)?;
+            let _change_cwd = ResetCWD::new(&secrets_dir)?;
             glob(GPG_GLOB)
                 .expect("valid pattern")
                 .filter_map(Result::ok)
@@ -143,7 +144,7 @@ impl Vault {
                         )
                     })?;
             }
-            write_at(&self.absolute_path(&encrypted_file_path))
+            write_at(&secrets_dir.join(&encrypted_file_path))
                 .context(format!(
                     "Could not open '{}' to write encrypted data",
                     encrypted_file_path.display()
