@@ -61,20 +61,20 @@ title "'vault init'"
 )
 
 (sandboxed
-  title "'vault init' - with change '--secrets' location"
+  title "'vault init' - with change '--secrets-dir' location"
 
   (with "a single gpg secret key"
     import_user "$fixture/tester.sec.asc"
   
     vault_dir=vault
     mkdir $vault_dir
-    (with "a specified --secrets location and relative directories for keys and recipients"
+    (with "a specified --secrets-dir location and relative directories for keys and recipients"
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/vault-init-with-at-argument" \
         expect_run $SUCCESSFULLY "$exe" vault \
           -c $vault_dir/vault.yml \
           --vault-id customized \
-          init --secrets secrets -k ./etc/keys -r ./etc/recipients
+          init --secrets-dir secrets -k ./etc/keys -r ./etc/recipients
       }
       
       it "creates the expected folder structure" && {

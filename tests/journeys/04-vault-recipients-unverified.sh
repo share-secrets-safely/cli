@@ -17,7 +17,7 @@ snapshot="$fixture/snapshots"
   (with "a vault initialized for a single recipient and an existing secret"
     { import_user "$fixture/tester.sec.asc"
       mkdir secrets
-      "$exe" vault init --secrets secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
+      "$exe" vault init --secrets-dir secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
       echo -n secret | "$exe" vault add :secret
     } &>/dev/null
     

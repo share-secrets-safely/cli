@@ -41,13 +41,13 @@ where
             )
             .arg(
                 Arg::with_name("secrets-dir")
-                    .long("secrets")
+                    .long("secrets-dir")
                     .short("s")
                     .default_value(".")
                     .required(false)
                     .takes_value(true)
                     .value_name("path")
-                    .help("The location at which the vaults secrets are stored."),
+                    .help("The directory which stores the vaults secrets."),
             )
             .arg(
                 Arg::with_name("recipients-file-path")

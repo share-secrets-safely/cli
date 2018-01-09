@@ -11,7 +11,7 @@ The breaking change requiring a major version increment is changes to the `sy-va
  * The `at` field is now called `secrets`
  * `recipients` and `gpg-keys` paths are no relative to the `sy-vault.yml` file, not relative to the
    `secrets` directory.
- * The '--at/-a' flag of `sy vault` is now `--secrets/-s`
+ * The '--at/-a' flag of `sy vault` is now `--secrets-dir-dir/-s`
 
 These improvements make handling paths consistent and less suprising.
 
