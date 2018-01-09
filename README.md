@@ -121,6 +121,44 @@ to be understandable, consistent and easy to remember.
 [pass-src]: https://git.zx2c4.com/password-store/tree/
 [pass-deps]: https://git.zx2c4.com/password-store/tree/README
 
+### Gopass
+
+[`gopass`][gopass] is '_the slightly more awesome standard unix password manager for teams_' as claimed on the projects 
+github page. As I have never used it beyond trying it locally, this paragraph might be lacking details. However, a first
+impression is worth something, and here we go.
+
+As it is a `go` program, it comes without any dependencies except for the `gpg` executable. It calls it directly, and thus
+would be vulnerable to changes to the way `gpg` parses its arguments.
+
+It's feature-ladden and seems overwhelming at first, it is clearly not centered
+around user experience. Otherwise the user-journey would be much more streamlined and easier to comprehend. Many advanced
+features I certainly don't get to enjoy that way.
+
+Somewhat a sybling of the issue above seems to be that it is hell-bent on being a personal password store.
+Thus it will store meta-data in your home directory and really wants a root-store which is placed in your 
+home by default. So-called 'mounts' are really just a way to let it know about other `pass` compatible vaults, 
+and I believe that makes it a buzz-word. Nonetheless, this made it hard for me to get started with it, and I still
+feel highly uncomfortable to use it thanks to it opinionatedness.
+
+Last but not least, and an issue that I find makes the case for not using `gopass` is that it actually 
+[abandons the `Web of Trust`][gopass-wot] in favor of simplicity to the user. Even though I understand
+why one would do that, I think the `Web of Trust` is an awesome idea, with terrible user experience, which
+just begs you to make it usable for the masses thanks to better tooling.
+
+Additionally `gopass` just aims to be a _slightly more awesome_ than `pass`, which shows as it is basically
+pass written in `go` with more features.
+
+Even though it certainly is better than `pass`, I wouldn't want to use it in its place because it adds so much
+complexity while entirely removing the 'Web of Trust'. The latter seemed to have happened rather sneakily, which
+I find problematic.
+
+It should be valued that they [actively increase test-coverage][gopass-tests], but it also means that they don't
+do test-driven development, which nurishes my doubt in the quality of the software.
+
+[gopass]: https://github.com/justwatchcom/gopass
+[gopass-wot]: https://github.com/justwatchcom/gopass/issues/305
+[gopass-tests]: https://github.com/justwatchcom/gopass/search?q=Increase+test+coverage&type=Commits&utf8=%E2%9C%93
+
 ## Caveats
 
  * Many crypto-operations store decrypted data in a temporary file. These touch
