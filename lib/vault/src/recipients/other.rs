@@ -25,9 +25,9 @@ impl Vault {
         ))?)
     }
 
-    pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
+    pub fn gpg_keys_dir(&self) -> Result<PathBuf, Error> {
         let unknown_path = PathBuf::from("<unknown>");
-        let gpg_keys_dir = self.gpg_keys
+        self.gpg_keys
             .as_ref()
             .map(|p| self.absolute_path(p))
             .ok_or_else(|| {
@@ -38,7 +38,11 @@ impl Vault {
                         .unwrap_or_else(|| &unknown_path)
                         .display()
                 )
-            })?;
+            })
+    }
+
+    pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
+        let gpg_keys_dir = self.gpg_keys_dir()?;
         let mut gpg_ctx = new_context()?;
         let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
 

@@ -1,8 +1,8 @@
 use util::write_at;
 
-use failure::{err_msg, Error, ResultExt};
+use failure::{Fail, err_msg, Error, ResultExt};
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 use vault::{strip_ext, ResetCWD, Vault, GPG_GLOB};
 use glob::glob;
 use mktemp::Temp;
@@ -11,11 +11,12 @@ use util::fingerprint_of;
 use util::new_context;
 use util::{KeylistDisplay, export_key};
 use util::KeyDisplay;
-use itertools::Itertools;
+use std::path::Path;
+use std::path::PathBuf;
 
-fn valid_fingerprint(id: &str) -> Result<&str, String> {
+fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
-        return Err(format!(
+        return Err(format_err!(
             "Fingerprint '{}' must be between 8 and 40 characters long.",
             id
         ));
@@ -28,7 +29,7 @@ fn valid_fingerprint(id: &str) -> Result<&str, String> {
     if has_only_fingerprint_chars {
         Ok(id)
     } else {
-        Err(format!(
+        Err(format_err!(
             "Fingerprint '{}' must only contain characters a-f, A-F and 0-9.",
             id
         ))
@@ -36,20 +37,90 @@ fn valid_fingerprint(id: &str) -> Result<&str, String> {
 }
 
 impl Vault {
-    pub fn add_recipients(&self, gpg_key_ids: &[String], verified: bool, output: &mut Write) -> Result<(), Error> {
-        if !verified {
-            let err = gpg_key_ids
-                .iter()
-                .map(|s| s.as_str())
-                .map(valid_fingerprint)
-                .filter_map(Result::err)
-                .join("\n");
-            if !err.is_empty() {
-                return Err(err_msg(err));
+    fn read_fingerprint_file(&self, fpr: &str, gpg_keys_dir: &Path) -> Result<(PathBuf, Vec<u8>), Error> {
+        let fpr_path = if fpr.len() == 40 {
+            gpg_keys_dir.join(fpr)
+        } else {
+            let _cwd = ResetCWD::new(gpg_keys_dir)?;
+            let glob_pattern = format!("*{}", fpr);
+            let matching_paths: Vec<_> = glob(&glob_pattern)
+                .expect("valid pattern")
+                .filter_map(Result::ok)
+                .collect();
+            match matching_paths.len() {
+                1 => gpg_keys_dir.join(&matching_paths[0]),
+                0 => {
+                    bail!(
+                        "Did not find key file matching glob pattern '{}' in directory '{}'.",
+                        glob_pattern,
+                        gpg_keys_dir.display()
+                    )
+                }
+                l @ _ => {
+                    bail!(
+                        "Found {} matching key files for glob pattern '{}' in directory '{}', but expected just one.",
+                        l,
+                        glob_pattern,
+                        gpg_keys_dir.display()
+                    )
+                }
             }
-            unimplemented!("a key which is not verified")
-        }
+        };
+        let mut buf = Vec::new();
+        File::open(&fpr_path)
+            .context(format!(
+                "Could not open key file '{}' for reading",
+                fpr_path.display()
+            ))
+            .and_then(|mut f| {
+                f.read_to_end(&mut buf).context(format!(
+                    "Could not read key file at '{}'.",
+                    fpr_path.display()
+                ))
+            })?;
+        Ok((fpr_path, buf))
+    }
+
+    pub fn add_recipients(&self, gpg_key_ids: &[String], verified: bool, output: &mut Write) -> Result<(), Error> {
         let mut gpg_ctx = new_context()?;
+        if !verified {
+            let gpg_keys_dir = self.gpg_keys_dir().context(
+                "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured",
+            )?;
+            let _imported_gpg_keys_ids = gpg_key_ids
+                .iter()
+                .map(|s| {
+                    valid_fingerprint(&s)
+                        .and_then(|fpr| self.read_fingerprint_file(&fpr, &gpg_keys_dir))
+                        .and_then(|(fpr_path, kb)| {
+                            gpg_ctx.import(kb).map_err(|e| {
+                                e.context(format!(
+                                    "Could not import key to gpg key database from content of file at '{}'",
+                                    fpr_path.display()
+                                )).into()
+                            })
+                        })
+                })
+                .fold(Ok(Vec::new()), |r, k| match k {
+                    Ok(imports) => {
+                        r.map(|mut v| {
+                            v.extend(imports.imports().filter_map(|i| {
+                                i.fingerprint().map(ToOwned::to_owned).ok()
+                            }));
+                            v
+                        })
+                    }
+                    Err(e) => {
+                        match r {
+                            Ok(_) => Err(e),
+                            r @ Err(_) => r.map_err(|f| format_err!("{}\n{}", e, f)),
+                        }
+                    }
+                })?;
+            unimplemented!(
+                "compared imported keys with supposedly imported keys, and sign them with correct secret key"
+            )
+        }
         let keys = {
             let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
             let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;

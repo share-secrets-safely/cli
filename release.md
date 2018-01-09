@@ -3,6 +3,8 @@
 ### Improvements
 
  * `vault list` now produces precise URLs
+ * `vault recipient add` now signs and re-exports added fingerprints to make
+   recipient verification part of adding them, and help build a *Web of Trust*.
 
 ### Breaking Changes
 
@@ -12,6 +14,7 @@ The breaking change requiring a major version increment is changes to the `sy-va
  * `recipients` and `gpg-keys` paths are no relative to the `sy-vault.yml` file, not relative to the
    `secrets` directory.
  * The '--at/-a' flag of `sy vault` is now `--secrets-dir-dir/-s`
+ * `recipients add` will now require fingerprints unless `--verified` is specified.
 
 These improvements make handling paths consistent and less suprising.
 

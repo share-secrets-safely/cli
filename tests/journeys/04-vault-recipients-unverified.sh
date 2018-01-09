@@ -9,6 +9,7 @@ exe="$root/../../$exe"
 source "$root/../utilities.sh"
 
 WITH_FAILURE=1
+SUCCESSFULLY=0
 
 fixture="$root/fixtures"
 snapshot="$fixture/snapshots"
@@ -39,6 +40,42 @@ snapshot="$fixture/snapshots"
       it "does not alter any files" && {
         expect_snapshot "$snapshot/vault-recipient-add-metadata-right-after-init" ./etc
       }
+    )
+    
+    (when "adding an unknown recipient with a valid fingerprint"
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/vault-recipient-add-valid-fingerprint-key-not-present-in-keys-dir" \
+        expect_run $WITH_FAILURE "$exe" vault recipient add abcabc12
+      }
+      
+      it "does not alter any files" && {
+        expect_snapshot "$snapshot/vault-recipient-add-metadata-right-after-init" ./etc
+      }
+    )
+    
+    echo "WIP..."
+    exit 0
+    (with "an untrusted user requesting membership"
+      (as_user "$fixture/b.sec.asc"
+        "$exe" vault recipient init
+      ) > /dev/null
+      
+      (when "adding them as recipient via fingerprint"
+        it "succeeds" && {
+          WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
+          expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
+        }
+        
+        it "re-exports the public key to contain the signature" && {
+          WITH_SNAPSHOT="$snapshot/vault-recipient-add-diff-gpg-list-packets-signed-key" \
+          expect_run $WITH_FAILURE diff <(gpg --list-packets "$fixture/b.pub.asc") \
+                                        <(gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28)
+        }
+        
+        it "creates the expected meta-data structure" && {
+          expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc
+        }
+      )
     )
   )
 )
