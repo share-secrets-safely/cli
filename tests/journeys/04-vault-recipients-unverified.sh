@@ -20,18 +20,24 @@ snapshot="$fixture/snapshots"
       echo -n secret | "$exe" vault add :secret
     } &>/dev/null
     
-    it "won't allow to add an unverified user" && {
-      WITH_SNAPSHOT="$snapshot/vault-recipient-add-unverified-invalid-fingerprint" \
-      expect_run $WITH_FAILURE $exe vault recipient add something-that-is-not-a-fingerprint \
-          also-invalid \
-          abc \
-          abc1f7d1 \
-          2CF6E0B51AAF73F09B1C21174D1DA68C88710E60ffffffff \
-          2CF6E0B51AAF73F09B1C21174D1DA68C88710E60 \
-          1AAF73F09B1C21174D1DA68C88710E60 \
-          9B1C21174D1DA68C88710E60 \
-          4D1DA68C88710E60 \
-          88710E60
-    }
+    (with "some invalid fingerprints and a few valid ones"
+      it "won't make any change" && {
+        WITH_SNAPSHOT="$snapshot/vault-recipient-add-unverified-invalid-fingerprint" \
+        expect_run $WITH_FAILURE $exe vault recipient add something-that-is-not-a-fingerprint \
+            also-invalid \
+            abc \
+            abc1f7d1 \
+            2CF6E0B51AAF73F09B1C21174D1DA68C88710E60ffffffff \
+            2CF6E0B51AAF73F09B1C21174D1DA68C88710E60 \
+            1AAF73F09B1C21174D1DA68C88710E60 \
+            9B1C21174D1DA68C88710E60 \
+            4D1DA68C88710E60 \
+            88710E60
+      }
+
+      it "does not alter any files" && {
+        expect_snapshot "$snapshot/vault-recipient-add-metadata-right-after-init" ./etc
+      }
+    )
   )
 )
