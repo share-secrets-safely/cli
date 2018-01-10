@@ -13,6 +13,7 @@ use util::{KeylistDisplay, export_key};
 use util::KeyDisplay;
 use std::path::Path;
 use std::path::PathBuf;
+use gpgme;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
@@ -37,6 +38,18 @@ fn valid_fingerprint(id: &str) -> Result<&str, Error> {
 }
 
 impl Vault {
+    fn find_signing_key(&self, ctx: &mut gpgme::Context) -> Result<gpgme::Key, Error> {
+        // TODO: find the secret keys which is actually used in our vault, and assure it's just one, too
+        let no_filter = Vec::<String>::new();
+        ctx.find_secret_keys(no_filter)?
+            .filter_map(Result::ok)
+            .filter(|k| k.can_sign())
+            .next()
+            .ok_or_else(|| {
+                err_msg("Didn't find a single secret key suitable to sign keys.")
+            })
+    }
+
     fn read_fingerprint_file(&self, fpr: &str, gpg_keys_dir: &Path) -> Result<(PathBuf, Vec<u8>), Error> {
         let fpr_path = if fpr.len() == 40 {
             gpg_keys_dir.join(fpr)
@@ -87,7 +100,7 @@ impl Vault {
             let gpg_keys_dir = self.gpg_keys_dir().context(
                 "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured",
             )?;
-            let _imported_gpg_keys_ids = gpg_key_ids
+            let imported_gpg_keys_ids = gpg_key_ids
                 .iter()
                 .map(|s| {
                     valid_fingerprint(&s)
@@ -117,9 +130,31 @@ impl Vault {
                         }
                     }
                 })?;
-            unimplemented!(
-                "compared imported keys with supposedly imported keys, and sign them with correct secret key"
-            )
+            if imported_gpg_keys_ids.len() < gpg_key_ids.len() {
+                panic!(
+                    "You should come and take a look at this! It should not be possible \
+                        to successfully import less keys than specified."
+                )
+            }
+
+            {
+                let mut extra_keys = imported_gpg_keys_ids.clone();
+                extra_keys.retain(|k| !gpg_key_ids.iter().any(|ok| k.ends_with(ok)));
+                if !extra_keys.is_empty() {
+                    return Err(format_err!(
+                        "One of the imported key-files contained more than one recipient.\n\
+                This might mean somebody trying to sneak in their key. The offending fingerprints are listed below\n\
+                {}",
+                        extra_keys.join("\n")
+                    ));
+                }
+            }
+
+            let signing_key = self.find_signing_key(&mut gpg_ctx)?;
+            for key_fpr_to_sign in imported_gpg_keys_ids {
+                gpg_ctx.sign_key(&signing_key, Some(key_fpr_to_sign), None)?
+            }
+            unimplemented!("better contexts; re-export recently signed keys")
         }
         let keys = {
             let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;

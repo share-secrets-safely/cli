@@ -1,0 +1,5 @@
+---
+name: ~
+secrets: "."
+gpg_keys: "./keys"
+recipients: ".gpg-id"

@@ -13,6 +13,28 @@ SUCCESSFULLY=0
 
 fixture="$root/fixtures"
 snapshot="$fixture/snapshots"
+
+(sandboxed
+  title "vault recipients add unverified - multi-recipient-key"
+  (with "a key file containing multiple recipients"
+    { import_user "$fixture/tester.sec.asc"
+      "$exe" vault init --gpg-keys-dir ./keys 
+      cat $fixture/b.pub.asc $fixture/c.pub.asc > ./keys/7435ACDC03D55429C41637C4DB9831D842C18D28
+    } >/dev/null
+    
+    (when "adding only one recipient from that file"
+      it "fails as only one of the keys was specified" && {
+        WITH_SNAPSHOT="$snapshot/vault-recipients-add-unverified-failure-with-multi-recipient-keyfile" \
+        expect_run $WITH_FAILURE "$exe" vault recipients add 42C18D28
+      }
+      
+      it "does not alter the vault at all" && {
+        expect_snapshot "$snapshot/vault-recipient-add-unverified-unchanged-state" .
+      }
+    )
+  )
+)
+
 (sandboxed 
   title "'vault recipient add unverified'"
   (with "a vault initialized for a single recipient and an existing secret"
@@ -53,14 +75,14 @@ snapshot="$fixture/snapshots"
       }
     )
     
-    echo "WIP..."
-    exit 0
     (with "an untrusted user requesting membership"
       (as_user "$fixture/b.sec.asc"
         "$exe" vault recipient init
       ) > /dev/null
       
       (when "adding them as recipient via fingerprint"
+        echo "WIP"
+        exit 0
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
           expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
