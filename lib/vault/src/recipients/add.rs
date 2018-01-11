@@ -1,5 +1,3 @@
-use util::write_at;
-
 use failure::{Fail, err_msg, Error, ResultExt};
 use std::fs::File;
 use std::io::{Read, Write};
@@ -7,10 +5,7 @@ use vault::{strip_ext, ResetCWD, Vault, GPG_GLOB};
 use glob::glob;
 use mktemp::Temp;
 use error::EncryptionError;
-use util::fingerprint_of;
-use util::new_context;
-use util::{KeylistDisplay, export_key};
-use util::KeyDisplay;
+use util::{write_at, fingerprint_of, new_context, UserIdFingerprint, KeyDisplay, KeylistDisplay, export_key};
 use std::path::Path;
 use std::path::PathBuf;
 use gpgme;
@@ -39,11 +34,43 @@ fn valid_fingerprint(id: &str) -> Result<&str, Error> {
 
 impl Vault {
     fn find_signing_key(&self, ctx: &mut gpgme::Context) -> Result<gpgme::Key, Error> {
-        // TODO: find the secret keys which is actually used in our vault, and assure it's just one, too
+        let recipients_fprs = self.recipients_list().context(
+            "A recipients list is needed assure the signing key is in the recipients list.",
+        )?;
+        if recipients_fprs.is_empty() {
+            return Err(err_msg(
+                "The recipients list is empty, but you are expected to be on that list.",
+            ));
+        }
         let no_filter = Vec::<String>::new();
-        ctx.find_secret_keys(no_filter)?
+//        for k in ctx.find_keys(&no_filter)?.filter_map(Result::ok) {
+//            println!("{}", UserIdFingerprint(&k));
+//            println!("can sign: {}", k.can_sign());
+//            println!("can encrypt: {}", k.can_encrypt());
+//            println!("is invalid: {}", k.is_invalid());
+//            for sk in k.subkeys() {
+//                println!(
+//                    "subkey {} can sign: {}, can encrypt: {}, is invalid: {}",
+//                    sk.fingerprint().unwrap(),
+//                    sk.can_sign(),
+//                    sk.can_encrypt(),
+//                    sk.is_invalid(),
+//                );
+//            }
+//        }
+
+        ctx.find_keys(&no_filter)?
             .filter_map(Result::ok)
-            .filter(|k| k.can_sign())
+            .filter(|k| k.can_sign() || k.subkeys().any(|sk| sk.can_sign()))
+            .filter_map(|k| fingerprint_of(&k).map(|fpr| (k, fpr)).ok())
+            .filter_map(|(k, fpr)| if recipients_fprs.iter().any(
+                |rfpr| rfpr == &fpr,
+            )
+            {
+                Some(k)
+            } else {
+                None
+            })
             .next()
             .ok_or_else(|| {
                 err_msg("Didn't find a single secret key suitable to sign keys.")
@@ -150,11 +177,19 @@ impl Vault {
                 }
             }
 
-            let signing_key = self.find_signing_key(&mut gpg_ctx)?;
+            let signing_key = self.find_signing_key(&mut gpg_ctx).context(
+                "Did not manage to find suitable signing key \
+            for re-exporting the recipient keys.",
+            )?;
             for key_fpr_to_sign in imported_gpg_keys_ids {
-                gpg_ctx.sign_key(&signing_key, Some(key_fpr_to_sign), None)?
+                gpg_ctx
+                    .sign_key(&signing_key, Some(&key_fpr_to_sign), None)
+                    .context(format_err!(
+                        "Could not sign key of recipient {} with signing key {}",
+                        key_fpr_to_sign,
+                        UserIdFingerprint(&signing_key)
+                    ))?;
             }
-            unimplemented!("better contexts; re-export recently signed keys")
         }
         let keys = {
             let mut keys_iter = gpg_ctx.find_keys(gpg_key_ids)?;
