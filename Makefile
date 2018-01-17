@@ -31,10 +31,10 @@ help:
 always:
 
 $(EXE): always
-	cargo build --all-features
+	cargo build
 
 $(RELEASE_EXE): always
-	cargo build --all-features --release
+	cargo build --release
 	
 $(MUSL_EXE): build-linux-musl
 	
@@ -60,7 +60,7 @@ stateful-journey-tests: $(MUSL_EXE)
 stateless-journey-tests: $(EXE)
 	tests/stateless-journey-test.sh $<
 
-journey-tests: stateless-journey-tests stateful-journey-tests
+journey-tests: stateful-journey-tests stateless-journey-tests
 
 build-libc-image:
 	docker build -t $(MY_LIBC_IMAGE) - < etc/docker/Dockerfile.rust
