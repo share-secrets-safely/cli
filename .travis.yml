@@ -37,11 +37,12 @@ script:
     set -ex
     if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then 
         make lint-scripts
-        make journey-tests
+        make stateful-journey-tests
         if [ -n "$TRAVIS_TAG" ]; then
           make deployable-linux
         fi
     else
+        make stateless-journey-tests
         if [ -n "$TRAVIS_TAG" ]; then
           make deployable-host
         fi
