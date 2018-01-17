@@ -43,26 +43,26 @@ impl Vault {
             ));
         }
         let no_filter = Vec::<String>::new();
-//        for k in ctx.find_keys(&no_filter)?.filter_map(Result::ok) {
-//            println!("{}", UserIdFingerprint(&k));
-//            println!("has secret: {}", k.has_secret());
-//            println!("has primary: {}", k.primary_key().is_some());
-//            if let Some(pk) = k.primary_key() {
-//                println!("pk: can sign: {}", pk.can_sign());
-//            }
-//            println!("can sign: {}", k.can_sign());
-//            println!("can encrypt: {}", k.can_encrypt());
-//            println!("is invalid: {}", k.is_invalid());
-//            for sk in k.subkeys() {
-//                println!(
-//                    "subkey {} can sign: {}, can encrypt: {}, is invalid: {}",
-//                    sk.fingerprint().unwrap(),
-//                    sk.can_sign(),
-//                    sk.can_encrypt(),
-//                    sk.is_invalid(),
-//                );
-//            }
-//        }
+        //        for k in ctx.find_keys(&no_filter)?.filter_map(Result::ok) {
+        //            println!("{}", UserIdFingerprint(&k));
+        //            println!("has secret: {}", k.has_secret());
+        //            println!("has primary: {}", k.primary_key().is_some());
+        //            if let Some(pk) = k.primary_key() {
+        //                println!("pk: can sign: {}", pk.can_sign());
+        //            }
+        //            println!("can sign: {}", k.can_sign());
+        //            println!("can encrypt: {}", k.can_encrypt());
+        //            println!("is invalid: {}", k.is_invalid());
+        //            for sk in k.subkeys() {
+        //                println!(
+        //                    "subkey {} can sign: {}, can encrypt: {}, is invalid: {}",
+        //                    sk.fingerprint().unwrap(),
+        //                    sk.can_sign(),
+        //                    sk.can_encrypt(),
+        //                    sk.is_invalid(),
+        //                );
+        //            }
+        //        }
 
         ctx.find_secret_keys(&no_filter)?
             .filter_map(Result::ok)
@@ -191,7 +191,7 @@ impl Vault {
             for key_fpr_to_sign in imported_gpg_keys_ids {
                 let key_to_sign = gpg_ctx.find_key(&key_fpr_to_sign)?;
                 gpg_ctx
-                    .sign_key(&key_to_sign, key_to_sign.user_ids().filter_map(|u| u.name_raw()).map(|n|n.to_bytes()), None)
+                    .sign_key(&key_to_sign, None::<&[u8]>, None)
                     .context(format_err!(
                         "Could not sign key of recipient {} with signing key {}",
                         key_fpr_to_sign,

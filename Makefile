@@ -78,7 +78,7 @@ build-linux-libc: build-libc-image
 	docker run $(CARGO_CACHE_ARGS) -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE) cargo build --target=x86_64-unknown-linux-gnu
 	
 interactive-linux-musl: build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE)
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" -it $(MY_MUSL_IMAGE)
 
 interactive-linux-libc: build-libc-image
 	docker run $(CARGO_CACHE_ARGS) -v "$$PWD:/volume" -w '/volume' --rm -it $(MY_LIBC_IMAGE)

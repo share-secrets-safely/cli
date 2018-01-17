@@ -81,8 +81,6 @@ snapshot="$fixture/snapshots"
       ) > /dev/null
       
       (when "adding them as recipient via fingerprint"
-        echo "WIP"
-        exit 0
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
           expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
