@@ -133,6 +133,11 @@ impl Vault {
             let gpg_keys_dir = self.gpg_keys_dir().context(
                 "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured",
             )?;
+            if !gpg_ctx.engine_info().check_version("2.1.12") {
+                return Err(err_msg(
+                    "Cannot use this functionality unless gpgme engine 2.1.12 or newer is used.",
+                ));
+            }
             let imported_gpg_keys_ids = gpg_key_ids
                 .iter()
                 .map(|s| {
