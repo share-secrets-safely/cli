@@ -4,7 +4,8 @@ WHITE="$(tput setaf 9)"
 YELLOW="$(tput setaf 3)"
 GREEN="$(tput setaf 2)"
 RED="$(tput setaf 1)"
-CONTEXT=( )
+OFFSET=( )
+STEP="  "
 
 function title () {
   echo "$WHITE-----------------------------------------------------"
@@ -49,23 +50,25 @@ function sandboxed () {
 }
 
 function with () {
-    CONTEXT+=("[with] $*")
+  echo 1>&2 "${YELLOW}${OFFSET[*]}[with] $*"
+  OFFSET+=("$STEP")
 }
 
 function when () {
-    CONTEXT+=("[when] $*")
+  echo 1>&2 "${YELLOW}${OFFSET[*]}[when] $*"
+  OFFSET+=("$STEP")
 }
 
 function it () {
-  echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${GREEN} [it] ${*//  /}"
+  echo 1>&2 -n "${OFFSET[*]}${GREEN}[it] ${*//  /}"
 }
 
 function precondition () {
-  echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${WHITE} [precondition] ${*//  /}"
+  echo 1>&2 -n "${OFFSET[*]}${GREEN}[precondition] ${*//  /}"
 }
 
 function shortcoming () {
-  echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${RED} [shortcoming] ${*//  /}"
+  echo 1>&2 -n "${OFFSET[*]}${STEP}${GREEN}[shortcoming] ${*//  /}"
 }
 
 function fail () {
@@ -109,18 +112,18 @@ function expect_run () {
         echo -n "$output" > "$expected" || exit 1
       fi
       if ! diff "$expected" <(echo -n "$output"); then
-        echo 1>&2 "$RED" " - FAIL"
-        echo 1>&2 "${WHITE}\$" "$@"
+        echo 1>&2 "${RED} - FAIL"
+        echo 1>&2 "${WHITE}\$$*"
         echo 1>&2 "Output snapshot did not match snapshot at '$expected'"
         echo 1>&2 "$output"
         exit 1
       fi
     fi
-    echo 1>&2 "$GREEN" " - OK"
+    echo 1>&2 "${GREEN} - OK"
   else
-    echo 1>&2 "$RED" " - FAIL"
-    echo 1>&2 "${WHITE}\$" "$@"
-    echo 1>&2 "$RED" "Expected actual status $actual_exit_code to be $expected_exit_code"
+    echo 1>&2 "${RED} - FAIL"
+    echo 1>&2 "${WHITE}\$$*"
+    echo 1>&2 "${RED}Expected actual status $actual_exit_code to be $expected_exit_code"
     echo 1>&2 "$output"
     exit 1
   fi

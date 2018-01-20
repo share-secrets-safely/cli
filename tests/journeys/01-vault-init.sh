@@ -134,26 +134,26 @@ EDITOR
       it "creates an the newly edited encrypted file" && {
         expect_exists "$vault_dir/new-resource.gpg"
       }
-    )
-    ( cd "$vault_dir/.."
-      echo 'content' > content
-      cd "$vault_dir"
-      
-      it "does not add resources which walk to the parent directory" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-failure" \
-        expect_run $WITH_FAILURE "$exe" \
-          vault -c vault.yml add ../content
-      }
-      
-      it "does add resource which walk to the parent directory if destination is specified" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-success" \
-        expect_run $SUCCESSFULLY "$exe" \
-          vault -c vault.yml add ../content:content
-      }
-      
-      it "creates an the encrypted file" && {
-        expect_exists content.gpg
-      }
+      ( cd "$vault_dir/.."
+        echo 'content' > content
+        cd "$vault_dir"
+        
+        it "does not add resources which walk to the parent directory" && {
+          WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-failure" \
+          expect_run $WITH_FAILURE "$exe" \
+            vault -c vault.yml add ../content
+        }
+        
+        it "does add resource which walk to the parent directory if destination is specified" && {
+          WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-success" \
+          expect_run $SUCCESSFULLY "$exe" \
+            vault -c vault.yml add ../content:content
+        }
+        
+        it "creates an the encrypted file" && {
+          expect_exists content.gpg
+        }
+      )
     )
   )
 )
