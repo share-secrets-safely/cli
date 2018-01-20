@@ -16,7 +16,7 @@ function title () {
 function _context () {
   local name="${1:?}"
   shift
-  echo 1>&2 "${YELLOW}${OFFSET[*]}[$name] $*"
+  echo 1>&2 "${YELLOW}${OFFSET[*]:-}[$name] $*"
   OFFSET+=("$STEP")
 }
 
@@ -32,7 +32,7 @@ function _note () {
   local name="${1:?}"
   local color="${2:?}"
   shift 2
-  echo 1>&2 -n "${OFFSET[*]}${color}[$name] ${*//  /}"
+  echo 1>&2 -n "${OFFSET[*]:-}${color}[$name] ${*//  /}"
 }
 
 function it () {

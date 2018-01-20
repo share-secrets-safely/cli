@@ -4,8 +4,8 @@ set -eu -o pipefail
 exe=${1:?First argument is the executable under test}
 
 root="$(cd "${0%/*}" && pwd)"
-# shellcheck source=./tests/utilities.sh
-source "$root/utilities.sh"
+# shellcheck source=./tests/gpg-helpers.sh
+source "$root/gpg-helpers.sh"
 
 WITH_FAILURE=1
 SUCCESSFULLY=0

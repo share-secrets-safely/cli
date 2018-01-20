@@ -222,7 +222,6 @@ gpg error remains unexplained**.
  * [ ] try encrypting on edit (before the edit) to fail fast
    * [ ] suggest to import keys or do it for the user
    * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
-   * [ ] possibly allow the user (locally sign) recipients
    * [ ] possibly allow to disable ownertrust using 'always-trust'
  * [x] list recipients which are unusable when re-encryption fails (lack of trust)
  * [x] list recipients which are not available in the gpg key database.
