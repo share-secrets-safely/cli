@@ -1,0 +1,26 @@
+--- /dev/fd/63
++++ /dev/fd/62
+@@ -28,13 +28,21 @@
+ 	hashed subpkt 2 len 4 (sig created 2017-12-24)
+ 	subpkt 16 len 8 (issuer key ID EF17047AB488BD82)
+ 	data: [1023 bits]
+-# off=556 ctb=b8 tag=14 hlen=2 plen=141
++# off=556 ctb=88 tag=2 hlen=2 plen=179
++:signature packet: algo 1, keyid AA5B7BF150F48332
++	version 4, created 1516380691, md5len 0, sigclass 0x10
++	digest algo 8, begin of digest e6 fe
++	hashed subpkt 33 len 21 (issuer fpr v4 D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
++	hashed subpkt 2 len 4 (sig created 2018-01-19)
++	subpkt 16 len 8 (issuer key ID AA5B7BF150F48332)
++	data: [1024 bits]
++# off=737 ctb=b8 tag=14 hlen=2 plen=141
+ :public sub key packet:
+ 	version 4, algo 1, created 1514109490, expires 0
+ 	pkey[0]: [1024 bits]
+ 	pkey[1]: [17 bits]
+ 	keyid: D24E6A9808B4938A
+-# off=699 ctb=88 tag=2 hlen=2 plen=182
++# off=880 ctb=88 tag=2 hlen=2 plen=182
+ :signature packet: algo 1, keyid DB9831D842C18D28
+ 	version 4, created 1514109490, md5len 0, sigclass 0x18
+ 	digest algo 8, begin of digest 24 d9

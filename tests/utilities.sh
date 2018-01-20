@@ -22,7 +22,7 @@ function trust_key () {
 function import_user () {
   local key=${1:?First argument must be the keyfile identifying the user}
   
-  gpg --import "$key" &>/dev/null
+  gpg --import --yes --batch "$key" &>/dev/null
   
   local fpr
   fpr="$(gpg --list-secret-keys --with-colons --with-fingerprint | grep fpr | head -1)"

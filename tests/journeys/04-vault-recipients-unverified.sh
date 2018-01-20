@@ -81,11 +81,16 @@ snapshot="$fixture/snapshots"
       ) > /dev/null
       
       (when "adding them as recipient via fingerprint"
-        echo "WIP"
-        exit 0
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
           expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
+        }
+        
+        echo WIP
+        exit 0
+        
+        it "creates the expected meta-data structure" && {
+          expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc
         }
         
         it "re-exports the public key to contain the signature" && {
@@ -94,9 +99,6 @@ snapshot="$fixture/snapshots"
                                         <(gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28)
         }
         
-        it "creates the expected meta-data structure" && {
-          expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc
-        }
       )
     )
   )

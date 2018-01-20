@@ -6,6 +6,7 @@ LIBC_EXE=target/x86_64-unknown-linux-gnu/debug/sy
 MUSL_IMAGE=clux/muslrust:stable
 MY_LIBC_IMAGE=sheesy_libc:stable
 MY_MUSL_IMAGE=sheesy_musl:stable
+MY_LINUX_RUN_IMAGE=alpine_with_gpg2:stable
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 
 help:
@@ -54,13 +55,16 @@ $(LIBC_EXE): build-linux-libc
 tag-release: bin/tag-release.sh release.md VERSION
 	bin/tag-release.sh $$(cat VERSION) release.md
 
-stateful-journey-tests: $(MUSL_EXE)
-	tests/stateful-journey-test.sh $< $(MY_MUSL_IMAGE)
+stateful-journey-tests: $(MUSL_EXE) build-linux-run-image
+	tests/stateful-journey-test.sh $< $(MY_LINUX_RUN_IMAGE)
 
 stateless-journey-tests: $(EXE)
 	tests/stateless-journey-test.sh $<
 
 journey-tests: stateful-journey-tests stateless-journey-tests
+
+build-linux-run-image:
+	docker build -t $(MY_LINUX_RUN_IMAGE) - < etc/docker/Dockerfile.alpine-gpg2
 
 build-libc-image:
 	docker build -t $(MY_LIBC_IMAGE) - < etc/docker/Dockerfile.rust

@@ -1,0 +1,3 @@
+error: Could not sign key of recipient 7435ACDC03D55429C41637C4DB9831D842C18D28 with signing key Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
+Caused by: 
+ 1: Not supported (gpg error 60)

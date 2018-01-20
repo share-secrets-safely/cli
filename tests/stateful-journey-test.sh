@@ -25,7 +25,7 @@ while read -r journey; do
 
     docker_args=( docker run -v "$absolute_root/.docker-cargo-cache:/usr/local/cargo/registry" -v "$absolute_root:/volume" -w '/volume' --rm -t "$journey_image" "$journey" "$exe" )
     in_red "Running '${docker_args[*]}'"
-    eval "${docker_args[@]}"
+    eval "${docker_args[@]}" || exit $?
 done
 
 
