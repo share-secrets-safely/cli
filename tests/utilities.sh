@@ -60,6 +60,10 @@ function it () {
   echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${GREEN} [it] ${*//  /}"
 }
 
+function precondition () {
+  echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${WHITE} [precondition] ${*//  /}"
+}
+
 function fail () {
   echo 1>&2 "$RED" "$@"
   exit 1
@@ -71,6 +75,10 @@ function expect_equals () {
 
 function expect_exists () {
   expect_run 0 test -e "${1:?}"
+}
+
+function expect_run_sh () {
+  expect_run ${1:?} bash -c "${2:?}"
 }
 
 function expect_snapshot () {

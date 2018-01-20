@@ -77,6 +77,9 @@ snapshot="$fixture/snapshots"
     
     (with "an untrusted user requesting membership"
       (as_user "$fixture/b.sec.asc"
+        precondition "b@example.com did not have the signature yet" && {
+          expect_run_sh $WITH_FAILURE "gpg --list-packets "$fixture/b.pub.asc" | grep -q 'issuer key ID AA5B7BF150F48332'"
+        }
         "$exe" vault recipient init
       ) > /dev/null
       
@@ -86,21 +89,13 @@ snapshot="$fixture/snapshots"
           expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
         }
         
-        echo WIP
-        exit 0
-        gpg --list-packets "$fixture/b.pub.asc"
-        gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28
-        
-        it "creates the expected meta-data structure" && {
-          expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc
+        it "signs the new recipient with prime members key and exports the key" && {
+          expect_run_sh $SUCCESSFULLY "gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28 | grep -q 'issuer key ID AA5B7BF150F48332'"
         }
         
-        it "re-exports the public key to contain the signature" && {
-          WITH_SNAPSHOT="$snapshot/vault-recipient-add-diff-gpg-list-packets-signed-key" \
-          expect_run $WITH_FAILURE diff <(gpg --list-packets "$fixture/b.pub.asc") \
-                                        <(gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28)
+        it "adds the new recipients to the recipients file" && {
+          expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc/recipients
         }
-        
       )
     )
   )
