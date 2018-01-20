@@ -197,6 +197,12 @@ impl Vault {
                         key_fpr_to_sign,
                         UserIdFingerprint(&signing_key)
                     ))?;
+                writeln!(
+                    output,
+                    "Signed recipients key '{}' with signing key '{}'",
+                    UserIdFingerprint(&key_to_sign),
+                    UserIdFingerprint(&signing_key)
+                ).ok();
             }
         }
         let keys = {

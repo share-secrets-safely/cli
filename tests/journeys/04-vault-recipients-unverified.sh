@@ -77,7 +77,7 @@ snapshot="$fixture/snapshots"
     
     (with "an untrusted user requesting membership"
       (as_user "$fixture/b.sec.asc"
-        precondition "b@example.com did not have the signature yet" && {
+        precondition "b@example.com did not have the prime members signature yet" && {
           expect_run_sh $WITH_FAILURE "gpg --list-packets "$fixture/b.pub.asc" | grep -q 'issuer key ID AA5B7BF150F48332'"
         }
         "$exe" vault recipient init
