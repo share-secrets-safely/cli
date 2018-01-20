@@ -10,6 +10,7 @@ use std::str::FromStr;
 use std::convert::Into;
 use std::ffi::OsStr;
 use cli::CLI;
+use sheesy_types::SigningMode;
 
 fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
@@ -69,7 +70,12 @@ pub fn vault_recipients_init(ctx: VaultContext, args: &ArgMatches) -> Result<Vau
 pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsAdd {
-            verified: args.is_present("verified"),
+            sign: if args.is_present("verified") {
+                SigningMode::None
+            } else {
+                SigningMode::Public
+            },
+            signing_key_id: args.value_of("signing-key").map(ToOwned::to_owned),
             gpg_key_ids: args.values_of("gpg-key-id")
                 .expect("Clap to assure this is a required arg")
                 .map(Into::into)

@@ -148,6 +148,18 @@ where
         let add_recipient = App::new("add")
             .alias("insert")
             .arg(
+                Arg::with_name("signing-key")
+                    .long("signing-key")
+                    .takes_value(true)
+                    .required(false)
+                    .conflicts_with("verified")
+                    .help(
+                        "The userid or fingerprint of the key to use for signing not-yet-verified keys. \
+                           It must only be specified if you have access to multiple secret keys which are \
+                           also current recipients.",
+                    ),
+            )
+            .arg(
                 Arg::with_name("verified")
                     .long("verified")
                     .required(false)
@@ -165,9 +177,11 @@ where
                 If the '--verified' flag is unset, you will have to specify the fingerprint directly \
                 (as opposed to allowing the recipients email address or name) to indicate you have \
                 assured yourself that it actually belongs to the person.\
-                The respective key will then be imported for you, signed and re-exported to store \
-                you have verified the recipients, and to allow other to use the 'Web of Trust' \
-                for convenient encryption.",
+                Otherwise the respective key as identified by its fingerprint will then be imported \
+                and signed. It is expected that you have assured the keys fingerprint belongs to the \
+                recipient. Keys will always be exported into the vaults key directory (if set), which \
+                includes signatures.\
+                Signatures allow others to use the 'Web of Trust' for convenient encryption.",
             );
         let list_recipient = App::new("list").alias("ls").about(
             "List the vaults recipients as identified by the recipients file.",

@@ -1,3 +1,5 @@
+extern crate sheesy_types;
+
 use failure::{Fail, err_msg, Error, ResultExt};
 use std::fs::File;
 use std::io::{Read, Write};
@@ -9,6 +11,8 @@ use util::{write_at, fingerprint_of, new_context, UserIdFingerprint, KeyDisplay,
 use std::path::Path;
 use std::path::PathBuf;
 use gpgme::{self, Key};
+use sheesy_types::SigningMode;
+use itertools::Itertools;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
@@ -33,7 +37,7 @@ fn valid_fingerprint(id: &str) -> Result<&str, Error> {
 }
 
 impl Vault {
-    fn find_signing_key(&self, ctx: &mut gpgme::Context) -> Result<Key, Error> {
+    fn find_signing_key(&self, ctx: &mut gpgme::Context, signing_key_id: Option<&str>) -> Result<Key, Error> {
         let recipients_fprs = self.recipients_list().context(
             "A recipients list is needed assure the signing key is in the recipients list.",
         )?;
@@ -47,14 +51,38 @@ impl Vault {
         } else {
             None
         };
-        ctx.find_secret_keys(None::<String>)?
+        let signing_key_fpr = match signing_key_id {
+            Some(id) => Some(ctx.find_key(id)
+                .map_err(Into::into)
+                .and_then(|k| fingerprint_of(&k))
+                .context(format!(
+                    "The given signing key named '{}' could not be found in the keychain.",
+                    id
+                ))?),
+            None => None,
+        };
+        let only_matching_signing_key = |(k, fpr)| match signing_key_fpr.as_ref() {
+            Some(sk_fpr) => if &fpr == sk_fpr { Some((k, fpr)) } else { None },
+            None => Some((k, fpr)),
+        };
+        let mut signing_keys: Vec<_> = ctx.find_secret_keys(None::<String>)?
             .filter_map(Result::ok)
             .filter_map(|k| fingerprint_of(&k).map(|fpr| (k, fpr)).ok())
+            .filter_map(only_matching_signing_key)
             .filter_map(key_is_in_recipients_list)
-            .next()
-            .ok_or_else(|| {
-                err_msg("Didn't find a single secret key suitable to sign keys.")
-            })
+            .collect();
+        match signing_keys.len() {
+            0 => Err(err_msg(
+                "Didn't find a single secret key suitable to sign keys.",
+            )),
+            1 => Ok(signing_keys.pop().expect("one entry")),
+            _ => Err(format_err!("Multiple keys are suitable for signing, which is ambiguous.\n{}",
+                signing_keys
+                    .iter()
+                    .map(|sk| format!("{}", UserIdFingerprint(sk)))
+                    .join("\n"),
+            )),
+        }
     }
 
     fn read_fingerprint_file(&self, fpr: &str, gpg_keys_dir: &Path) -> Result<(PathBuf, Vec<u8>), Error> {
@@ -101,9 +129,15 @@ impl Vault {
         Ok((fpr_path, buf))
     }
 
-    pub fn add_recipients(&self, gpg_key_ids: &[String], verified: bool, output: &mut Write) -> Result<(), Error> {
+    pub fn add_recipients(
+        &self,
+        gpg_key_ids: &[String],
+        sign: SigningMode,
+        signing_key_id: Option<&str>,
+        output: &mut Write,
+    ) -> Result<(), Error> {
         let mut gpg_ctx = new_context()?;
-        if !verified {
+        if let SigningMode::Public = sign {
             let gpg_keys_dir = self.gpg_keys_dir().context(
                 "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured",
             )?;
@@ -163,10 +197,11 @@ impl Vault {
                 }
             }
 
-            let signing_key = self.find_signing_key(&mut gpg_ctx).context(
-                "Did not manage to find suitable signing key \
+            let signing_key = self.find_signing_key(&mut gpg_ctx, signing_key_id)
+                .context(
+                    "Did not manage to find suitable signing key \
             for re-exporting the recipient keys.",
-            )?;
+                )?;
             gpg_ctx.add_signer(&signing_key)?;
             for key_fpr_to_sign in imported_gpg_keys_ids {
                 let key_to_sign = gpg_ctx.find_key(&key_fpr_to_sign)?;

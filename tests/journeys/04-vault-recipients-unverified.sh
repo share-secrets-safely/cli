@@ -131,10 +131,24 @@ snapshot="$fixture/snapshots"
       )
       
       (when "adding the new recipient again"
-        it "succeeds as it takes the first viable signing key" && {
-          WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint" \
-          expect_run $SUCCESSFULLY "$exe" vault recipient add EF17047AB488BD82
-        } && shortcoming "it should be possible to select the signing key in case of ambiguity"
+        (when "not specifying the signing key"
+          it "fails the signing key can not be determined unambiguously" && {
+            WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint-ambiguously" \
+            expect_run $WITH_FAILURE "$exe" vault recipient add EF17047AB488BD82
+          }
+        )
+        (when "specifying an invalid signing key"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint-invalid-signing-key" \
+            expect_run $WITH_FAILURE "$exe" vault recipient add --signing-key foo@example.com EF17047AB488BD82
+          }
+        )
+        (when "specifying the correct signing key"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint-valid-signing-key" \
+            expect_run $SUCCESSFULLY "$exe" vault recipient add --signing-key tester@example.com EF17047AB488BD82
+          }
+        )
       )
     )
   )

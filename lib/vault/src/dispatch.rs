@@ -18,11 +18,13 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     match ctx.command {
         VaultCommand::RecipientsAdd {
             ref gpg_key_ids,
-            verified,
+            ref sign,
+            ref signing_key_id,
         } => {
             vault_from(&ctx)?.add_recipients(
                 gpg_key_ids,
-                verified,
+                *sign,
+                signing_key_id.as_ref().map(String::as_str),
                 output,
             )
         }

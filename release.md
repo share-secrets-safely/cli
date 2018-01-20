@@ -5,6 +5,8 @@
  * `vault list` now produces precise URLs
  * `vault recipient add` now signs and re-exports added fingerprints to make
    recipient verification part of adding them, and help build a *Web of Trust*.
+ * `vault recipient add --verified` allows to add any recipient by name, but requires
+    you to assure you are able to encrypt for that recipient.
 
 ### Breaking Changes
 

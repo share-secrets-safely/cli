@@ -46,7 +46,8 @@ pub enum VaultCommand {
     RecipientsInit { gpg_key_ids: Vec<String> },
     RecipientsAdd {
         gpg_key_ids: Vec<String>,
-        verified: bool,
+        signing_key_id: Option<String>,
+        sign: SigningMode,
     },
     List,
 }
@@ -61,6 +62,12 @@ pub enum Destination {
 pub enum WriteMode {
     AllowOverwrite,
     RefuseOverwrite,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum SigningMode {
+    None,
+    Public,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]

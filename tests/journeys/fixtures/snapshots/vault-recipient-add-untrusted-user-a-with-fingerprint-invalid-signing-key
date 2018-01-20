@@ -1,0 +1,5 @@
+Imported recipient key at path 'etc/keys/1E1114E11B362B46B53E1ABAEF17047AB488BD82'
+error: Did not manage to find suitable signing key for re-exporting the recipient keys.
+Caused by: 
+ 2: The given signing key named 'foo@example.com' could not be found in the keychain.
+ 1: End of file (gpg error 16383)
