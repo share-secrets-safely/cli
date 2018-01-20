@@ -6,7 +6,7 @@ exe=${1:?First argument is the executable under test}
 root="$(cd "${0%/*}" && pwd)"
 exe="$root/../../$exe"
 # shellcheck source=./tests/utilities.sh
-source "$root/../utilities.sh"
+source "$root/../gpg-helpers.sh"
 
 WITH_FAILURE=1
 

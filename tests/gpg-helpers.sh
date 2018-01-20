@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=1090
+source "$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)/utilities.sh"
+
 function trust_key () {
   {
     gpg --export-ownertrust
@@ -26,8 +29,11 @@ function as_user () {
   import_user "$key" &>/dev/null
 }
 
-function title () {
-  echo "$WHITE-----------------------------------------------------"
-  echo "${GREEN}$*"
-  echo "$WHITE-----------------------------------------------------"
+function gpg_sandbox () {
+  GNUPGHOME="$(mktemp -t gnupg-home.XXXX -d)"
+  export GNUPGHOME
+}
+
+function sandboxed () {
+  sandbox "gpg_sandbox"
 }

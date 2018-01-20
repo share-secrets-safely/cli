@@ -7,17 +7,10 @@ RED="$(tput setaf 1)"
 OFFSET=( )
 STEP="  "
 
-# shellcheck disable=1090
-source "$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)/gpg-helpers.sh"
-
-function sandboxed () {
-  sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
-  # shellcheck disable=2064
-  trap "popd >/dev/null" EXIT
-  pushd "$sandbox_tempdir" >/dev/null \
-   || fail "Could not change directory into temporary directory."
-  GNUPGHOME="$(mktemp -t gnupg-home.XXXX -d)"
-  export GNUPGHOME
+function title () {
+  echo "$WHITE-----------------------------------------------------"
+  echo "${GREEN}$*"
+  echo "$WHITE-----------------------------------------------------"
 }
 
 function _context () {
@@ -55,8 +48,21 @@ function shortcoming () {
 }
 
 function fail () {
-  echo 1>&2 "$RED" "$@"
+  echo 1>&2 "${RED} $*"
   exit 1
+}
+
+function sandbox () {
+  sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
+  # shellcheck disable=2064
+  trap "popd >/dev/null" EXIT
+  pushd "$sandbox_tempdir" >/dev/null \
+   || fail "Could not change directory into temporary directory."
+   
+  local custom_init="${1:-}"
+  if [ -n "$custom_init" ]; then
+    eval "$custom_init"
+  fi
 }
 
 function expect_equals () {
