@@ -1,3 +1,4 @@
+Imported recipient key at path 'keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
 error: One of the imported key-files contained more than one recipient.
 This might mean somebody trying to sneak in their key. The offending fingerprints are listed below
 905E53FE2FC0A500100AB80B056F92A52DF04D4E

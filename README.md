@@ -165,6 +165,8 @@ do test-driven development, which nurishes my doubt in the quality of the softwa
    disk and currently might be picked up by attackers. A fix could be 'tempfile', 
    which allows using a secure temporary file - however, it might make getting
    MUSL builds impossible. Static builds should still be alright.
+ * GPG2 is required to use the 'sign-key' operation. The latter is required when
+   trying to add new unverified recipients via `vault recipients add <fingerprint>`.
 
 ## Roadmap
 

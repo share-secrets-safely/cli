@@ -98,5 +98,44 @@ snapshot="$fixture/snapshots"
         }
       )
     )
+    
+    (with "another usable secret key which is not a vault recipient"
+      import_user "$fixture/a.sec.asc"
+      
+      (when "re-adding the new recipient via fingerprint"
+        it "succeeds as it finds a signing key non-ambiguously" && {
+          WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
+          expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
+        }
+        
+        it "signs the new recipient with prime members key and exports the key" && {
+          expect_run_sh $SUCCESSFULLY "gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28 | grep -q 'issuer key ID AA5B7BF150F48332'"
+        }
+        
+        it "adds the new recipients to the recipients file" && {
+          expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc/recipients
+        }
+      )
+    )
+    
+    (with "two usable signing keys"
+      ( as_user "$fixture/a.sec.asc"
+        "$exe" vault recipient init a@example.com
+      ) >/dev/null
+      
+      (when "adding the new recipient"
+        it "succeeds as there still is only one secret key which is also in recipients" && {
+          WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint" \
+          expect_run $SUCCESSFULLY "$exe" vault recipient add EF17047AB488BD82
+        }
+      )
+      
+      (when "adding the new recipient again"
+        it "succeeds as it takes the first viable signing key" && {
+          WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint" \
+          expect_run $SUCCESSFULLY "$exe" vault recipient add EF17047AB488BD82
+        } && shortcoming "it should be possible to select the signing key in case of ambiguity"
+      )
+    )
   )
 )

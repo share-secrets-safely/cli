@@ -64,6 +64,10 @@ function precondition () {
   echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${WHITE} [precondition] ${*//  /}"
 }
 
+function shortcoming () {
+  echo 1>&2 -n "${YELLOW}${CONTEXT[*]}${RED} [shortcoming] ${*//  /}"
+}
+
 function fail () {
   echo 1>&2 "$RED" "$@"
   exit 1

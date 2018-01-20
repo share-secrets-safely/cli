@@ -42,41 +42,15 @@ impl Vault {
                 "The recipients list is empty, but you are expected to be on that list.",
             ));
         }
-        let no_filter = Vec::<String>::new();
-        //        for k in ctx.find_keys(&no_filter)?.filter_map(Result::ok) {
-        //            println!("{}", UserIdFingerprint(&k));
-        //            println!("has secret: {}", k.has_secret());
-        //            println!("has primary: {}", k.primary_key().is_some());
-        //            if let Some(pk) = k.primary_key() {
-        //                println!("pk: can sign: {}", pk.can_sign());
-        //            }
-        //            println!("can sign: {}", k.can_sign());
-        //            println!("can encrypt: {}", k.can_encrypt());
-        //            println!("is invalid: {}", k.is_invalid());
-        //            for sk in k.subkeys() {
-        //                println!(
-        //                    "subkey {} can sign: {}, can encrypt: {}, is invalid: {}",
-        //                    sk.fingerprint().unwrap(),
-        //                    sk.can_sign(),
-        //                    sk.can_encrypt(),
-        //                    sk.is_invalid(),
-        //                );
-        //            }
-        //        }
-
-        ctx.find_secret_keys(&no_filter)?
+        let key_is_in_recipients_list = |(k, fpr)| if recipients_fprs.iter().any(|rfpr| rfpr == &fpr) {
+            Some(k)
+        } else {
+            None
+        };
+        ctx.find_secret_keys(None::<String>)?
             .filter_map(Result::ok)
-//            .filter(Key::has_secret)
-//            .filter(|k| k.can_sign() || k.subkeys().any(|sk| sk.can_sign()))
-//            .filter_map(|k| fingerprint_of(&k).map(|fpr| (k, fpr)).ok())
-//            .filter_map(|(k, fpr)| if recipients_fprs.iter().any(
-//                |rfpr| rfpr == &fpr,
-//            )
-//            {
-//                Some(k)
-//            } else {
-//                None
-//            })
+            .filter_map(|k| fingerprint_of(&k).map(|fpr| (k, fpr)).ok())
+            .filter_map(key_is_in_recipients_list)
             .next()
             .ok_or_else(|| {
                 err_msg("Didn't find a single secret key suitable to sign keys.")
@@ -139,12 +113,18 @@ impl Vault {
                     valid_fingerprint(&s)
                         .and_then(|fpr| self.read_fingerprint_file(&fpr, &gpg_keys_dir))
                         .and_then(|(fpr_path, kb)| {
-                            gpg_ctx.import(kb).map_err(|e| {
+                            let res = gpg_ctx.import(kb).map_err(|e| {
                                 e.context(format!(
                                     "Could not import key to gpg key database from content of file at '{}'",
                                     fpr_path.display()
                                 )).into()
-                            })
+                            });
+                            writeln!(
+                                output,
+                                "Imported recipient key at path '{}'",
+                                fpr_path.display()
+                            ).ok();
+                            res
                         })
                 })
                 .fold(Ok(Vec::new()), |r, k| match k {
@@ -199,7 +179,7 @@ impl Vault {
                     ))?;
                 writeln!(
                     output,
-                    "Signed recipients key '{}' with signing key '{}'",
+                    "Signed recipients key {} with signing key {}",
                     UserIdFingerprint(&key_to_sign),
                     UserIdFingerprint(&signing_key)
                 ).ok();
@@ -314,7 +294,7 @@ impl Vault {
             obuf.clear();
             writeln!(
                 output,
-                "Re-encrypted '{}' for new recipients",
+                "Re-encrypted '{}' for new recipient(s)",
                 strip_ext(&encrypted_file_path)
             ).ok();
         }

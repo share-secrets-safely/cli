@@ -1,4 +1,5 @@
-Signed recipients key 'user b <b@example.com> (7435ACDC03D55429C41637C4DB9831D842C18D28)' with signing key 'Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)'
+Imported recipient key at path 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
+Signed recipients key user b <b@example.com> (7435ACDC03D55429C41637C4DB9831D842C18D28) with signing key Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
 Exported key '7435ACDC03D55429C41637C4DB9831D842C18D28' for user user b <b@example.com>
 Added recipient user b <b@example.com>
-Re-encrypted 'secret' for new recipients
+Re-encrypted 'secret' for new recipient(s)
