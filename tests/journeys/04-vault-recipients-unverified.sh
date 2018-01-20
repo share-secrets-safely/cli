@@ -88,6 +88,8 @@ snapshot="$fixture/snapshots"
         
         echo WIP
         exit 0
+        gpg --list-packets "$fixture/b.pub.asc"
+        gpg --list-packets etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28
         
         it "creates the expected meta-data structure" && {
           expect_snapshot "$snapshot/vault-recipient-add-untrusted-user-with-fingerprint-metadata" etc

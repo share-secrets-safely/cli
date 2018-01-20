@@ -82,12 +82,21 @@ pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             None => None, // failure.into(),
         };
         match gpg_error_code {
+            Some(code) if code == gpgme::Error::NOT_SUPPORTED.code() => {
+                failure
+                    .context(
+                        "The GNU Privacy Guard (GPG) does not supported the attempted operation.\n\
+                         GPG v2 is known to work, and you can install it here:\n\
+                         https://www.gnupg.org for more information.",
+                    )
+                    .into()
+            }
             Some(code) if code == gpgme::Error::UNSUPPORTED_PROTOCOL.code() => {
                 failure
                     .context(
-                        "The GNU Privacy Guard (GPG) is not available on your system. \
-                     Please install it and try again. \
-                     See https://www.gnupg.org for more information.",
+                        "The GNU Privacy Guard (GPG) is not available on your system.\n\
+                         Please install it and try again.\n\
+                         See https://www.gnupg.org for more information.",
                     )
                     .into()
             }

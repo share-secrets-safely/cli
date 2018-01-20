@@ -1,3 +1,5 @@
-error: The GNU Privacy Guard (GPG) is not available on your system. Please install it and try again. See https://www.gnupg.org for more information.
+error: The GNU Privacy Guard (GPG) is not available on your system.
+Please install it and try again.
+See https://www.gnupg.org for more information.
 Caused by: 
  1: Unsupported protocol (gpg error 121)
