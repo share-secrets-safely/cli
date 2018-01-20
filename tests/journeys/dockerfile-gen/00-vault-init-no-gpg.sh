@@ -1,6 +1,6 @@
 #!/bin/bash
 
 cat <<DOCKERFILE
-from ${1:?}
-run apk del gpg
+from ${BASE_IMAGE:?}
+run apk del gnupg
 DOCKERFILE

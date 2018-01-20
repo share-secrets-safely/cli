@@ -21,7 +21,7 @@ while read -r journey; do
         BASE_IMAGE="$image" "$make_journey_dockerfile" | docker build -t "$journey_image" -
     else
         echo 1>&2 "Custom docker image supported via script at 'BASE_IMAGE=$image $make_journey_dockerfile'"
-    fi
+    fi || exit $?
 
     docker_args=( docker run -v "$absolute_root/.docker-cargo-cache:/usr/local/cargo/registry" -v "$absolute_root:/volume" -w '/volume' --rm -t "$journey_image" "$journey" "$exe" )
     in_red "Running '${docker_args[*]}'"
