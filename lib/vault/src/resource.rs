@@ -139,14 +139,12 @@ impl Vault {
                 ))?;
                 buf
             };
-            let mut output = Vec::new();
-            ctx.encrypt(&keys, input, &mut output).map_err(
-                |e: gpgme::Error| {
-                    EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys)
-                },
+            let mut encrypted_bytes = Vec::new();
+            ctx.encrypt(&keys, input, &mut encrypted_bytes).map_err(
+                |e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys),
             )?;
-            spec.open_output_in(&secrets_path, mode, dst_mode)?
-                .write_all(&output)
+            spec.open_output_in(&secrets_path, mode, dst_mode, output)?
+                .write_all(&encrypted_bytes)
                 .context(format!(
                     "Failed to write all encrypted data to '{}'.",
                     spec.destination().display(),

@@ -224,8 +224,7 @@ and add a few more features to provide API symmetry.
    * [x] init
    * [ ] remove recipient(s) and re-encrypt
  * [x] `vault remove` a resource
- * [ ] `vault add`
-   * [ ] create sub-directories automatically
+ * [x] `vault add` create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
  * [ ] `multi-vault`
    * _manage multiple vaults in a single vault configuration file_

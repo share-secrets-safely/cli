@@ -9,6 +9,7 @@
  * `vault recipients remove` removes recipients and re-encrypts the vaults content.
  * `vault recipient add --verified` allows to add any recipient by name, but requires
     you to assure you are able to encrypt for that recipient.
+ * `vault add` now creates sub-directories automatically
 
 ### Breaking Changes
 

@@ -1,7 +1,8 @@
 use conv::TryFrom;
 use std::fmt;
 use std::fs::{File, OpenOptions};
-use std::io::{stdin, Read};
+use std::io::{stdin, Write, Read};
+use std::fs::create_dir_all;
 
 use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
@@ -73,8 +74,27 @@ impl VaultSpec {
         })
     }
 
-    pub fn open_output_in(&self, root: &Path, mode: WriteMode, dst_mode: Destination) -> Result<File, Error> {
+    pub fn open_output_in(
+        &self,
+        root: &Path,
+        mode: WriteMode,
+        dst_mode: Destination,
+        output: &mut Write,
+    ) -> Result<File, Error> {
         let output_file = self.output_in(root, dst_mode)?;
+        if let Some(d) = output_file.parent() {
+            if !d.is_dir() {
+                create_dir_all(d).context(format!(
+                    "Failed to created intermediate directory at '{}'",
+                    d.display()
+                ))?;
+                writeln!(
+                    output,
+                    "Created intermediate directory at '{}'",
+                    d.display()
+                ).ok();
+            }
+        }
         if mode.refuse_overwrite() && output_file.exists() {
             return Err(format_err!(
                 "Refusing to overwrite existing file at '{}'",

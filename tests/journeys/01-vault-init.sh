@@ -97,6 +97,18 @@ title "'vault init'"
         expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml list
       }
     )
+    
+    (when "adding a secret in a subdirectory"
+      it "succeeds" && {
+        echo with-sub-dirs | \
+        WITH_SNAPSHOT="$snapshot/vault-add-with-subdirectory" \
+        expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml add :partition/subdir/secret
+      }
+      
+      it "creates the encrypted secret file in the correct location" && {
+        expect_exists "$vault_dir/secrets/partition/subdir/secret.gpg"
+      }
+    )
   )
 )
 
