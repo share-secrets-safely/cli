@@ -57,6 +57,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             ).ok();
             Ok(())
         }
+        VaultCommand::ResourceRemove { ref specs } => vault_from(&ctx)?.remove(specs, output),
         VaultCommand::ResourceAdd { ref specs } => {
             vault_from(&ctx)?.encrypt(
                 specs,

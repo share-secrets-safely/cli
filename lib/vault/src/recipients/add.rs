@@ -76,12 +76,14 @@ impl Vault {
                 "Didn't find a single secret key suitable to sign keys.",
             )),
             1 => Ok(signing_keys.pop().expect("one entry")),
-            _ => Err(format_err!("Multiple keys are suitable for signing, which is ambiguous.\n{}",
+            _ => Err(
+                format_err!("Multiple keys are suitable for signing, which is ambiguous.\n{}",
                 signing_keys
                     .iter()
                     .map(|sk| format!("{}", UserIdFingerprint(sk)))
                     .join("\n"),
-            )),
+            ),
+            ),
         }
     }
 

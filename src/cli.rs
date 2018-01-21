@@ -122,23 +122,27 @@ where
         let show_resource = App::new("show").about("Decrypt a resource").arg(
             resource_path,
         );
+        let spec = Arg::with_name("spec")
+            .required(true)
+            .multiple(false)
+            .takes_value(true)
+            .value_name("spec");
         let add_resource = App::new("add")
             .alias("insert")
             .about("Add a new resource to the vault.")
-            .arg(
-                Arg::with_name("spec")
-                    .required(true)
-                    .multiple(false)
-                    .takes_value(true)
-                    .value_name("spec")
-                    .help(
-                        "A specification identifying a mapping from a source file to be stored \
+            .arg(spec.clone().help(
+                "A specification identifying a mapping from a source file to be stored \
                          in a location of the vault. It takes the form '<src>:<dst>', where \
                          '<src>' is equivalent to '<src>:<src>'.\
-                         <dst> should be vault-relative paths, whereas <src> must point tel a readable file \
+                         <dst> should be vault-relative paths, whereas <src> must point to a readable file \
                          and can be empty to read from standard input, such as in ':<dst>'.",
-                    ),
-            );
+            ));
+        let remove_resource = App::new("remove")
+            .alias("delete")
+            .about("Delete a resource from the vault.")
+            .arg(spec.multiple(true).help(
+                "The vault-relative path of a resource in the vault",
+            ));
         let init_recipient = App::new("init").arg(gpg_key_id.clone()).about(
             "Add your single (or the given) recipient key to the vault by exporting the public \
              key and storing it in the vaults local gpg key database. \
@@ -198,6 +202,7 @@ where
             .about("a variety of vault interactions")
             .subcommand(init)
             .subcommand(add_resource)
+            .subcommand(remove_resource)
             .subcommand(recipients)
             .subcommand(show_resource)
             .subcommand(edit_resource)

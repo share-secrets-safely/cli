@@ -14,7 +14,7 @@ SUCCESSFULLY=0
 fixture="$root/fixtures"
 snapshot="$fixture/snapshots"
 (sandboxed 
-  title "'vault add', 'show' and 'edit'"
+  title "'vault add'"
   (with "a vault initialized for a single recipient"
     {
       import_user "$fixture/tester.sec.asc"
@@ -48,6 +48,7 @@ snapshot="$fixture/snapshots"
         expect_equals "$previous_resource_id" "$(md5sum ./from-stdin.gpg)"
       }
     )
+    title "'vault show'"
     (when "showing the previously added resource"
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/vault-resource-show" \
@@ -78,6 +79,7 @@ EDITOR
       chmod +x "$editor"
     )
     
+    title "'vault edit'"
     (when "editing a known resource"
       (with "a custom editor"
         it "succeeds" && {
@@ -116,6 +118,33 @@ EDITOR
       it "fails" && {
         WITH_SNAPSHOT="$snapshot/vault-known-resource-edit-editor-not-in-path" \
         expect_run $WITH_FAILURE "$exe" vault edit --editor foo from-stdin
+      }
+    )
+    
+    title "'vault remove'"
+    function add_resource () {
+      local res=${1:?}
+      echo "$res" | "$exe" vault add ":$res" > /dev/null
+    }
+    (when "removing a resource that exists without the gpg extension and with gpg extension"
+      add_resource a.ext; add_resource b; add_resource c
+      
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-remove-multiple-existing" \
+        expect_run $SUCCESSFULLY "$exe" vault remove a.ext b.gpg c
+      }
+      
+      it "actually removes the files" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-remove-multiple-existing-after" \
+        expect_run $SUCCESSFULLY "$exe" vault list
+      }
+    )
+    
+    (when "removing a resource that does not exist"
+      add_resource existing
+      it "fails at the first non-existing resource" && {
+        WITH_SNAPSHOT="$snapshot/vault-resource-remove-non-existing" \
+        expect_run $WITH_FAILURE "$exe" vault delete existing non-existing existing
       }
     )
   )

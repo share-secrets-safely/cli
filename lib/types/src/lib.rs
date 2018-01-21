@@ -36,6 +36,7 @@ pub enum VaultCommand {
     },
     ResourceShow { spec: PathBuf },
     ResourceAdd { specs: Vec<VaultSpec> },
+    ResourceRemove { specs: Vec<VaultSpec> },
     Init {
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
@@ -127,11 +128,15 @@ impl VaultSpec {
         &self.dst
     }
 
-    pub fn open_output_in(&self, root: &Path, mode: WriteMode, dst_mode: Destination) -> Result<File, Error> {
-        let output_file = match dst_mode {
+    pub fn output_in(&self, root: &Path, dst_mode: Destination) -> Result<PathBuf, Error> {
+        Ok(match dst_mode {
             Destination::ReolveAndAppendGpg => root.join(gpg_output_filename(&self.dst)?),
             Destination::Unchanged => self.dst.to_owned(),
-        };
+        })
+    }
+
+    pub fn open_output_in(&self, root: &Path, mode: WriteMode, dst_mode: Destination) -> Result<File, Error> {
+        let output_file = self.output_in(root, dst_mode)?;
         if mode.refuse_overwrite() && output_file.exists() {
             return Err(format_err!(
                 "Refusing to overwrite existing file at '{}'",

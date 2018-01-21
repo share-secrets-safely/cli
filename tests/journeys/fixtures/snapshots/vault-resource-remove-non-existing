@@ -1,0 +1,2 @@
+Removed file at './existing.gpg'
+error: No file present at './non-existing.gpg'

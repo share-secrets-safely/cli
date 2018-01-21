@@ -89,7 +89,8 @@ fn main() {
                     }
                 }
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
-                ("add", Some(args)) => ok_or_exit(vault_resource_add_from(context, args)),
+                ("add", Some(args)) => ok_or_exit(vault_resource_add(context, args)),
+                ("remove", Some(args)) => ok_or_exit(vault_resource_remove(context, args)),
                 ("show", Some(args)) => ok_or_exit(vault_resource_show(context, args)),
                 ("edit", Some(args)) => ok_or_exit(vault_resource_edit(context, args)),
                 ("list", Some(args)) => ok_or_exit(vault_resource_list(context, args)),

@@ -2,7 +2,7 @@ extern crate sheesy_types;
 
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::fs::File;
+use std::fs::{remove_file, File};
 use std::process::Command;
 use mktemp::Temp;
 use itertools::join;
@@ -175,6 +175,35 @@ impl Vault {
             return Err(err_msg(msg.join("\n")));
         }
         Ok(keys)
+    }
+
+    pub fn remove(&self, specs: &[VaultSpec], output: &mut Write) -> Result<(), Error> {
+        let sp = self.secrets_path();
+        for spec in specs {
+            let path = {
+                let gpg_path = spec.output_in(&sp, Destination::ReolveAndAppendGpg)?;
+                if gpg_path.exists() {
+                    gpg_path
+                } else {
+                    let mut new_path = gpg_path.clone();
+                    let no_gpg_basename = new_path
+                        .file_stem()
+                        .expect("a file extension to be present")
+                        .to_owned();
+                    new_path.set_file_name(no_gpg_basename);
+                    if !new_path.exists() {
+                        return Err(format_err!("No file present at '{}'", gpg_path.display()));
+                    }
+                    new_path
+                }
+            };
+            remove_file(&path).context(format!(
+                "Failed to remove file at '{}'.",
+                path.display()
+            ))?;
+            writeln!(output, "Removed file at '{}'", path.display()).ok();
+        }
+        Ok(())
     }
 
     pub fn encrypt(

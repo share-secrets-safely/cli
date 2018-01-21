@@ -114,7 +114,19 @@ pub fn vault_resource_edit(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
     })
 }
 
-pub fn vault_resource_add_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+pub fn vault_resource_remove(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::ResourceRemove {
+            specs: match args.values_of("spec") {
+                Some(v) => v.map(|s| s.try_into()).collect::<Result<_, _>>()?,
+                None => Vec::new(),
+            },
+        },
+        ..ctx
+    })
+}
+
+pub fn vault_resource_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::ResourceAdd {
             specs: match args.values_of("spec") {
