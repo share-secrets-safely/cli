@@ -170,6 +170,30 @@ do test-driven development, which nurishes my doubt in the quality of the softwa
 
 ## Roadmap
 
+### Documentation
+
+Currnently the only documentation that exists is the program itself, it is self-documentating
+after all, as well as the journey tests. The latter are probably not what a user would look
+like, so we should provide something more along the lines of how users want to use `sheesy`.
+
+The most important thing to me is to test the documentation as well to assure it is always
+accurately reflecting what was actually released. That way, they can also serve as high-level
+smoke-tests.
+
+How can that be done, you wonder? With `shell-book`! It allows you to run specially made
+scripts in various modes: 
+
+ * **interactively**
+   * The user runs chapters one by one and can press enter to run actual commands and see
+     their output.
+ * **test**
+   * This one is run on CI and runs everything automatically, verifying the program invocations work as expected.
+ * **mdbook**
+   * generate pages suitable to be rendered by [`mdbook`][mdbook-github] (or equivalent)
+     and deploy them to github pages.
+   
+[mdbook-github]: https://github.com/rust-lang-nursery/mdBook
+
 ### Add the `pass` subcommand
 
 `sy` aims to be as usable as possible, and breaks compatiblity were needed to
@@ -199,9 +223,8 @@ and add a few more features to provide API symmetry.
    * [x] list
    * [x] init
    * [ ] remove recipient(s) and re-encrypt
- * [ ] `vault remove` a resource
+ * [x] `vault remove` a resource
  * [ ] `vault add`
-   * [ ] force overwrite flag
    * [ ] create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
  * [ ] `multi-vault`
