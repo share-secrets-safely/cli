@@ -1,11 +1,19 @@
 use std::io::{self, Write};
-use std::path::Path;
+use std::path::{PathBuf, Path};
 
+use std::env::{current_dir, set_current_dir};
 use std::fs::{self, OpenOptions};
 use std::fmt;
 use itertools::join;
 use failure::{self, err_msg, Error, ResultExt};
 use gpgme;
+
+pub fn strip_ext(p: &Path) -> PathBuf {
+    let mut p = p.to_owned();
+    let stem = p.file_stem().expect(".gpg file extension").to_owned();
+    p.set_file_name(stem);
+    p
+}
 
 pub fn write_at(path: &Path) -> io::Result<fs::File> {
     OpenOptions::new()
@@ -131,4 +139,24 @@ pub fn extract_at_least_one_secret_key(
     };
 
     Ok(keys)
+}
+
+pub struct ResetCWD {
+    cwd: Result<PathBuf, io::Error>,
+}
+impl ResetCWD {
+    pub fn new(next_cwd: &Path) -> Result<Self, Error> {
+        let prev_cwd = current_dir();
+        set_current_dir(next_cwd).context(format!(
+            "Failed to temporarily change the working directory to '{}'",
+            next_cwd.display()
+        ))?;
+        Ok(ResetCWD { cwd: prev_cwd })
+    }
+}
+
+impl Drop for ResetCWD {
+    fn drop(&mut self) {
+        self.cwd.as_ref().map(set_current_dir).ok();
+    }
 }

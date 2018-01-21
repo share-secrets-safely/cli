@@ -1,21 +1,17 @@
-extern crate sheesy_types;
-
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::fs::{remove_file, File};
 use std::process::Command;
+
 use mktemp::Temp;
 use itertools::join;
 use gpgme;
-use vault::Vault;
-use failure::{err_msg, Error, ResultExt};
-use util::FingerprintUserId;
-use util::write_at;
+use base::Vault;
+use failure::{Error, ResultExt};
 use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 use error::{DecryptionError, EncryptionError};
-use util::fingerprint_of;
-use util::new_context;
+use util::{write_at, strip_ext, new_context};
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
@@ -96,87 +92,6 @@ impl Vault {
         Ok(path_for_decryption)
     }
 
-    pub fn recipient_keys(&self, ctx: &mut gpgme::Context) -> Result<Vec<gpgme::Key>, Error> {
-        let recipients_fprs = self.recipients_list()?;
-        if recipients_fprs.is_empty() {
-            return Err(format_err!(
-                "No recipients found in recipients file at '{}'.",
-                self.recipients.display()
-            ));
-        }
-        let keys: Vec<gpgme::Key> = ctx.find_keys(&recipients_fprs)
-            .context("Could not iterate keys for given recipients")?
-            .filter_map(Result::ok)
-            .filter(|k| k.can_encrypt())
-            .collect();
-        if keys.len() != recipients_fprs.len() {
-            let diff = recipients_fprs.len() - keys.len();
-            let mut msg = vec![
-                if diff > 0 {
-                    let existing_fprs: Vec<_> = keys.iter()
-                        .map(|k| fingerprint_of(k))
-                        .flat_map(Result::ok)
-                        .collect();
-                    let missing_fprs = recipients_fprs.iter().fold(Vec::new(), |mut m, f| {
-                        if existing_fprs.iter().all(|of| of != f) {
-                            m.push(f);
-                        }
-                        m
-                    });
-                    let mut msg = format!(
-                        "Didn't find the key for {} recipient(s) in the gpg database.{}",
-                        diff,
-                        match self.gpg_keys.as_ref() {
-                            Some(dir) => {
-                                format!(
-                                    " This might mean it wasn't imported yet from '{}'.",
-                                    self.absolute_path(dir).display()
-                                )
-                            }
-                            None => String::new(),
-                        }
-                    );
-                    msg.push_str(
-                        "\nThe following recipient(s) could not be found in the gpg key database:",
-                    );
-                    for fpr in missing_fprs {
-                        msg.push_str("\n");
-                        let key_path_info = match self.gpg_keys.as_ref() {
-                            Some(dir) => {
-                                let key_path = self.absolute_path(dir).join(&fpr);
-                                format!(
-                                    "{}'{}'",
-                                    if key_path.is_file() {
-                                        "Import key-file using 'gpg --import "
-                                    } else {
-                                        "Key-file does not exist at "
-                                    },
-                                    key_path.display()
-                                )
-                            }
-                            None => "No GPG keys directory".into(),
-                        };
-                        msg.push_str(&format!("{} ({})", &fpr, key_path_info));
-                    }
-                    msg
-                } else {
-                    format!(
-                        "Found {} additional keys to encrypt for, which may indicate an unusual \
-                        recipients specification in the recipients file at '{}'",
-                        diff,
-                        self.absolute_path(&self.recipients).display()
-                    )
-                },
-            ];
-            if !keys.is_empty() {
-                msg.push("All recipients found in gpg database:".into());
-                msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
-            }
-            return Err(err_msg(msg.join("\n")));
-        }
-        Ok(keys)
-    }
-
     pub fn remove(&self, specs: &[VaultSpec], output: &mut Write) -> Result<(), Error> {
         let sp = self.secrets_path();
         for spec in specs {
@@ -185,12 +100,7 @@ impl Vault {
                 if gpg_path.exists() {
                     gpg_path
                 } else {
-                    let mut new_path = gpg_path.clone();
-                    let no_gpg_basename = new_path
-                        .file_stem()
-                        .expect("a file extension to be present")
-                        .to_owned();
-                    new_path.set_file_name(no_gpg_basename);
+                    let mut new_path = strip_ext(&gpg_path);
                     if !new_path.exists() {
                         return Err(format_err!("No file present at '{}'", gpg_path.display()));
                     }

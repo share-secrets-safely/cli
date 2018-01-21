@@ -16,11 +16,11 @@ extern crate mktemp;
 
 pub mod error;
 mod util;
-mod vault;
+mod base;
 mod dispatch;
 mod recipients;
 mod init;
-mod crypt;
+mod resource;
 
-pub use vault::Vault;
+pub use base::Vault;
 pub use dispatch::do_it;

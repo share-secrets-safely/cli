@@ -1,6 +1,6 @@
 extern crate sheesy_types;
 
-use vault::{Vault, VaultExt};
+use base::{Vault, VaultExt};
 use sheesy_types::VaultContext;
 use failure::Error;
 use sheesy_types::WriteMode;

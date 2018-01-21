@@ -8,7 +8,7 @@ use std::path::Path;
 use failure::{Error, ResultExt};
 use std::fs::create_dir_all;
 use std::io::Write;
-use vault::Vault;
+use base::Vault;
 use util::new_context;
 use util::extract_at_least_one_secret_key;
 use util::export_key;
