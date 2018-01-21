@@ -2,9 +2,11 @@
 
 ### Improvements
 
- * `vault list` now produces precise URLs
+ * `vault list` now produces precise URLs.
+ * `vault remove` can remove resources from the vault.
  * `vault recipient add` now signs and re-exports added fingerprints to make
    recipient verification part of adding them, and help build a *Web of Trust*.
+ * `vault recipients remove` removes recipients and re-encrypts the vaults content.
  * `vault recipient add --verified` allows to add any recipient by name, but requires
     you to assure you are able to encrypt for that recipient.
 
