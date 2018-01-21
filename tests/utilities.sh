@@ -108,7 +108,7 @@ function expect_run () {
         exit 1
       fi
     fi
-    echo 1>&2 "${GREEN} - OK"
+    echo 1>&2
   else
     echo 1>&2 "${RED} - FAIL"
     echo 1>&2 "${WHITE}\$$*"
