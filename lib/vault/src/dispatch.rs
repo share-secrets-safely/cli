@@ -16,6 +16,7 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     use sheesy_types::VaultCommand;
     match ctx.command {
+        VaultCommand::RecipientsRemove { ref gpg_key_ids } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, output),
         VaultCommand::RecipientsAdd {
             ref gpg_key_ids,
             ref sign,

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::{BufReader, BufRead, stdin, Read, Write};
 use serde_yaml;
-use util::{FingerprintUserId, fingerprint_of, strip_ext, ResetCWD, write_at};
+use util::{FingerprintUserId, strip_ext, ResetCWD, write_at};
 use error::{IOMode, VaultError};
 use failure::{Error, ResultExt, err_msg};
 use glob::glob;
@@ -127,6 +127,26 @@ impl Vault {
         Ok(())
     }
 
+    pub fn write_recipients_list(&self, recipients: &mut Vec<String>) -> Result<PathBuf, Error> {
+        recipients.sort();
+        recipients.dedup();
+
+        let recipients_file = self.absolute_path(&self.recipients);
+        let mut writer = write_at(&recipients_file).context(format!(
+            "Failed to open recipients at '{}' file for writing",
+            recipients_file.display()
+        ))?;
+        for recipient in recipients {
+            writeln!(&mut writer, "{}", recipient).context(format!(
+                "Failed to write recipient '{}' to file at '{}'",
+                recipient,
+                recipients_file
+                    .display()
+            ))?
+        }
+        Ok(recipients_file)
+    }
+
     pub fn recipients_list(&self) -> Result<Vec<String>, Error> {
         let recipients_file_path = self.absolute_path(&self.recipients);
         let rfile = File::open(&recipients_file_path)
@@ -142,6 +162,92 @@ impl Vault {
         ))?)
     }
 
+    pub fn keys_by_ids(
+        &self,
+        ctx: &mut gpgme::Context,
+        ids: &[String],
+        type_of_ids_for_errors: &str,
+    ) -> Result<Vec<gpgme::Key>, Error> {
+        let keys: Vec<gpgme::Key> = ctx.find_keys(ids)
+            .context(format!(
+                "Could not iterate keys for given {}s",
+                type_of_ids_for_errors
+            ))?
+            .filter_map(Result::ok)
+            .collect();
+        if keys.len() == ids.len() {
+            return Ok(keys);
+        }
+        let diff = ids.len() - keys.len();
+        let mut msg = vec![
+            if diff > 0 {
+                // TODO: this check doesn't work anymore if ids is not full fingerprints
+                // which now can happen.
+                let existing_fprs: Vec<_> = keys.iter().filter_map(|k| k.fingerprint().ok()).collect();
+                let missing_fprs = ids.iter().fold(Vec::new(), |mut m, f| {
+                    if existing_fprs.iter().all(|of| of != f) {
+                        m.push(f);
+                    }
+                    m
+                });
+                let mut msg = format!(
+                    "Didn't find the key for {} {}(s) in the gpg database.{}",
+                    diff,
+                    type_of_ids_for_errors,
+                    match self.gpg_keys.as_ref() {
+                        Some(dir) => {
+                            format!(
+                                " This might mean it wasn't imported yet from the '{}' directory.",
+                                self.absolute_path(dir).display()
+                            )
+                        }
+                        None => String::new(),
+                    }
+                );
+                msg.push_str(&format!(
+                    "\nThe following {}(s) could not be found in the gpg key database:",
+                    type_of_ids_for_errors
+                ));
+                for fpr in missing_fprs {
+                    msg.push_str("\n");
+                    let key_path_info = match self.gpg_keys.as_ref() {
+                        Some(dir) => {
+                            let key_path = self.absolute_path(dir).join(&fpr);
+                            format!(
+                                "{}'{}'",
+                                if key_path.is_file() {
+                                    "Import key-file using 'gpg --import "
+                                } else {
+                                    "Key-file does not exist at "
+                                },
+                                key_path.display()
+                            )
+                        }
+                        None => "No GPG keys directory".into(),
+                    };
+                    msg.push_str(&format!("{} ({})", &fpr, key_path_info));
+                }
+                msg
+            } else {
+                format!(
+                    "Found {} additional keys to encrypt for, which may indicate an unusual \
+                        {}s specification in the recipients file at '{}'",
+                    diff,
+                    type_of_ids_for_errors,
+                    self.absolute_path(&self.recipients).display()
+                )
+            },
+        ];
+        if !keys.is_empty() {
+            msg.push(format!(
+                "All {}s found in gpg database:",
+                type_of_ids_for_errors
+            ));
+            msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
+        }
+        return Err(err_msg(msg.join("\n")));
+    }
+
     pub fn recipient_keys(&self, ctx: &mut gpgme::Context) -> Result<Vec<gpgme::Key>, Error> {
         let recipients_fprs = self.recipients_list()?;
         if recipients_fprs.is_empty() {
@@ -150,77 +256,7 @@ impl Vault {
                 self.recipients.display()
             ));
         }
-        let keys: Vec<gpgme::Key> = ctx.find_keys(&recipients_fprs)
-            .context("Could not iterate keys for given recipients")?
-            .filter_map(Result::ok)
-            .filter(|k| k.can_encrypt())
-            .collect();
-        if keys.len() != recipients_fprs.len() {
-            let diff = recipients_fprs.len() - keys.len();
-            let mut msg = vec![
-                if diff > 0 {
-                    let existing_fprs: Vec<_> = keys.iter()
-                        .map(|k| fingerprint_of(k))
-                        .flat_map(Result::ok)
-                        .collect();
-                    let missing_fprs = recipients_fprs.iter().fold(Vec::new(), |mut m, f| {
-                        if existing_fprs.iter().all(|of| of != f) {
-                            m.push(f);
-                        }
-                        m
-                    });
-                    let mut msg = format!(
-                        "Didn't find the key for {} recipient(s) in the gpg database.{}",
-                        diff,
-                        match self.gpg_keys.as_ref() {
-                            Some(dir) => {
-                                format!(
-                                    " This might mean it wasn't imported yet from '{}'.",
-                                    self.absolute_path(dir).display()
-                                )
-                            }
-                            None => String::new(),
-                        }
-                    );
-                    msg.push_str(
-                        "\nThe following recipient(s) could not be found in the gpg key database:",
-                    );
-                    for fpr in missing_fprs {
-                        msg.push_str("\n");
-                        let key_path_info = match self.gpg_keys.as_ref() {
-                            Some(dir) => {
-                                let key_path = self.absolute_path(dir).join(&fpr);
-                                format!(
-                                    "{}'{}'",
-                                    if key_path.is_file() {
-                                        "Import key-file using 'gpg --import "
-                                    } else {
-                                        "Key-file does not exist at "
-                                    },
-                                    key_path.display()
-                                )
-                            }
-                            None => "No GPG keys directory".into(),
-                        };
-                        msg.push_str(&format!("{} ({})", &fpr, key_path_info));
-                    }
-                    msg
-                } else {
-                    format!(
-                        "Found {} additional keys to encrypt for, which may indicate an unusual \
-                        recipients specification in the recipients file at '{}'",
-                        diff,
-                        self.absolute_path(&self.recipients).display()
-                    )
-                },
-            ];
-            if !keys.is_empty() {
-                msg.push("All recipients found in gpg database:".into());
-                msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
-            }
-            return Err(err_msg(msg.join("\n")));
-        }
-        Ok(keys)
+        self.keys_by_ids(ctx, &recipients_fprs, "recipient")
     }
 
     pub fn gpg_keys_dir(&self) -> Result<PathBuf, Error> {

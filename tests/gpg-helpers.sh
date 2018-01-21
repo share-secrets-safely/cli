@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # shellcheck disable=1090
-source "$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)/utilities.sh"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utilities.sh"
 
 function trust_key () {
   {

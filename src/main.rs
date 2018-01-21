@@ -73,6 +73,7 @@ fn main() {
                 ("recipients", Some(args)) => {
                     match args.subcommand() {
                         ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
+                        ("remove", Some(args)) => ok_or_exit(vault_recipients_remove(context, args)),
                         ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
                         ("list", Some(args)) => ok_or_exit(vault_recipients_list(context, args)),
                         _ => ok_or_exit(vault_recipients_list(context, args)),

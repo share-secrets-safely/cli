@@ -67,6 +67,18 @@ pub fn vault_recipients_init(ctx: VaultContext, args: &ArgMatches) -> Result<Vau
     })
 }
 
+pub fn vault_recipients_remove(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::RecipientsRemove {
+            gpg_key_ids: args.values_of("gpg-key-id")
+                .expect("Clap to assure this is a required arg")
+                .map(Into::into)
+                .collect(),
+        },
+        ..ctx
+    })
+}
+
 pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsAdd {

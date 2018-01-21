@@ -1,0 +1,4 @@
+Removed key file at 'keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
+Wrote changed recipients to file at '.gpg-id'
+Re-encrypted 'a' for new recipient(s)
+Re-encrypted 'subdir/b' for new recipient(s)

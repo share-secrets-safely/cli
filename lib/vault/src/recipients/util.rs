@@ -2,13 +2,17 @@ use failure::{Fail, err_msg, Error, ResultExt};
 use std::fs::File;
 use std::io::{Write, Read};
 use util::ResetCWD;
-use base::Vault;
+use base::{GPG_GLOB, Vault};
 use std::path::{PathBuf, Path};
 use glob::glob;
 use util::{fingerprint_of, UserIdFingerprint};
 use gpgme::{self, Key};
 use itertools::Itertools;
 use sheesy_types::print_causes;
+use mktemp::Temp;
+use error::EncryptionError;
+use util::write_at;
+use util::strip_ext;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
@@ -214,5 +218,66 @@ impl Vault {
                 ))
             })?;
         Ok((fpr_path, buf))
+    }
+
+    pub fn reencrypt(&self, ctx: &mut gpgme::Context, output: &mut Write) -> Result<(), Error> {
+        let keys = self.recipient_keys(ctx)?;
+
+        let mut obuf = Vec::new();
+
+        let secrets_dir = self.secrets_path();
+        let files_to_reencrypt: Vec<_> = {
+            let _change_cwd = ResetCWD::new(&secrets_dir)?;
+            glob(GPG_GLOB)
+                .expect("valid pattern")
+                .filter_map(Result::ok)
+                .collect()
+        };
+        for encrypted_file_path in files_to_reencrypt {
+            let tempfile = Temp::new_file().context(format!(
+                "Failed to create temporary file to hold decrypted '{}'",
+                encrypted_file_path.display()
+            ))?;
+            {
+                let mut plain_writer = write_at(&tempfile.to_path_buf())?;
+                self.decrypt(&encrypted_file_path, &mut plain_writer)
+                    .context(format!(
+                        "Could not decrypt '{}' to re-encrypt for new recipients.",
+                        encrypted_file_path.display()
+                    ))?;
+            }
+            {
+                let mut plain_reader = File::open(tempfile.to_path_buf())?;
+                ctx.encrypt(&keys, &mut plain_reader, &mut obuf).map_err(
+                    |e| {
+                        EncryptionError::caused_by(
+                            e,
+                            format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
+                            ctx,
+                            &keys,
+                        )
+                    },
+                )?;
+            }
+            write_at(&secrets_dir.join(&encrypted_file_path))
+                .context(format!(
+                    "Could not open '{}' to write encrypted data",
+                    encrypted_file_path.display()
+                ))
+                .and_then(|mut w| {
+                    w.write_all(&obuf).context(format!(
+                        "Failed to write out encrypted data to '{}'",
+                        encrypted_file_path.display()
+                    ))
+                })?;
+
+            obuf.clear();
+            writeln!(
+                output,
+                "Re-encrypted '{}' for new recipient(s)",
+                strip_ext(&encrypted_file_path).display()
+            ).ok();
+        }
+        Ok(())
     }
 }

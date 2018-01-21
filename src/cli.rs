@@ -141,6 +141,7 @@ where
             .alias("delete")
             .about("Delete a resource from the vault.")
             .arg(spec.multiple(true).help(
+                // TODO: use resource-path instead of spec
                 "The vault-relative path of a resource in the vault",
             ));
         let init_recipient = App::new("init").arg(gpg_key_id.clone()).about(
@@ -174,7 +175,7 @@ where
             can encrypt for the recipient.",
                     ),
             )
-            .arg(gpg_key_id.required(true))
+            .arg(gpg_key_id.clone().required(true))
             .about(
                 "Add a new recipient. This will re-encrypt all the vaults content.\
                 \
@@ -187,6 +188,17 @@ where
                 includes signatures.\
                 Signatures allow others to use the 'Web of Trust' for convenient encryption.",
             );
+        let remove_recipient = App::new("remove")
+            .alias("delete")
+            .about(
+                "Remove the given recipient. This will re-encrypt all the vaults content for the remaining \
+            recipients.\
+            \
+            The gpg keychain will not be altered, thus the trust-relationship with the removed recipient is \
+            left intact.\
+            However, the recipients key file will be removed from the vault.",
+            )
+            .arg(gpg_key_id.required(true));
         let list_recipient = App::new("list").alias("ls").about(
             "List the vaults recipients as identified by the recipients file.",
         );
@@ -196,6 +208,7 @@ where
                 "Interact with recipients of a vault. They can encrypt and decrypt its contents.",
             )
             .subcommand(add_recipient)
+            .subcommand(remove_recipient)
             .subcommand(list_recipient)
             .subcommand(init_recipient);
         let vault = App::new("vault")

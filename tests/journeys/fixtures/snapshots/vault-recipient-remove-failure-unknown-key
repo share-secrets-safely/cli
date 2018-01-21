@@ -1,0 +1,3 @@
+error: Didn't find the key for 1 user-id(s) in the gpg database. This might mean it wasn't imported yet from 'keys'.
+The following user-id(s) could not be found in the gpg key database:
+unkown@example.com (Key-file does not exist at 'keys/unkown@example.com')

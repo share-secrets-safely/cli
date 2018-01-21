@@ -219,10 +219,10 @@ and add a few more features to provide API symmetry.
  * [x] Stream progress/output messages instead of aggregating them if all succeeded
    * For example, when adding a recipient, parts of the operation succeed, but 
      it is not visible if re-encryption fails.
- * [ ] `vault recipients`
+ * [x] `vault recipients`
    * [x] list
    * [x] init
-   * [ ] remove recipient(s) and re-encrypt
+   * [x] remove recipient(s) and re-encrypt
  * [x] `vault remove` a resource
  * [x] `vault add` create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.

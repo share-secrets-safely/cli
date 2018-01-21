@@ -19,7 +19,7 @@ snapshot="$fixture/snapshots"
   (with "a key file containing multiple recipients"
     { import_user "$fixture/tester.sec.asc"
       "$exe" vault init --gpg-keys-dir ./keys 
-      cat $fixture/b.pub.asc $fixture/c.pub.asc > ./keys/7435ACDC03D55429C41637C4DB9831D842C18D28
+      cat "$fixture/b.pub.asc" "$fixture/c.pub.asc" > ./keys/7435ACDC03D55429C41637C4DB9831D842C18D28
     } >/dev/null
     
     (when "adding only one recipient from that file"
@@ -78,7 +78,7 @@ snapshot="$fixture/snapshots"
     (with "an untrusted user requesting membership"
       (as_user "$fixture/b.sec.asc"
         precondition "b@example.com did not have the prime members signature yet" && {
-          expect_run_sh $WITH_FAILURE "gpg --list-packets "$fixture/b.pub.asc" | grep -q 'issuer key ID AA5B7BF150F48332'"
+          expect_run_sh $WITH_FAILURE "gpg --list-packets $fixture/b.pub.asc | grep -q 'issuer key ID AA5B7BF150F48332'"
         }
         "$exe" vault recipient init
       ) > /dev/null

@@ -41,6 +41,7 @@ pub enum VaultCommand {
     },
     RecipientsList,
     RecipientsInit { gpg_key_ids: Vec<String> },
+    RecipientsRemove { gpg_key_ids: Vec<String> },
     RecipientsAdd {
         gpg_key_ids: Vec<String>,
         signing_key_id: Option<String>,

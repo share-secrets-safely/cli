@@ -74,7 +74,7 @@ function expect_exists () {
 }
 
 function expect_run_sh () {
-  expect_run ${1:?} bash -c "${2:?}"
+  expect_run "${1:?}" bash -c "${2:?}"
 }
 
 function expect_snapshot () {
