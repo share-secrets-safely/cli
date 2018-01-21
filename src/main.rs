@@ -12,6 +12,7 @@ extern crate sheesy_vault as vault;
 mod cli;
 mod parse;
 
+use sheesy_types::print_causes;
 use clap::ArgMatches;
 use failure::Error;
 use std::io::{stderr, stdout, Write};
@@ -47,19 +48,8 @@ where
     match r {
         Ok(r) => r,
         Err(e) => {
-            let e = e.into();
-            let causes = e.causes().collect::<Vec<_>>();
-            let num_causes = causes.len();
-            for (index, cause) in causes.iter().enumerate() {
-                if index == 0 {
-                    writeln!(stderr(), "error: {}", cause).ok();
-                    if num_causes > 1 {
-                        writeln!(stderr(), "Caused by: ").ok();
-                    }
-                } else {
-                    writeln!(stderr(), " {}: {}", num_causes - index, cause).ok();
-                }
-            }
+            write!(stderr(), "error: ").ok();
+            print_causes(e, stderr());
             process::exit(1);
         }
     }

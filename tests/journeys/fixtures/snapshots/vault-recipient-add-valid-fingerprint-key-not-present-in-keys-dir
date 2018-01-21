@@ -1,1 +1,3 @@
-error: Did not find key file matching glob pattern '*abcabc12' in directory 'etc/keys'.
+error: Could not find fingerprint 'abcabc12', tried local file as well as gpg keychain.
+Caused by: 
+ 1: Did not find key file matching glob pattern '*abcabc12' in directory 'etc/keys'.

@@ -131,3 +131,31 @@ snapshot="$fixture/snapshots"
     )
   )
 )
+
+(sandboxed
+  title "vault recipient add from keychain"
+  (with "a for a single recipient and secret" 
+    { import_user "$fixture/tester.sec.asc"  
+      "$exe" vault init --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
+      echo a | "$exe" vault add :a
+    } > /dev/null
+    
+    when "adding a new recipient whose key is only the the users keychain" && {
+      import_user "$fixture/b.pub.asc"
+      it "succeeds (also thanks to signing the fingerprinted recipient key)" && {
+        WITH_SNAPSHOT="$snapshot/vault-recipient-add-from-keychain" \
+        expect_run $SUCCESSFULLY "$exe" vault recipient add 42C18D28
+      }
+      
+      it "creates the correct meta-data structure" && {
+        expect_snapshot "$snapshot/vault-recipient-add-from-keychain-recipients" ./etc/recipients
+      }
+      
+      it "re-encrypted secrets so the new recipient can see them" && (
+        as_user "$fixture/b.sec.asc"
+        WITH_SNAPSHOT="$snapshot/vault-recipients-add-from-keychain-show-as-recipient" \
+        expect_run "$SUCCESSFULLY" "$exe" vault show a
+      )
+    }
+  )
+)

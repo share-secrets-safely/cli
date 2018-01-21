@@ -1,5 +1,27 @@
 use std::path::PathBuf;
 use spec::VaultSpec;
+use std::io::Write;
+use failure::Error;
+
+pub fn print_causes<E, W>(e: E, mut w: W)
+where
+    E: Into<Error>,
+    W: Write,
+{
+    let e = e.into();
+    let causes = e.causes().collect::<Vec<_>>();
+    let num_causes = causes.len();
+    for (index, cause) in causes.iter().enumerate() {
+        if index == 0 {
+            writeln!(w, "{}", cause).ok();
+            if num_causes > 1 {
+                writeln!(w, "Caused by: ").ok();
+            }
+        } else {
+            writeln!(w, " {}: {}", num_causes - index, cause).ok();
+        }
+    }
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum VaultCommand {

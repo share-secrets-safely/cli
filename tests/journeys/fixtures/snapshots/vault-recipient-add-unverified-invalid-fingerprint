@@ -1,10 +1,23 @@
-error: Did not find key file matching glob pattern '*88710E60' in directory 'etc/keys'.
-Did not find key file matching glob pattern '*4D1DA68C88710E60' in directory 'etc/keys'.
-Did not find key file matching glob pattern '*9B1C21174D1DA68C88710E60' in directory 'etc/keys'.
-Did not find key file matching glob pattern '*1AAF73F09B1C21174D1DA68C88710E60' in directory 'etc/keys'.
-Could not open key file 'etc/keys/2CF6E0B51AAF73F09B1C21174D1DA68C88710E60' for reading
+error: Could not find fingerprint '88710E60', tried local file as well as gpg keychain.
+Caused by: 
+ 1: Did not find key file matching glob pattern '*88710E60' in directory 'etc/keys'.
+Could not find fingerprint '4D1DA68C88710E60', tried local file as well as gpg keychain.
+Caused by: 
+ 1: Did not find key file matching glob pattern '*4D1DA68C88710E60' in directory 'etc/keys'.
+Could not find fingerprint '9B1C21174D1DA68C88710E60', tried local file as well as gpg keychain.
+Caused by: 
+ 1: Did not find key file matching glob pattern '*9B1C21174D1DA68C88710E60' in directory 'etc/keys'.
+Could not find fingerprint '1AAF73F09B1C21174D1DA68C88710E60', tried local file as well as gpg keychain.
+Caused by: 
+ 1: Did not find key file matching glob pattern '*1AAF73F09B1C21174D1DA68C88710E60' in directory 'etc/keys'.
+Could not find fingerprint '2CF6E0B51AAF73F09B1C21174D1DA68C88710E60', tried local file as well as gpg keychain.
+Caused by: 
+ 2: Could not open key file 'etc/keys/2CF6E0B51AAF73F09B1C21174D1DA68C88710E60' for reading
+ 1: No such file or directory (os error 2)
 Fingerprint '2CF6E0B51AAF73F09B1C21174D1DA68C88710E60ffffffff' must be between 8 and 40 characters long.
-Did not find key file matching glob pattern '*abc1f7d1' in directory 'etc/keys'.
+Could not find fingerprint 'abc1f7d1', tried local file as well as gpg keychain.
+Caused by: 
+ 1: Did not find key file matching glob pattern '*abc1f7d1' in directory 'etc/keys'.
 Fingerprint 'abc' must be between 8 and 40 characters long.
 Fingerprint 'also-invalid' must only contain characters a-f, A-F and 0-9.
 Fingerprint 'something-that-is-not-a-fingerprint' must only contain characters a-f, A-F and 0-9.

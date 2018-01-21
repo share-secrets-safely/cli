@@ -8,6 +8,7 @@ use glob::glob;
 use util::{fingerprint_of, UserIdFingerprint};
 use gpgme::{self, Key};
 use itertools::Itertools;
+use sheesy_types::print_causes;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
@@ -42,15 +43,23 @@ impl Vault {
         let imported_gpg_keys_fprs = gpg_key_ids
             .iter()
             .map(|s| {
-                valid_fingerprint(&s)
-                    .and_then(|fpr| self.read_fingerprint_file(&fpr, &gpg_keys_dir))
+                let fpr = valid_fingerprint(&s)?;
+                self.read_fingerprint_file(&fpr, &gpg_keys_dir)
                     .and_then(|(fpr_path, kb)| {
-                        let res = gpg_ctx.import(kb).map_err(|e| {
-                            e.context(format!(
-                                "Could not import key to gpg key database from content of file at '{}'",
-                                fpr_path.display()
-                            )).into()
-                        });
+                        let res = gpg_ctx
+                            .import(kb)
+                            .map_err(|e| {
+                                e.context(format!(
+                                    "Could not import key to gpg key database from content of file at '{}'",
+                                    fpr_path.display()
+                                )).into()
+                            })
+                            .map(|imports| {
+                                imports
+                                    .imports()
+                                    .filter_map(|i| i.fingerprint().map(ToOwned::to_owned).ok())
+                                    .collect::<Vec<_>>()
+                            });
                         writeln!(
                             output,
                             "Imported recipient key at path '{}'",
@@ -58,20 +67,36 @@ impl Vault {
                         ).ok();
                         res
                     })
+                    .or_else(|err| {
+                        gpg_ctx
+                            .find_key(fpr)
+                            .map(|_key| vec![fpr.to_owned()])
+                            .map_err(|_gpg_err| {
+                                err.context(format!(
+                                    "Could not find fingerprint '{}', tried local file as well as gpg keychain.",
+                                    fpr
+                                )).into()
+                            })
+                    })
             })
             .fold(Ok(Vec::new()), |r, k| match k {
                 Ok(imports) => {
                     r.map(|mut v| {
-                        v.extend(imports.imports().filter_map(|i| {
-                            i.fingerprint().map(ToOwned::to_owned).ok()
-                        }));
+                        v.extend(imports);
                         v
                     })
                 }
                 Err(e) => {
                     match r {
                         Ok(_) => Err(e),
-                        r @ Err(_) => r.map_err(|f| format_err!("{}\n{}", e, f)),
+                        r @ Err(_) => {
+                            r.map_err(|f| {
+                                let mut buf = Vec::<u8>::new();
+                                print_causes(e, &mut buf);
+                                let sbuf = String::from_utf8_lossy(&buf);
+                                format_err!("{}{}", sbuf, f)
+                            })
+                        }
                     }
                 }
             })?;

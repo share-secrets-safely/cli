@@ -7,6 +7,8 @@
  * `vault recipient add` now signs and re-exports added fingerprints to make
    recipient verification part of adding them, and help build a *Web of Trust*.
  * `vault recipients remove` removes recipients and re-encrypts the vaults content.
+ * `vault recipient add` also adds recipients which are only in your gpg keychain.
+    Previously it would always require an exported public key in the right spot.
  * `vault recipient add --verified` allows to add any recipient by name, but requires
     you to assure you are able to encrypt for that recipient.
  * `vault add` now creates sub-directories automatically
