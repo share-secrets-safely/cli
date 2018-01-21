@@ -4,7 +4,6 @@ use std::io::{self, stdin, Read, Write};
 use std::env::{current_dir, set_current_dir};
 use serde_yaml;
 use util::write_at;
-use itertools::join;
 use error::{IOMode, VaultError};
 use failure::{Error, ResultExt};
 use glob::glob;
@@ -18,12 +17,11 @@ pub fn secrets_default() -> PathBuf {
     PathBuf::from(".")
 }
 
-pub fn strip_ext(p: &Path) -> String {
-    let cow = p.to_string_lossy();
-    let tokens = cow.split('.');
-    let all_expect_last = tokens.count().checked_sub(1).expect("at least two tokens");
-    let tokens = cow.split('.');
-    join(tokens.take(all_expect_last), ".")
+pub fn strip_ext(p: &Path) -> PathBuf {
+    let mut p = p.to_owned();
+    let stem = p.file_stem().expect(".gpg file extension").to_owned();
+    p.set_file_name(stem);
+    p
 }
 pub struct ResetCWD {
     cwd: Result<PathBuf, io::Error>,
@@ -174,7 +172,7 @@ impl Vault {
             Result::ok,
         )
         {
-            writeln!(w, "{}", strip_ext(&entry))?;
+            writeln!(w, "{}", strip_ext(&entry).display())?;
         }
         Ok(())
     }

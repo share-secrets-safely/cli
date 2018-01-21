@@ -332,7 +332,7 @@ impl Vault {
             writeln!(
                 output,
                 "Re-encrypted '{}' for new recipient(s)",
-                strip_ext(&encrypted_file_path)
+                strip_ext(&encrypted_file_path).display()
             ).ok();
         }
         Ok(())
