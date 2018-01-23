@@ -168,11 +168,74 @@ do test-driven development, which nurishes my doubt in the quality of the softwa
  * GPG2 is required to use the 'sign-key' operation. The latter is required when
    trying to add new unverified recipients via `vault recipients add <fingerprint>`.
 
-## Roadmap
+
+## Roadmap to Future
+
+## Roadmap to 5.1
+
+### Add the `pass` subcommand
+
+`sy` aims to be as usable as possible, and breaks compatiblity were needed to
+achieve that. However, to allow people to leverage its improved portability
+thanks to it being self-contained, it should be possible to let it act as a
+stand-in for pass.
+
+Even though its output won't be matched, its input will be matched perfectly, as
+well as its behaviour.
+
+## Roadmap to 5.0
+
+### Adding the `extract` subcommand
+
+The `extract` capability makes it feasilbe to store secrets in structured files
+like YAML or JSON, as it allows to extract pieces of data in various ways.
+That way, you can easily substitute secrets into configuration files using the
+well-known `{{handlebar}}` syntax.
+
+### Sub-Commands as standalone programs
+
+Even though the main binary should by `sy` as before, the code should be structured to
+provide `cli` versions of the respective subcommand, e.g. `vault-cli`.
+That way, people can also use special-purpose sub-programs directly without having
+a binary that contains all the other cruft.
+
+This can be useful to make `pass` standins more approachable, and also build custom
+`sy` binaries with just a sub-set of the functionality (for example, without `pass`
+stand-in capability).
+
+ * [ ] move vault-cli into own library and use it from `hub` cli.
+ 
+## Roadmap to 4.0
+
+### Web of Trust for everyone
+
+The web-of-trust is powerful if used correctly, and helps to assure you are encrypting
+only for trusted keys.
+
+ * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
+ * [ ] Suggestion engine to learn how to encrypt for everyone in partition(s) with the
+       least amount of work. It will suggest 'ownertrust' to well-connected people
+       and make available everyone they signed for.
+ 
+## Roadmap to 3.0
+
+### Partition Support
+
+Partitions are just another vault with individual config, but operations on vaults are 
+aware of partitions. This allows sharing key-lists, for example, and alters the way
+vaults are displayed when showing them.
+
+ * [ ] `multi-vault`
+   * _manage multiple vaults in a single vault configuration file_
+   * _it is possible to share public keys, too, so you can implement partitions_
+ * [ ] Show vault with all partitions as tree
+ * [ ] Show recipients per partition
+
+## Roadmap to 2.0
 
 ### Documentation
 
-Currnently the only documentation that exists is the program itself, it is self-documentating
+Currently the only documentation that exists is the program itself, it is self-documentating
 after all, as well as the journey tests. The latter are probably not what a user would look
 like, so we should provide something more along the lines of how users want to use `sheesy`.
 
@@ -194,23 +257,6 @@ scripts in various modes:
    
 [mdbook-github]: https://github.com/rust-lang-nursery/mdBook
 
-### Add the `pass` subcommand
-
-`sy` aims to be as usable as possible, and breaks compatiblity were needed to
-achieve that. However, to allow people to leverage its improved portability
-thanks to it being self-contained, it should be possible to let it act as a
-stand-in for pass.
-
-Even though its output won't be matched, its input will be matched perfectly, as
-well as its behaviour.
-
-### Completing the `extract` subcommand
-
-The `extract` capability makes it feasilbe to store secrets in structured files
-like YAML or JSON, as it allows to extract pieces of data in various ways.
-That way, you can easily substitute secrets into configuration files using the
-well-known `{{handlebar}}` syntax.
-
 ### Completing the `vault` subcommand
 
 The first iteration only fulfilled the main journey. Now it's  time to fill the gaps
@@ -226,9 +272,6 @@ and add a few more features to provide API symmetry.
  * [x] `vault remove` a resource
  * [x] `vault add` create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
- * [ ] `multi-vault`
-   * _manage multiple vaults in a single vault configuration file_
-   * _it is possible to share public keys, too, so you can implement partitions_
  * [ ] it must be possible to turn off any automation introduced above
  
 ### UX - The next iteration
@@ -249,27 +292,7 @@ gpg error remains unexplained**.
  * [x] list recipients which are not available in the gpg key database.
  * [x] allow future recipients to export their key to the right spot.
  * [ ] it must be possible to turn off any automation introduced above
- * [ ] certain configuration flags should be persisted with the vault configuration
 
-### On our way to the minimal viable product v1.0
-
- * [x] **setup rust workspace for clear dependency separation**
- * [x] **setup CI for linux and OSX**
- * [x] **standalone deployables without additional dependencies for**
-   * [x] OSX (static binary) - _just gettext is still dynamically linked :(_
-   * [x] MUSL Linux
- * [x] **shell completions**
- * [x] **complete a happy journey with**
-   * [x] initialize a new vault
-   * [x] add contents
-   * [x] support for multiple vaults
-   * [x] list vault contents
-   * [x] decrypt vault contents
-   * [x] edit vault contents
-   * [x] add another user and re-encrypt vault content
- * [x] **installable from crates.io**
- * [x] **release binaries generated by travis for tags**
- 
 ## Development Practices
 
  * **test-first development**
