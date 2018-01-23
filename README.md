@@ -216,6 +216,9 @@ only for trusted keys.
  * [ ] Suggestion engine to learn how to encrypt for everyone in partition(s) with the
        least amount of work. It will suggest 'ownertrust' to well-connected people
        and make available everyone they signed for.
+ * [ ] suggest to import keys or do it for the user
+ * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
+ * [ ] possibly allow to disable ownertrust using 'always-trust'
  
 ## Roadmap to 3.0
 
@@ -272,11 +275,10 @@ and add a few more features to provide API symmetry.
  * [x] `vault remove` a resource
  * [x] `vault add` create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
- * [ ] it must be possible to turn off any automation introduced above
  
 ### UX - The next iteration
 
-GPG is cryptic, and it's usually entirely unclear to the uniniciated user why
+GPG is cryptic, and it's usually entirely unclear to the uninitiated user why
 encryption just didn't work. Right now, we are not much better than using `pass`.
 
 In this iteration, we want to achieve that for all major user journeys, **no 
@@ -285,13 +287,9 @@ gpg error remains unexplained**.
  * [x] Suggest installing GPG if there is none
  * [x] Suggest creating a gpg key if there is none.
  * [ ] try encrypting on edit (before the edit) to fail fast
-   * [ ] suggest to import keys or do it for the user
-   * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
-   * [ ] possibly allow to disable ownertrust using 'always-trust'
  * [x] list recipients which are unusable when re-encryption fails (lack of trust)
  * [x] list recipients which are not available in the gpg key database.
  * [x] allow future recipients to export their key to the right spot.
- * [ ] it must be possible to turn off any automation introduced above
 
 ## Development Practices
 
