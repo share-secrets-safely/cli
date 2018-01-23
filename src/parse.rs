@@ -165,12 +165,6 @@ pub fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultCont
     })
 }
 
-pub fn extraction_context_from(args: &ArgMatches) -> Result<ExtractionContext, Error> {
-    Ok(ExtractionContext {
-        file_path: required_os_arg(args, "file")?,
-    })
-}
-
 pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error> {
     let shell = args.value_of("shell")
         .ok_or_else(|| err_msg("expected 'shell' argument"))

@@ -240,13 +240,6 @@ where
                     .help("Path to the vault configuration YAML file.")
                     .default_value("./sy-vault.yml"),
             );
-        let extract = App::new("extract")
-            .about(
-                "utilities to extract information from structured data files",
-            )
-            .arg(Arg::with_name("file").short("f").required(true).help(
-                "Path to the data file to read",
-            ));
         let completions = App::new("completions")
             .about("generate completions for supported shell")
             .arg({
@@ -264,8 +257,7 @@ where
             .name(CLI::name())
             .version(include_str!("../VERSION"))
             .subcommand(vault)
-            .subcommand(completions)
-            .subcommand(extract);
+            .subcommand(completions);
 
         Self { app }
     }

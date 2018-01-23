@@ -25,13 +25,6 @@ title "'vault init' subcommand"
       WITH_SNAPSHOT="$snapshot/invalid-vault-path" expect_run $WITH_FAILURE "$exe" vault -c / init
 )
 
-title "'extract' subcommand"
-
-(with "no data file to read from"
-    it "fails" && \
-      WITH_SNAPSHOT="$snapshot/no-data-file" expect_run $WITH_FAILURE "$exe" extract
-)
-
 title "'completions' subcommand"
 
 (with "a supported $SHELL"

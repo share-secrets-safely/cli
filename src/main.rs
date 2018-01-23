@@ -91,10 +91,6 @@ fn main() {
             let mut lock = sout.lock();
             add_vault_context(vault::do_it(context, &mut lock))
         }
-        ("extract", Some(args)) => {
-            let context = ok_or_exit(extraction_context_from(args));
-            extract::do_it(context)
-        }
         _ => usage_and_exit(&matches),
     };
 
