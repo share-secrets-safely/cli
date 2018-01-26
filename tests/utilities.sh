@@ -1,9 +1,9 @@
 #!/bin/bash
 
-WHITE="$(tput setaf 9)"
-YELLOW="$(tput setaf 3)"
-GREEN="$(tput setaf 2)"
-RED="$(tput setaf 1)"
+WHITE="$(tput setaf 9 || echo -n '')"
+YELLOW="$(tput setaf 3 || echo -n '')"
+GREEN="$(tput setaf 2 || echo -n '')"
+RED="$(tput setaf 1 || echo -n '')"
 OFFSET=( )
 STEP="  "
 
@@ -58,7 +58,7 @@ function sandbox () {
   trap "popd >/dev/null" EXIT
   pushd "$sandbox_tempdir" >/dev/null \
    || fail "Could not change directory into temporary directory."
-   
+
   local custom_init="${1:-}"
   if [ -n "$custom_init" ]; then
     eval "$custom_init"
