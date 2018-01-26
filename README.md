@@ -44,6 +44,11 @@ cargo install sheesy-cli
 This installation should be preferred as it makes updating the binary much easier.
 If you don't have `cargo` yet, you can install it via [instructions on rustup.rs][rustup].
 
+Please note that for building on OSX, you are required to locally install [certain dependencies][dep-osx],
+which is also the case on [linux systems][dep-debian].
+
+[dep-osx]: https://github.com/Byron/share-secrets-safely/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L30
+[dep-debian]: https://github.com/Byron/share-secrets-safely/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L22
 [releases]: https://github.com/Byron/share-secrets-safely/releases
 [rustup]: http://rustup.rs
 
