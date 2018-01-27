@@ -313,10 +313,11 @@ gpg error remains unexplained**.
 
 ## Maintenance Guide
 
-### Making a deployment
+### Making a release
 
 As a prerequisite, you should be sure the build is green.
 
+ * run `clippy` and fix all warnings
  * change the version in the `VERSION` file
  * update the release notes in the `release.md` file.
    * Just prefix it with a description of new features and fixes 
