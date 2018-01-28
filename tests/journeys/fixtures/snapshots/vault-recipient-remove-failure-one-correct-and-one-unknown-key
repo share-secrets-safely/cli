@@ -1,6 +1,5 @@
 error: Didn't find the key for 1 user-id(s) in the gpg database. This might mean it wasn't imported yet from the 'keys' directory.
 The following user-id(s) could not be found in the gpg key database:
-b@example.com (Key-file does not exist at 'keys/b@example.com')
 unkown@example.com (Key-file does not exist at 'keys/unkown@example.com')
 All user-ids found in gpg database:
 7435ACDC03D55429C41637C4DB9831D842C18D28 (user b <b@example.com>)

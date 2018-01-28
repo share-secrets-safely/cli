@@ -156,28 +156,27 @@ impl Vault {
         ids: &[String],
         type_of_ids_for_errors: &str,
     ) -> Result<Vec<gpgme::Key>, Error> {
-        let keys: Vec<gpgme::Key> = ctx.find_keys(ids)
-            .context(format!(
-                "Could not iterate keys for given {}s",
-                type_of_ids_for_errors
-            ))?
-            .filter_map(Result::ok)
-            .collect();
+        ctx.find_keys(ids).context(format!(
+            "Could not iterate keys for given {}s",
+            type_of_ids_for_errors
+        ))?;
+        let (keys, missing): (Vec<gpgme::Key>, Vec<String>) = ids.iter().map(|id| (ctx.find_key(id), id)).fold(
+            (Vec::new(), Vec::new()),
+            |(mut keys, mut missing), (r, id)| {
+                match r {
+                    Ok(k) => keys.push(k),
+                    Err(_) => missing.push(id.to_owned()),
+                };
+                (keys, missing)
+            },
+        );
         if keys.len() == ids.len() {
+            assert_eq!(missing.len(), 0);
             return Ok(keys);
         }
-        let diff = ids.len() - keys.len();
+        let diff: isize = ids.len() as isize - keys.len() as isize;
         let mut msg = vec![
             if diff > 0 {
-                // TODO: this check doesn't work anymore if ids is not full fingerprints
-                // which now can happen.
-                let existing_fprs: Vec<_> = keys.iter().filter_map(|k| k.fingerprint().ok()).collect();
-                let missing_fprs = ids.iter().fold(Vec::new(), |mut m, f| {
-                    if existing_fprs.iter().all(|of| of != f) {
-                        m.push(f);
-                    }
-                    m
-                });
                 let mut msg = format!(
                     "Didn't find the key for {} {}(s) in the gpg database.{}",
                     diff,
@@ -194,7 +193,7 @@ impl Vault {
                     "\nThe following {}(s) could not be found in the gpg key database:",
                     type_of_ids_for_errors
                 ));
-                for fpr in missing_fprs {
+                for fpr in missing {
                     msg.push_str("\n");
                     let key_path_info = match self.gpg_keys.as_ref() {
                         Some(dir) => {
