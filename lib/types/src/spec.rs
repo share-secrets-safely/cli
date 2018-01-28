@@ -1,13 +1,13 @@
 use conv::TryFrom;
 use std::fmt;
 use std::fs::{File, OpenOptions};
-use std::io::{stdin, Write, Read};
+use std::io::{stdin, Read, Write};
 use std::fs::create_dir_all;
 
 use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
 use std::path::Component;
-use super::{WriteMode, Destination};
+use super::{Destination, WriteMode};
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultSpec {
@@ -43,19 +43,16 @@ impl ::std::error::Error for VaultSpecError {
 }
 
 pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
-    let file_name = path.file_name().ok_or_else(|| {
-        format_err!("'{}' does not have a filename", path.display())
-    })?;
-    Ok(
-        path.parent()
-            .expect("path with filename to have a root")
-            .join(format!(
-                "{}.gpg",
-                file_name.to_str().expect(
-                    "filename to be decodeable with UTF8",
-                )
-            )),
-    )
+    let file_name = path.file_name()
+        .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
+    Ok(path.parent()
+        .expect("path with filename to have a root")
+        .join(format!(
+            "{}.gpg",
+            file_name
+                .to_str()
+                .expect("filename to be decodeable with UTF8",)
+        )))
 }
 
 impl VaultSpec {
@@ -114,10 +111,7 @@ impl VaultSpec {
 
     pub fn open_input(&self) -> Result<Box<Read>, Error> {
         Ok(match self.src {
-            Some(ref p) => Box::new(File::open(p).context(format!(
-                "Could not open input file at '{}'",
-                p.display()
-            ))?),
+            Some(ref p) => Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?),
             None => Box::new(stdin()),
         })
     }
@@ -141,13 +135,15 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                 Some(PathBuf::from(src))
             })
         };
-        let validate_dst = |p: PathBuf| if p.is_absolute() {
-            Err(VaultSpecError(format!(
-                "'{}' must not have an absolute destination.",
-                input
-            )))
-        } else {
-            Ok(p)
+        let validate_dst = |p: PathBuf| {
+            if p.is_absolute() {
+                Err(VaultSpecError(format!(
+                    "'{}' must not have an absolute destination.",
+                    input
+                )))
+            } else {
+                Ok(p)
+            }
         };
 
         if input.is_empty() {
@@ -175,15 +171,17 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                 src: validate(src)?,
                 dst: PathBuf::from(if dst.is_empty() {
                     if src.is_empty() {
-                        return Err(VaultSpecError(
-                            format!("'{}' does not contain a destination.", input),
-                        ));
+                        return Err(VaultSpecError(format!(
+                            "'{}' does not contain a destination.",
+                            input
+                        )));
                     }
                     src
                 } else if dst.contains(SEPARATOR) {
-                    return Err(VaultSpecError(
-                        format!("'{}' must not contain more than one colon.", input),
-                    ));
+                    return Err(VaultSpecError(format!(
+                        "'{}' must not contain more than one colon.",
+                        input
+                    )));
                 } else {
                     dst
                 }),

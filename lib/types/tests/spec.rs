@@ -1,5 +1,5 @@
-extern crate sheesy_types;
 extern crate conv;
+extern crate sheesy_types;
 
 use sheesy_types::*;
 
@@ -23,9 +23,10 @@ fn it_cannot_have_just_a_separator() {
     let invalid = ":";
     assert_eq!(
         VaultSpec::try_from(invalid),
-        Err(VaultSpecError(
-            format!("'{}' does not contain a destination.", invalid),
-        ))
+        Err(VaultSpecError(format!(
+            "'{}' does not contain a destination.",
+            invalid
+        ),))
     )
 }
 
@@ -123,8 +124,8 @@ fn it_does_not_allow_relative_parent_directories() {
     assert_eq!(
         VaultSpec::try_from("../relative"),
         Err(VaultSpecError(format!(
-                "Relative parent directories in source '../relative' need the destination set explicitly.",
-            )))
+            "Relative parent directories in source '../relative' need the destination set explicitly.",
+        )))
     )
 }
 
@@ -150,13 +151,12 @@ fn it_does_allow_an_absolute_destination_if_it_is_specified() {
 
 #[test]
 fn it_displays_itself_properly() {
-    for &(ref input, ref expected) in
-        [
-            (":path", ":path"),
-            ("src:dst", "src:dst"),
-            ("src", "src:src"),
-            ("src:", "src:src"),
-        ].iter()
+    for &(ref input, ref expected) in [
+        (":path", ":path"),
+        ("src:dst", "src:dst"),
+        ("src", "src:src"),
+        ("src:", "src:src"),
+    ].iter()
     {
         let s = VaultSpec::try_from(*input).unwrap();
         assert_eq!(&format!("{}", s), expected)

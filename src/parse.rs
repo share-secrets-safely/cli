@@ -1,7 +1,7 @@
 extern crate sheesy_types;
 
 use conv::TryInto;
-use sheesy_types::{CreateMode, ExtractionContext, VaultCommand, VaultContext};
+use sheesy_types::{CreateMode, VaultCommand, VaultContext};
 use clap::{App, ArgMatches, Shell};
 use failure::{err_msg, Error, ResultExt};
 use std::io::stdout;
@@ -11,6 +11,7 @@ use std::convert::Into;
 use std::ffi::OsStr;
 use cli::CLI;
 use sheesy_types::SigningMode;
+use std::path::PathBuf;
 
 fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
@@ -99,7 +100,9 @@ pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<Vaul
 
 pub fn vault_resource_show(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
-        command: VaultCommand::ResourceShow { spec: required_os_arg(args, "path")? },
+        command: VaultCommand::ResourceShow {
+            spec: required_os_arg(args, "path")?,
+        },
         ..ctx
     })
 }
@@ -129,8 +132,8 @@ pub fn vault_resource_edit(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
 pub fn vault_resource_remove(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::ResourceRemove {
-            specs: match args.values_of("spec") {
-                Some(v) => v.map(|s| s.try_into()).collect::<Result<_, _>>()?,
+            specs: match args.values_of("path") {
+                Some(v) => v.map(PathBuf::from).collect(),
                 None => Vec::new(),
             },
         },
@@ -172,9 +175,8 @@ pub fn generate_completions(mut app: App, args: &ArgMatches) -> Result<(), Error
             Path::new(s)
                 .file_name()
                 .map(|f| {
-                    f.to_str().expect(
-                        "os-string to str conversion to work for filename",
-                    )
+                    f.to_str()
+                        .expect("os-string to str conversion to work for filename")
                 })
                 .unwrap_or(s)
         })

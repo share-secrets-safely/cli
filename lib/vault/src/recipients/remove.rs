@@ -1,7 +1,7 @@
-use failure::{ResultExt, Error};
+use failure::{Error, ResultExt};
 use std::io::Write;
 use Vault;
-use util::{UserIdFingerprint, new_context};
+use util::{new_context, UserIdFingerprint};
 use itertools::Itertools;
 use util::fingerprint_of;
 use std::fs::remove_file;
@@ -58,8 +58,7 @@ impl Vault {
             if let Ok(gpg_keys_dir) = gpg_keys_dir.as_ref() {
                 let fingerprint_path = gpg_keys_dir.join(fpr);
                 if fingerprint_path.is_file() {
-                    remove_file(&fingerprint_path).context(
-                    format!(
+                    remove_file(&fingerprint_path).context(format!(
                         "Failed to remove key file at '{}'",
                         fingerprint_path.display(),
                     ))?;

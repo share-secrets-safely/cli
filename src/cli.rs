@@ -27,9 +27,7 @@ where
             .required(false)
             .takes_value(true)
             .value_name("userid")
-            .help(
-                "The key-id of the public key identifying a recipient in your gpg keychain.",
-            );
+            .help("The key-id of the public key identifying a recipient in your gpg keychain.");
         let init = App::new("init")
             .about(
                 "Initialize the vault in the current directory. \
@@ -77,9 +75,9 @@ where
             )
             .arg(gpg_key_id.clone().long("gpg-key-id").short("i"));
 
-        let list = App::new("list").alias("ls").about(
-            "List the vault's content.",
-        );
+        let list = App::new("list")
+            .alias("ls")
+            .about("List the vault's content.");
         let resource_path = Arg::with_name("path")
             .required(true)
             .multiple(false)
@@ -119,9 +117,9 @@ where
                  a temporary file, open up the $EDITOR you have specified, and re-encrypt the \
                  changed content before deleting it on disk.",
             );
-        let show_resource = App::new("show").about("Decrypt a resource").arg(
-            resource_path,
-        );
+        let show_resource = App::new("show")
+            .about("Decrypt a resource")
+            .arg(resource_path.clone());
         let spec = Arg::with_name("spec")
             .required(true)
             .multiple(false)
@@ -132,18 +130,19 @@ where
             .about("Add a new resource to the vault.")
             .arg(spec.clone().help(
                 "A specification identifying a mapping from a source file to be stored \
-                         in a location of the vault. It takes the form '<src>:<dst>', where \
-                         '<src>' is equivalent to '<src>:<src>'.\
-                         <dst> should be vault-relative paths, whereas <src> must point to a readable file \
-                         and can be empty to read from standard input, such as in ':<dst>'.",
+                 in a location of the vault. It takes the form '<src>:<dst>', where \
+                 '<src>' is equivalent to '<src>:<src>'.\
+                 <dst> should be vault-relative paths, whereas <src> must point to a readable file \
+                 and can be empty to read from standard input, such as in ':<dst>'.",
             ));
         let remove_resource = App::new("remove")
             .alias("delete")
             .about("Delete a resource from the vault.")
-            .arg(spec.multiple(true).help(
-                // TODO: use resource-path instead of spec
-                "The vault-relative path of a resource in the vault",
-            ));
+            .arg(
+                resource_path
+                    .multiple(true)
+                    .help("The vault-relative path of a resource in the vault"),
+            );
         let init_recipient = App::new("init").arg(gpg_key_id.clone()).about(
             "Add your single (or the given) recipient key to the vault by exporting the public \
              key and storing it in the vaults local gpg key database. \
@@ -160,8 +159,8 @@ where
                     .conflicts_with("verified")
                     .help(
                         "The userid or fingerprint of the key to use for signing not-yet-verified keys. \
-                           It must only be specified if you have access to multiple secret keys which are \
-                           also current recipients.",
+                         It must only be specified if you have access to multiple secret keys which are \
+                         also current recipients.",
                     ),
             )
             .arg(
@@ -169,44 +168,42 @@ where
                     .long("verified")
                     .required(false)
                     .help(
-                        "If specified, you indicate that the user id to be added truly belongs to a person you know \
-            and that you have verified that relationship already. \
-            You have used `gpg --sign-key <recipient>` or have set the owner trust to ultimate so that you \
-            can encrypt for the recipient.",
-                    ),
+                    "If specified, you indicate that the user id to be added truly belongs to a person you know \
+                     and that you have verified that relationship already. \
+                     You have used `gpg --sign-key <recipient>` or have set the owner trust to ultimate so that you \
+                     can encrypt for the recipient.",
+                ),
             )
             .arg(gpg_key_id.clone().required(true))
             .about(
                 "Add a new recipient. This will re-encrypt all the vaults content.\
-                \
-                If the '--verified' flag is unset, you will have to specify the fingerprint directly \
-                (as opposed to allowing the recipients email address or name) to indicate you have \
-                assured yourself that it actually belongs to the person.\
-                Otherwise the respective key as identified by its fingerprint will then be imported \
-                and signed. It is expected that you have assured the keys fingerprint belongs to the \
-                recipient. Keys will always be exported into the vaults key directory (if set), which \
-                includes signatures.\
-                Signatures allow others to use the 'Web of Trust' for convenient encryption.",
+                 \
+                 If the '--verified' flag is unset, you will have to specify the fingerprint directly \
+                 (as opposed to allowing the recipients email address or name) to indicate you have \
+                 assured yourself that it actually belongs to the person.\
+                 Otherwise the respective key as identified by its fingerprint will then be imported \
+                 and signed. It is expected that you have assured the keys fingerprint belongs to the \
+                 recipient. Keys will always be exported into the vaults key directory (if set), which \
+                 includes signatures.\
+                 Signatures allow others to use the 'Web of Trust' for convenient encryption.",
             );
         let remove_recipient = App::new("remove")
             .alias("delete")
             .about(
                 "Remove the given recipient. This will re-encrypt all the vaults content for the remaining \
-            recipients.\
-            \
-            The gpg keychain will not be altered, thus the trust-relationship with the removed recipient is \
-            left intact.\
-            However, the recipients key file will be removed from the vault.",
+                 recipients.\
+                 \
+                 The gpg keychain will not be altered, thus the trust-relationship with the removed recipient is \
+                 left intact.\
+                 However, the recipients key file will be removed from the vault.",
             )
             .arg(gpg_key_id.required(true));
-        let list_recipient = App::new("list").alias("ls").about(
-            "List the vaults recipients as identified by the recipients file.",
-        );
+        let list_recipient = App::new("list")
+            .alias("ls")
+            .about("List the vaults recipients as identified by the recipients file.");
         let recipients = App::new("recipients")
             .alias("recipient")
-            .about(
-                "Interact with recipients of a vault. They can encrypt and decrypt its contents.",
-            )
+            .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
             .subcommand(add_recipient)
             .subcommand(remove_recipient)
             .subcommand(list_recipient)
@@ -226,9 +223,7 @@ where
                     .long("vault-id")
                     .required(false)
                     .value_name("id")
-                    .help(
-                        "Either an index into the vaults list, or the name of the vault.",
-                    )
+                    .help("Either an index into the vaults list, or the name of the vault.")
                     .default_value("0"),
             )
             .arg(

@@ -119,41 +119,31 @@ impl fmt::Display for VaultError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::VaultError::*;
         match *self {
-            ConfigurationFileExists(ref path) => {
-                writeln!(
-                    f,
-                    "Cannot overwrite vault configuration file as it already exists at '{}'",
-                    path.display()
-                )
-            }
-            Serialization { ref path, .. } => {
-                writeln!(
-                    f,
-                    "Failed to serialize vault configuration file at '{}'",
-                    path.display()
-                )
-            }
-            Deserialization { ref path, .. } => {
-                writeln!(
-                    f,
-                    "Failed to deserialize vault configuration file at '{}'",
-                    path.display()
-                )
-            }
-            WriteFile { ref path, .. } => {
-                writeln!(
-                    f,
-                    "Failed to write vault configuration file at '{}'",
-                    path.display()
-                )
-            }
-            ReadFile { ref path, .. } => {
-                writeln!(
-                    f,
-                    "Failed to read vault configuration file at '{}'",
-                    path.display()
-                )
-            }
+            ConfigurationFileExists(ref path) => writeln!(
+                f,
+                "Cannot overwrite vault configuration file as it already exists at '{}'",
+                path.display()
+            ),
+            Serialization { ref path, .. } => writeln!(
+                f,
+                "Failed to serialize vault configuration file at '{}'",
+                path.display()
+            ),
+            Deserialization { ref path, .. } => writeln!(
+                f,
+                "Failed to deserialize vault configuration file at '{}'",
+                path.display()
+            ),
+            WriteFile { ref path, .. } => writeln!(
+                f,
+                "Failed to write vault configuration file at '{}'",
+                path.display()
+            ),
+            ReadFile { ref path, .. } => writeln!(
+                f,
+                "Failed to read vault configuration file at '{}'",
+                path.display()
+            ),
         }
     }
 }

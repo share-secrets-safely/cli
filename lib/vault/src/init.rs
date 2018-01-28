@@ -73,8 +73,7 @@ impl Vault {
 
             writeln!(recipients, "{}", fingerprint).context(format!(
                 "Could not append fingerprint to file at '{}'",
-                recipients_file
-                    .display()
+                recipients_file.display()
             ))?;
         }
         recipients.flush().context(format!(

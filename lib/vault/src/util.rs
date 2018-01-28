@@ -1,5 +1,5 @@
 use std::io::{self, Write};
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use std::env::{current_dir, set_current_dir};
 use std::fs::{self, OpenOptions};
@@ -50,9 +50,8 @@ impl<'a> fmt::Display for FingerprintUserId<'a> {
 pub fn fingerprint_of(key: &gpgme::Key) -> Result<String, failure::Error> {
     key.fingerprint()
         .map_err(|e| {
-            e.map(Into::into).unwrap_or_else(
-                || err_msg("Fingerprint extraction failed"),
-            )
+            e.map(Into::into)
+                .unwrap_or_else(|| err_msg("Fingerprint extraction failed"))
         })
         .map(ToOwned::to_owned)
 }
@@ -94,8 +93,8 @@ pub fn export_key(
         gpgme::ExportMode::empty(),
         &mut *buf,
     ).context(err_msg(
-            "Failed to export at least one public key with signatures.",
-        ))?;
+        "Failed to export at least one public key with signatures.",
+    ))?;
     write_at(&key_path)
         .and_then(|mut f| f.write_all(buf))
         .context(format!(

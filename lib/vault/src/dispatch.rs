@@ -21,14 +21,12 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             ref gpg_key_ids,
             ref sign,
             ref signing_key_id,
-        } => {
-            vault_from(&ctx)?.add_recipients(
-                gpg_key_ids,
-                *sign,
-                signing_key_id.as_ref().map(String::as_str),
-                output,
-            )
-        }
+        } => vault_from(&ctx)?.add_recipients(
+            gpg_key_ids,
+            *sign,
+            signing_key_id.as_ref().map(String::as_str),
+            output,
+        ),
         VaultCommand::RecipientsList => vault_from(&ctx)?.list_recipients(output),
         VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
         VaultCommand::Init {
@@ -59,14 +57,12 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             Ok(())
         }
         VaultCommand::ResourceRemove { ref specs } => vault_from(&ctx)?.remove(specs, output),
-        VaultCommand::ResourceAdd { ref specs } => {
-            vault_from(&ctx)?.encrypt(
-                specs,
-                WriteMode::RefuseOverwrite,
-                Destination::ReolveAndAppendGpg,
-                output,
-            )
-        }
+        VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(
+            specs,
+            WriteMode::RefuseOverwrite,
+            Destination::ReolveAndAppendGpg,
+            output,
+        ),
         VaultCommand::ResourceEdit {
             ref spec,
             ref editor,
@@ -86,24 +82,20 @@ pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             None => None, // failure.into(),
         };
         match gpg_error_code {
-            Some(code) if code == gpgme::Error::NOT_SUPPORTED.code() => {
-                failure
-                    .context(
-                        "The GNU Privacy Guard (GPG) does not supported the attempted operation.\n\
-                         GPG v2 is known to work, and you can install it here:\n\
-                         https://www.gnupg.org for more information.",
-                    )
-                    .into()
-            }
-            Some(code) if code == gpgme::Error::UNSUPPORTED_PROTOCOL.code() => {
-                failure
-                    .context(
-                        "The GNU Privacy Guard (GPG) is not available on your system.\n\
-                         Please install it and try again.\n\
-                         See https://www.gnupg.org for more information.",
-                    )
-                    .into()
-            }
+            Some(code) if code == gpgme::Error::NOT_SUPPORTED.code() => failure
+                .context(
+                    "The GNU Privacy Guard (GPG) does not supported the attempted operation.\n\
+                     GPG v2 is known to work, and you can install it here:\n\
+                     https://www.gnupg.org for more information.",
+                )
+                .into(),
+            Some(code) if code == gpgme::Error::UNSUPPORTED_PROTOCOL.code() => failure
+                .context(
+                    "The GNU Privacy Guard (GPG) is not available on your system.\n\
+                     Please install it and try again.\n\
+                     See https://www.gnupg.org for more information.",
+                )
+                .into(),
             _ => failure.into(),
         }
     })

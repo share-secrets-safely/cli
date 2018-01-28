@@ -11,18 +11,15 @@ use failure::{Error, ResultExt};
 use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 use error::{DecryptionError, EncryptionError};
-use util::{write_at, strip_ext, new_context};
+use util::{new_context, strip_ext, write_at};
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
-        let file = Temp::new_file().context(
-            "Could not create tempfile to decrypt to.",
-        )?;
+        let file = Temp::new_file().context("Could not create tempfile to decrypt to.")?;
         let tempfile_path = file.to_path_buf();
         let decrypted_file_path = {
-            let mut decrypted_writer = write_at(&tempfile_path).context(
-                "Failed to open temporary file for writing decrypted content to.",
-            )?;
+            let mut decrypted_writer =
+                write_at(&tempfile_path).context("Failed to open temporary file for writing decrypted content to.")?;
             self.decrypt(path, &mut decrypted_writer)
                 .context(format!("Failed to decrypt file at '{}'.", path.display()))
                 .or_else(|err| match (mode, err.first_cause_of::<io::Error>()) {
@@ -40,9 +37,9 @@ impl Vault {
                 "Failed to start editor program at '{}'.",
                 editor.display()
             ))?;
-        let status = running_program.wait().context(
-            "Failed to wait for editor to exit.",
-        )?;
+        let status = running_program
+            .wait()
+            .context("Failed to wait for editor to exit.")?;
         if !status.success() {
             return Err(format_err!(
                 "Editor '{}' failed. Edit aborted.",
@@ -71,31 +68,29 @@ impl Vault {
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
             .map(|f| (f, resolved_gpg_path.to_owned()))
-            .or_else(|_| {
-                File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned()))
-            })
+            .or_else(|_| File::open(&resolved_absolute_path).map(|f| (f, resolved_absolute_path.to_owned())))
             .context(format!(
                 "Could not open input file at '{}' for reading. Tried '{}' as well.",
                 resolved_gpg_path.display(),
                 resolved_absolute_path.display()
             ))?;
         let mut output = Vec::new();
-        ctx.decrypt(&mut input, &mut output).map_err(
-            |e: gpgme::Error| {
-                DecryptionError::caused_by(e, "Failed to decrypt data.")
-            },
-        )?;
+        ctx.decrypt(&mut input, &mut output)
+            .map_err(|e: gpgme::Error| DecryptionError::caused_by(e, "Failed to decrypt data."))?;
 
-        w.write_all(&output).context(
-            "Could not write out all decrypted data.",
-        )?;
+        w.write_all(&output)
+            .context("Could not write out all decrypted data.")?;
         Ok(path_for_decryption)
     }
 
-    pub fn remove(&self, specs: &[VaultSpec], output: &mut Write) -> Result<(), Error> {
+    pub fn remove(&self, specs: &[PathBuf], output: &mut Write) -> Result<(), Error> {
         let sp = self.secrets_path();
-        for spec in specs {
+        for path_to_remove in specs {
             let path = {
+                let spec = VaultSpec {
+                    src: None,
+                    dst: path_to_remove.clone(),
+                };
                 let gpg_path = spec.output_in(&sp, Destination::ReolveAndAppendGpg)?;
                 if gpg_path.exists() {
                     gpg_path
@@ -107,10 +102,7 @@ impl Vault {
                     new_path
                 }
             };
-            remove_file(&path).context(format!(
-                "Failed to remove file at '{}'.",
-                path.display()
-            ))?;
+            remove_file(&path).context(format!("Failed to remove file at '{}'.", path.display()))?;
             writeln!(output, "Removed file at '{}'", path.display()).ok();
         }
         Ok(())
@@ -140,9 +132,10 @@ impl Vault {
                 buf
             };
             let mut encrypted_bytes = Vec::new();
-            ctx.encrypt(&keys, input, &mut encrypted_bytes).map_err(
-                |e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys),
-            )?;
+            ctx.encrypt(&keys, input, &mut encrypted_bytes)
+                .map_err(|e: gpgme::Error| {
+                    EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys)
+                })?;
             spec.open_output_in(&secrets_path, mode, dst_mode, output)?
                 .write_all(&encrypted_bytes)
                 .context(format!(

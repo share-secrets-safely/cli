@@ -30,7 +30,7 @@ function when () {
 
 function _note () {
   local name="${1:?}"
-  local color="${2:?}"
+  local color="${2:-}"
   shift 2
   echo 1>&2 -n "${OFFSET[*]:-}${color}[$name] ${*//  /}"
 }

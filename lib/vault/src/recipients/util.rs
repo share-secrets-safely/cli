@@ -1,9 +1,9 @@
-use failure::{Fail, err_msg, Error, ResultExt};
+use failure::{err_msg, Error, Fail, ResultExt};
 use std::fs::File;
-use std::io::{Write, Read};
+use std::io::{Read, Write};
 use util::ResetCWD;
-use base::{GPG_GLOB, Vault};
-use std::path::{PathBuf, Path};
+use base::{Vault, GPG_GLOB};
+use std::path::{Path, PathBuf};
 use glob::glob;
 use util::{fingerprint_of, UserIdFingerprint};
 use gpgme::{self, Key};
@@ -84,30 +84,24 @@ impl Vault {
                     })
             })
             .fold(Ok(Vec::new()), |r, k| match k {
-                Ok(imports) => {
-                    r.map(|mut v| {
-                        v.extend(imports);
-                        v
-                    })
-                }
-                Err(e) => {
-                    match r {
-                        Ok(_) => Err(e),
-                        r @ Err(_) => {
-                            r.map_err(|f| {
-                                let mut buf = Vec::<u8>::new();
-                                print_causes(e, &mut buf);
-                                let sbuf = String::from_utf8_lossy(&buf);
-                                format_err!("{}{}", sbuf, f)
-                            })
-                        }
-                    }
-                }
+                Ok(imports) => r.map(|mut v| {
+                    v.extend(imports);
+                    v
+                }),
+                Err(e) => match r {
+                    Ok(_) => Err(e),
+                    r @ Err(_) => r.map_err(|f| {
+                        let mut buf = Vec::<u8>::new();
+                        print_causes(e, &mut buf);
+                        let sbuf = String::from_utf8_lossy(&buf);
+                        format_err!("{}{}", sbuf, f)
+                    }),
+                },
             })?;
         if imported_gpg_keys_fprs.len() < gpg_key_ids.len() {
             panic!(
                 "You should come and take a look at this! It should not be possible \
-                        to successfully import less keys than specified."
+                 to successfully import less keys than specified."
             )
         }
 
@@ -127,18 +121,19 @@ impl Vault {
     }
 
     pub fn find_signing_key(&self, ctx: &mut gpgme::Context, signing_key_id: Option<&str>) -> Result<Key, Error> {
-        let recipients_fprs = self.recipients_list().context(
-            "A recipients list is needed assure the signing key is in the recipients list.",
-        )?;
+        let recipients_fprs = self.recipients_list()
+            .context("A recipients list is needed assure the signing key is in the recipients list.")?;
         if recipients_fprs.is_empty() {
             return Err(err_msg(
                 "The recipients list is empty, but you are expected to be on that list.",
             ));
         }
-        let key_is_in_recipients_list = |(k, fpr)| if recipients_fprs.iter().any(|rfpr| rfpr == &fpr) {
-            Some(k)
-        } else {
-            None
+        let key_is_in_recipients_list = |(k, fpr)| {
+            if recipients_fprs.iter().any(|rfpr| rfpr == &fpr) {
+                Some(k)
+            } else {
+                None
+            }
         };
         let signing_key_fpr = match signing_key_id {
             Some(id) => Some(ctx.find_key(id)
@@ -151,7 +146,11 @@ impl Vault {
             None => None,
         };
         let only_matching_signing_key = |(k, fpr)| match signing_key_fpr.as_ref() {
-            Some(sk_fpr) => if &fpr == sk_fpr { Some((k, fpr)) } else { None },
+            Some(sk_fpr) => if &fpr == sk_fpr {
+                Some((k, fpr))
+            } else {
+                None
+            },
             None => Some((k, fpr)),
         };
         let mut signing_keys: Vec<_> = ctx.find_secret_keys(None::<String>)?
@@ -165,14 +164,13 @@ impl Vault {
                 "Didn't find a single secret key suitable to sign keys.",
             )),
             1 => Ok(signing_keys.pop().expect("one entry")),
-            _ => Err(
-                format_err!("Multiple keys are suitable for signing, which is ambiguous.\n{}",
+            _ => Err(format_err!(
+                "Multiple keys are suitable for signing, which is ambiguous.\n{}",
                 signing_keys
                     .iter()
                     .map(|sk| format!("{}", UserIdFingerprint(sk)))
                     .join("\n"),
-            ),
-            ),
+            )),
         }
     }
 
@@ -188,21 +186,17 @@ impl Vault {
                 .collect();
             match matching_paths.len() {
                 1 => gpg_keys_dir.join(&matching_paths[0]),
-                0 => {
-                    bail!(
-                        "Did not find key file matching glob pattern '{}' in directory '{}'.",
-                        glob_pattern,
-                        gpg_keys_dir.display()
-                    )
-                }
-                l @ _ => {
-                    bail!(
-                        "Found {} matching key files for glob pattern '{}' in directory '{}', but expected just one.",
-                        l,
-                        glob_pattern,
-                        gpg_keys_dir.display()
-                    )
-                }
+                0 => bail!(
+                    "Did not find key file matching glob pattern '{}' in directory '{}'.",
+                    glob_pattern,
+                    gpg_keys_dir.display()
+                ),
+                l @ _ => bail!(
+                    "Found {} matching key files for glob pattern '{}' in directory '{}', but expected just one.",
+                    l,
+                    glob_pattern,
+                    gpg_keys_dir.display()
+                ),
             }
         };
         let mut buf = Vec::new();
@@ -248,16 +242,15 @@ impl Vault {
             }
             {
                 let mut plain_reader = File::open(tempfile.to_path_buf())?;
-                ctx.encrypt(&keys, &mut plain_reader, &mut obuf).map_err(
-                    |e| {
+                ctx.encrypt(&keys, &mut plain_reader, &mut obuf)
+                    .map_err(|e| {
                         EncryptionError::caused_by(
                             e,
                             format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
                             ctx,
                             &keys,
                         )
-                    },
-                )?;
+                    })?;
             }
             write_at(&secrets_dir.join(&encrypted_file_path))
                 .context(format!(

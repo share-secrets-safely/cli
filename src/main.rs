@@ -36,9 +36,9 @@ fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
         };
         (e, ctx)
     }).map_err(|(e, msg)| match msg {
-            Some(msg) => e.context(msg).into(),
-            None => e,
-        })
+        Some(msg) => e.context(msg).into(),
+        None => e,
+    })
 }
 
 fn ok_or_exit<T, E>(r: Result<T, E>) -> T
@@ -70,15 +70,13 @@ fn main() {
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
-                ("recipients", Some(args)) => {
-                    match args.subcommand() {
-                        ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
-                        ("remove", Some(args)) => ok_or_exit(vault_recipients_remove(context, args)),
-                        ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
-                        ("list", Some(args)) => ok_or_exit(vault_recipients_list(context, args)),
-                        _ => ok_or_exit(vault_recipients_list(context, args)),
-                    }
-                }
+                ("recipients", Some(args)) => match args.subcommand() {
+                    ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
+                    ("remove", Some(args)) => ok_or_exit(vault_recipients_remove(context, args)),
+                    ("init", Some(args)) => ok_or_exit(vault_recipients_init(context, args)),
+                    ("list", Some(args)) => ok_or_exit(vault_recipients_list(context, args)),
+                    _ => ok_or_exit(vault_recipients_list(context, args)),
+                },
                 ("init", Some(args)) => ok_or_exit(vault_init_from(context, args)),
                 ("add", Some(args)) => ok_or_exit(vault_resource_add(context, args)),
                 ("remove", Some(args)) => ok_or_exit(vault_resource_remove(context, args)),

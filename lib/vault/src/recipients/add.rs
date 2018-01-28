@@ -1,7 +1,7 @@
 use failure::{err_msg, Error, ResultExt};
 use std::io::Write;
 use base::Vault;
-use util::{fingerprint_of, new_context, UserIdFingerprint, KeyDisplay, KeylistDisplay, export_key};
+use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
 use sheesy_types::SigningMode;
 
 impl Vault {
@@ -17,16 +17,11 @@ impl Vault {
             let gpg_keys_dir = self.gpg_keys_dir().context(
                 "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured",
             )?;
-            let imported_gpg_keys_ids = self.import_keys(
-                &mut gpg_ctx,
-                &gpg_keys_dir,
-                gpg_key_ids,
-                output,
-            )?;
+            let imported_gpg_keys_ids = self.import_keys(&mut gpg_ctx, &gpg_keys_dir, gpg_key_ids, output)?;
             let signing_key = self.find_signing_key(&mut gpg_ctx, signing_key_id)
                 .context(
                     "Did not manage to find suitable signing key \
-            for re-exporting the recipient keys.",
+                     for re-exporting the recipient keys.",
                 )?;
             gpg_ctx.add_signer(&signing_key)?;
             for key_fpr_to_sign in imported_gpg_keys_ids {
