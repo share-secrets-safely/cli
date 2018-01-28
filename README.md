@@ -263,6 +263,11 @@ scripts in various modes:
    * generate pages suitable to be rendered by [`mdbook`][mdbook-github] (or equivalent)
      and deploy them to github pages.
 
+Here is what would have to be done, in greater detail:
+
+ * [ ] `pulldown-cmark` event serialization back to markdown.
+ * [ ] test for processing code blocks to execute lines and capture their output.
+
 [mdbook-github]: https://github.com/rust-lang-nursery/mdBook
 
 ### Completing the `vault` subcommand
