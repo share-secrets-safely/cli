@@ -1,5 +1,3 @@
-extern crate mktemp;
-
 use serde_yaml;
 use std::io;
 use std::path::{Path, PathBuf};

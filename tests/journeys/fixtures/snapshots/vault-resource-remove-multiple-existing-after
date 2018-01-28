@@ -1,3 +1,4 @@
 syv://.
+from-stdin-no-tty
 from-stdin
 new-edited-file

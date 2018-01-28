@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/Byron/share-secrets-safely.svg?branch=master)](https://travis-ci.org/Byron/share-secrets-safely)
 
-**sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing 
+**sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing
 shared secrets in teams and build pipelines.
 
 Like [`pass`][pass], `sy` allows to setup a vault to store secrets, and share
@@ -57,7 +57,7 @@ which is also the case on [linux systems][dep-debian].
  * **sy --help** - help yourself
    * You can always use `--help` to learn about what the program can do. It is self-documenting.
  * **sy vault init** - create a new vault in the current directory
- * **sy vault add /path/to/file:file** - add an existing file to the vault 
+ * **sy vault add /path/to/file:file** - add an existing file to the vault
  * **sy vault add :file** - read a secret from stdin
  * **sy vault recipients add name-of-mate** - add a recipient to the vault
    * Note that the recipient is identified by the ID of a key already imported
@@ -87,7 +87,7 @@ which is also the case on [linux systems][dep-debian].
    * make use of gpg's *web of trust* to allow inheriting trust even across team boundaries, and incentivize thorough checking of keys
  * **basic access control**
    * partition your secrets and define who can access them
- 
+
 
 ## Non-Goals
 
@@ -95,7 +95,7 @@ which is also the case on [linux systems][dep-debian].
    * having seen what `pass` actually is and how difficult it can be to use it especially in conjunction with `gpg`, this project will not even look at the provided functionality but be driven by its project goals instead.
  * **become something like hashicorp vault**
    * this solution is strictly file based and *offline*, so it can fill be used without any additional setup.
-   
+
 ## Why would I use `sheesy` over...
 
 ### Pass
@@ -128,7 +128,7 @@ to be understandable, consistent and easy to remember.
 
 ### Gopass
 
-[`gopass`][gopass] is '_the slightly more awesome standard unix password manager for teams_' as claimed on the projects 
+[`gopass`][gopass] is '_the slightly more awesome standard unix password manager for teams_' as claimed on the projects
 github page. As I have never used it beyond trying it locally, this paragraph might be lacking details. However, a first
 impression is worth something, and here we go.
 
@@ -140,12 +140,12 @@ around user experience. Otherwise the user-journey would be much more streamline
 features I certainly don't get to enjoy that way.
 
 Somewhat a sybling of the issue above seems to be that it is hell-bent on being a personal password store.
-Thus it will store meta-data in your home directory and really wants a root-store which is placed in your 
-home by default. So-called 'mounts' are really just a way to let it know about other `pass` compatible vaults, 
+Thus it will store meta-data in your home directory and really wants a root-store which is placed in your
+home by default. So-called 'mounts' are really just a way to let it know about other `pass` compatible vaults,
 and I believe that makes it a buzz-word. Nonetheless, this made it hard for me to get started with it, and I still
 feel highly uncomfortable to use it thanks to it opinionatedness.
 
-Last but not least, and an issue that I find makes the case for not using `gopass` is that it actually 
+Last but not least, and an issue that I find makes the case for not using `gopass` is that it actually
 [abandons the `Web of Trust`][gopass-wot] in favor of simplicity to the user. Even though I understand
 why one would do that, I think the `Web of Trust` is an awesome idea, with terrible user experience, which
 just begs you to make it usable for the masses thanks to better tooling.
@@ -167,7 +167,7 @@ do test-driven development, which nurishes my doubt in the quality of the softwa
 ## Caveats
 
  * Many crypto-operations store decrypted data in a temporary file. These touch
-   disk and currently might be picked up by attackers. A fix could be 'tempfile', 
+   disk and currently might be picked up by attackers. A fix could be 'tempfile',
    which allows using a secure temporary file - however, it might make getting
    MUSL builds impossible. Static builds should still be alright.
  * GPG2 is required to use the 'sign-key' operation. The latter is required when
@@ -209,7 +209,7 @@ This can be useful to make `pass` standins more approachable, and also build cus
 stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
- 
+
 ## Roadmap to 4.0
 
 ### Web of Trust for everyone
@@ -224,12 +224,12 @@ only for trusted keys.
  * [ ] suggest to import keys or do it for the user
  * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
  * [ ] possibly allow to disable ownertrust using 'always-trust'
- 
+
 ## Roadmap to 3.0
 
 ### Partition Support
 
-Partitions are just another vault with individual config, but operations on vaults are 
+Partitions are just another vault with individual config, but operations on vaults are
 aware of partitions. This allows sharing key-lists, for example, and alters the way
 vaults are displayed when showing them.
 
@@ -252,7 +252,7 @@ accurately reflecting what was actually released. That way, they can also serve 
 smoke-tests.
 
 How can that be done, you wonder? With `shell-book`! It allows you to run specially made
-scripts in various modes: 
+scripts in various modes:
 
  * **interactively**
    * The user runs chapters one by one and can press enter to run actual commands and see
@@ -262,7 +262,7 @@ scripts in various modes:
  * **mdbook**
    * generate pages suitable to be rendered by [`mdbook`][mdbook-github] (or equivalent)
      and deploy them to github pages.
-   
+
 [mdbook-github]: https://github.com/rust-lang-nursery/mdBook
 
 ### Completing the `vault` subcommand
@@ -271,7 +271,7 @@ The first iteration only fulfilled the main journey. Now it's  time to fill the 
 and add a few more features to provide API symmetry.
 
  * [x] Stream progress/output messages instead of aggregating them if all succeeded
-   * For example, when adding a recipient, parts of the operation succeed, but 
+   * For example, when adding a recipient, parts of the operation succeed, but
      it is not visible if re-encryption fails.
  * [x] `vault recipients`
    * [x] list
@@ -280,18 +280,18 @@ and add a few more features to provide API symmetry.
  * [x] `vault remove` a resource
  * [x] `vault add` create sub-directories automatically
  * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
- 
+
 ### UX - The next iteration
 
 GPG is cryptic, and it's usually entirely unclear to the uninitiated user why
 encryption just didn't work. Right now, we are not much better than using `pass`.
 
-In this iteration, we want to achieve that for all major user journeys, **no 
+In this iteration, we want to achieve that for all major user journeys, **no
 gpg error remains unexplained**.
 
  * [x] Suggest installing GPG if there is none
  * [x] Suggest creating a gpg key if there is none.
- * [ ] try encrypting on edit (before the edit) to fail fast
+ * [x] try encrypting on edit (before the edit) to fail fast
  * [x] list recipients which are unusable when re-encryption fails (lack of trust)
  * [x] list recipients which are not available in the gpg key database.
  * [x] allow future recipients to export their key to the right spot.
@@ -320,7 +320,7 @@ As a prerequisite, you should be sure the build is green.
  * run `clippy` and fix all warnings
  * change the version in the `VERSION` file
  * update the release notes in the `release.md` file.
-   * Just prefix it with a description of new features and fixes 
+   * Just prefix it with a description of new features and fixes
  * run `make tag-release`
    * requires push permissions to this repository
    * requires maintainer or owner privileges on crates.io for all deployed crates

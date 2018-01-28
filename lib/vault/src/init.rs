@@ -1,6 +1,3 @@
-extern crate glob;
-extern crate mktemp;
-
 use util::write_at;
 
 use std::path::Path;

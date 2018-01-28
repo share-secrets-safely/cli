@@ -133,7 +133,9 @@ where
                  in a location of the vault. It takes the form '<src>:<dst>', where \
                  '<src>' is equivalent to '<src>:<src>'.\
                  <dst> should be vault-relative paths, whereas <src> must point to a readable file \
-                 and can be empty to read from standard input, such as in ':<dst>'.",
+                 and can be empty to read from standard input, such as in ':<dst>'.\
+                 If standard input is a TTY, it will open the editor as defined by the \
+                 EDITOR environment variable.",
             ));
         let remove_resource = App::new("remove")
             .alias("delete")

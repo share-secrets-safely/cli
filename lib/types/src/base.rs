@@ -1,7 +1,32 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use spec::VaultSpec;
 use std::io::Write;
-use failure::Error;
+use failure::{Error, ResultExt};
+use std::process::{Command, Stdio};
+use std::ffi::OsStr;
+
+pub fn run_editor(editor: &OsStr, path_to_edit: &Path) -> Result<(), Error> {
+    let mut running_program = Command::new(editor)
+        .arg(path_to_edit)
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .context(format!(
+            "Failed to start editor program at '{}'.",
+            editor.to_string_lossy()
+        ))?;
+    let status = running_program
+        .wait()
+        .context("Failed to wait for editor to exit.")?;
+    if !status.success() {
+        return Err(format_err!(
+            "Editor '{}' failed. Edit aborted.",
+            editor.to_string_lossy()
+        ));
+    }
+    Ok(())
+}
 
 pub fn print_causes<E, W>(e: E, mut w: W)
 where

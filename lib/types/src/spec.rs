@@ -1,13 +1,22 @@
 use conv::TryFrom;
 use std::fmt;
 use std::fs::{File, OpenOptions};
-use std::io::{stdin, Read, Write};
+use std::io::{self, stdin, Read, Write};
 use std::fs::create_dir_all;
 
+use atty;
+use mktemp::Temp;
 use failure::{Error, ResultExt};
 use std::path::{Path, PathBuf};
 use std::path::Component;
+use std::env;
+use std::ffi::OsString;
 use super::{Destination, WriteMode};
+use base::run_editor;
+
+lazy_static! {
+    static ref EDITOR: PathBuf = PathBuf::from(env::var_os("EDITOR").unwrap_or_else(||OsString::from("vim")));
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultSpec {
@@ -53,6 +62,17 @@ pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
                 .to_str()
                 .expect("filename to be decodeable with UTF8",)
         )))
+}
+
+struct TemporaryFile {
+    _tempfile: Temp,
+    open_file: File,
+}
+
+impl Read for TemporaryFile {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.open_file.read(buf)
+    }
 }
 
 impl VaultSpec {
@@ -112,7 +132,22 @@ impl VaultSpec {
     pub fn open_input(&self) -> Result<Box<Read>, Error> {
         Ok(match self.src {
             Some(ref p) => Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?),
-            None => Box::new(stdin()),
+            None => {
+                if atty::is(atty::Stream::Stdin) {
+                    let tempfile = Temp::new_file().context("Failed to obtain temporary file for editing.")?;
+                    let tempfile_path = tempfile.to_path_buf();
+                    run_editor(EDITOR.as_os_str(), &tempfile_path)?;
+                    Box::new(TemporaryFile {
+                        _tempfile: tempfile,
+                        open_file: File::open(&tempfile_path).context(format!(
+                            "Could not open temporary file '{}' for reading.",
+                            tempfile_path.display()
+                        ))?,
+                    })
+                } else {
+                    Box::new(stdin())
+                }
+            }
         })
     }
 }

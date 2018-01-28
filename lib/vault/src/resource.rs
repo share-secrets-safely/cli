@@ -1,7 +1,6 @@
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::fs::{remove_file, File};
-use std::process::Command;
 
 use mktemp::Temp;
 use itertools::join;
@@ -12,6 +11,7 @@ use error::FailExt;
 use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
 use error::{DecryptionError, EncryptionError};
 use util::{new_context, strip_ext, write_at};
+use sheesy_types::run_editor;
 
 impl Vault {
     pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
@@ -27,25 +27,7 @@ impl Vault {
                     _ => Err(err.into()),
                 })?
         };
-        let mut running_program = Command::new(editor)
-            .arg(&tempfile_path)
-            .stdin(::std::process::Stdio::inherit())
-            .stdout(::std::process::Stdio::inherit())
-            .stderr(::std::process::Stdio::inherit())
-            .spawn()
-            .context(format!(
-                "Failed to start editor program at '{}'.",
-                editor.display()
-            ))?;
-        let status = running_program
-            .wait()
-            .context("Failed to wait for editor to exit.")?;
-        if !status.success() {
-            return Err(format_err!(
-                "Editor '{}' failed. Edit aborted.",
-                editor.display()
-            ));
-        }
+        run_editor(editor.as_os_str(), &tempfile_path)?;
         let mut zero = Vec::new();
         self.encrypt(
             &[

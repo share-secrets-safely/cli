@@ -15,3 +15,6 @@ travis-ci = { repository = "Byron/share-secrets-safely" }
 conv = "0.3.3"
 failure = "0.1.1"
 failure_derive = "0.1.1"
+atty = "0.2.6"
+mktemp = "0.3.1"
+lazy_static = "1.0.0"
