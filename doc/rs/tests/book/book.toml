@@ -1,0 +1,8 @@
+[book]
+authors = []
+multilingual = false
+src = "."
+
+[build]
+build-dir = "html"
+create-missing = false

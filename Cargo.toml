@@ -36,3 +36,4 @@ path = "lib/vault"
 version = "1.0.1"
 
 [workspace]
+exclude = [ "doc/rs" ]
