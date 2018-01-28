@@ -52,6 +52,7 @@ where
 pub enum VaultCommand {
     ResourceEdit {
         editor: PathBuf,
+        try_encrypt: bool,
         spec: PathBuf,
         mode: CreateMode,
     },

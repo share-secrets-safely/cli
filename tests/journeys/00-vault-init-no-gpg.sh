@@ -5,7 +5,7 @@ exe=${1:?First argument is the executable under test}
 
 root="$(cd "${0%/*}" && pwd)"
 exe="$root/../../$exe"
-# shellcheck source=./tests/utilities.sh
+# shellcheck source=./tests/gpg-helpers.sh
 source "$root/../gpg-helpers.sh"
 
 WITH_FAILURE=1
@@ -16,7 +16,7 @@ cd /tmp
 
 title "'vault init' - without GPG"
 
-(with "no GPG installation" 
+(with "no GPG installation"
     it "fails and provides helpful notes" && {
       WITH_SNAPSHOT="$snapshot/vault-init-no-gpg" \
       expect_run $WITH_FAILURE "$exe" vault init
@@ -34,7 +34,7 @@ title "'vault init' - without GPG"
       }
     )
   )
-  
+
   (with "an non-empty recipients file"
     echo 'recipient' > .gpg-id
     (when "adding a new secret"
@@ -44,7 +44,7 @@ title "'vault init' - without GPG"
       }
     )
   )
-  
+
   (with "a resource"
     echo 'fake secret' > secret.gpg
     (when "showing the secret"

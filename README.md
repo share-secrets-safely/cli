@@ -279,7 +279,7 @@ and add a few more features to provide API symmetry.
    * [x] remove recipient(s) and re-encrypt
  * [x] `vault remove` a resource
  * [x] `vault add` create sub-directories automatically
- * [ ] `vault add :secret` opens an editor if there is a tty and no input from stdin.
+ * [x] `vault add :secret` opens an editor if there is a tty and no input from stdin.
 
 ### UX - The next iteration
 
@@ -291,7 +291,7 @@ gpg error remains unexplained**.
 
  * [x] Suggest installing GPG if there is none
  * [x] Suggest creating a gpg key if there is none.
- * [x] try encrypting on edit (before the edit) to fail fast
+ * [ ] try encrypting on edit (before the edit) to fail fast
  * [x] list recipients which are unusable when re-encryption fails (lack of trust)
  * [x] list recipients which are not available in the gpg key database.
  * [x] allow future recipients to export their key to the right spot.

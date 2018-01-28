@@ -8,14 +8,21 @@ use gpgme;
 use base::Vault;
 use failure::{Error, ResultExt};
 use error::FailExt;
-use sheesy_types::{gpg_output_filename, CreateMode, Destination, VaultSpec, WriteMode};
+use sheesy_types::{gpg_output_filename, CreateMode, Destination, SpecSourceType, VaultSpec, WriteMode};
 use error::{DecryptionError, EncryptionError};
 use util::{new_context, strip_ext, write_at};
 use sheesy_types::run_editor;
 
 impl Vault {
-    pub fn edit(&self, path: &Path, editor: &Path, mode: &CreateMode, output: &mut Write) -> Result<(), Error> {
-        let file = Temp::new_file().context("Could not create tempfile to decrypt to.")?;
+    pub fn edit(
+        &self,
+        path: &Path,
+        editor: &Path,
+        mode: &CreateMode,
+        try_encrypt: bool,
+        output: &mut Write,
+    ) -> Result<(), Error> {
+        let file = Temp::new_file().context("Could not create temporary file to decrypt to.")?;
         let tempfile_path = file.to_path_buf();
         let decrypted_file_path = {
             let mut decrypted_writer =
@@ -32,7 +39,7 @@ impl Vault {
         self.encrypt(
             &[
                 VaultSpec {
-                    src: Some(tempfile_path),
+                    src: SpecSourceType::Path(tempfile_path),
                     dst: decrypted_file_path,
                 },
             ],
@@ -70,7 +77,7 @@ impl Vault {
         for path_to_remove in specs {
             let path = {
                 let spec = VaultSpec {
-                    src: None,
+                    src: SpecSourceType::Stdin,
                     dst: path_to_remove.clone(),
                 };
                 let gpg_path = spec.output_in(&sp, Destination::ReolveAndAppendGpg)?;

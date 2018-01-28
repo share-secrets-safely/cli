@@ -119,6 +119,11 @@ pub fn vault_resource_edit(ctx: VaultContext, args: &ArgMatches) -> Result<Vault
         command: VaultCommand::ResourceEdit {
             spec: required_os_arg(args, "path")?,
             editor: required_os_arg(args, "editor")?,
+            try_encrypt: if args.is_present("no-try-encrypt") {
+                false
+            } else {
+                true
+            },
             mode: if args.is_present("no-create") {
                 CreateMode::NoCreate
             } else {

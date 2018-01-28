@@ -65,9 +65,10 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
         ),
         VaultCommand::ResourceEdit {
             ref spec,
+            try_encrypt,
             ref editor,
             ref mode,
-        } => vault_from(&ctx)?.edit(spec, editor, mode, output),
+        } => vault_from(&ctx)?.edit(spec, editor, mode, try_encrypt, output),
         VaultCommand::List => vault_from(&ctx)?.list(output),
         VaultCommand::ResourceShow { ref spec } => vault_from(&ctx)?.decrypt(spec, output).map(|_| ()),
     }

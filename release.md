@@ -11,7 +11,9 @@
     Previously it would always require an exported public key in the right spot.
  * `vault recipient add --verified` allows to add any recipient by name, but requires
     you to assure you are able to encrypt for that recipient.
- * `vault add` now creates sub-directories automatically
+ * `vault add` now creates sub-directories automatically.
+ * `vault edit` now tries to encrypt before launching the editor.
+ * `vault add :something` with a tty as standard input will open an editor automatically.
 
 ### Breaking Changes
 

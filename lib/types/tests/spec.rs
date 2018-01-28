@@ -47,7 +47,7 @@ fn it_is_ok_to_not_specify_a_source_to_signal_stdin() {
     assert_eq!(
         VaultSpec::try_from(":other/path"),
         Ok(VaultSpec {
-            src: None,
+            src: SpecSourceType::Stdin,
             dst: PathBuf::from("other/path"),
         })
     )
@@ -58,7 +58,7 @@ fn it_is_created_from_relative_source_and_relative_destination() {
     assert_eq!(
         VaultSpec::try_from("relative/path:other/path"),
         Ok(VaultSpec {
-            src: Some(PathBuf::from("relative/path")),
+            src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("other/path"),
         })
     )
@@ -69,7 +69,7 @@ fn it_is_created_from_relative_source_fills_destination_with_source_when_using_a
     assert_eq!(
         VaultSpec::try_from("relative/path:"),
         Ok(VaultSpec {
-            src: Some(PathBuf::from("relative/path")),
+            src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("relative/path"),
         })
     )
@@ -80,7 +80,7 @@ fn it_is_created_from_relative_source_fills_destination_with_source() {
     assert_eq!(
         VaultSpec::try_from("relative/path"),
         Ok(VaultSpec {
-            src: Some(PathBuf::from("relative/path")),
+            src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("relative/path"),
         })
     )
@@ -103,7 +103,7 @@ fn it_do_allow_relative_parent_directories_if_destination_is_specified() {
     assert_eq!(
         VaultSpec::try_from("../relative:destination"),
         Ok(VaultSpec {
-            src: Some(PathBuf::from("../relative")),
+            src: SpecSourceType::Path(PathBuf::from("../relative")),
             dst: PathBuf::from("destination"),
         })
     )
@@ -113,7 +113,7 @@ fn it_does_allow_relative_parent_directories_in_destinations_if_that_is_what_the
     assert_eq!(
         VaultSpec::try_from("../relative:../other"),
         Ok(VaultSpec {
-            src: Some(PathBuf::from("../relative")),
+            src: SpecSourceType::Path(PathBuf::from("../relative")),
             dst: PathBuf::from("../other"),
         })
     )
@@ -143,7 +143,7 @@ fn it_does_allow_an_absolute_destination_if_it_is_specified() {
     assert_eq!(
         VaultSpec::try_from(invalid),
         Ok(VaultSpec {
-            src: Some(PathBuf::from("relative/path")),
+            src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("/absolute/path"),
         })
     )

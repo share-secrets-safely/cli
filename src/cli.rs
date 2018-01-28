@@ -90,6 +90,15 @@ where
             );
         let edit_resource = App::new("edit")
             .arg(
+                Arg::with_name("no-try-encrypt")
+                    .long("no-try-encrypt")
+                    .required(false)
+                    .help(
+                        "Unless set, we will assure encryption works prior to launching \
+                         the editor. This assures you do not accidentally loose your edits.",
+                    ),
+            )
+            .arg(
                 Arg::with_name("no-create")
                     .long("no-create")
                     .required(false)

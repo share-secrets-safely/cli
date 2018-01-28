@@ -5,7 +5,7 @@ exe=${1:?First argument is the executable under test}
 
 root="$(cd "${0%/*}" && pwd)"
 exe="$root/../../$exe"
-# shellcheck source=./tests/utilities.sh
+# shellcheck source=./tests/gpg-helpers.sh
 source "$root/../gpg-helpers.sh"
 
 WITH_FAILURE=1
@@ -149,6 +149,27 @@ EDITOR
         WITH_SNAPSHOT="$snapshot/vault-known-resource-edit-editor-not-in-path" \
         expect_run $WITH_FAILURE "$exe" vault edit --editor foo from-stdin
       }
+    )
+    (when "editing a file without being able to encrypt (but to decrypt)"
+      {
+        gpg --import "$fixture/b.sec.asc"
+        "$exe" vault recipient add 42C18D28
+      } &>/dev/null
+
+      (with "no additional flags"
+        it "fails because it encrypts in advance to avoid losing the edit" && (
+          as_user "$fixture/b.sec.asc"
+          WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure" \
+          expect_run $WITH_FAILURE "$exe" vault edit --editor 'does-not-matter' from-stdin
+        )
+      )
+      (with "--no-try-encrypt set"
+        it "fails because now it would try to open the non-existing editor right away" && (
+          as_user "$fixture/b.sec.asc"
+          WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure" \
+          expect_run $WITH_FAILURE "$exe" vault edit --no-try-encrypt --editor 'does-not-matter' from-stdin
+        )
+      )
     )
 
     title "'vault remove'"

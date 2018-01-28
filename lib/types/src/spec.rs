@@ -1,5 +1,5 @@
 use conv::TryFrom;
-use std::fmt;
+use std::fmt::{self, Display};
 use std::fs::{File, OpenOptions};
 use std::io::{self, stdin, Read, Write};
 use std::fs::create_dir_all;
@@ -14,13 +14,31 @@ use std::ffi::OsString;
 use super::{Destination, WriteMode};
 use base::run_editor;
 
-lazy_static! {
+lazy_static!{
     static ref EDITOR: PathBuf = PathBuf::from(env::var_os("EDITOR").unwrap_or_else(||OsString::from("vim")));
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum SpecSourceType {
+    Stdin,
+    Path(PathBuf),
+}
+
+impl fmt::Display for SpecSourceType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            SpecSourceType::Stdin => {
+                let empty = PathBuf::new();
+                empty.display().fmt(f)
+            }
+            SpecSourceType::Path(ref p) => p.display().fmt(f),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultSpec {
-    pub src: Option<PathBuf>,
+    pub src: SpecSourceType,
     pub dst: PathBuf,
 }
 
@@ -36,12 +54,7 @@ impl fmt::Display for VaultSpecError {
 impl fmt::Display for VaultSpec {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let empty = PathBuf::new();
-        write!(
-            f,
-            "{}:{}",
-            self.src.as_ref().unwrap_or_else(|| &empty).display(),
-            self.dst.display()
-        )
+        write!(f, "{}:{}", self.src, self.dst.display())
     }
 }
 
@@ -77,7 +90,10 @@ impl Read for TemporaryFile {
 
 impl VaultSpec {
     pub fn source(&self) -> Option<&Path> {
-        self.src.as_ref().map(|s| s.as_ref())
+        match self.src {
+            SpecSourceType::Stdin => None,
+            SpecSourceType::Path(ref p) => Some(p.as_path()),
+        }
     }
 
     pub fn destination(&self) -> &Path {
@@ -131,8 +147,10 @@ impl VaultSpec {
 
     pub fn open_input(&self) -> Result<Box<Read>, Error> {
         Ok(match self.src {
-            Some(ref p) => Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?),
-            None => {
+            SpecSourceType::Path(ref p) => {
+                Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?)
+            }
+            SpecSourceType::Stdin => {
                 if atty::is(atty::Stream::Stdin) {
                     let tempfile = Temp::new_file().context("Failed to obtain temporary file for editing.")?;
                     let tempfile_path = tempfile.to_path_buf();
@@ -165,9 +183,9 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
         }
         let validate = |src: &'a str| {
             Ok(if src.is_empty() {
-                None
+                SpecSourceType::Stdin
             } else {
-                Some(PathBuf::from(src))
+                SpecSourceType::Path(PathBuf::from(src))
             })
         };
         let validate_dst = |p: PathBuf| {
