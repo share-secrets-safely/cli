@@ -1,0 +1,4 @@
+error: Aborted edit operation as you cannot encrypt resources.
+Caused by: 
+ 1: At least one recipient you try to encrypt for is untrusted. Consider (locally) signing the key with `gpg --sign-key <recipient>` or ultimately trusting them.
+Could not encrypt for recipient D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (Tester (for testing only) <tester@example.com>) with error: Unusable public key (gpg error 53)

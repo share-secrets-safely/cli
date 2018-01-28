@@ -291,7 +291,7 @@ gpg error remains unexplained**.
 
  * [x] Suggest installing GPG if there is none
  * [x] Suggest creating a gpg key if there is none.
- * [ ] try encrypting on edit (before the edit) to fail fast
+ * [x] try encrypting on edit (before the edit) to fail fast
  * [x] list recipients which are unusable when re-encryption fails (lack of trust)
  * [x] list recipients which are not available in the gpg key database.
  * [x] allow future recipients to export their key to the right spot.

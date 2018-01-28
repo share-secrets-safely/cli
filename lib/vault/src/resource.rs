@@ -13,6 +13,13 @@ use error::{DecryptionError, EncryptionError};
 use util::{new_context, strip_ext, write_at};
 use sheesy_types::run_editor;
 
+fn encrypt_buffer(ctx: &mut gpgme::Context, input: &[u8], keys: &[gpgme::Key]) -> Result<Vec<u8>, Error> {
+    let mut encrypted_bytes = Vec::<u8>::new();
+    ctx.encrypt(keys, input, &mut encrypted_bytes)
+        .map_err(|e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into(), ctx, &keys))?;
+    Ok(encrypted_bytes)
+}
+
 impl Vault {
     pub fn edit(
         &self,
@@ -34,6 +41,10 @@ impl Vault {
                     _ => Err(err.into()),
                 })?
         };
+        if try_encrypt {
+            self.encrypt_buffer(b"")
+                .context("Aborted edit operation as you cannot encrypt resources.")?;
+        }
         run_editor(editor.as_os_str(), &tempfile_path)?;
         let mut zero = Vec::new();
         self.encrypt(
@@ -97,6 +108,14 @@ impl Vault {
         Ok(())
     }
 
+    pub fn encrypt_buffer(&self, input: &[u8]) -> Result<Vec<u8>, Error> {
+        let mut ctx = new_context()?;
+        let keys = self.recipient_keys(&mut ctx)?;
+
+        let encrypted_bytes = encrypt_buffer(&mut ctx, input, &keys)?;
+        Ok(encrypted_bytes)
+    }
+
     pub fn encrypt(
         &self,
         specs: &[VaultSpec],
@@ -120,11 +139,7 @@ impl Vault {
                 ))?;
                 buf
             };
-            let mut encrypted_bytes = Vec::new();
-            ctx.encrypt(&keys, input, &mut encrypted_bytes)
-                .map_err(|e: gpgme::Error| {
-                    EncryptionError::caused_by(e, "Failed to encrypt data.".into(), &mut ctx, &keys)
-                })?;
+            let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, &keys)?;
             spec.open_output_in(&secrets_path, mode, dst_mode, output)?
                 .write_all(&encrypted_bytes)
                 .context(format!(

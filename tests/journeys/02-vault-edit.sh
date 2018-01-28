@@ -159,6 +159,7 @@ EDITOR
       (with "no additional flags"
         it "fails because it encrypts in advance to avoid losing the edit" && (
           as_user "$fixture/b.sec.asc"
+          gpg --import '.gpg-keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332' &>/dev/null
           WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure" \
           expect_run $WITH_FAILURE "$exe" vault edit --editor 'does-not-matter' from-stdin
         )
@@ -166,7 +167,8 @@ EDITOR
       (with "--no-try-encrypt set"
         it "fails because now it would try to open the non-existing editor right away" && (
           as_user "$fixture/b.sec.asc"
-          WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure" \
+
+          WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure-no-try-encrypt" \
           expect_run $WITH_FAILURE "$exe" vault edit --no-try-encrypt --editor 'does-not-matter' from-stdin
         )
       )
