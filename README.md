@@ -270,6 +270,19 @@ Here is what would have to be done, in greater detail:
 
 [mdbook-github]: https://github.com/rust-lang-nursery/mdBook
 
+### Signed binaries
+
+Even though it's great that travis is building binaries, the question is if it should be trusted.
+Thus I believe the created archives should be processed after they have been created to re-assure
+they are what we think they should be.
+
+We should test the linux version again and sign it if all tests still work, and if the binary we
+create locally matches the one on CI.
+
+The same should be done on the host system (OSX) in that case, and if at all possible.
+Providing signatures would also help prevent third parties distribute changed binaries on their own,
+making the binaries produced here the only ones that are endorsed.
+
 ### Completing the `vault` subcommand
 
 The first iteration only fulfilled the main journey. Now it's  time to fill the gaps
