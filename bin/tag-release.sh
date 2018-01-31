@@ -11,7 +11,7 @@ while read -r cf; do
 	sed -i "" -E "s/^version = \".*\"/version = \"$version\"/" "$cf"
 done
 
-git commit -am "bumping version to $version"
+git commit -am "bumping version to $version" || true
 git tag -s -F "${notes_path}" "$version"
 
 for lib in lib/types lib/extract lib/vault .; do

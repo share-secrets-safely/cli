@@ -302,28 +302,28 @@ dependencies = [
 
 [[package]]
 name = "sheesy-cli"
-version = "1.0.1"
+version = "2.0.0"
 dependencies = [
  "clap 2.29.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "conv 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sheesy-extract 1.0.1",
- "sheesy-types 1.0.1",
- "sheesy-vault 1.0.1",
+ "sheesy-extract 2.0.0",
+ "sheesy-types 2.0.0",
+ "sheesy-vault 2.0.0",
 ]
 
 [[package]]
 name = "sheesy-extract"
-version = "1.0.1"
+version = "2.0.0"
 dependencies = [
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "sheesy-types 1.0.1",
+ "sheesy-types 2.0.0",
 ]
 
 [[package]]
 name = "sheesy-types"
-version = "1.0.1"
+version = "2.0.0"
 dependencies = [
  "atty 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "conv 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -335,7 +335,7 @@ dependencies = [
 
 [[package]]
 name = "sheesy-vault"
-version = "1.0.1"
+version = "2.0.0"
 dependencies = [
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure_derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -346,7 +346,7 @@ dependencies = [
  "serde 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_yaml 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sheesy-types 1.0.1",
+ "sheesy-types 2.0.0",
  "yaml-rust 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
