@@ -2,6 +2,7 @@
 
 set -eu -o pipefail
 
+set -x
 version=${1:?First argument is the version you want to tag, like '1.0.0'}
 notes_path=${2:?Second argument a file path to the release notes file to include.}
 
