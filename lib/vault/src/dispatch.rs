@@ -97,7 +97,7 @@ pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
                      See https://www.gnupg.org for more information.",
                 )
                 .into(),
-            _ => failure.into(),
+            _ => failure,
         }
     })
 }

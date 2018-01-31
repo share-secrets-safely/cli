@@ -17,7 +17,7 @@ pub fn strip_ext(p: &Path) -> PathBuf {
 
 pub fn fingerprints_of_keys(keys: &[gpgme::Key]) -> Result<Vec<(&gpgme::Key, String)>, Error> {
     keys.iter()
-        .map(|k| fingerprint_of(&k).map(|fpr| (k, fpr)))
+        .map(|k| fingerprint_of(k).map(|fpr| (k, fpr)))
         .collect::<Result<Vec<_>, _>>()
         .context("Unexpectedly failed to obtain fingerprint")
         .map_err(Into::into)

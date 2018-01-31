@@ -123,9 +123,9 @@ fn it_does_allow_relative_parent_directories_in_destinations_if_that_is_what_the
 fn it_does_not_allow_relative_parent_directories() {
     assert_eq!(
         VaultSpec::try_from("../relative"),
-        Err(VaultSpecError(format!(
-            "Relative parent directories in source '../relative' need the destination set explicitly.",
-        )))
+        Err(VaultSpecError(
+            "Relative parent directories in source '../relative' need the destination set explicitly.".to_owned(),
+        ))
     )
 }
 
@@ -133,7 +133,7 @@ fn it_does_not_allow_relative_parent_directories() {
 fn it_handles_an_empty_string_too() {
     assert_eq!(
         VaultSpec::try_from(""),
-        Err(VaultSpecError(format!("An empty spec is invalid.",)))
+        Err(VaultSpecError("An empty spec is invalid.".to_owned(),))
     )
 }
 
@@ -151,14 +151,13 @@ fn it_does_allow_an_absolute_destination_if_it_is_specified() {
 
 #[test]
 fn it_displays_itself_properly() {
-    for &(ref input, ref expected) in [
+    for &(input, expected) in &[
         (":path", ":path"),
         ("src:dst", "src:dst"),
         ("src", "src:src"),
         ("src:", "src:src"),
-    ].iter()
-    {
-        let s = VaultSpec::try_from(*input).unwrap();
+    ] {
+        let s = VaultSpec::try_from(input).unwrap();
         assert_eq!(&format!("{}", s), expected)
     }
 }

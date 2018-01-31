@@ -47,8 +47,8 @@ impl Vault {
         let imported_gpg_keys_fprs = gpg_key_ids
             .iter()
             .map(|s| {
-                let fpr = valid_fingerprint(&s)?;
-                self.read_fingerprint_file(&fpr, &gpg_keys_dir)
+                let fpr = valid_fingerprint(s)?;
+                self.read_fingerprint_file(fpr, gpg_keys_dir)
                     .and_then(|(fpr_path, kb)| {
                         let res = gpg_ctx
                             .import(kb)
@@ -191,7 +191,7 @@ impl Vault {
                     glob_pattern,
                     gpg_keys_dir.display()
                 ),
-                l @ _ => bail!(
+                l => bail!(
                     "Found {} matching key files for glob pattern '{}' in directory '{}', but expected just one.",
                     l,
                     glob_pattern,

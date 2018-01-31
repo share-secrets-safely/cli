@@ -16,7 +16,7 @@ use sheesy_types::run_editor;
 fn encrypt_buffer(ctx: &mut gpgme::Context, input: &[u8], keys: &[gpgme::Key]) -> Result<Vec<u8>, Error> {
     let mut encrypted_bytes = Vec::<u8>::new();
     ctx.encrypt(keys, input, &mut encrypted_bytes)
-        .map_err(|e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into(), ctx, &keys))?;
+        .map_err(|e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into(), ctx, keys))?;
     Ok(encrypted_bytes)
 }
 

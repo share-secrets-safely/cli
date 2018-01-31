@@ -67,7 +67,7 @@ impl Vault {
     }
 
     pub fn set_resolved_at(mut self, vault_file: &Path) -> Result<Self, Error> {
-        self.resolved_at = normalize(&vault_file
+        self.resolved_at = normalize(vault_file
             .parent()
             .ok_or_else(|| format_err!("The vault file path '{}' is invalid.", vault_file.display()))?);
         self.vault_path = Some(vault_file.to_owned());
@@ -230,7 +230,7 @@ impl Vault {
             ));
             msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
         }
-        return Err(err_msg(msg.join("\n")));
+        Err(err_msg(msg.join("\n")))
     }
 
     pub fn recipient_keys(&self, ctx: &mut gpgme::Context) -> Result<Vec<gpgme::Key>, Error> {

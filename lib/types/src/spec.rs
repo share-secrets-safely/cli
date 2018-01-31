@@ -1,8 +1,9 @@
 use conv::TryFrom;
-use std::fmt::{self, Display};
+use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{self, stdin, Read, Write};
 use std::fs::create_dir_all;
+
 
 use atty;
 use mktemp::Temp;
@@ -53,7 +54,6 @@ impl fmt::Display for VaultSpecError {
 
 impl fmt::Display for VaultSpec {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let empty = PathBuf::new();
         write!(f, "{}:{}", self.src, self.dst.display())
     }
 }
