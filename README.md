@@ -87,6 +87,10 @@ which is also the case on [linux systems][dep-debian].
    * make use of gpg's *web of trust* to allow inheriting trust even across team boundaries, and incentivize thorough checking of keys
  * **basic access control**
    * partition your secrets and define who can access them
+ * **support old wheels - pass compatibility**
+   * something `pass` does really well is to setup a vault with minimal infrastructure and configuration.
+     We use said infrastructure and don't reinvent the wheel. 
+   * This makes us **compatible with pass**, allowing you use `pass` on a `sheesy` vault with default configuration.  
 
 
 ## Non-Goals
