@@ -6,6 +6,9 @@ MUSL_IMAGE=clux/muslrust:stable
 MY_MUSL_IMAGE=sheesy_musl:stable
 MY_LINUX_RUN_IMAGE=alpine_with_gpg2:stable
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
+MUSL_DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE)
+HOST_DEPLOYABLE=sy-cli-$$(uname -s)-$$(uname -m).tar.gz
+LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
 
 help:
 	$(info Available Targets)
@@ -18,6 +21,7 @@ help:
 	$(info tag-release            | Create a new release commit using the version in VERSION file)
 	$(info deployable-linux       | Archive usable for any more recent linux system)
 	$(info deployable-host        | Archive usable on your host)
+	$(info deployment             | Archive usable on your host)
 	$(info - Docker ------------------------------------------------------------------------------------------------------)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
 	$(info build-musl-image       | Build our musl build image)
@@ -31,20 +35,21 @@ $(EXE): always
 
 $(RELEASE_EXE): always
 	cargo build --release
-	
+
 $(MUSL_EXE): build-linux-musl
-	
+
 $(RELEASE_MUSL_EXE): release-linux-musl
 
 deployable-linux: $(RELEASE_MUSL_EXE)
-	strip --strip-all $<
-	tar czf sy-cli-linux-musl-x86_64.tar.gz -C $(dir $<) $(notdir $<)
+	$(MUSL_DOCKER_ARGS) strip --strip-all $<
+	gpg --yes --output $<.gpg --detach-sig $<
+	tar czf $(LINUX_DEPLOYABLE) -C $(dir $<) $(notdir $<) $(notdir $<).gpg
 
 deployable-host: $(RELEASE_EXE)
 	strip $<
-	echo tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
-	tar czf sy-cli-$$(uname -s)-$$(uname -m).tar.gz -C $(dir $<) $(notdir $<)
-	
+	gpg --yes --output $<.gpg --detach-sig $<
+	tar czf $(HOST_DEPLOYABLE) -C $(dir $<) $(notdir $<) $(notdir $<).gpg
+
 tag-release: bin/tag-release.sh release.md VERSION
 	bin/tag-release.sh $$(cat VERSION) release.md
 
@@ -56,6 +61,10 @@ stateless-journey-tests: $(EXE)
 
 journey-tests: stateful-journey-tests stateless-journey-tests
 
+deployment: lint-scripts journey-tests
+	$(MAKE) deployable-host
+	$(MAKE) deployable-linux
+
 build-linux-run-image:
 	docker build -t $(MY_LINUX_RUN_IMAGE) - < etc/docker/Dockerfile.alpine-gpg2
 
@@ -63,8 +72,8 @@ build-musl-image:
 	docker build -t $(MY_MUSL_IMAGE) - < etc/docker/Dockerfile.musl-build
 
 build-linux-musl: build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl
-	
+	$(MUSL_DOCKER_ARGS) cargo build --target=x86_64-unknown-linux-musl
+
 release-linux-musl: build-musl-image
 	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl --release
 

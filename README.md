@@ -27,7 +27,13 @@ for your system. A full example *for linux* looks like this:
 ```bash
 curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.1/sy-linux-musl-x86_64.tar.gz
 tar xzf sy.tar.gz
-# run sy  - even better when in your PATH
+# verify 'sy' was built by one of the maintainers
+gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc)
+gpg --verify ./sy.gpg sy
+# This will print out that the file was created by one of the maintainers. If you chose to
+# trust the respective key after verifying it belongs to the maintainers, gpg will tell you
+# it is verified.
+# run sy if it was verified - even better when in your PATH
 ./sy
 ```
 
@@ -89,7 +95,7 @@ which is also the case on [linux systems][dep-debian].
    * partition your secrets and define who can access them
  * **support old wheels - pass compatibility**
    * something `pass` does really well is to setup a vault with minimal infrastructure and configuration.
-     We use said infrastructure and don't reinvent the wheel. 
+     We use said infrastructure and don't reinvent the wheel.
    * This makes us **compatible with pass**, allowing you use `pass` on a `sheesy` vault with default configuration.  
 
 
@@ -287,6 +293,11 @@ The same should be done on the host system (OSX) in that case, and if at all pos
 Providing signatures would also help prevent third parties distribute changed binaries on their own,
 making the binaries produced here the only ones that are endorsed.
 
+ * [x] Make deployment local and adjust scripts to include signature.
+   * Unfortunately travis deployments don't really work well yet, and it's
+     somewhat difficult to test.
+   * Also it seems easiest to assure users can trust the binaries.
+
 ### Completing the `vault` subcommand
 
 The first iteration only fulfilled the main journey. Now it's  time to fill the gaps
@@ -346,6 +357,18 @@ As a prerequisite, you should be sure the build is green.
  * run `make tag-release`
    * requires push permissions to this repository
    * requires maintainer or owner privileges on crates.io for all deployed crates
+
+### Making a deployment
+
+As a prerequisite you must have made a release and your worktree must be clean,
+with the HEAD at a commit.
+
+For safety, tests will run once more as CI doesn't prevent you from publishing
+red builds just yet.
+
+  * run `make deployment`.
+  * copy all text from the `release.md` file and copy it into the release text on github.
+  * drag & drop all _tar.gz_  into the release and publish it.
 
 ### Making a new Asciinema recording
 

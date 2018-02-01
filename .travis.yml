@@ -11,7 +11,7 @@ language: rust
 
 rust:
   - stable
-  
+
 cache:
   - cargo
   - $HOME/docker
@@ -25,7 +25,7 @@ addons:
 
 before_install:
   - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
-  - | 
+  - |
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew install gpgme gettext
       brew link --force gettext
@@ -35,40 +35,16 @@ before_cache:
   - >
     mkdir -p $HOME/docker && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
     | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 | gzip -2 > $HOME/docker/$1.tar.gz'
-   
+
 script:
   - cargo doc
   - cargo test --all
   # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
-  - | 
-    set -ex
-    if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then 
+  - |
+    set -e
+    if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
         make lint-scripts
         make stateful-journey-tests
-        if [ -n "$TRAVIS_TAG" ]; then
-          make deployable-linux
-        fi
     else
         make stateless-journey-tests
-        if [ -n "$TRAVIS_TAG" ]; then
-          make deployable-host
-        fi
     fi
-    
-deploy:
-  - provider: releases
-    api_key:
-      secure: N9lPHcUcU83Oz1DGaxg3UUV6Qu1UmbaP0zI3pc+NbouPeheR0PDlAf4nUsUX/1e4qCQ3aLQblRBmPQpAqypr3BZClZEvR0qkmV2UGtJyQICF/SfWS1Gte073HLg/sbT9fc5Ja+PkMieRONSB8LWEFWtoiR61mNYq+rJAu2YhrqhDSMs35ETh5cSSxZv565xxMG8vb30Us1L2FHL0PlBlgi5QLpkWuj0NFMq2sY+rhcMCFsnPH6HDZh0wwLifdAMFYyoWEvU9TVhFFfjIG0LIPigbFF5iv6l9tyLH2pl6w5Zf3n2JNc7VGMADe+rSo78/8vOf4IWSsfJQNzibENZV02qzq5K1IfAOzvdtnHmAlpWXuCFEuy/KLXxwOOkgXbd4VGajC59f14ujO5H13JxcU/D3lJnDuWdOo/RAecupiZXGhq5bwswfiGPIb4GRCW8bTqLDOLRyzYavhj7tJ1Eb+Fa4w6JtRwAoCAPG+5Bew895CT2KwZVoFh5W4FIZOfAzfmxKyxXp4KYPvBoxH2iXq5ZlZd/8KzZecos5XwiHuq73n1gfmkSbKMCZBXMFDyP5yrXJr61mnuULCYL/+PVo2P3gtx1gn56KgLpIhVIInbzu6W1TLyXb3Xg2m52vwYLV0rlyIFz0QDuoeu0errTRlUlu5RMFrSQE7N5v+ZR8rvE=
-    file: sy-cli-Darwin-x86_64.tar.gz
-    on:
-      repo: Byron/share-secrets-safely
-      tags: true
-      condition: $TRAVIS_OS_NAME = osx
-  - provider: releases
-    api_key:
-      secure: N9lPHcUcU83Oz1DGaxg3UUV6Qu1UmbaP0zI3pc+NbouPeheR0PDlAf4nUsUX/1e4qCQ3aLQblRBmPQpAqypr3BZClZEvR0qkmV2UGtJyQICF/SfWS1Gte073HLg/sbT9fc5Ja+PkMieRONSB8LWEFWtoiR61mNYq+rJAu2YhrqhDSMs35ETh5cSSxZv565xxMG8vb30Us1L2FHL0PlBlgi5QLpkWuj0NFMq2sY+rhcMCFsnPH6HDZh0wwLifdAMFYyoWEvU9TVhFFfjIG0LIPigbFF5iv6l9tyLH2pl6w5Zf3n2JNc7VGMADe+rSo78/8vOf4IWSsfJQNzibENZV02qzq5K1IfAOzvdtnHmAlpWXuCFEuy/KLXxwOOkgXbd4VGajC59f14ujO5H13JxcU/D3lJnDuWdOo/RAecupiZXGhq5bwswfiGPIb4GRCW8bTqLDOLRyzYavhj7tJ1Eb+Fa4w6JtRwAoCAPG+5Bew895CT2KwZVoFh5W4FIZOfAzfmxKyxXp4KYPvBoxH2iXq5ZlZd/8KzZecos5XwiHuq73n1gfmkSbKMCZBXMFDyP5yrXJr61mnuULCYL/+PVo2P3gtx1gn56KgLpIhVIInbzu6W1TLyXb3Xg2m52vwYLV0rlyIFz0QDuoeu0errTRlUlu5RMFrSQE7N5v+ZR8rvE=
-    file: sy-cli-linux-musl-x86_64.tar.gz
-    on:
-      repo: Byron/share-secrets-safely
-      tags: true
-      condition: $TRAVIS_OS_NAME = linux
