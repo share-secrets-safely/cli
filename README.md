@@ -282,7 +282,10 @@ Here is what would have to be done, in greater detail:
 
  * [ ] `pulldown-cmark` event serialization back to markdown.
  * [ ] test for processing code blocks to execute lines and capture their output.
+ 
+ For more details, have a look at [`termbook`][termbook].
 
+[termbook]: https://github.com/Byron/termbook
 [mdbook-github]: https://github.com/rust-lang-nursery/mdBook
 
 ### Signed binaries
