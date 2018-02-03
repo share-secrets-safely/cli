@@ -3,6 +3,11 @@
 **sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing
 shared secrets in teams and build pipelines.
 
+TODO: stuff to look at when doing termbook
+* https://crates.io/crates/mdcat
+* https://github.com/bestouff/catmark
+* https://github.com/srijs/rust-prettify-cmark/blob/master/src/tests.rs
+
 Like [`pass`][pass], `sy` allows to setup a vault to store secrets, and share
 them with your team members and tooling.
 However, it wants to be a one-stop-shop in a single binary without any dependencies except

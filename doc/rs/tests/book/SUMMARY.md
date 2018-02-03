@@ -1,3 +1,0 @@
-# Summary
-
-[Introduction](./index.md)

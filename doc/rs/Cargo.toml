@@ -1,7 +1,0 @@
-[package]
-name = "doc"
-version = "2.0.0"
-authors = ["Sebastian Thiel <sthiel@thoughtworks.com>"]
-
-[dependencies]
-mdbook = "0.1.1"
