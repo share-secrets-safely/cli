@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/Byron/share-secrets-safely.svg?branch=master)](https://travis-ci.org/Byron/share-secrets-safely)
+[![dependency
+status](https://deps.rs/repo/github/byron/share-secrets-safely/status.svg)](https://deps.rs/repo/github/byron/share-secrets-safely)
 
 **sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing
 shared secrets in teams and build pipelines.
