@@ -39,12 +39,27 @@ before_cache:
 script:
   - cargo doc
   - cargo test --all
-  # JourneyTests need docker, so it's OK to run them just on one OS. We also just need them once, as journey tests just use the MUSL binary
   - |
     set -e
     if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
         make lint-scripts
         make stateful-journey-tests
+        make docs
     else
         make stateless-journey-tests
     fi
+
+deploy:
+  - provider: pages
+    skip-cleanup: true
+    local-dir: doc/book
+    github-token: "$GITHUB_TOKEN"
+    on:
+      repo: Byron/share-secrets-safely
+      branch: master
+      tags: false
+      condition: $TRAVIS_OS_NAME != "osx"
+      
+env:
+  global:
+    secure: k59lnFDNaDzeILWAPF1hy4cUd0/7GdEo9Ix2zUdFrARsaKJVHn6uZ4fj7A5f6HFms22Zz8G8W7wHcC+Tq731srB6qDRSMuCQdfw4Riw8STDmC218w1N/CVUXfNWdZfTUKBkuc5Q8aQ4XQzJGnpX+7Q95Ait6wrpvXevtMFnarszlUvg+JPnuildEljm4WpEU5OumqQPIsQZg33pL1SS9gOJmlcTxKYrApofc2HqEp3hzQ81Ig0pGeAZVtKrs4HvppcQS/1mWvWbODk5eNmbOGWuRIycyeSq/+klYN4f0spZ6YNwaA5tFhPIFaViwtCpn7Y8joG8W1/0CYai76kVrVm8aKwVbk66F3yqIIzXm74BwMPIK3hoKHRQtljh+iFbOUBuaEavKcyX5rIyyMpLIs/JzdegO9m6L9eDehIY0fTnadmjW1V1kf5+XSNbGvoZC6WpcXT07+K/uMBpDpOVRQO1VP23Vh9xfDUDeKLhIOYVpSE3Dql70FpeaqdGVpWvYhE9+Bi2u1S0jxJxjHe19jfAlP8fea+YC2CF5FZ8ORwAN3TBNJL8YJhY39WC1jBTxXUMa2W0CgwD/H3msxTuOOxpYtThtgC/8kzc4+OWToN60fY5lHr5xOKzV5+SaXrQ3HIHKtNYf+bgqEiE+/SdjIoGxybModNjNf9FtupoUgBk=
