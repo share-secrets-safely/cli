@@ -1,4 +1,6 @@
 EXE=target/debug/sy
+TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$([ "$$(uname -s)" == 'Darwin' ] && echo 'apple-darwin' || echo "unknown-$$(uname -s)"))
+TERMBOOK_ARCHIVE=$(TERMBOOK).tar.gz
 RELEASE_EXE=target/release/sy
 RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/sy
@@ -17,11 +19,12 @@ help:
 	$(info journey-tests           | Run all journey tests using a pre-built binary)
 	$(info stateful-journey-tests  | Run only stateful journeys in docker)
 	$(info stateless-journey-tests | Run only stateless journey)
+	$(info docs                   | build documentation with termbook)
 	$(info - Deployment  -------------------------------------------------------------------------------------------------)
 	$(info tag-release            | Create a new release commit using the version in VERSION file)
 	$(info deployable-linux       | Archive usable for any more recent linux system)
 	$(info deployable-host        | Archive usable on your host)
-	$(info deployment             | Archive usable on your host)
+	$(info deployment             | All archives, for host and linux system)
 	$(info - Docker ------------------------------------------------------------------------------------------------------)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
 	$(info build-musl-image       | Build our musl build image)
@@ -29,6 +32,16 @@ help:
 	$(info ---------------------------------------------------------------------------------------------------------------)
 
 always:
+	
+$(TERMBOOK):
+	mkdir -p $(dir $(TERMBOOK_ARCHIVE))
+	curl --fail -Lo $(TERMBOOK_ARCHIVE) https://github.com/Byron/termbook/releases/download/1.2.1-release/$(notdir $(TERMBOOK_ARCHIVE)) \
+		&& cd $(dir $(TERMBOOK_ARCHIVE)) && tar xzvf $(notdir $(TERMBOOK_ARCHIVE)) \
+		&& rm $(notdir $(TERMBOOK_ARCHIVE)) \
+		&& mv termbook $(notdir $(TERMBOOK))
+	
+docs: $(TERMBOOK)
+	$< build doc/
 
 $(EXE): always
 	cargo build

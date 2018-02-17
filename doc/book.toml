@@ -2,7 +2,3 @@
 authors = ["Sebastian Thiel"]
 multilingual = false
 src = "."
-
-[build]
-build-dir = "html"
-create-missing = false

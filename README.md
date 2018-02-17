@@ -277,8 +277,8 @@ scripts in various modes:
 
 Here is what would have to be done, in greater detail:
 
- * [ ] `pulldown-cmark` event serialization back to markdown.
- * [ ] test for processing code blocks to execute lines and capture their output.
+ * [x] `pulldown-cmark` event serialization back to markdown.
+ * [x] test for processing code blocks to execute lines and capture their output.
  
  For more details, have a look at [`termbook`][termbook].
 
