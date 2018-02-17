@@ -1,5 +1,6 @@
+SHELL=/bin/bash
 EXE=target/debug/sy
-TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$([ "$$(uname -s)" == 'Darwin' ] && echo 'apple-darwin' || echo "unknown-$$(uname -s)"))
+TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$([[ "$$(uname -s)" == 'Darwin' ]] && echo 'apple-darwin' || echo "unknown-$$(uname -s)"))
 TERMBOOK_ARCHIVE=$(TERMBOOK).tar.gz
 RELEASE_EXE=target/release/sy
 RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
@@ -40,8 +41,8 @@ $(TERMBOOK):
 		&& rm $(notdir $(TERMBOOK_ARCHIVE)) \
 		&& mv termbook $(notdir $(TERMBOOK))
 	
-docs: $(TERMBOOK)
-	$< build doc/
+docs: $(TERMBOOK) $(EXE)
+	PATH=$(dir $(EXE)):$$PATH $(TERMBOOK) build doc/
 
 $(EXE): always
 	cargo build
