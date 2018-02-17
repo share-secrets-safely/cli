@@ -1,5 +1,6 @@
 SHELL=/bin/bash
 EXE=target/debug/sy
+DOC_EXE=$(shell [[ $$TRAVIS == true ]] && echo $(MUSL_EXE) || echo $(EXE))
 TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$(if [[ "$$(uname -s)" == 'Darwin' ]]; then echo 'apple-darwin'; elif [[ "$$(uname -s)" == 'Linux' ]]; then echo "unknown-linux-musl"; else echo "unkown-$$(uname -s | tr '[:upper:]' '[:lower:]')"; fi))
 TERMBOOK_ARCHIVE=$(TERMBOOK).tar.gz
 RELEASE_EXE=target/release/sy
@@ -41,8 +42,8 @@ $(TERMBOOK):
 		&& rm $(notdir $(TERMBOOK_ARCHIVE)) \
 		&& mv termbook $(notdir $(TERMBOOK))
 	
-docs: $(TERMBOOK) $(EXE)
-	PATH=$(dir $(EXE)):$$PATH $(TERMBOOK) build doc/
+docs: $(TERMBOOK) $(DOC_EXE)
+	PATH=$(dir $(DOC_EXE)):$$PATH $(TERMBOOK) build doc/
 
 $(EXE): always
 	cargo build
