@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 EXE=target/debug/sy
-TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$([[ "$$(uname -s)" == 'Darwin' ]] && echo 'apple-darwin' || echo "unknown-$$(uname -s)"))
+TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$(if [[ "$$(uname -s)" == 'Darwin' ]]; then echo 'apple-darwin'; elif [[ "$$(uname -s)" == 'Linux' ]]; then echo "unknown-linux-musl"; else echo "unkown-$$(uname -s | tr '[:upper:]' '[:lower:]')"; fi))
 TERMBOOK_ARCHIVE=$(TERMBOOK).tar.gz
 RELEASE_EXE=target/release/sy
 RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
