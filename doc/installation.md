@@ -19,17 +19,45 @@ Please note that in order to use `sy`, you will need a working [installation of 
 Navigate to the [releases page][releases] and download a release binary suitable
 for your system. A full example *for linux* looks like this:
 
-```bash
-curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/2.0.0/sy-linux-musl-x86_64.tar.gz
+```bash,exec,hide
+gpg --import /volume/tests/journeys/fixtures/tester.sec.asc &>/dev/null
+fpr="$(gpg --list-secret-keys --with-colons --with-fingerprint | grep fpr | head -1)"
+fpr=${fpr:12:40}
+
+function trust_key () {
+  {
+    gpg --export-ownertrust
+    echo "${1:?First argument is the long fingerprint of the key to trust}:6:"
+  } | gpg --import-ownertrust &>/dev/null
+}
+
+trust_key "$fpr"
+```
+
+```bash,prepare=sandboxed,hide
+sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
+pushd "$sandbox_tempdir" >/dev/null
+```
+
+```bash,use=sandboxed,exec
+curl --fail -Lso sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/2.0.0/sy-cli-linux-musl-x86_64.tar.gz
 tar xzf sy.tar.gz
 # verify 'sy' was built by one of the maintainers
-gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc)
+gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc) 2>/dev/null
+gpg --sign-key --yes --batch 296B26A2B943AFFA &>/dev/null
 gpg --verify ./sy.gpg sy
 # This will print out that the file was created by one of the maintainers. If you chose to
 # trust the respective key after verifying it belongs to the maintainers, gpg will tell you
 # it is verified.
-# run sy if it was verified - even better when in your PATH
-./sy
+
+# Finally put the executable into your PATH
+mv ./sy /usr/local/bin
+```
+
+Now the `sy` executable is available in your `PATH`.
+
+```bash,exec=1
+sy
 ```
 
 [gpg]: https://www.gnupg.org/download/index.html#binary
