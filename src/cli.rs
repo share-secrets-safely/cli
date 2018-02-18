@@ -261,6 +261,7 @@ where
             });
         let app: App = app_from_crate!()
             .name(CLI::name())
+            .after_help("Read more on https://byron.github.io/share-secrets-safely")
             .version(include_str!("../VERSION"))
             .subcommand(vault)
             .subcommand(completions);

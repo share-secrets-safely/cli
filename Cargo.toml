@@ -7,7 +7,7 @@ description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vau
 license = "LGPL-2.1"
 repository = "https://github.com/Byron/share-secrets-safely"
 homepage = "https://github.com/Byron/share-secrets-safely"
-documentation = "https://docs.rs/crate/sheesy-cli"
+documentation = "https://byron.github.io/share-secrets-safely"
 keywords = ["gnupg", "pgp", "crypto"]
 readme = "README.md"
 
