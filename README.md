@@ -21,13 +21,22 @@ Please note that in order to use `sy`, you will need a working [installation of 
 
 [gpg]: https://www.gnupg.org/download/index.html#binary
 
+### Via HomeBrew (OSX and Linux)
+
+This is by far the easiest way to get the binary. Just execute the following code:
+
+```bash
+brew tap byron/share-secrets-safely https://github.com/Byron/share-secrets-safely.git
+brew install sheesy
+```
+
 ### Via [Releases][releases]
 
 Navigate to the [releases page][releases] and download a release binary suitable
 for your system. A full example *for linux* looks like this:
 
 ```bash
-curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/1.0.1/sy-linux-musl-x86_64.tar.gz
+curl -Lo sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/2.0.0/sy-linux-musl-x86_64.tar.gz
 tar xzf sy.tar.gz
 # verify 'sy' was built by one of the maintainers
 gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc)
