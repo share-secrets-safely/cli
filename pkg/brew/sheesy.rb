@@ -2,6 +2,7 @@ class Sheesy < Formula
   version '2.0.0'
   desc "share secrets within teams to avoid plain-text secrets from day one"
   homepage "https://github.com/Byron/share-secrets-safely"
+  depends_on "gnupg"
 
   if OS.mac?
       url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-Darwin-x86_64.tar.gz"
