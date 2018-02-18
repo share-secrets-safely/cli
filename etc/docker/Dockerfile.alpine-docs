@@ -1,0 +1,7 @@
+FROM alpine_with_gpg2:stable
+
+RUN apk --no-cache -U add curl
+RUN curl --progress --fail -Lo termbook.tar.gz https://github.com/Byron/termbook/releases/download/1.2.3/termbook-1.2.3-x86_64-unknown-linux-musl.tar.gz \
+		&& tar xzvf termbook.tar.gz \
+		&& rm termbook.tar.gz \
+		&& mv termbook /usr/local/bin/

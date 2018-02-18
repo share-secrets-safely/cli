@@ -1,8 +1,6 @@
 SHELL=/bin/bash
 EXE=target/debug/sy
-DOC_EXE=$(shell [[ $$TRAVIS == true ]] && echo $(MUSL_EXE) || echo $(EXE))
-TERMBOOK=.tools/$(shell echo termbook-1.2.1-release-$$(uname -m)-$$(if [[ "$$(uname -s)" == 'Darwin' ]]; then echo 'apple-darwin'; elif [[ "$$(uname -s)" == 'Linux' ]]; then echo "unknown-linux-musl"; else echo "unkown-$$(uname -s | tr '[:upper:]' '[:lower:]')"; fi))
-TERMBOOK_ARCHIVE=$(TERMBOOK).tar.gz
+DOCS_IMAGE=sheesy_docs:latest
 RELEASE_EXE=target/release/sy
 RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/sy
@@ -10,18 +8,21 @@ MUSL_IMAGE=clux/muslrust:stable
 MY_MUSL_IMAGE=sheesy_musl:stable
 MY_LINUX_RUN_IMAGE=alpine_with_gpg2:stable
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
-MUSL_DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE)
+DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm 
+MUSL_DOCKER_ARGS=$(DOCKER_ARGS) $(MY_MUSL_IMAGE)
 HOST_DEPLOYABLE=sy-cli-$$(uname -s)-$$(uname -m).tar.gz
 LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
+DOCKER_DOCS_ARGS=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume $(DOCS_IMAGE) termbook build ./doc
 
 help:
 	$(info Available Targets)
 	$(info - Testing -----------------------------------------------------------------------------------------------------)
-	$(info lint-scripts           | Run journey tests using a pre-built linux binary)
+	$(info lint-scripts            | Run journey tests using a pre-built linux binary)
 	$(info journey-tests           | Run all journey tests using a pre-built binary)
 	$(info stateful-journey-tests  | Run only stateful journeys in docker)
 	$(info stateless-journey-tests | Run only stateless journey)
-	$(info docs                   | build documentation with termbook)
+	$(info docs                    | build documentation with termbook)
+	$(info watch-docs              | continuously rebuild docs when changes happen. Needs `watchexec`)
 	$(info - Deployment  -------------------------------------------------------------------------------------------------)
 	$(info tag-release            | Create a new release commit using the version in VERSION file)
 	$(info deployable-linux       | Archive usable for any more recent linux system)
@@ -35,15 +36,17 @@ help:
 
 always:
 	
-$(TERMBOOK):
-	mkdir -p $(dir $(TERMBOOK_ARCHIVE))
-	curl --fail -Lo $(TERMBOOK_ARCHIVE) https://github.com/Byron/termbook/releases/download/1.2.1-release/$(notdir $(TERMBOOK_ARCHIVE)) \
-		&& cd $(dir $(TERMBOOK_ARCHIVE)) && tar xzvf $(notdir $(TERMBOOK_ARCHIVE)) \
-		&& rm $(notdir $(TERMBOOK_ARCHIVE)) \
-		&& mv termbook $(notdir $(TERMBOOK))
+build-docs-image: build-linux-run-image
+	docker build -t $(DOCS_IMAGE) - < etc/docker/Dockerfile.alpine-docs
 	
-docs: $(TERMBOOK) $(DOC_EXE)
-	PATH=$(dir $(DOC_EXE)):$$PATH $(TERMBOOK) build doc/
+docs: build-docs-image $(MUSL_EXE)
+	$(DOCKER_DOCS_ARGS)
+	
+docs-no-deps:
+	$(DOCKER_DOCS_ARGS)
+	
+watch-docs: docs
+	watchexec -w doc $(MAKE) docs-no-deps
 
 $(EXE): always
 	cargo build
@@ -90,10 +93,10 @@ build-linux-musl: build-musl-image
 	$(MUSL_DOCKER_ARGS) cargo build --target=x86_64-unknown-linux-musl
 
 release-linux-musl: build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm -it $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl --release
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl --release
 
 interactive-linux-musl: build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" -it $(MY_MUSL_IMAGE)
+	$(DOCKER_ARGS) -it $(MY_MUSL_IMAGE)
 
 lint-scripts:
 	find . -not \( -path '*target/*' -or -path "*cargo*" \) -name '*.sh' -type f | while read -r sf; do shellcheck -x "$$sf"; done
