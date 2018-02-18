@@ -43,7 +43,7 @@ docs: build-docs-image $(MUSL_EXE)
 	$(DOCKER_DOCS_ARGS)
 	
 docs-no-deps:
-	$(DOCKER_DOCS_ARGS)
+	$(DOCKER_DOCS_ARGS) 1.
 	
 watch-docs: docs
 	watchexec -w doc $(MAKE) docs-no-deps

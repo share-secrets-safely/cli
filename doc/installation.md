@@ -56,8 +56,8 @@ mv ./sy /usr/local/bin
 
 Now the `sy` executable is available in your `PATH`.
 
-```bash,exec=1
-sy
+```bash,exec
+sy --help
 ```
 
 [gpg]: https://www.gnupg.org/download/index.html#binary
