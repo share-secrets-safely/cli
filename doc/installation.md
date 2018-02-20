@@ -19,6 +19,11 @@ Please note that in order to use `sy`, you will need a working [installation of 
 Navigate to the [releases page][releases] and download a release binary suitable
 for your system. A full example *for linux* looks like this:
 
+```bash,prepare=sy-in-path,hide
+set -eu
+export PATH="/volume/${EXE_PATH%/*}:$PATH"
+```
+
 ```bash,exec,hide
 gpg --import /volume/tests/journeys/fixtures/tester.sec.asc &>/dev/null
 fpr="$(gpg --list-secret-keys --with-colons --with-fingerprint | grep fpr | head -1)"

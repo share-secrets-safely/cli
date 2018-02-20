@@ -8,7 +8,7 @@ MUSL_IMAGE=clux/muslrust:stable
 MY_MUSL_IMAGE=sheesy_musl:stable
 MY_LINUX_RUN_IMAGE=alpine_with_gpg2:stable
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
-DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm 
+DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm
 MUSL_DOCKER_ARGS=$(DOCKER_ARGS) $(MY_MUSL_IMAGE)
 HOST_DEPLOYABLE=sy-cli-$$(uname -s)-$$(uname -m).tar.gz
 LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
@@ -35,16 +35,16 @@ help:
 	$(info ---------------------------------------------------------------------------------------------------------------)
 
 always:
-	
+
 build-docs-image: build-linux-run-image
 	docker build -t $(DOCS_IMAGE) - < etc/docker/Dockerfile.alpine-docs
-	
+
 docs: build-docs-image $(MUSL_EXE)
 	$(DOCKER_DOCS_ARGS)
-	
+
 docs-no-deps:
-	$(DOCKER_DOCS_ARGS) 1.
-	
+	$(DOCKER_DOCS_ARGS) '1.*'
+
 watch-docs: docs
 	watchexec -w doc $(MAKE) docs-no-deps
 
