@@ -35,6 +35,9 @@ This is called the [Web of trust][wot], a feature that `sheesy` makes easier to 
 
 ### The *vault* sub-command
 
+As the `vault` sub-command is only a hub, we recommend you to look at its sub-commands
+instead.
+
 ```bash,prepare=sy-in-path,hide
 set -eu
 export PATH="/volume/${EXE_PATH%/*}:$PATH"
@@ -43,5 +46,3 @@ export PATH="/volume/${EXE_PATH%/*}:$PATH"
 ```bash,use=sy-in-path,exec
 sy vault --help
 ```
-
-TBD About
