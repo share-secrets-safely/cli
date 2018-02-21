@@ -45,7 +45,7 @@ docs: build-docs-image $(MUSL_EXE)
 docs-no-deps:
 	$(DOCKER_DOCS_ARGS) '1.*'
 
-watch-docs: docs
+watch-docs: build-docs-image $(MUSL_EXE)
 	watchexec -w doc $(MAKE) docs-no-deps
 
 $(EXE): always
