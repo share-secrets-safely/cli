@@ -5,6 +5,7 @@ If not, please have a look at the [chapter about installation][install].
 
 ```bash,use=sy-in-path,prepare=vault-dir,hide
 set -eu
+export SRC_DIR=$PWD
 export VAULT_DIR=/tmp/share-secrets-safely-docs-vault
 ```
 ```bash,use=vault-dir,hide,exec
@@ -43,3 +44,36 @@ as_user tests/journeys/fixtures/tester.sec.asc
 ```bash,use=in-vault-dir,use=as-tester,exec
 sy vault init
 ```
+
+### Adding Resources
+
+Usually what happens next is to add some [resources][resource]. For now they will
+only be encrypted for you, and thus can only be read by you.
+
+Resources are added via resource *specs*, or can be created by editing.
+
+There are various ways to add new resources...
+
+...from existing files.
+
+
+```bash,use=in-vault-dir,use=as-tester,exec
+echo hi | sy vault add :from-program
+```
+
+...by gathering output from a program.
+```bash,use=in-vault-dir,use=as-tester,exec
+sy vault add $SRC_DIR/README.md:README.md
+```
+
+You can *list* existing resources...
+```bash,use=in-vault-dir,use=as-tester,exec
+sy vault list
+```
+
+or you can *show* them.
+```bash,use=in-vault-dir,use=as-tester,exec
+sy vault show from-program
+```
+
+[resource]: vault/about.html#about-resources
