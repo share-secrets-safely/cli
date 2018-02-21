@@ -1,9 +1,9 @@
 #!/bin/bash
 
-WHITE="$(tput setaf 9 || echo -n '')"
-YELLOW="$(tput setaf 3 || echo -n '')"
-GREEN="$(tput setaf 2 || echo -n '')"
-RED="$(tput setaf 1 || echo -n '')"
+WHITE="$(tput setaf 9 2>/dev/null || echo -n '')"
+YELLOW="$(tput setaf 3 2>/dev/null || echo -n '')"
+GREEN="$(tput setaf 2 2>/dev/null || echo -n '')"
+RED="$(tput setaf 1 2>/dev/null || echo -n '')"
 OFFSET=( )
 STEP="  "
 
