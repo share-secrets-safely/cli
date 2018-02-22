@@ -1,6 +1,6 @@
 FROM alpine_with_gpg2:stable
 
-RUN apk --no-cache -U add curl tree
+RUN apk --no-cache -U add curl tree python3 asciinema
 RUN curl --progress --fail -Lo termbook.tar.gz https://github.com/Byron/termbook/releases/download/1.4.0/termbook-1.4.0-x86_64-unknown-linux-musl.tar.gz \
 		&& tar xzvf termbook.tar.gz \
 		&& rm termbook.tar.gz \
