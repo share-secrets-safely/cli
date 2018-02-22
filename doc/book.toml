@@ -1,4 +1,3 @@
 [book]
 authors = ["Sebastian Thiel"]
 multilingual = false
-src = "."
