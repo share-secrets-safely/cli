@@ -29,19 +29,24 @@ What you want to do is to initialize the vault. This will add yourself as the fi
 
 [recipients]: vault/about.html#about-recipients
 
-```bash,use=in-vault-dir,exec=1
+```bash,use=in-vault-dir,prepare=as-nobody,hide
+GNUPGHOME="$(mktemp -t gnupg-home.XXXX -d)"
+export GNUPGHOME
+```
+
+```bash,use=as-nobody,exec=1
 sy vault init
 ```
 
 Assuming we have followed the instructions or already have setup a *gpg key*, you will
 get quite a different result.
 
-```bash,prepare=as-tester,hide
-source tests/gpg-helpers.sh
-as_user tests/journeys/fixtures/tester.sec.asc
+```bash,use=in-vault-dir,prepare=as-tester,hide
+source $SRC_DIR/tests/gpg-helpers.sh
+as_user $SRC_DIR/tests/journeys/fixtures/tester.sec.asc
 ```
 
-```bash,use=in-vault-dir,use=as-tester,exec
+```bash,use=as-tester,exec
 sy vault init
 ```
 
@@ -57,22 +62,22 @@ There are various ways to add new resources...
 ...from existing files.
 
 
-```bash,use=in-vault-dir,use=as-tester,exec
+```bash,use=as-tester,exec
 echo hi | sy vault add :from-program
 ```
 
 ...by gathering output from a program.
-```bash,use=in-vault-dir,use=as-tester,exec
+```bash,use=as-tester,exec
 sy vault add $SRC_DIR/README.md:README.md
 ```
 
 You can *list* existing resources...
-```bash,use=in-vault-dir,use=as-tester,exec
+```bash,use=as-tester,exec
 sy vault list
 ```
 
 or you can *show* them.
-```bash,use=in-vault-dir,use=as-tester,exec
+```bash,use=as-tester,exec
 sy vault show from-program
 ```
 
