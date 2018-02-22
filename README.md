@@ -77,44 +77,21 @@ However, it's a fun read, and please feel free to make PRs for corrections.
 
 
 ## Roadmap to Future
+### Roadmap to 3.0
+#### Partition Support
 
-## Roadmap to 5.1
+Partitions are just another vault with individual config, but operations on vaults are
+aware of partitions. This allows sharing key-lists, for example, and alters the way
+vaults are displayed when showing them.
 
-### Add the `pass` subcommand
+ * [ ] `multi-vault`
+   * _manage multiple vaults in a single vault configuration file_
+   * _it is possible to share public keys, too, so you can implement partitions_
+ * [ ] Show vault with all partitions as tree
+ * [ ] Show recipients per partition
 
-`sy` aims to be as usable as possible, and breaks compatiblity were needed to
-achieve that. However, to allow people to leverage its improved portability
-thanks to it being self-contained, it should be possible to let it act as a
-stand-in for pass.
-
-Even though its output won't be matched, its input will be matched perfectly, as
-well as its behaviour.
-
-## Roadmap to 5.0
-
-### Adding the `extract` subcommand
-
-The `extract` capability makes it feasilbe to store secrets in structured files
-like YAML or JSON, as it allows to extract pieces of data in various ways.
-That way, you can easily substitute secrets into configuration files using the
-well-known `{{handlebar}}` syntax.
-
-### Sub-Commands as standalone programs
-
-Even though the main binary should by `sy` as before, the code should be structured to
-provide `cli` versions of the respective subcommand, e.g. `vault-cli`.
-That way, people can also use special-purpose sub-programs directly without having
-a binary that contains all the other cruft.
-
-This can be useful to make `pass` standins more approachable, and also build custom
-`sy` binaries with just a sub-set of the functionality (for example, without `pass`
-stand-in capability).
-
- * [ ] move vault-cli into own library and use it from `hub` cli.
-
-## Roadmap to 4.0
-
-### Web of Trust for everyone
+### Roadmap to 4.0
+#### Web of Trust for everyone
 
 The web-of-trust is powerful if used correctly, and helps to assure you are encrypting
 only for trusted keys.
@@ -127,19 +104,40 @@ only for trusted keys.
  * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
  * [ ] possibly allow to disable ownertrust using 'always-trust'
 
-## Roadmap to 3.0
 
-### Partition Support
+### Roadmap to 5.0
 
-Partitions are just another vault with individual config, but operations on vaults are
-aware of partitions. This allows sharing key-lists, for example, and alters the way
-vaults are displayed when showing them.
+#### Adding the `extract` subcommand
 
- * [ ] `multi-vault`
-   * _manage multiple vaults in a single vault configuration file_
-   * _it is possible to share public keys, too, so you can implement partitions_
- * [ ] Show vault with all partitions as tree
- * [ ] Show recipients per partition
+The `extract` capability makes it feasilbe to store secrets in structured files
+like YAML or JSON, as it allows to extract pieces of data in various ways.
+That way, you can easily substitute secrets into configuration files using the
+well-known `{{handlebar}}` syntax.
+
+#### Sub-Commands as standalone programs
+
+Even though the main binary should by `sy` as before, the code should be structured to
+provide `cli` versions of the respective subcommand, e.g. `vault-cli`.
+That way, people can also use special-purpose sub-programs directly without having
+a binary that contains all the other cruft.
+
+This can be useful to make `pass` standins more approachable, and also build custom
+`sy` binaries with just a sub-set of the functionality (for example, without `pass`
+stand-in capability).
+
+ * [ ] move vault-cli into own library and use it from `hub` cli.
+
+### Roadmap to 5.1
+
+#### Add the `pass` subcommand
+
+`sy` aims to be as usable as possible, and breaks compatiblity were needed to
+achieve that. However, to allow people to leverage its improved portability
+thanks to it being self-contained, it should be possible to let it act as a
+stand-in for pass.
+
+Even though its output won't be matched, its input will be matched perfectly, as
+well as its behaviour.
 
 ## Development Practices
 

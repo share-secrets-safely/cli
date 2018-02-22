@@ -1,4 +1,4 @@
-## V2.0.0: Better user onboarding experience
+## V2.0.0: Better user experience and documentation
 
 Besides the many improvements, you will also find [a complete book][book] about
 the capabilities so far!
