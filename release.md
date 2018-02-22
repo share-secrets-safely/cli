@@ -1,5 +1,14 @@
 ## V2.0.0: Better user onboarding experience
 
+Besides the many improvements, you will also find [a complete book][book] about
+the capabilities so far!
+
+We also [sign our binaries][signatures] from here on, and make them available [via *homebrew*][install].
+
+[signatures]: https://byron.github.io/share-secrets-safely/installation.html#via-a-hrefhttpsgithubcombyronshare-secrets-safelyreleasesreleasesa
+[install]: https://byron.github.io/share-secrets-safely/installation.html#via-homebrew-osx-and-linux
+[book]: https://byron.github.io/share-secrets-safely
+
 ### Improvements
 
  * `vault list` now produces precise URLs.

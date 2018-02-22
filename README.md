@@ -23,20 +23,10 @@ Please read the [installation notes here][installation].
 
 ## Getting Started
 
- * **sy --help** - help yourself
-   * You can always use `--help` to learn about what the program can do. It is self-documenting.
- * **sy vault init** - create a new vault in the current directory
- * **sy vault add /path/to/file:file** - add an existing file to the vault
- * **sy vault add :file** - read a secret from stdin
- * **sy vault recipients add name-of-mate** - add a recipient to the vault
-   * Note that the recipient is identified by the ID of a key already imported
-     into your gpg keychain.
-   * In order for secrets to be re-encrypted, you must trust the new key enough.
-     Either (_locally_) sign it, or trust it ultimately. Read more about the [web of trust][gpgweb].
- * **sy vault edit secret** - change a secret
- * **sy vault show secret** - print a secret to standard output
+The first steps showing on how to use the vault with a complete example and detailed
+explanations can be found [in the book][first-steps].
 
-[gpgweb]: https://www.gnupg.org/gph/en/manual/x547.html
+[first-steps]: https://byron.github.io/share-secrets-safely/vault/first-steps.html
 
 ## Project Goals
 
@@ -150,89 +140,6 @@ vaults are displayed when showing them.
    * _it is possible to share public keys, too, so you can implement partitions_
  * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
-
-## Roadmap to 2.0
-
-### Documentation
-
-Currently the only documentation that exists is the program itself, it is self-documentating
-after all, as well as the journey tests. The latter are probably not what a user would look
-like, so we should provide something more along the lines of how users want to use `sheesy`.
-
-The most important thing to me is to test the documentation as well to assure it is always
-accurately reflecting what was actually released. That way, they can also serve as high-level
-smoke-tests.
-
-How can that be done, you wonder? With `shell-book`! It allows you to run specially made
-scripts in various modes:
-
- * **interactively**
-   * The user runs chapters one by one and can press enter to run actual commands and see
-     their output.
- * **test**
-   * This one is run on CI and runs everything automatically, verifying the program invocations work as expected.
- * **mdbook**
-   * generate pages suitable to be rendered by [`mdbook`][mdbook-github] (or equivalent)
-     and deploy them to github pages.
-
-Here is what would have to be done, in greater detail:
-
- * [x] `pulldown-cmark` event serialization back to markdown.
- * [x] test for processing code blocks to execute lines and capture their output.
- 
- For more details, have a look at [`termbook`][termbook].
-
-[termbook]: https://github.com/Byron/termbook
-[mdbook-github]: https://github.com/rust-lang-nursery/mdBook
-
-### Signed binaries
-
-Even though it's great that travis is building binaries, the question is if it should be trusted.
-Thus I believe the created archives should be processed after they have been created to re-assure
-they are what we think they should be.
-
-We should test the linux version again and sign it if all tests still work, and if the binary we
-create locally matches the one on CI.
-
-The same should be done on the host system (OSX) in that case, and if at all possible.
-Providing signatures would also help prevent third parties distribute changed binaries on their own,
-making the binaries produced here the only ones that are endorsed.
-
- * [x] Make deployment local and adjust scripts to include signature.
-   * Unfortunately travis deployments don't really work well yet, and it's
-     somewhat difficult to test.
-   * Also it seems easiest to assure users can trust the binaries.
-
-### Completing the `vault` subcommand
-
-The first iteration only fulfilled the main journey. Now it's  time to fill the gaps
-and add a few more features to provide API symmetry.
-
- * [x] Stream progress/output messages instead of aggregating them if all succeeded
-   * For example, when adding a recipient, parts of the operation succeed, but
-     it is not visible if re-encryption fails.
- * [x] `vault recipients`
-   * [x] list
-   * [x] init
-   * [x] remove recipient(s) and re-encrypt
- * [x] `vault remove` a resource
- * [x] `vault add` create sub-directories automatically
- * [x] `vault add :secret` opens an editor if there is a tty and no input from stdin.
-
-### UX - The next iteration
-
-GPG is cryptic, and it's usually entirely unclear to the uninitiated user why
-encryption just didn't work. Right now, we are not much better than using `pass`.
-
-In this iteration, we want to achieve that for all major user journeys, **no
-gpg error remains unexplained**.
-
- * [x] Suggest installing GPG if there is none
- * [x] Suggest creating a gpg key if there is none.
- * [x] try encrypting on edit (before the edit) to fail fast
- * [x] list recipients which are unusable when re-encryption fails (lack of trust)
- * [x] list recipients which are not available in the gpg key database.
- * [x] allow future recipients to export their key to the right spot.
 
 ## Development Practices
 
