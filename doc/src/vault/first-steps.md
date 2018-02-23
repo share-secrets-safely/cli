@@ -59,13 +59,13 @@ Resources are added via resource *specs*, or can be created by editing.
 
 There are various ways to add new resources...
 
-...from existing files.
+...by gathering output from a program...
 
 ```bash,use=as-tester,exec
 echo hi | sy vault add :from-program
 ```
 
-...by gathering output from a program.
+...or from existing files.
 
 ```bash,use=as-tester,exec
 sy vault add $SRC_DIR/README.md:README.md

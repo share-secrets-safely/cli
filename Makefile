@@ -14,6 +14,7 @@ HOST_DEPLOYABLE=sy-cli-$$(uname -s)-$$(uname -m).tar.gz
 LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
 DOCKER_DOCS_ARGS_NO_CMD=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume -it $(DOCS_IMAGE)
 DOCKER_DOCS_ARGS=$(DOCKER_DOCS_ARGS_NO_CMD) termbook build ./doc
+CAST=getting-started.cast
 
 help:
 	$(info Available Targets)
@@ -22,9 +23,11 @@ help:
 	$(info journey-tests           | Run all journey tests using a pre-built binary)
 	$(info stateful-journey-tests  | Run only stateful journeys in docker)
 	$(info stateless-journey-tests | Run only stateless journey)
+	$(info - Documentation -----------------------------------------------------------------------------------------------)
 	$(info docs                    | build documentation with termbook)
 	$(info watch-docs              | continuously rebuild docs when changes happen. Needs `watchexec`)
-	$(info asciinema-no-upload     | record the latest asciinema-no-upload )
+	$(info asciinema-no-upload     | record the getting-started chapter to a file)
+	$(info asciinema-upload        | upload the recorded cast after review)
 	$(info - Deployment  -------------------------------------------------------------------------------------------------)
 	$(info tag-release            | Create a new release commit using the version in VERSION file)
 	$(info deployable-linux       | Archive usable for any more recent linux system)
@@ -50,13 +53,18 @@ docs-no-deps:
 watch-docs: build-docs-image $(MUSL_EXE)
 	watchexec -w doc $(MAKE) docs-no-deps
 
-getting-started.cast: build-docs-image $(MUSL_EXE)
-	$(DOCKER_DOCS_ARGS_NO_CMD) asciinema rec \
+$(CAST):
+	rm -f $@
+	asciinema rec \
 		--title 'Getting Started with Sheesy (https://byron.github.io/share-secrets-safely)' \
-		-c 'termbook play doc ' \
+		--idle-time-limit 1 \
+		-c '$(DOCKER_DOCS_ARGS_NO_CMD) sh -c "termbook play doc 1.1. 2>/dev/null"' \
 		$@
 
-asciinema-no-upload: getting-started.cast
+asciinema-no-upload: build-docs-image $(MUSL_EXE) $(CAST)
+
+asciinema-upload: build-docs-image $(MUSL_EXE) $(CAST)
+	asciinema upload $(CAST)
 
 $(EXE): always
 	cargo build

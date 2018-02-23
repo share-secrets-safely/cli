@@ -11,7 +11,7 @@ However, it wants to be a one-stop-shop in a single binary without any dependenc
 for a `gpg` installation,
 helping users to work with the `gpg` toolchain and workaround peculiarities.
 
-[![asciicast](https://asciinema.org/a/154953.png)](https://asciinema.org/a/154953)
+[![asciicast](https://asciinema.org/a/164964.png)](https://asciinema.org/a/164964?t=14)
 
 [pass]: https://www.passwordstore.org/
 
@@ -182,13 +182,19 @@ red builds just yet.
 
 ### Making a new Asciinema recording
 
- * build the latest asciinema docker image
-   * `docker build -t asciinema - < etc/docker/Dockerfile.asciinema`
- * drop into the image, possibly prepare it a little more
-   * `docker run -it --rm asciinema`
-   * `chmod ga+rw $(tty)` to allow changing to `su max` and allow `gpg --gen-key` to work.
- * Start a local recording
-   * `asciinema rec -w 1 -t "A tour of sy" sy-demo.json`
- * Possibly upload the recording
-   * `asciinema auth`
-   * `asciinema upload sy-demo.json`
+Even though the documentation is currently updated with every push to master (to allows
+fixing the existing docs easily), the *eye-candy* on the front page needs to be regenerated
+too.
+
+As a prerequisite, you will need an installed binary of [`asciinema`][asciinema].
+Please make sure your player is already linked to your account via `asciinema auth`.
+
+ * Set your terminal to a size of 120x20
+   * You see these units when resizing an iterm2/3 terminal window
+ * run `make asciinema-no-upload` and verify it contains what you expect with
+   `asciicast play getting-started.cast`
+ * Possibly upload the recording with `make asciinema-upload`
+   * Enter the given URL and configure the asciicast to your liking, add backlinks
+     to the description, and make it nice.
+
+[asciinema]: https://asciinema.org
