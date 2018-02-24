@@ -1,0 +1,19 @@
+class Sheesy < Formula
+  # '${TEMPLATE_NOTE}'
+  version '${VERSION}'
+  desc "share secrets within teams to avoid plain-text secrets from day one"
+  homepage "https://github.com/Byron/share-secrets-safely"
+  depends_on "gnupg"
+
+  if OS.mac?
+      url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-Darwin-x86_64.tar.gz"
+      sha256 "${OSX_SHA256}"
+  elsif OS.linux?
+      url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-linux-musl-x86_64.tar.gz"
+      sha256 "${LINUX_SHA256}"
+  end
+
+  def install
+    bin.install "sy"
+  end
+end

@@ -179,6 +179,7 @@ red builds just yet.
   * run `make deployment`.
   * copy all text from the `release.md` file and copy it into the release text on github.
   * drag & drop all _tar.gz_  into the release and publish it.
+  * run `make update-homebrew` and push the changed brew file
 
 ### Making a new Asciinema recording
 

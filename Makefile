@@ -10,7 +10,7 @@ MY_LINUX_RUN_IMAGE=alpine_with_gpg2:stable
 CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm
 MUSL_DOCKER_ARGS=$(DOCKER_ARGS) $(MY_MUSL_IMAGE)
-HOST_DEPLOYABLE=sy-cli-$$(uname -s)-$$(uname -m).tar.gz
+HOST_DEPLOYABLE=$(shell echo sy-cli-$$(uname -s)-$$(uname -m).tar.gz)
 LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
 DOCKER_DOCS_ARGS_NO_CMD=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume -it $(DOCS_IMAGE)
 DOCKER_DOCS_ARGS=$(DOCKER_DOCS_ARGS_NO_CMD) termbook build ./doc
@@ -33,6 +33,7 @@ help:
 	$(info deployable-linux       | Archive usable for any more recent linux system)
 	$(info deployable-host        | Archive usable on your host)
 	$(info deployment             | All archives, for host and linux system)
+	$(info update-homebrew        | Update homebrew after both deployables have been generated)
 	$(info - Docker ------------------------------------------------------------------------------------------------------)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
 	$(info build-musl-image       | Build our musl build image)
@@ -76,15 +77,22 @@ $(MUSL_EXE): build-linux-musl
 
 $(RELEASE_MUSL_EXE): release-linux-musl
 
-deployable-linux: $(RELEASE_MUSL_EXE)
+$(LINUX_DEPLOYABLE): $(RELEASE_MUSL_EXE)
 	$(MUSL_DOCKER_ARGS) strip --strip-all $<
 	gpg --yes --output $<.gpg --detach-sig $<
-	tar czf $(LINUX_DEPLOYABLE) -C $(dir $<) $(notdir $<) $(notdir $<).gpg
+	tar czf $@ -C $(dir $<) $(notdir $<) $(notdir $<).gpg
+	
+deployable-linux: $(LINUX_DEPLOYABLE)
 
-deployable-host: $(RELEASE_EXE)
+$(HOST_DEPLOYABLE): $(RELEASE_EXE)
 	strip $<
 	gpg --yes --output $<.gpg --detach-sig $<
-	tar czf $(HOST_DEPLOYABLE) -C $(dir $<) $(notdir $<) $(notdir $<).gpg
+	tar czf $@ -C $(dir $<) $(notdir $<) $(notdir $<).gpg
+	
+deployable-host: $(HOST_DEPLOYABLE)
+	
+update-homebrew: $(HOST_DEPLOYABLE) $(LINUX_DEPLOYABLE)
+	@set -ex; ./bin/update-homebrew-formula.sh $$(git tag | tail -1) ./pkg/brew/sheesy.rb.in ./pkg/brew/sheesy.rb
 
 tag-release: bin/tag-release.sh release.md VERSION
 	bin/tag-release.sh $$(cat VERSION) release.md
