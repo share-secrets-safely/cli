@@ -1,3 +1,4 @@
+[![https://crates.io](http://meritbadge.herokuapp.com/sheesy-cli)](https://crates.io/crates/sheesy-cli)
 [![Build Status](https://travis-ci.org/Byron/share-secrets-safely.svg?branch=master)](https://travis-ci.org/Byron/share-secrets-safely)
 [![dependency
 status](https://deps.rs/repo/github/byron/share-secrets-safely/status.svg)](https://deps.rs/repo/github/byron/share-secrets-safely)
