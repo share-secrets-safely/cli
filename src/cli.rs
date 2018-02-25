@@ -229,6 +229,7 @@ where
                     .short("n")
                     .long("name")
                     .required(false)
+                    .takes_value(true)
                     .help(
                         "The name of the partitions vault to use. If unset, it will default to the basename name of \
                          the partitions resources directory.",

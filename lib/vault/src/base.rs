@@ -18,8 +18,24 @@ pub fn secrets_default() -> PathBuf {
 }
 
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
+pub enum VaultKind {
+    Master { index: usize },
+    Partition,
+}
+
+impl Default for VaultKind {
+    fn default() -> Self {
+        VaultKind::Master { index: 0 }
+    }
+}
+
+#[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub struct Vault {
     pub name: Option<String>,
+    #[serde(skip)]
+    pub kind: VaultKind,
+    #[serde(skip)]
+    pub partitions: Vec<Vault>,
     #[serde(skip)]
     pub resolved_at: PathBuf,
     #[serde(skip)]
@@ -34,6 +50,8 @@ pub struct Vault {
 impl Default for Vault {
     fn default() -> Self {
         Vault {
+            kind: VaultKind::default(),
+            partitions: Default::default(),
             vault_path: None,
             name: None,
             secrets: secrets_default(),
@@ -78,13 +96,31 @@ impl Vault {
         if path.exists() {
             return Err(VaultError::ConfigurationFileExists(path.to_owned()));
         }
-        let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
-        serde_yaml::to_writer(&file, self)
-            .map_err(|cause| VaultError::Serialization {
-                cause,
-                path: path.to_owned(),
-            })
-            .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))
+        fn serialize_vault(vault: &Vault, mut file: &File, path: &Path) -> Result<(), VaultError> {
+            serde_yaml::to_writer(&mut file, vault)
+                .map_err(|cause| VaultError::Serialization {
+                    cause,
+                    path: path.to_owned(),
+                })
+                .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))
+        }
+        match self.kind {
+            VaultKind::Partition => return Err(VaultError::PartitionUnsupported),
+            VaultKind::Master { index } => {
+                let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
+                if self.partitions.is_empty() {
+                    serialize_vault(self, &file, path)?;
+                } else {
+                    for (vid, partition) in self.partitions.iter().enumerate() {
+                        if vid == index {
+                            serialize_vault(self, &file, path)?;
+                        }
+                        serialize_vault(partition, &file, path)?
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     pub fn absolute_path(&self, path: &Path) -> PathBuf {
@@ -262,22 +298,44 @@ impl Vault {
 }
 
 pub trait VaultExt {
-    fn select(&self, vault_id: &str) -> Result<Vault, Error>;
+    fn select(self, vault_id: &str) -> Result<Vault, Error>;
 }
 
 impl VaultExt for Vec<Vault> {
-    fn select(&self, vault_id: &str) -> Result<Vault, Error> {
+    fn select(mut self, vault_id: &str) -> Result<Vault, Error> {
         let idx: Result<usize, _> = vault_id.parse();
-        Ok(match idx {
-            Ok(idx) => self.get(idx)
-                .ok_or_else(|| format_err!("Vault index {} is out of bounds.", idx))?,
+        let (index, mut vault) = match idx {
+            Ok(idx) => (
+                idx,
+                self.get(idx)
+                    .map(ToOwned::to_owned)
+                    .ok_or_else(|| format_err!("Vault index {} is out of bounds.", idx))?,
+            ),
             Err(_) => self.iter()
-                .find(|v| match v.name {
+                .enumerate()
+                .find(|&(_vid, v)| match v.name {
                     Some(ref name) if name == vault_id => true,
                     _ => false,
                 })
+                .map(|(vid, v)| (vid, v.to_owned()))
                 .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
-        }.clone())
+        };
+        vault.kind = VaultKind::Master { index };
+        for vault in self.iter_mut()
+            .enumerate()
+            .filter_map(|(vid, v)| if vid == index { None } else { Some(v) })
+        {
+            vault.kind = VaultKind::Partition;
+        }
+        self.retain(|v| {
+            if let VaultKind::Partition = v.kind {
+                true
+            } else {
+                false
+            }
+        });
+        vault.partitions = self;
+        Ok(vault)
     }
 }
 

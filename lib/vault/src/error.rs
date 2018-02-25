@@ -91,6 +91,7 @@ impl EncryptionError {
 #[derive(Debug, Fail)]
 pub enum VaultError {
     ConfigurationFileExists(PathBuf),
+    PartitionUnsupported,
     ReadFile {
         #[cause]
         cause: io::Error,
@@ -117,6 +118,7 @@ impl fmt::Display for VaultError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::VaultError::*;
         match *self {
+            PartitionUnsupported => f.write_str("Cannot perform this operation on a partition"),
             ConfigurationFileExists(ref path) => writeln!(
                 f,
                 "Cannot overwrite vault configuration file as it already exists at '{}'",
