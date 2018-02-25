@@ -20,7 +20,8 @@ impl Vault {
             )
         })?);
         self.partitions.push(Vault {
-            name: name.map(ToOwned::to_owned),
+            name: name.map(ToOwned::to_owned)
+                .or_else(|| path.file_name().map(|f| f.to_string_lossy().into_owned())),
             kind: VaultKind::Partition,
             partitions: Vec::new(),
             resolved_at: self.resolved_at.clone(),

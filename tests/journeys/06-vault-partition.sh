@@ -36,10 +36,11 @@ title "'vault partition add'"
         }
       )
       
+      SHARED_NAME=second-partition
       (when "adding another named partition"
-        it "succeeds" && {
+        it "succeeds and defaults the name to the path" && {
           WITH_SNAPSHOT="$snapshot/partition-add-second-named" \
-          expect_run $SUCCESSFULLY "$exe" vault partition add --name second-partition second
+          expect_run $SUCCESSFULLY "$exe" vault partition add --name $SHARED_NAME second
         }
         
         it "creates the expected vault file" && {
@@ -55,6 +56,20 @@ title "'vault partition add'"
         
         it "creates the expected vault file" && {
           expect_snapshot "$snapshot/partition-add-third-named-directory" .
+        }
+      )
+      
+      (when "adding a partition with a name that was already used and an absolute path"
+        ABS_PATH=/tmp/some-empty-dir
+        mkdir -p $ABS_PATH
+        
+        it "succeeds" && {
+          WITH_SNAPSHOT="$snapshot/partition-add-fourth-named-absolute-path" \
+          expect_run $SUCCESSFULLY "$exe" vault partition add --name $SHARED_NAME "$ABS_PATH"
+        }
+        
+        it "creates the expected vault file" && {
+          expect_snapshot "$snapshot/partition-add-fourth-directory" .
         }
       )
     )

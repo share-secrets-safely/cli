@@ -87,10 +87,10 @@ vaults are displayed when showing them.
 
  * [ ] `multi-vault`
    * _manage multiple vaults in a single vault configuration file_
-   * _it is possible to share public keys, too, so you can implement partitions_
+   * _it is possible to share public keys, too_
  * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
- * [ ] Strong validation of the vault configuration
+ * [x] Strong validation of the vault configuration
    * even though our commands can keep things simple, users can create configuration
      which is ambiguous. We should reject such configurations when needed.
 
