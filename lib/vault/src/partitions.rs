@@ -29,13 +29,15 @@ impl Vault {
             gpg_keys: None,
             recipients: recipients_file,
         });
-        let res = self.to_file(
+
+        self.to_file(
             self.vault_path
                 .as_ref()
                 .map(|p| p.as_path())
                 .ok_or_else(|| format_err!("Expected vault to know its configuration file"))?,
             WriteMode::AllowOverwrite,
-        ).map_err(Into::into);
+        )?;
+
         match name {
             Some(name) => writeln!(
                 output,
@@ -49,6 +51,6 @@ impl Vault {
                 partition_secrets_dir.display()
             ),
         }.ok();
-        res
+        Ok(())
     }
 }

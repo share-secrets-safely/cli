@@ -98,7 +98,16 @@ impl Vault {
             return Ok(());
         }
 
-        let mut all_secrets_paths: Vec<_> = self.partitions.iter().map(|v| v.secrets_path()).collect();
+        let mut all_secrets_paths: Vec<_> = self.partitions
+            .iter()
+            .map(|v| {
+                let mut p = v.secrets_path();
+                if p.is_relative() {
+                    p = Path::new(".").join(p);
+                }
+                p
+            })
+            .collect();
         all_secrets_paths.push(self.secrets_path());
         for (sp, dp) in iproduct!(
             all_secrets_paths.iter().enumerate(),
