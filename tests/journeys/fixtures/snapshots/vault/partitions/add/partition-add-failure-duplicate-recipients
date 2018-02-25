@@ -1,0 +1,1 @@
+error: Recipients path '.gpg-id' is already used, but must be unique across all partitions

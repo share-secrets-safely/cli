@@ -70,5 +70,22 @@ title "'vault partition add'"
         }
       )
     )
+    (with "a vault with a custom recipients file that exists in another partition"
+      in-space three/vault
+      cat <<'YAML' > sy-vault.yml
+---
+secrets: "one"
+gpg_keys: ".gpg-keys"
+recipients: ".gpg-id"
+---
+secrets: "two"
+gpg_keys: ".gpg-keys"
+recipients: ".gpg-id"
+YAML
+        it "fails as recipients files must be unique" && {
+          WITH_SNAPSHOT="$snapshot/partition-add-failure-duplicate-recipients" \
+          expect_run $WITH_FAILURE "$exe" vault partition add any
+        }
+    )
   )
 )

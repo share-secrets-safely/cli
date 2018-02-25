@@ -8,6 +8,8 @@ use failure::{err_msg, Error, ResultExt};
 use glob::glob;
 use sheesy_types::WriteMode;
 use gpgme;
+use std::collections::HashSet;
+use std::iter::once;
 
 pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
@@ -71,7 +73,7 @@ impl Vault {
         } else {
             Box::new(File::open(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
         };
-        Ok(split_documents(reader)?
+        let vaults: Vec<_> = split_documents(reader)?
             .iter()
             .map(|s| {
                 serde_yaml::from_str(s)
@@ -82,7 +84,11 @@ impl Vault {
                     .map_err(Into::into)
                     .and_then(|v: Vault| v.set_resolved_at(path))
             })
-            .collect::<Result<_, _>>()?)
+            .collect::<Result<_, _>>()?;
+        if !vaults.is_empty() {
+            vaults[0].validate()?;
+        }
+        Ok(vaults)
     }
 
     pub fn set_resolved_at(mut self, vault_file: &Path) -> Result<Self, Error> {
@@ -97,29 +103,46 @@ impl Vault {
         if self.partitions.is_empty() {
             return Ok(());
         }
-
-        let mut all_secrets_paths: Vec<_> = self.partitions
-            .iter()
-            .map(|v| {
-                let mut p = v.secrets_path();
-                if p.is_relative() {
-                    p = Path::new(".").join(p);
-                }
-                p
-            })
-            .collect();
-        all_secrets_paths.push(self.secrets_path());
-        for (sp, dp) in iproduct!(
-            all_secrets_paths.iter().enumerate(),
-            all_secrets_paths.iter().enumerate()
-        ).filter_map(|((si, s), (di, d))| if si == di { None } else { Some((s, d)) })
         {
-            if sp.starts_with(&dp) {
-                return Err(format_err!(
-                    "Partition at '{}' is contained in another partitions resources directory at '{}'",
-                    sp.display(),
-                    dp.display()
-                ));
+            let all_secrets_paths: Vec<_> = self.partitions
+                .iter()
+                .map(|v| v.secrets_path())
+                .chain(once(self.secrets_path()))
+                .map(|mut p| {
+                    if p.is_relative() {
+                        p = Path::new(".").join(p);
+                    }
+                    p
+                })
+                .collect();
+            for (sp, dp) in iproduct!(
+                all_secrets_paths.iter().enumerate(),
+                all_secrets_paths.iter().enumerate()
+            ).filter_map(|((si, s), (di, d))| if si == di { None } else { Some((s, d)) })
+            {
+                if sp.starts_with(&dp) {
+                    bail!(
+                        "Partition at '{}' is contained in another partitions resources directory at '{}'",
+                        sp.display(),
+                        dp.display()
+                    );
+                }
+            }
+        }
+        {
+            let mut seen: HashSet<_> = Default::default();
+            for path in self.partitions
+                .iter()
+                .map(|v| v.recipients_path())
+                .chain(once(self.recipients_path()))
+            {
+                if seen.contains(&path) {
+                    bail!(
+                        "Recipients path '{}' is already used, but must be unique across all partitions",
+                        path.display()
+                    );
+                }
+                seen.insert(path);
             }
         }
 
@@ -195,23 +218,27 @@ impl Vault {
         recipients.sort();
         recipients.dedup();
 
-        let recipients_file = self.absolute_path(&self.recipients);
-        let mut writer = write_at(&recipients_file).context(format!(
+        let recipients_path = self.recipients_path();
+        let mut writer = write_at(&recipients_path).context(format!(
             "Failed to open recipients at '{}' file for writing",
-            recipients_file.display()
+            recipients_path.display()
         ))?;
         for recipient in recipients {
             writeln!(&mut writer, "{}", recipient).context(format!(
                 "Failed to write recipient '{}' to file at '{}'",
                 recipient,
-                recipients_file.display()
+                recipients_path.display()
             ))?
         }
-        Ok(recipients_file)
+        Ok(recipients_path)
+    }
+
+    pub fn recipients_path(&self) -> PathBuf {
+        self.absolute_path(&self.recipients)
     }
 
     pub fn recipients_list(&self) -> Result<Vec<String>, Error> {
-        let recipients_file_path = self.absolute_path(&self.recipients);
+        let recipients_file_path = self.recipients_path();
         let rfile = File::open(&recipients_file_path)
             .map(BufReader::new)
             .context(format!(
@@ -293,7 +320,7 @@ impl Vault {
                      {}s specification in the recipients file at '{}'",
                     diff,
                     type_of_ids_for_errors,
-                    self.absolute_path(&self.recipients).display()
+                    self.recipients_path().display()
                 )
             },
         ];
