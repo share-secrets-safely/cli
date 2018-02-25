@@ -78,6 +78,18 @@ However, it's a fun read, and please feel free to make PRs for corrections.
 
 
 ## Roadmap to Future
+
+As you can see from the version numbers, this projet dispenses major version generously.
+This is mainly because, for the sake of simplicity, there is only a single version number
+for the *CLI* as well as all used libraries.
+
+Effectively, you can expect the *CLI* will change rarely, and if it does only to improve
+the user experience. The more tests we write, the more certain shortcomings become
+evident.
+
+The *vault library* and its types will change much more often, but we would expect it
+to settle from 5.0.
+
 ### Roadmap to 3.0
 #### Partition Support
 
