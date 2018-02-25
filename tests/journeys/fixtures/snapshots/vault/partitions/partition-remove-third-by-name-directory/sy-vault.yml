@@ -1,0 +1,15 @@
+---
+name: ~
+secrets: "../one"
+gpg_keys: etc/keys
+recipients: etc/recipients
+---
+name: first
+secrets: "../first"
+gpg_keys: ~
+recipients: "../first/recipients"
+---
+name: "second-partition"
+secrets: "../second"
+gpg_keys: ~
+recipients: "../second/recipients"

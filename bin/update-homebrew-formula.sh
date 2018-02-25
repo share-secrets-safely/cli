@@ -29,4 +29,4 @@ LINUX_SHA256="$($SHA_SUM $LINUX_FILE | awk '{print $1}')"
 TEMPLATE_NOTE="---> DO NOT EDIT <--- (this file was generated from $TEMPLATE_FILE"
 export VERSION OSX_SHA256 LINUX_SHA256 TEMPLATE_NOTE
 
-envsubst < $TEMPLATE_FILE > $HOMEBREW_FILE
+envsubst < "$TEMPLATE_FILE" > "$HOMEBREW_FILE"

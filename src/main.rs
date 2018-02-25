@@ -72,6 +72,7 @@ fn main() {
             context = match args.subcommand() {
                 ("partitions", Some(args)) => match args.subcommand() {
                     ("add", Some(args)) => ok_or_exit(vault_partitions_add(context, args)),
+                    ("remove", Some(args)) => ok_or_exit(vault_partitions_remove(context, args)),
                     _ => usage_and_exit(&matches),
                 },
                 ("recipients", Some(args)) => match args.subcommand() {

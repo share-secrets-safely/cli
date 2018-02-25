@@ -1,0 +1,5 @@
+---
+name: same
+secrets: one
+gpg_keys: ".gpg-keys"
+recipients: bar

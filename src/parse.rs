@@ -90,6 +90,15 @@ pub fn vault_partitions_add(ctx: VaultContext, args: &ArgMatches) -> Result<Vaul
     })
 }
 
+pub fn vault_partitions_remove(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::PartitionsRemove {
+            selector: required_arg(args, "partition-selector")?,
+        },
+        ..ctx
+    })
+}
+
 pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsAdd {

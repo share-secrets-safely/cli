@@ -22,13 +22,13 @@ pub fn secrets_default() -> PathBuf {
 
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub enum VaultKind {
-    Leader { index: usize },
+    Leader,
     Partition,
 }
 
 impl Default for VaultKind {
     fn default() -> Self {
-        VaultKind::Leader { index: 0 }
+        VaultKind::Leader
     }
 }
 
@@ -37,6 +37,8 @@ pub struct Vault {
     pub name: Option<String>,
     #[serde(skip)]
     pub kind: VaultKind,
+    #[serde(skip)]
+    pub index: usize,
     #[serde(skip)]
     pub partitions: Vec<Vault>,
     #[serde(skip)]
@@ -54,6 +56,7 @@ impl Default for Vault {
     fn default() -> Self {
         Vault {
             kind: VaultKind::default(),
+            index: 0,
             partitions: Default::default(),
             vault_path: None,
             name: None,
@@ -75,14 +78,21 @@ impl Vault {
         };
         let vaults: Vec<_> = split_documents(reader)?
             .iter()
-            .map(|s| {
+            .enumerate()
+            .map(|(index, s)| {
                 serde_yaml::from_str(s)
                     .map_err(|cause| VaultError::Deserialization {
                         cause,
                         path: path.to_owned(),
                     })
                     .map_err(Into::into)
-                    .and_then(|v: Vault| v.set_resolved_at(path))
+                    .and_then(|v: Vault| match v.set_resolved_at(path) {
+                        Ok(mut v) => {
+                            v.index = index;
+                            Ok(v)
+                        }
+                        err @ _ => err,
+                    })
             })
             .collect::<Result<_, _>>()?;
         if !vaults.is_empty() {
@@ -167,13 +177,13 @@ impl Vault {
         }
         match self.kind {
             VaultKind::Partition => return Err(VaultError::PartitionUnsupported),
-            VaultKind::Leader { index } => {
+            VaultKind::Leader => {
                 let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
                 if self.partitions.is_empty() {
                     serialize_vault(self, &file, path)?;
                 } else {
                     for (vid, partition) in self.partitions.iter().enumerate() {
-                        if vid == index {
+                        if vid == self.index {
                             serialize_vault(self, &file, path)?;
                         }
                         serialize_vault(partition, &file, path)?
@@ -385,11 +395,8 @@ impl VaultExt for Vec<Vault> {
                 .map(|(vid, v)| (vid, v.to_owned()))
                 .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
         };
-        vault.kind = VaultKind::Leader { index };
-        for vault in self.iter_mut()
-            .enumerate()
-            .filter_map(|(vid, v)| if vid == index { None } else { Some(v) })
-        {
+        vault.kind = VaultKind::Leader;
+        for (_, vault) in self.iter_mut().enumerate().filter(|&(vid, _)| vid != index) {
             vault.kind = VaultKind::Partition;
         }
         self.retain(|v| {

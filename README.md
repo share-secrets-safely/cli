@@ -85,9 +85,12 @@ Partitions are just another vault with individual config, but operations on vaul
 aware of partitions. This allows sharing key-lists, for example, and alters the way
 vaults are displayed when showing them.
 
- * [ ] `multi-vault`
-   * _manage multiple vaults in a single vault configuration file_
-   * _it is possible to share public keys, too_
+ * [ ] `multi-vault` aka *partitions*
+   * [x] partition add
+   * [x] partition remove
+   * [ ] multi-partition operations work correctly
+     * [ ] when adding and removing resources
+     * [ ] when adding and removing recipients
  * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
  * [x] Strong validation of the vault configuration

@@ -9,7 +9,7 @@ function in-space () {
     echo 1>&2 "'$VAULT' directory is already used. Please chose a different name."
     return 2
   }
-  { mkdir -p $VAULT && cd $VAULT; } || return 2
+  { mkdir -p "$VAULT" && cd "$VAULT"; } || return 2
 }
 
 function trust_key () {

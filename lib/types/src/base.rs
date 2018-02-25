@@ -83,6 +83,9 @@ pub enum VaultCommand {
         signing_key_id: Option<String>,
         sign: SigningMode,
     },
+    PartitionsRemove {
+        selector: String,
+    },
     PartitionsAdd {
         name: Option<String>,
         path: PathBuf,

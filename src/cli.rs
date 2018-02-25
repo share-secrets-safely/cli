@@ -224,6 +224,7 @@ where
             .subcommand(init_recipient);
         let add_partition = App::new("add")
             .alias("insert")
+            .about("Adds a partition to the vault.")
             .arg(
                 Arg::with_name("name")
                     .short("n")
@@ -242,6 +243,23 @@ where
                  of the resource directory of the master vault.\
                  It may also be an absolute directory, which works but removes portability.",
             ));
+        let remove_partition = App::new("remove")
+            .alias("delete")
+            .about(
+                "Removes a partition.\
+                 Please note that this will not delete any files on disk, but change the \
+                 vault description file accordingly.",
+            )
+            .arg(
+                Arg::with_name("partition-selector")
+                    .required(true)
+                    .takes_value(true)
+                    .help(
+                        "A partition can be selected by the directory used to stored its resources, \
+                         by its name (which may be ambiguous), or by the index in the \
+                         vault description file.",
+                    ),
+            );
         let partitions = App::new("partitions")
             .alias("partition")
             .about(
@@ -252,7 +270,8 @@ where
                  Its main benefit is that it allows one recipients list per resource directory, \
                  effectively emulating simpe access control lists.",
             )
-            .subcommand(add_partition);
+            .subcommand(add_partition)
+            .subcommand(remove_partition);
 
         let vault = App::new("vault")
             .about("a variety of vault interactions")
