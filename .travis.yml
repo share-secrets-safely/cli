@@ -59,7 +59,7 @@ deploy:
     on:
       repo: Byron/share-secrets-safely
       branch: master
-      tags: false
+      tags: true
       condition: $TRAVIS_OS_NAME != "osx"
       
 env:
