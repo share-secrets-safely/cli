@@ -4,6 +4,7 @@ extern crate failure;
 extern crate failure_derive;
 extern crate glob;
 extern crate gpgme;
+#[macro_use]
 extern crate itertools;
 extern crate mktemp;
 extern crate serde;

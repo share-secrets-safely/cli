@@ -98,14 +98,18 @@ impl Vault {
             return Ok(());
         }
 
-        let own_secrets_path = self.secrets_path();
-        for partition in &self.partitions {
-            let partition_secrets_path = partition.secrets_path();
-            if partition_secrets_path.starts_with(&own_secrets_path) {
+        let mut all_secrets_paths: Vec<_> = self.partitions.iter().map(|v| v.secrets_path()).collect();
+        all_secrets_paths.push(self.secrets_path());
+        for (sp, dp) in iproduct!(
+            all_secrets_paths.iter().enumerate(),
+            all_secrets_paths.iter().enumerate()
+        ).filter_map(|((si, s), (di, d))| if si == di { None } else { Some((s, d)) })
+        {
+            if sp.starts_with(&dp) {
                 return Err(format_err!(
                     "Partition at '{}' is contained in another partitions resources directory at '{}'",
-                    partition_secrets_path.display(),
-                    own_secrets_path.display()
+                    sp.display(),
+                    dp.display()
                 ));
             }
         }

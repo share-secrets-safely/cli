@@ -58,17 +58,20 @@ title "'vault partition add'"
         }
       )
     )
-  )
     
-  (with "an unnamed vault and the default secrets directory"
-    in-space two/vault
-    "$exe" vault init >/dev/null
-    
-    (when "adding an unnamed partition"
-      it "fails as the partition is contained in the the first partition" && {
-        WITH_SNAPSHOT="$snapshot/partition-add-failure" \
-        expect_run $WITH_FAILURE "$exe" vault partition add two
-      }
+    (with "an unnamed vault and the default secrets directory"
+      in-space two/vault
+      "$exe" vault init --secrets-dir . >/dev/null
+      
+      (when "adding an unnamed partition"
+        it "fails as the partition is contained in the the first partition" && {
+          WITH_SNAPSHOT="$snapshot/partition-add-failure" \
+          expect_run $SUCCESSFULLY "$exe" vault partition add two
+        }
+        it "creates the expected vault file" && {
+          expect_snapshot "$snapshot/test-snapshot" .
+        }
+      )
     )
   )
 )
