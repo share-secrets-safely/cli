@@ -12,7 +12,7 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/recipients/unverified"
 
 (sandboxed
   title "vault recipients add unverified - multi-recipient-key"

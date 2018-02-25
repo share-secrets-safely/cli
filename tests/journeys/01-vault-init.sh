@@ -12,13 +12,13 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/init"
 
 title "'vault init'"
 
 (with "no available gpg key and no key"
     it "fails as it cannot identify the user" && \
-      WITH_SNAPSHOT="$snapshot/vault-init-failure-no-secret-key" \
+      WITH_SNAPSHOT="$snapshot/init-failure-no-secret-key" \
       expect_run $WITH_FAILURE "$exe" vault init
 )
 
@@ -28,33 +28,33 @@ title "'vault init'"
   (with "a single gpg secret key available"
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
-      WITH_SNAPSHOT="$snapshot/successful-vault-init" \
+      WITH_SNAPSHOT="$snapshot/successful-init" \
       expect_run $SUCCESSFULLY "$exe" vault init
     }
     it "creates a valid vault configuration file, \
         exports the public portion of the key to the correct spot and \
         writes the list of recipients" && {
-      expect_snapshot "$snapshot/vault-init-single-user" .
+      expect_snapshot "$snapshot/init-single-user" .
     }
   )
 
   (with "an existing vault configuration file"
     it "fails as it cannot possibly overwrite anything" && {
-      WITH_SNAPSHOT="$snapshot/vault-init-will-not-overwrite-vault-config" \
+      WITH_SNAPSHOT="$snapshot/init-will-not-overwrite-vault-config" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
   )
 
   (with "an existing gpg-keys directory"
     it "fails as it cannot possibly overwrite anything" && {
-      WITH_SNAPSHOT="$snapshot/vault-init-will-not-write-into-existing-nonempty-directory" \
+      WITH_SNAPSHOT="$snapshot/init-will-not-write-into-existing-nonempty-directory" \
       expect_run $WITH_FAILURE "$exe" vault -c a-different-file.yml init
     }
   )
 
   (with "an existing recipients file"
     it "fails as it cannot possibly overwrite anything" && {
-      WITH_SNAPSHOT="$snapshot/vault-init-will-overwrite-recipients-file" \
+      WITH_SNAPSHOT="$snapshot/init-will-overwrite-recipients-file" \
       expect_run $WITH_FAILURE "$exe" vault -c a-different-file-too.yml init -k some-nonexisting-directory
     }
   )
@@ -70,7 +70,7 @@ title "'vault init'"
     mkdir $vault_dir
     (with "a specified --secrets-dir location and relative directories for keys and recipients"
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-init-with-at-argument" \
+        WITH_SNAPSHOT="$snapshot/init-with-at-argument" \
         expect_run $SUCCESSFULLY "$exe" vault \
           -c $vault_dir/vault.yml \
           --vault-id customized \
@@ -78,7 +78,7 @@ title "'vault init'"
       }
 
       it "creates the expected folder structure" && {
-        expect_snapshot "$snapshot/vault-init-change-secrets-location-folder-structure" $vault_dir/etc
+        expect_snapshot "$snapshot/init-change-secrets-location-folder-structure" $vault_dir/etc
       }
     )
 
@@ -93,7 +93,7 @@ title "'vault init'"
       }
 
       it "lists the content as expected" && {
-        WITH_SNAPSHOT="$snapshot/vault-list-changed-secrets-location" \
+        WITH_SNAPSHOT="$snapshot/list-changed-secrets-location" \
         expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml list
       }
     )
@@ -101,7 +101,7 @@ title "'vault init'"
     (when "adding a secret in a subdirectory"
       it "succeeds" && {
         echo with-sub-dirs | \
-        WITH_SNAPSHOT="$snapshot/vault-add-with-subdirectory" \
+        WITH_SNAPSHOT="$snapshot/add-with-subdirectory" \
         expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml add :partition/subdir/secret
       }
 
@@ -126,7 +126,7 @@ title "'vault init'"
         init --gpg-keys-dir keys --recipients-file recipients
     }
     it "creates the correct folder structure" && {
-      expect_snapshot "$snapshot/vault-init-single-user-absolute-directory" "$vault_dir"
+      expect_snapshot "$snapshot/init-single-user-absolute-directory" "$vault_dir"
     }
     (when "editing a file"
       editor="$PWD/my-simple-editor.sh"
@@ -138,7 +138,7 @@ EDITOR
         chmod +x "$editor"
       )
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-edit-with-absolute-vault-directory" \
+        WITH_SNAPSHOT="$snapshot/edit-with-absolute-vault-directory" \
         EDITOR="$editor" \
         expect_run $SUCCESSFULLY "$exe" vault -c "$vault_dir/vault.yml" \
           edit new-resource
@@ -151,13 +151,13 @@ EDITOR
         cd "$vault_dir"
 
         it "does not add resources which walk to the parent directory" && {
-          WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-failure" \
+          WITH_SNAPSHOT="$snapshot/resource-add-relative-dir-failure" \
           expect_run $WITH_FAILURE "$exe" \
             vault -c vault.yml add ../content
         }
 
         it "does add resource which walk to the parent directory if destination is specified" && {
-          WITH_SNAPSHOT="$snapshot/vault-resource-add-relative-dir-success" \
+          WITH_SNAPSHOT="$snapshot/resource-add-relative-dir-success" \
           expect_run $SUCCESSFULLY "$exe" \
             vault -c vault.yml add ../content:content
         }
@@ -176,23 +176,23 @@ EDITOR
 
   (with "a gpg key signed by others"
     it "fails as it can't decide which gpg key to export" && {
-      WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-viable-keys" \
+      WITH_SNAPSHOT="$snapshot/init-with-multiple-viable-keys" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
     (with "a selected gpg key and a vault name"
       it "succeeds as it just follow instructions" && {
-        WITH_SNAPSHOT="$snapshot/vault-init-with-key-specified-explicitly" \
+        WITH_SNAPSHOT="$snapshot/init-with-key-specified-explicitly" \
         expect_run $SUCCESSFULLY "$exe" vault --vault-id vault-name init --gpg-key-id c@example.com
       }
 
       it "creates a valid vault configuration file, \
           exports the public portion of the selected key with signatures and \
           writes the list of recipients" && {
-        expect_snapshot "$snapshot/vault-init-single-user-with-multiple-signatures" .
+        expect_snapshot "$snapshot/init-single-user-with-multiple-signatures" .
       }
 
       it "uses the vault name when showing its contents" && {
-        WITH_SNAPSHOT="$snapshot/vault-list-with-name" \
+        WITH_SNAPSHOT="$snapshot/list-with-name" \
         expect_run $SUCCESSFULLY "$exe" vault list 
       }
     )
@@ -206,12 +206,12 @@ EDITOR
 
   (with "multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
-      WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-specified-keys" \
+      WITH_SNAPSHOT="$snapshot/init-with-multiple-specified-keys" \
       expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com --gpg-key-id tester@example.com
     }
 
     it "creates the expected folder structure" && {
-      expect_snapshot "$snapshot/vault-init-multiple-users" .
+      expect_snapshot "$snapshot/init-multiple-users" .
     }
   )
 )

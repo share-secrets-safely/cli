@@ -81,6 +81,7 @@ function expect_snapshot () {
   local expected=${1:?}
   local actual=${2:?}
   if ! [ -e "$expected" ]; then
+    mkdir -p "${expected%/*}"
     cp -R "$actual" "$expected"
   fi
   expect_run 0 diff -r "$expected" "$actual"
@@ -98,6 +99,7 @@ function expect_run () {
     if [[ -n "${WITH_SNAPSHOT-}" ]]; then
       local expected="$WITH_SNAPSHOT"
       if ! [ -f "$expected" ]; then
+        mkdir -p "${expected%/*}"
         echo -n "$output" > "$expected" || exit 1
       fi
       if ! diff "$expected" <(echo -n "$output"); then

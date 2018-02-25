@@ -1,0 +1,15 @@
+---
+name: ~
+secrets: "../one"
+gpg_keys: etc/keys
+recipients: etc/recipients
+---
+name: ~
+secrets: "../two"
+gpg_keys: ~
+recipients: "../two/recipients"
+---
+name: second
+secrets: "../two"
+gpg_keys: ~
+recipients: "../two/recipients"

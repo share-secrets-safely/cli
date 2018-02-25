@@ -11,14 +11,14 @@ source "$root/../gpg-helpers.sh"
 WITH_FAILURE=1
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/init-no-gpg-installed"
 cd /tmp
 
 title "'vault init' - without GPG"
 
 (with "no GPG installation"
     it "fails and provides helpful notes" && {
-      WITH_SNAPSHOT="$snapshot/vault-init-no-gpg" \
+      WITH_SNAPSHOT="$snapshot/init-no-gpg" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
 )
@@ -29,7 +29,7 @@ title "'vault init' - without GPG"
     touch .gpg-id
     (when "adding a new secret"
       it "fails and provides helpful notes" && {
-        WITH_SNAPSHOT="$snapshot/vault-add-empty-recipients" \
+        WITH_SNAPSHOT="$snapshot/add-empty-recipients" \
         expect_run $WITH_FAILURE "$exe" vault add some:secret
       }
     )
@@ -39,7 +39,7 @@ title "'vault init' - without GPG"
     echo 'recipient' > .gpg-id
     (when "adding a new secret"
       it "fails and provides helpful notes" && {
-        WITH_SNAPSHOT="$snapshot/vault-add-no-gpg" \
+        WITH_SNAPSHOT="$snapshot/add-no-gpg" \
         expect_run $WITH_FAILURE "$exe" vault add some:secret
       }
     )
@@ -49,7 +49,7 @@ title "'vault init' - without GPG"
     echo 'fake secret' > secret.gpg
     (when "showing the secret"
       it "fails and provides helpful notes" && {
-        WITH_SNAPSHOT="$snapshot/vault-show-no-gpg" \
+        WITH_SNAPSHOT="$snapshot/show-no-gpg" \
         expect_run $WITH_FAILURE "$exe" vault show secret
       }
     )

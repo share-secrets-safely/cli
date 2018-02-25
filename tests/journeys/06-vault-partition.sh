@@ -12,7 +12,7 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/partitions/add"
 
 
 title "'vault partition add'"
@@ -27,34 +27,34 @@ title "'vault partition add'"
       
       (when "adding an unnnamed partition"
         it "succeeds" && {
-          WITH_SNAPSHOT="$snapshot/vault-partition-add-simple" \
+          WITH_SNAPSHOT="$snapshot/partition-add-simple" \
           expect_run $SUCCESSFULLY "$exe" vault partition add two
         }
         
         it "creates the expected vault file with another vault whose secrets dir is a sibling" && {
-          expect_snapshot "$snapshot/vault-partition-simple" .
+          expect_snapshot "$snapshot/partition-simple" .
         }
       )
       
       (when "adding another named partition"
         it "succeeds" && {
-          WITH_SNAPSHOT="$snapshot/vault-partition-add-second-named" \
+          WITH_SNAPSHOT="$snapshot/partition-add-second-named" \
           expect_run $SUCCESSFULLY "$exe" vault partition add --name second two
         }
         
         it "creates the expected vault file" && {
-          expect_snapshot "$snapshot/vault-partition-add-second-named-directory" .
+          expect_snapshot "$snapshot/partition-add-second-named-directory" .
         }
       )
       
       (when "adding another unnamed partition"
         it "succeeds" && {
-          WITH_SNAPSHOT="$snapshot/vault-partition-add-third-unnamed" \
+          WITH_SNAPSHOT="$snapshot/partition-add-third-unnamed" \
           expect_run $SUCCESSFULLY "$exe" vault partition add subdir/third
         }
         
         it "creates the expected vault file" && {
-          expect_snapshot "$snapshot/vault-partition-add-second-named-directory" .
+          expect_snapshot "$snapshot/partition-add-second-named-directory" .
         }
       )
     )
@@ -66,7 +66,7 @@ title "'vault partition add'"
     
     (when "adding an unnamed partition"
       it "fails as the partition is contained in the the first partition" && {
-        WITH_SNAPSHOT="$snapshot/vault-partition-add-failure" \
+        WITH_SNAPSHOT="$snapshot/partition-add-failure" \
         expect_run $WITH_FAILURE "$exe" vault partition add two
       }
     )

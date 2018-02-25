@@ -12,7 +12,7 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/recipients/remove"
 
 (sandboxed
   title "vault recipient remove"
@@ -37,21 +37,21 @@ snapshot="$fixture/snapshots"
     (when "the recipient to remove does not exist in the vault but in the keychain"
       gpg --import "$fixture/c.pub.asc" &>/dev/null
       it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-recipient-remove-failure-just-in-keychain" \
+        WITH_SNAPSHOT="$snapshot/recipient-remove-failure-just-in-keychain" \
         expect_run $WITH_FAILURE "$exe" vault recipient remove c@example.com
       }
     )
 
     (when "the recipient to remove does not exist in the vault and not in the keychain"
       it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-recipient-remove-failure-unknown-key" \
+        WITH_SNAPSHOT="$snapshot/recipient-remove-failure-unknown-key" \
         expect_run $WITH_FAILURE "$exe" vault recipient remove unkown@example.com
       }
     )
 
     (with "one recipient to remove which exists in the vault and another that does not"
       it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-recipient-remove-failure-one-correct-and-one-unknown-key" \
+        WITH_SNAPSHOT="$snapshot/recipient-remove-failure-one-correct-and-one-unknown-key" \
         expect_run $WITH_FAILURE "$exe" vault recipient remove b@example.com unkown@example.com
       }
 
@@ -65,13 +65,13 @@ snapshot="$fixture/snapshots"
       keys_list_before_removal="$(gpg --list-keys)"
 
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-recipient-remove-success" \
+        WITH_SNAPSHOT="$snapshot/recipient-remove-success" \
         expect_run $SUCCESSFULLY "$exe" vault recipient remove b@example.com
       }
 
       it "prevents the removed recipient from seeing the secrets" && (
         as_user "$fixture/b.sec.asc"
-        WITH_SNAPSHOT="$snapshot/vault-recipient-after-remove-show-failure" \
+        WITH_SNAPSHOT="$snapshot/recipient-after-remove-show-failure" \
         expect_run $WITH_FAILURE "$exe" vault show subdir/b
       )
 

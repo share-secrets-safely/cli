@@ -1,7 +1,0 @@
-error: The following required arguments were not provided:
-    -f
-
-USAGE:
-    sy extract [FLAGS] -f
-
-For more information try --help

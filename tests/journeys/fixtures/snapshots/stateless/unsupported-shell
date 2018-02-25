@@ -1,3 +1,0 @@
-error: The shell 'foobar' is unsupported
-Caused by: 
- 1: [valid values: bash, fish, zsh, powershell]

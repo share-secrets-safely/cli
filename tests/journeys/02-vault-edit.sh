@@ -12,7 +12,7 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/edit"
 (sandboxed
   title "'vault add'"
   (with "a vault initialized for a single recipient"
@@ -23,7 +23,7 @@ snapshot="$fixture/snapshots"
 
     (when "adding new resource from stdin"
       it "succeeds" && {
-        echo hi | WITH_SNAPSHOT="$snapshot/vault-resource-add-from-stdin" \
+        echo hi | WITH_SNAPSHOT="$snapshot/resource-add-from-stdin" \
         expect_run $SUCCESSFULLY "$exe" vault add :from-stdin
       }
 
@@ -32,7 +32,7 @@ snapshot="$fixture/snapshots"
       }
 
       it "shows the single file without gpg suffix" && {
-        WITH_SNAPSHOT="$snapshot/vault-ls-with-single-resource" \
+        WITH_SNAPSHOT="$snapshot/ls-with-single-resource" \
         expect_run $SUCCESSFULLY "$exe" vault ls
       }
     )
@@ -49,7 +49,7 @@ EDITOR
       )
       export EDITOR="$editor"
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-add-from-stdin-no-tty" \
+        WITH_SNAPSHOT="$snapshot/resource-add-from-stdin-no-tty" \
         expect_run $SUCCESSFULLY "$exe" vault add :from-stdin-no-tty
       }
 
@@ -58,7 +58,7 @@ EDITOR
       }
 
       it "encrypts the content from the editor" && {
-        WITH_SNAPSHOT="$snapshot/vault-add-from-stdin-no-tty-show" \
+        WITH_SNAPSHOT="$snapshot/add-from-stdin-no-tty-show" \
         expect_run $SUCCESSFULLY "$exe" vault show from-stdin-no-tty
       }
 
@@ -70,7 +70,7 @@ EDITOR
       previous_resource_id="$(md5sum ./from-stdin.gpg)"
 
       it "fails as it won't overwrite existing resources" && {
-        echo hi | WITH_SNAPSHOT="$snapshot/vault-resource-add-overwrite-protection" \
+        echo hi | WITH_SNAPSHOT="$snapshot/resource-add-overwrite-protection" \
         expect_run $WITH_FAILURE "$exe" vault add :from-stdin
       }
 
@@ -81,19 +81,19 @@ EDITOR
     title "'vault show'"
     (when "showing the previously added resource"
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-show" \
+        WITH_SNAPSHOT="$snapshot/resource-show" \
         expect_run $SUCCESSFULLY "$exe" vault show from-stdin
       }
     )
     (when "showing the previously added resource using the gpg suffix"
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-show" \
+        WITH_SNAPSHOT="$snapshot/resource-show" \
         expect_run $SUCCESSFULLY "$exe" vault show ./from-stdin.gpg
       }
     )
     (when "showing an unknown resource"
       it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-unknown-resource-show" \
+        WITH_SNAPSHOT="$snapshot/unknown-resource-show" \
         expect_run $WITH_FAILURE "$exe" vault show some-unknown-resource
       }
     )
@@ -117,7 +117,7 @@ EDITOR
           expect_run $SUCCESSFULLY "$exe" vault edit from-stdin
         }
         it "changes the file accordingly" && {
-          WITH_SNAPSHOT="$snapshot/vault-edit-changed-file" \
+          WITH_SNAPSHOT="$snapshot/edit-changed-file" \
           expect_run $SUCCESSFULLY "$exe" vault show from-stdin.gpg
         }
         it "removes the file with decrypted content" && {
@@ -131,7 +131,7 @@ EDITOR
         expect_run $SUCCESSFULLY "$exe" vault edit new-edited-file
       }
       it "changes creates file accordingly" && {
-        WITH_SNAPSHOT="$snapshot/vault-edit-changed-file" \
+        WITH_SNAPSHOT="$snapshot/edit-changed-file" \
         expect_run $SUCCESSFULLY "$exe" vault show new-edited-file
       }
       it "removes the file with decrypted content" && {
@@ -140,13 +140,13 @@ EDITOR
     )
     (when "editing an unknown resource"
       it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-unknown-resource-edit" \
+        WITH_SNAPSHOT="$snapshot/unknown-resource-edit" \
         expect_run $WITH_FAILURE "$exe" vault edit --no-create some-unknown-resource
       }
     )
     (with "an editor program that does not exist in path"
       it "fails" && {
-        WITH_SNAPSHOT="$snapshot/vault-known-resource-edit-editor-not-in-path" \
+        WITH_SNAPSHOT="$snapshot/known-resource-edit-editor-not-in-path" \
         expect_run $WITH_FAILURE "$exe" vault edit --editor foo from-stdin
       }
     )
@@ -160,7 +160,7 @@ EDITOR
         it "fails because it encrypts in advance to avoid losing the edit" && (
           as_user "$fixture/b.sec.asc"
           gpg --import '.gpg-keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332' &>/dev/null
-          WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure" \
+          WITH_SNAPSHOT="$snapshot/resource-edit-encrypt-failure" \
           expect_run $WITH_FAILURE "$exe" vault edit --editor 'does-not-matter' from-stdin
         )
       )
@@ -168,7 +168,7 @@ EDITOR
         it "fails because now it would try to open the non-existing editor right away" && (
           as_user "$fixture/b.sec.asc"
 
-          WITH_SNAPSHOT="$snapshot/vault-resource-edit-encrypt-failure-no-try-encrypt" \
+          WITH_SNAPSHOT="$snapshot/resource-edit-encrypt-failure-no-try-encrypt" \
           expect_run $WITH_FAILURE "$exe" vault edit --no-try-encrypt --editor 'does-not-matter' from-stdin
         )
       )
@@ -183,12 +183,12 @@ EDITOR
       add_resource a.ext; add_resource b; add_resource c
 
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-remove-multiple-existing" \
+        WITH_SNAPSHOT="$snapshot/resource-remove-multiple-existing" \
         expect_run $SUCCESSFULLY "$exe" vault remove a.ext b.gpg c
       }
 
       it "actually removes the files" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-remove-multiple-existing-after" \
+        WITH_SNAPSHOT="$snapshot/resource-remove-multiple-existing-after" \
         expect_run $SUCCESSFULLY "$exe" vault list
       }
     )
@@ -196,7 +196,7 @@ EDITOR
     (when "removing a resource that does not exist"
       add_resource existing
       it "fails at the first non-existing resource" && {
-        WITH_SNAPSHOT="$snapshot/vault-resource-remove-non-existing" \
+        WITH_SNAPSHOT="$snapshot/resource-remove-non-existing" \
         expect_run $WITH_FAILURE "$exe" vault delete existing non-existing existing
       }
     )

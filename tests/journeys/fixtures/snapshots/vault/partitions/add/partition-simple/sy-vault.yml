@@ -7,4 +7,4 @@ recipients: etc/recipients
 name: ~
 secrets: "../two"
 gpg_keys: ~
-recipients: ../two/recipients
+recipients: "../two/recipients"
