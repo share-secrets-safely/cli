@@ -13,3 +13,8 @@ name: "second-partition"
 secrets: "../second"
 gpg_keys: ~
 recipients: "../second/recipients"
+---
+name: ~
+secrets: "../subdir/third"
+gpg_keys: ~
+recipients: "../subdir/third/recipients"

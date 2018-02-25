@@ -5,6 +5,6 @@ gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: ~
-secrets: "../two"
+secrets: "../first"
 gpg_keys: ~
-recipients: "../two/recipients"
+recipients: "../first/recipients"

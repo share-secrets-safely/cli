@@ -9,6 +9,7 @@ use base::Vault;
 use util::new_context;
 use util::extract_at_least_one_secret_key;
 use util::export_key;
+use sheesy_types::WriteMode;
 
 impl Vault {
     pub fn init(
@@ -29,7 +30,7 @@ impl Vault {
 
         let mut gpg_ctx = new_context()?;
         let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
-        vault.to_file(vault_path)?;
+        vault.to_file(vault_path, WriteMode::RefuseOverwrite)?;
 
         let gpg_keys_dir = vault.absolute_path(gpg_keys_dir);
         let recipients_file = vault.absolute_path(recipients_file);

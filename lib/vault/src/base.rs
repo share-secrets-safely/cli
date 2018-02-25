@@ -6,6 +6,7 @@ use util::{strip_ext, write_at, FingerprintUserId, ResetCWD};
 use error::{IOMode, VaultError};
 use failure::{err_msg, Error, ResultExt};
 use glob::glob;
+use sheesy_types::WriteMode;
 use gpgme;
 
 pub const GPG_GLOB: &str = "**/*.gpg";
@@ -19,13 +20,13 @@ pub fn secrets_default() -> PathBuf {
 
 #[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
 pub enum VaultKind {
-    Master { index: usize },
+    Leader { index: usize },
     Partition,
 }
 
 impl Default for VaultKind {
     fn default() -> Self {
-        VaultKind::Master { index: 0 }
+        VaultKind::Leader { index: 0 }
     }
 }
 
@@ -92,10 +93,34 @@ impl Vault {
         Ok(self)
     }
 
-    pub fn to_file(&self, path: &Path) -> Result<(), VaultError> {
-        if path.exists() {
-            return Err(VaultError::ConfigurationFileExists(path.to_owned()));
+    pub fn validate(&self) -> Result<(), Error> {
+        if self.partitions.is_empty() {
+            return Ok(());
         }
+
+        let own_secrets_path = self.secrets_path();
+        for partition in &self.partitions {
+            let partition_secrets_path = partition.secrets_path();
+            if partition_secrets_path.starts_with(&own_secrets_path) {
+                return Err(format_err!(
+                    "Partition at '{}' is contained in another partitions resources directory at '{}'",
+                    partition_secrets_path.display(),
+                    own_secrets_path.display()
+                ));
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn to_file(&self, path: &Path, mode: WriteMode) -> Result<(), VaultError> {
+        if let WriteMode::RefuseOverwrite = mode {
+            if path.exists() {
+                return Err(VaultError::ConfigurationFileExists(path.to_owned()));
+            }
+        }
+        self.validate().map_err(|e| VaultError::Validation(e))?;
+
         fn serialize_vault(vault: &Vault, mut file: &File, path: &Path) -> Result<(), VaultError> {
             serde_yaml::to_writer(&mut file, vault)
                 .map_err(|cause| VaultError::Serialization {
@@ -106,7 +131,7 @@ impl Vault {
         }
         match self.kind {
             VaultKind::Partition => return Err(VaultError::PartitionUnsupported),
-            VaultKind::Master { index } => {
+            VaultKind::Leader { index } => {
                 let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
                 if self.partitions.is_empty() {
                     serialize_vault(self, &file, path)?;
@@ -320,7 +345,7 @@ impl VaultExt for Vec<Vault> {
                 .map(|(vid, v)| (vid, v.to_owned()))
                 .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
         };
-        vault.kind = VaultKind::Master { index };
+        vault.kind = VaultKind::Leader { index };
         for vault in self.iter_mut()
             .enumerate()
             .filter_map(|(vid, v)| if vid == index { None } else { Some(v) })

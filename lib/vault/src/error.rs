@@ -91,6 +91,7 @@ impl EncryptionError {
 #[derive(Debug, Fail)]
 pub enum VaultError {
     ConfigurationFileExists(PathBuf),
+    Validation(failure::Error),
     PartitionUnsupported,
     ReadFile {
         #[cause]
@@ -118,6 +119,7 @@ impl fmt::Display for VaultError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::VaultError::*;
         match *self {
+            Validation(ref err) => writeln!(f, "{}", err),
             PartitionUnsupported => f.write_str("Cannot perform this operation on a partition"),
             ConfigurationFileExists(ref path) => writeln!(
                 f,

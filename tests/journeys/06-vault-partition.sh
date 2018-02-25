@@ -27,19 +27,19 @@ title "'vault partition add'"
       
       (when "adding an unnnamed partition"
         it "succeeds" && {
-          WITH_SNAPSHOT="$snapshot/partition-add-simple" \
-          expect_run $SUCCESSFULLY "$exe" vault partition add two
+          WITH_SNAPSHOT="$snapshot/partition-first-unnamed" \
+          expect_run $SUCCESSFULLY "$exe" vault partition add first
         }
         
         it "creates the expected vault file with another vault whose secrets dir is a sibling" && {
-          expect_snapshot "$snapshot/partition-simple" .
+          expect_snapshot "$snapshot/partition-first-unnamed-directory" .
         }
       )
       
       (when "adding another named partition"
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/partition-add-second-named" \
-          expect_run $SUCCESSFULLY "$exe" vault partition add --name second two
+          expect_run $SUCCESSFULLY "$exe" vault partition add --name second-partition second
         }
         
         it "creates the expected vault file" && {
@@ -49,12 +49,12 @@ title "'vault partition add'"
       
       (when "adding another unnamed partition"
         it "succeeds" && {
-          WITH_SNAPSHOT="$snapshot/partition-add-third-unnamed" \
+          WITH_SNAPSHOT="$snapshot/partition-add-third-unnamed-relative-path" \
           expect_run $SUCCESSFULLY "$exe" vault partition add subdir/third
         }
         
         it "creates the expected vault file" && {
-          expect_snapshot "$snapshot/partition-add-second-named-directory" .
+          expect_snapshot "$snapshot/partition-add-third-named-directory" .
         }
       )
     )
