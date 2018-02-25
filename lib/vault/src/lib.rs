@@ -20,6 +20,7 @@ mod dispatch;
 mod recipients;
 mod init;
 mod resource;
+mod partitions;
 
 pub use base::Vault;
 pub use dispatch::do_it;

@@ -4,7 +4,6 @@ use std::fs::{File, OpenOptions};
 use std::io::{self, stdin, Read, Write};
 use std::fs::create_dir_all;
 
-
 use atty;
 use mktemp::Temp;
 use failure::{Error, ResultExt};

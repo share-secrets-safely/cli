@@ -80,6 +80,16 @@ pub fn vault_recipients_remove(ctx: VaultContext, args: &ArgMatches) -> Result<V
     })
 }
 
+pub fn vault_partitions_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    Ok(VaultContext {
+        command: VaultCommand::PartitionsAdd {
+            path: required_os_arg(args, "partition-path")?,
+            name: args.value_of("name").map(ToOwned::to_owned),
+        },
+        ..ctx
+    })
+}
+
 pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsAdd {

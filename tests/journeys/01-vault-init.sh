@@ -179,7 +179,7 @@ EDITOR
       WITH_SNAPSHOT="$snapshot/vault-init-with-multiple-viable-keys" \
       expect_run $WITH_FAILURE "$exe" vault init
     }
-    (with "a selected gpg key (and a vault name)"
+    (with "a selected gpg key and a vault name"
       it "succeeds as it just follow instructions" && {
         WITH_SNAPSHOT="$snapshot/vault-init-with-key-specified-explicitly" \
         expect_run $SUCCESSFULLY "$exe" vault --vault-id vault-name init --gpg-key-id c@example.com
@@ -189,6 +189,11 @@ EDITOR
           exports the public portion of the selected key with signatures and \
           writes the list of recipients" && {
         expect_snapshot "$snapshot/vault-init-single-user-with-multiple-signatures" .
+      }
+
+      it "uses the vault name when showing its contents" && {
+        WITH_SNAPSHOT="$snapshot/vault-list-with-name" \
+        expect_run $SUCCESSFULLY "$exe" vault list 
       }
     )
   )

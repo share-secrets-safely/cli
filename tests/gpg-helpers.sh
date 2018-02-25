@@ -3,6 +3,15 @@
 # shellcheck disable=1090
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utilities.sh"
 
+function in-space () {
+  VAULT="${1:?}"
+  [[ -d $VAULT ]] && {
+    echo 1>&2 "'$VAULT' directory is already used. Please chose a different name."
+    return 2
+  }
+  { mkdir -p $VAULT && cd $VAULT; } || return 2
+}
+
 function trust_key () {
   {
     gpg --export-ownertrust

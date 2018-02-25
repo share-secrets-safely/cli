@@ -1,5 +1,8 @@
+extern crate clap;
+
 use clap::{App, Arg};
 use std::env;
+use clap::AppSettings;
 
 lazy_static! {
     static ref SHELL: Result<String, env::VarError> = env::var("SHELL");
@@ -219,6 +222,37 @@ where
             .subcommand(remove_recipient)
             .subcommand(list_recipient)
             .subcommand(init_recipient);
+        let add_partition = App::new("add")
+            .alias("insert")
+            .arg(
+                Arg::with_name("name")
+                    .short("n")
+                    .long("name")
+                    .required(false)
+                    .help(
+                        "The name of the partitions vault to use. If unset, it will default to the basename name of \
+                         the partitions resources directory.",
+                    ),
+            )
+            .arg(Arg::with_name("partition-path").required(true).help(
+                "The path at which the partition should store resources.\
+                 \
+                 It may be a relative path which will be adjusted to be relative to the root \
+                 of the resource directory of the master vault.\
+                 It may also be an absolute directory, which works but removes portability.",
+            ));
+        let partitions = App::new("partitions")
+            .alias("partition")
+            .about(
+                "A partition is essentially another vault, as such it has its own recipients list, name, \
+                 keys directory place to store resources.\
+                 \
+                 Its major promise is that it is non-overlapping with any other partition.\
+                 Its main benefit is that it allows one recipients list per resource directory, \
+                 effectively emulating simpe access control lists.",
+            )
+            .subcommand(add_partition);
+
         let vault = App::new("vault")
             .about("a variety of vault interactions")
             .subcommand(init)
@@ -228,6 +262,7 @@ where
             .subcommand(show_resource)
             .subcommand(edit_resource)
             .subcommand(list)
+            .subcommand(partitions)
             .arg(
                 Arg::with_name("vault-id")
                     .short("i")
@@ -260,6 +295,7 @@ where
                 }
             });
         let app: App = app_from_crate!()
+            .setting(AppSettings::VersionlessSubcommands)
             .name(CLI::name())
             .after_help("Read more on https://byron.github.io/share-secrets-safely")
             .version(include_str!("../VERSION"))

@@ -16,6 +16,9 @@ fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
 fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     use sheesy_types::VaultCommand;
     match ctx.command {
+        VaultCommand::PartitionsAdd { ref path, ref name } => {
+            vault_from(&ctx)?.add_partition(path, name.as_ref().map(|s| s.as_str()), output)
+        }
         VaultCommand::RecipientsRemove { ref gpg_key_ids } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, output),
         VaultCommand::RecipientsAdd {
             ref gpg_key_ids,

@@ -70,6 +70,10 @@ fn main() {
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(vault_context_from(args));
             context = match args.subcommand() {
+                ("partitions", Some(args)) => match args.subcommand() {
+                    ("add", Some(args)) => ok_or_exit(vault_partitions_add(context, args)),
+                    _ => usage_and_exit(&matches),
+                },
                 ("recipients", Some(args)) => match args.subcommand() {
                     ("add", Some(args)) => ok_or_exit(vault_recipients_add(context, args)),
                     ("remove", Some(args)) => ok_or_exit(vault_recipients_remove(context, args)),
