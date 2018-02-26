@@ -167,27 +167,19 @@ impl Vault {
         }
         self.validate().map_err(|e| VaultError::Validation(e))?;
 
-        fn serialize_vault(vault: &Vault, mut file: &File, path: &Path) -> Result<(), VaultError> {
-            serde_yaml::to_writer(&mut file, vault)
-                .map_err(|cause| VaultError::Serialization {
-                    cause,
-                    path: path.to_owned(),
-                })
-                .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))
-        }
         match self.kind {
             VaultKind::Partition => return Err(VaultError::PartitionUnsupported),
             VaultKind::Leader => {
                 let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
-                if self.partitions.is_empty() {
-                    serialize_vault(self, &file, path)?;
-                } else {
-                    for (vid, partition) in self.partitions.iter().enumerate() {
-                        if vid == self.index {
-                            serialize_vault(self, &file, path)?;
-                        }
-                        serialize_vault(partition, &file, path)?
-                    }
+                let mut all_vaults: Vec<_> = self.partitions.iter().chain(once(self)).collect();
+                all_vaults.sort_by_key(|v| v.index);
+                for vault in &all_vaults {
+                    serde_yaml::to_writer(&mut file, vault)
+                        .map_err(|cause| VaultError::Serialization {
+                            cause,
+                            path: path.to_owned(),
+                        })
+                        .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))?;
                 }
             }
         }
