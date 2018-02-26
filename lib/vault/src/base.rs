@@ -91,7 +91,7 @@ impl Vault {
                             v.index = index;
                             Ok(v)
                         }
-                        err @ _ => err,
+                        err => err,
                     })
             })
             .collect::<Result<_, _>>()?;
@@ -165,7 +165,7 @@ impl Vault {
                 return Err(VaultError::ConfigurationFileExists(path.to_owned()));
             }
         }
-        self.validate().map_err(|e| VaultError::Validation(e))?;
+        self.validate().map_err(VaultError::Validation)?;
 
         match self.kind {
             VaultKind::Partition => return Err(VaultError::PartitionUnsupported),
@@ -369,35 +369,22 @@ pub trait VaultExt {
 }
 
 impl VaultExt for Vec<Vault> {
-    fn select(mut self, vault_id: &str) -> Result<Vault, Error> {
-        let idx: Result<usize, _> = vault_id.parse();
-        let (index, mut vault) = match idx {
-            Ok(idx) => (
-                idx,
-                self.get(idx)
-                    .map(ToOwned::to_owned)
-                    .ok_or_else(|| format_err!("Vault index {} is out of bounds.", idx))?,
-            ),
-            Err(_) => self.iter()
-                .enumerate()
-                .find(|&(_vid, v)| match v.name {
-                    Some(ref name) if name == vault_id => true,
-                    _ => false,
-                })
-                .map(|(vid, v)| (vid, v.to_owned()))
-                .ok_or_else(|| format_err!("Vault name '{}' is unknown.", vault_id))?,
-        };
-        vault.kind = VaultKind::Leader;
-        for (_, vault) in self.iter_mut().enumerate().filter(|&(vid, _)| vid != index) {
+    fn select(mut self, selector: &str) -> Result<Vault, Error> {
+        let leader_index = Vault::partition_index(selector, self.as_slice(), None)?;
+        for (_, vault) in self.iter_mut().enumerate().filter(|&(vid, _)| vid != leader_index) {
             vault.kind = VaultKind::Partition;
         }
+
+        let mut vault = self[leader_index].clone();
+        vault.kind = VaultKind::Leader;
+
         self.retain(|v| {
-            if let VaultKind::Partition = v.kind {
-                true
-            } else {
-                false
+            match v.kind {
+                VaultKind::Partition => true,
+                VaultKind::Leader => false,
             }
         });
+
         vault.partitions = self;
         Ok(vault)
     }
@@ -454,6 +441,16 @@ mod tests_vault_ext {
     }
 
     #[test]
+    fn it_selects_by_secrets_dir() {
+        let vault = Vault {
+            secrets: PathBuf::from("../dir"),
+            ..Default::default()
+        };
+        let v = vec![vault.clone()];
+        assert_eq!(v.select("../dir").unwrap(), vault)
+    }
+
+    #[test]
     fn it_selects_by_index() {
         let v = vec![Vault::default()];
         assert!(v.select("0").is_ok())
@@ -464,7 +461,7 @@ mod tests_vault_ext {
         let v = Vec::<Vault>::new();
         assert_eq!(
             format!("{}", v.select("foo").unwrap_err()),
-            "Vault name 'foo' is unknown."
+            "No partition matched the given selector 'foo'"
         )
     }
     #[test]
@@ -472,7 +469,7 @@ mod tests_vault_ext {
         let v = Vec::<Vault>::new();
         assert_eq!(
             format!("{}", v.select("0").unwrap_err()),
-            "Vault index 0 is out of bounds."
+            "Could not find partition with index 0"
         )
     }
 }

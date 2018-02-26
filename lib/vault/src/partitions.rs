@@ -1,5 +1,5 @@
 use base::{Vault, VaultKind};
-use failure::Error;
+use failure::{err_msg, Error};
 use std::io::Write;
 use std::path::Path;
 use sheesy_types::WriteMode;
@@ -11,30 +11,32 @@ impl Vault {
             self.vault_path
                 .as_ref()
                 .map(|p| p.as_path())
-                .ok_or_else(|| format_err!("Expected vault to know its configuration file"))?,
+                .ok_or_else(|| err_msg("Expected vault to know its configuration file"))?,
             WriteMode::AllowOverwrite,
         ).map_err(Into::into)
     }
-    pub fn remove_partition(&mut self, selector: &str, output: &mut Write) -> Result<(), Error> {
+
+    pub fn partition_index(selector: &str, partitions: &[Vault], leader_index: Option<usize>) -> Result<usize, Error> {
         let index: Result<usize, _> = selector.parse();
-        let index = match index {
+        Ok(match index {
             Ok(index) => {
-                if self.index == index {
-                    bail!(
+                if let Some(leader_index) = leader_index {
+                    if leader_index == index {
+                        bail!(
                         "Refusing to remove the leading partition at index {}",
                         index
-                    )
+                        )
+                    }
                 };
-                self.partitions
+                partitions
                     .iter()
+                    .find(|v| v.index == index)
                     .map(|v| v.index)
-                    .filter(|vdx| *vdx == index)
-                    .next()
                     .ok_or_else(|| format_err!("Could not find partition with index {}", index))?
             }
             Err(_) => {
                 let selector_as_path = Path::new(selector);
-                let mut matches = self.partitions.iter().filter_map(|v| {
+                let mut matches = partitions.iter().filter_map(|v| {
                     if v.secrets.as_path() == selector_as_path {
                         Some(v.index)
                     } else {
@@ -52,7 +54,11 @@ impl Vault {
                     _ => bail!("No partition matched the given selector '{}'", selector),
                 }
             }
-        };
+        })
+    }
+
+    pub fn remove_partition(&mut self, selector: &str, output: &mut Write) -> Result<(), Error> {
+        let index = Vault::partition_index(selector, &self.partitions, Some(self.index))?;
 
         self.partitions.retain(|v| v.index != index);
         self.serialize()?;
