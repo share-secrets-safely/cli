@@ -74,6 +74,28 @@ impl Vault {
         let reader: Box<Read> = if path_is_stdin {
             Box::new(stdin())
         } else {
+            if !path.exists() {
+                if let Some(recipients_path) = path.parent().map(|p| p.join(recipients_default())) {
+                    if recipients_path.is_file() {
+                        let mut vault = Vault {
+                            name: None,
+                            kind: VaultKind::Leader,
+                            index: 0,
+                            partitions: Vec::new(),
+                            resolved_at: path.to_owned(),
+                            vault_path: None,
+                            secrets: PathBuf::from("."),
+                            gpg_keys: None,
+                            recipients: recipients_default(),
+                        };
+                        vault = vault.set_resolved_at(&recipients_path
+                            .parent()
+                            .expect("parent dir for recipient path which was joined before")
+                            .join("sy-vault.yml"))?;
+                        return Ok(vec![vault]);
+                    }
+                }
+            }
             Box::new(File::open(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Read))?)
         };
         let vaults: Vec<_> = split_documents(reader)?

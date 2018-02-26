@@ -61,8 +61,10 @@ where
                     .required(false)
                     .takes_value(true)
                     .value_name("name")
-                    .help("The name of the vault. It can be used to identify the vault more easily, \
-                           and its primary purpose is convenience."),
+                    .help(
+                        "The name of the vault. It can be used to identify the vault more easily, \
+                         and its primary purpose is convenience.",
+                    ),
             )
             .arg(
                 Arg::with_name("secrets-dir")

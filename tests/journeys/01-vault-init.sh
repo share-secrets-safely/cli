@@ -61,6 +61,50 @@ title "'vault init'"
 )
 
 (sandboxed
+  title "'vault init' without vault description"
+
+  (with "a single gpg user"
+    import_user "$fixture/tester.sec.asc"
+
+    (with "pass-compatible gpg-id file in the current directory"
+      echo D6339718E9B58FCE3C66C78AAA5B7BF150F48332 > .gpg-id
+
+      (when "adding a new secret"
+        it "succeeds" && {
+          echo hi | \
+          WITH_SNAPSHOT="$snapshot/add-without-vault-description" \
+          expect_run $SUCCESSFULLY "$exe" vault add :resource
+        }
+
+        it "creates the encrypted resource file" && {
+          expect_exists resource.gpg
+        }
+      )
+    )
+
+    (with "pass-compatible gpg-id file in a nested directory"
+      DIR=some/sub/directory
+      mkdir -p $DIR
+      echo D6339718E9B58FCE3C66C78AAA5B7BF150F48332 > $DIR/.gpg-id
+
+      (when "adding a new secret"
+        (with "the a non-existing vault configuration file in the correct sub directory"
+          it "succeeds" && {
+            echo hi | \
+            WITH_SNAPSHOT="$snapshot/add-without-vault-description" \
+            expect_run $SUCCESSFULLY "$exe" vault --config-file "$DIR/non-existing.yml" add :resource
+          }
+
+          it "creates the encrypted resource file" && {
+            expect_exists "$DIR/resource.gpg"
+          }
+        )
+      )
+    )
+  )
+)
+
+(sandboxed
   title "'vault init' - with change '--secrets-dir' location"
 
   (with "a single gpg secret key"
