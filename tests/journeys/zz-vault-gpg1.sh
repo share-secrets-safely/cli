@@ -11,7 +11,7 @@ source "$root/../gpg-helpers.sh"
 WITH_FAILURE=1
 
 fixture="$root/fixtures"
-snapshot="$fixture/snapshots"
+snapshot="$fixture/snapshots/vault/init-with-gpg1"
 
 (sandboxed
   title "'vault recipient add unverified'"

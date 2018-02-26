@@ -11,7 +11,7 @@ WITH_FAILURE=1
 SUCCESSFULLY=0
 
 title "'vault' subcommand"
-snapshot="$root/journeys/fixtures/snapshots/stateless"
+snapshot="$root/journeys/fixtures/snapshots/vault/stateless"
 
 (with "a minimal vault configuration file"
   it "succeeds even if there is no further argument" && \

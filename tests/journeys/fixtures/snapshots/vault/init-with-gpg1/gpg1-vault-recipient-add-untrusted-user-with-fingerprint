@@ -1,0 +1,7 @@
+Imported recipient key at path 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
+error: The GNU Privacy Guard (GPG) does not supported the attempted operation.
+GPG v2 is known to work, and you can install it here:
+https://www.gnupg.org for more information.
+Caused by: 
+ 2: Could not sign key of recipient 7435ACDC03D55429C41637C4DB9831D842C18D28 with signing key Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
+ 1: Not supported (gpg error 60)
