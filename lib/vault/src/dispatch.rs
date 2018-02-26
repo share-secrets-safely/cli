@@ -10,7 +10,7 @@ use gpgme;
 use error::first_cause_of_type;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
-    Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_id)
+    Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_selector)
 }
 
 fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
@@ -34,6 +34,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
         VaultCommand::RecipientsList => vault_from(&ctx)?.list_recipients(output),
         VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
         VaultCommand::Init {
+            ref name,
             ref gpg_key_ids,
             ref gpg_keys_dir,
             ref recipients_file,
@@ -45,13 +46,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
                 gpg_keys_dir,
                 recipients_file,
                 &ctx.vault_path,
-                {
-                    let r: Result<usize, _> = ctx.vault_id.parse();
-                    match r {
-                        Err(_) => Some(ctx.vault_id),
-                        Ok(_) => None,
-                    }
-                },
+                name.clone(),
             )?;
             writeln!(
                 output,

@@ -179,7 +179,9 @@ impl Vault {
                             cause,
                             path: path.to_owned(),
                         })
-                        .and_then(|_| writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write)))?;
+                        .and_then(|_| {
+                            writeln!(file).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))
+                        })?;
                 }
             }
         }
@@ -371,18 +373,19 @@ pub trait VaultExt {
 impl VaultExt for Vec<Vault> {
     fn select(mut self, selector: &str) -> Result<Vault, Error> {
         let leader_index = Vault::partition_index(selector, self.as_slice(), None)?;
-        for (_, vault) in self.iter_mut().enumerate().filter(|&(vid, _)| vid != leader_index) {
+        for (_, vault) in self.iter_mut()
+            .enumerate()
+            .filter(|&(vid, _)| vid != leader_index)
+        {
             vault.kind = VaultKind::Partition;
         }
 
         let mut vault = self[leader_index].clone();
         vault.kind = VaultKind::Leader;
 
-        self.retain(|v| {
-            match v.kind {
-                VaultKind::Partition => true,
-                VaultKind::Leader => false,
-            }
+        self.retain(|v| match v.kind {
+            VaultKind::Partition => true,
+            VaultKind::Leader => false,
         });
 
         vault.partitions = self;

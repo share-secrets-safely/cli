@@ -73,8 +73,7 @@ title "'vault init'"
         WITH_SNAPSHOT="$snapshot/init-with-at-argument" \
         expect_run $SUCCESSFULLY "$exe" vault \
           -c $vault_dir/vault.yml \
-          --vault-id customized \
-          init --secrets-dir secrets -k ./etc/keys -r ./etc/recipients
+          init --name customized --secrets-dir secrets -k ./etc/keys -r ./etc/recipients
       }
 
       it "creates the expected folder structure" && {
@@ -120,10 +119,10 @@ title "'vault init'"
   vault_dir=$PWD/$vault_dir
   import_user "$fixture/tester.sec.asc"
 
-  (with "a an absolute vault directory"
+  (with "a an absolute vault directory (and a custom name)"
     it "succeeds" && {
       expect_run $SUCCESSFULLY "$exe" vault --config-file "$vault_dir/vault.yml" \
-        init --gpg-keys-dir keys --recipients-file recipients
+        init -n custom-name --gpg-keys-dir keys --recipients-file recipients
     }
     it "creates the correct folder structure" && {
       expect_snapshot "$snapshot/init-single-user-absolute-directory" "$vault_dir"
@@ -182,7 +181,7 @@ EDITOR
     (with "a selected gpg key and a vault name"
       it "succeeds as it just follow instructions" && {
         WITH_SNAPSHOT="$snapshot/init-with-key-specified-explicitly" \
-        expect_run $SUCCESSFULLY "$exe" vault --vault-id vault-name init --gpg-key-id c@example.com
+        expect_run $SUCCESSFULLY "$exe" vault init --name vault-name --gpg-key-id c@example.com
       }
 
       it "creates a valid vault configuration file, \
@@ -193,7 +192,7 @@ EDITOR
 
       it "uses the vault name when showing its contents" && {
         WITH_SNAPSHOT="$snapshot/list-with-name" \
-        expect_run $SUCCESSFULLY "$exe" vault list 
+        expect_run $SUCCESSFULLY "$exe" vault list
       }
     )
   )

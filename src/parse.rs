@@ -44,7 +44,7 @@ where
 pub fn vault_context_from(args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         vault_path: required_os_arg(args, "config-file")?,
-        vault_id: required_arg(args, "vault-id")?,
+        vault_selector: required_arg(args, "vault-selector")?,
         command: VaultCommand::List,
     })
 }
@@ -176,6 +176,7 @@ pub fn vault_resource_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultC
 pub fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::Init {
+            name: args.value_of("name").map(ToOwned::to_owned),
             recipients_file: required_os_arg(args, "recipients-file-path")?,
             secrets: required_os_arg(args, "secrets-dir")?,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,

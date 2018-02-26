@@ -4,9 +4,23 @@ use clap::{App, Arg};
 use std::env;
 use clap::AppSettings;
 
+fn mk_help(kind: &str, prefix: &str) -> String {
+    format!(
+        "{}A {} can be selected by the directory used to stored its resources, \
+         by its name (which may be ambiguous), or by the index in the \
+         vault description file.",
+        prefix, kind
+    )
+}
+
 lazy_static! {
     static ref SHELL: Result<String, env::VarError> = env::var("SHELL");
     static ref EDITOR: Result<String, env::VarError> = env::var("EDITOR");
+    static ref PARTITION_HELP: String = mk_help("partition", "");
+    static ref VAULT_HELP: String = mk_help("vault",
+        "Specify the vault which should be the leader.\
+         This is particularly relevant for operations with partitions.\
+         It has no effect during 'vault init'.");
 }
 
 pub struct CLI<'a, 'b>
@@ -39,6 +53,16 @@ where
                  only key that you have a secret key for, assuming it is yours.\
                  If you have multiple keys, the --gpg-key-id must be specified \
                  to make the input unambiguous.",
+            )
+            .arg(
+                Arg::with_name("name")
+                    .long("name")
+                    .short("n")
+                    .required(false)
+                    .takes_value(true)
+                    .value_name("name")
+                    .help("The name of the vault. It can be used to identify the vault more easily, \
+                           and its primary purpose is convenience."),
             )
             .arg(
                 Arg::with_name("secrets-dir")
@@ -254,11 +278,7 @@ where
                 Arg::with_name("partition-selector")
                     .required(true)
                     .takes_value(true)
-                    .help(
-                        "A partition can be selected by the directory used to stored its resources, \
-                         by its name (which may be ambiguous), or by the index in the \
-                         vault description file.",
-                    ),
+                    .help(&PARTITION_HELP),
             );
         let partitions = App::new("partitions")
             .alias("partition")
@@ -268,7 +288,7 @@ where
                  \
                  Its major promise is that it is non-overlapping with any other partition.\
                  Its main benefit is that it allows one recipients list per resource directory, \
-                 effectively emulating simpe access control lists.",
+                 effectively emulating simple access control lists.",
             )
             .subcommand(add_partition)
             .subcommand(remove_partition);
@@ -284,12 +304,12 @@ where
             .subcommand(list)
             .subcommand(partitions)
             .arg(
-                Arg::with_name("vault-id")
-                    .short("i")
-                    .long("vault-id")
+                Arg::with_name("vault-selector")
+                    .short("s")
+                    .long("select")
                     .required(false)
-                    .value_name("id")
-                    .help("Either an index into the vaults list, or the name of the vault.")
+                    .value_name("selector")
+                    .help(&VAULT_HELP)
                     .default_value("0"),
             )
             .arg(

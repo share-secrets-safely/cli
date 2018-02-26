@@ -23,8 +23,8 @@ impl Vault {
                 if let Some(leader_index) = leader_index {
                     if leader_index == index {
                         bail!(
-                        "Refusing to remove the leading partition at index {}",
-                        index
+                            "Refusing to remove the leading partition at index {}",
+                            index
                         )
                     }
                 };

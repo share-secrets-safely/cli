@@ -66,6 +66,7 @@ pub enum VaultCommand {
         specs: Vec<PathBuf>,
     },
     Init {
+        name: Option<String>,
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
         secrets: PathBuf,
@@ -129,7 +130,7 @@ impl WriteMode {
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct VaultContext {
     pub vault_path: PathBuf,
-    pub vault_id: String,
+    pub vault_selector: String,
     pub command: VaultCommand,
 }
 

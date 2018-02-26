@@ -103,6 +103,8 @@ vaults are displayed when showing them.
    * [ ] multi-partition operations work correctly
      * [ ] when adding and removing resources
      * [ ] when adding and removing recipients
+ * [x] `vault init` now takes the name explicitly
+ * [x] `vault --vault-id` is now `vault --select`
  * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
  * [x] Strong validation of the vault configuration
