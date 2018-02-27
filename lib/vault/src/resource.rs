@@ -12,6 +12,7 @@ use sheesy_types::{gpg_output_filename, CreateMode, Destination, SpecSourceType,
 use error::{DecryptionError, EncryptionError};
 use util::{new_context, strip_ext, write_at};
 use sheesy_types::run_editor;
+use std::iter::once;
 
 fn encrypt_buffer(ctx: &mut gpgme::Context, input: &[u8], keys: &[gpgme::Key]) -> Result<Vec<u8>, Error> {
     let mut encrypted_bytes = Vec::<u8>::new();
@@ -117,8 +118,8 @@ impl Vault {
     }
 
     pub fn partition_by_spec(&self, spec: &VaultSpec) -> Result<(&Vault, VaultSpec), Error> {
-        let partition = self.partitions
-            .iter()
+        let partition = once(self)
+            .chain(&self.partitions)
             .find(|p| spec.dst.starts_with(&p.secrets))
             .ok_or_else(|| {
                 format_err!("Spec '{}' could not be associated with any partition. Prefix it with the partition resource directory.", spec)
