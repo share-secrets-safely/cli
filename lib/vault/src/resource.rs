@@ -116,6 +116,24 @@ impl Vault {
         Ok(encrypted_bytes)
     }
 
+    pub fn partition_by_spec(&self, spec: &VaultSpec) -> Result<(&Vault, VaultSpec), Error> {
+        let partition = self.partitions
+            .iter()
+            .find(|p| spec.dst.starts_with(&p.secrets))
+            .ok_or_else(|| {
+                format_err!("Spec '{}' could not be associated with any partition. Prefix it with the partition resource directory.", spec)
+            })?;
+        Ok((
+            partition,
+            VaultSpec {
+                src: spec.src.clone(),
+                dst: spec.dst
+                    .strip_prefix(&partition.secrets)
+                    .expect("success if 'starts_with' succeeds")
+                    .to_owned(),
+            },
+        ))
+    }
     pub fn encrypt(
         &self,
         specs: &[VaultSpec],
@@ -124,10 +142,17 @@ impl Vault {
         output: &mut Write,
     ) -> Result<(), Error> {
         let mut ctx = new_context()?;
-        let keys = self.recipient_keys(&mut ctx)?;
+
+        // TODO: fill the LUT lazily
+        let lut: Vec<(PathBuf, Vec<gpgme::Key>)> = self.all_in_order()
+            .into_iter()
+            .map(|v| {
+                v.recipient_keys(&mut ctx)
+                    .map(|keys| (v.secrets_path(), keys))
+            })
+            .collect::<Result<_, _>>()?;
 
         let mut encrypted = Vec::new();
-        let secrets_path = self.secrets_path();
         for spec in specs {
             let input = {
                 let mut buf = Vec::new();
@@ -139,13 +164,23 @@ impl Vault {
                 ))?;
                 buf
             };
-            let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, &keys)?;
-            spec.open_output_in(&secrets_path, mode, dst_mode, output)?
-                .write_all(&encrypted_bytes)
-                .context(format!(
-                    "Failed to write all encrypted data to '{}'.",
-                    spec.destination().display(),
-                ))?;
+            {
+                let (secrets_dir, keys, spec) = if self.partitions.is_empty() {
+                    let (ref secrets_dir, ref keys) = lut[self.index];
+                    (secrets_dir.as_path(), keys.as_slice(), spec.clone())
+                } else {
+                    let (partition, stripped_spec) = self.partition_by_spec(spec)?;
+                    let (ref secrets_dir, ref keys) = lut[partition.index];
+                    (secrets_dir.as_path(), keys.as_slice(), stripped_spec)
+                };
+                let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys)?;
+                spec.open_output_in(secrets_dir, mode, dst_mode, output)?
+                    .write_all(&encrypted_bytes)
+                    .context(format!(
+                        "Failed to write all encrypted data to '{}'.",
+                        spec.destination().display(),
+                    ))?;
+            }
             encrypted.push(spec.destination());
         }
         writeln!(

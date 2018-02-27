@@ -112,6 +112,7 @@ vaults are displayed when showing them.
  * [x] `vault init` is tuned to allow adding partitions later
  * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
+ * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
  * [x] Strong validation of the vault configuration
    * even though our commands can keep things simple, users can create configuration
      which is ambiguous. We should reject such configurations when needed.

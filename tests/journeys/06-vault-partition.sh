@@ -14,6 +14,52 @@ SUCCESSFULLY=0
 fixture="$root/fixtures"
 snapshot="$fixture/snapshots/vault/partitions"
 
+title "'vault partition add as non-owner"
+(sandboxed
+  (with "a single user"
+    import_user "$fixture/tester.sec.asc"
+
+    (with "an unnamed vault with an explicit secrets directory owned by 'tester'"
+      "$exe" vault init -k etc/keys --first-partition -r etc/recipients --secrets-dir secrets >/dev/null
+
+      (with "another user with access to the vault, which is no recipient"
+        as_user "$fixture/b.sec.asc"
+        (when "adding a new partition"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/partition-add-as-another-user-no-recipient" \
+            expect_run $SUCCESSFULLY "$exe" vault partition add private-partition
+          }
+
+          it "creates the expected folder structure" && {
+            expect_snapshot "$snapshot/partition-add-as-another-user-no-recipient-directory" .
+          }
+        )
+
+        (when "adding a resource"
+          (with "a resource path without a known partition"
+            it "fails" && {
+              echo "hi to something" |
+              WITH_SNAPSHOT="$snapshot/partition-add-unqualified-resource" \
+              expect_run $WITH_FAILURE "$exe" vault add :hello
+            }
+          )
+
+          (with "a resource path identifying the partition"
+            it "succeeds" && {
+              echo "hi to partition" |
+              WITH_SNAPSHOT="$snapshot/partition-add-qualified-resource" \
+              expect_run $SUCCESSFULLY "$exe" vault add :private-partition/hello
+            }
+
+            it "creates the gpg file at the right spot" && {
+              expect_exists private-partition/hello.gpg
+            }
+          )
+        )
+      )
+    )
+  )
+)
 
 title "'vault partition add & remove'"
 (sandboxed
@@ -208,30 +254,6 @@ title "vault partition failures"
   )
 )
 
-title "'vault partition add as non-owner"
-(sandboxed
-  (with "a single user"
-    import_user "$fixture/tester.sec.asc"
-
-    (with "an unnamed vault with an explicit secrets directory owned by 'tester'"
-      "$exe" vault init -k etc/keys --first-partition -r etc/recipients --secrets-dir secrets >/dev/null
-
-      (with "another user with access to the vault, which is no recipient"
-        as_user "$fixture/b.sec.asc"
-        (when "adding a new partition"
-          it "succeeds" && {
-            WITH_SNAPSHOT="$snapshot/partition-add-as-another-user-no-recipient" \
-            expect_run $SUCCESSFULLY "$exe" vault partition add private-partition
-          }
-
-          it "creates the expected folder structure" && {
-            expect_snapshot "$snapshot/partition-add-as-another-user-no-recipient-directory" .
-          }
-        )
-      )
-    )
-  )
-)
 
 
 title "'vault partition add validation"

@@ -21,7 +21,7 @@ pub fn secrets_default() -> PathBuf {
     PathBuf::from(".")
 }
 
-#[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub enum VaultKind {
     Leader,
     Partition,
@@ -33,7 +33,7 @@ impl Default for VaultKind {
     }
 }
 
-#[derive(Deserialize, PartialEq, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Vault {
     pub name: Option<String>,
     #[serde(skip)]
