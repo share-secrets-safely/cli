@@ -86,6 +86,23 @@ impl<'a> fmt::Display for KeyDisplay<'a> {
     }
 }
 
+pub fn export_key_with_progress(
+    ctx: &mut gpgme::Context,
+    gpg_keys_dir: &Path,
+    key: &gpgme::Key,
+    buf: &mut Vec<u8>,
+    output: &mut Write,
+) -> Result<(String, PathBuf), Error> {
+    let (fingerprint, key_path) = export_key(ctx, &gpg_keys_dir, key, buf)?;
+    writeln!(
+        output,
+        "Exported public key for user {} to '{}'",
+        KeyDisplay(&key),
+        key_path.display()
+    ).ok();
+    Ok((fingerprint, key_path))
+}
+
 pub fn export_key(
     ctx: &mut gpgme::Context,
     gpg_keys_dir: &Path,

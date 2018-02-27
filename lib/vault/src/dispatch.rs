@@ -49,12 +49,8 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
                 recipients_file,
                 &ctx.vault_path,
                 name.clone(),
-            )?;
-            writeln!(
                 output,
-                "vault initialized at '{}'",
-                ctx.vault_path.display()
-            ).ok();
+            )?;
             Ok(())
         }
         VaultCommand::ResourceRemove { ref specs } => vault_from(&ctx)?.remove(specs, output),

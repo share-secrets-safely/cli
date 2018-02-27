@@ -7,8 +7,7 @@ use std::iter::once;
 use util::extract_at_least_one_secret_key;
 use util::new_context;
 use util::fingerprint_of;
-use util::export_key;
-use util::KeyDisplay;
+use util::export_key_with_progress;
 
 impl Vault {
     pub fn all_in_order(&self) -> Vec<&Vault> {
@@ -132,13 +131,7 @@ impl Vault {
             if let Ok(gpg_keys_dir) = self.find_gpg_keys_dir() {
                 let mut buf = Vec::new();
                 for key in &keys {
-                    let (_, key_path) = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
-                    writeln!(
-                        output,
-                        "Exported public key for user {} to '{}'",
-                        KeyDisplay(&key),
-                        key_path.display()
-                    ).ok();
+                    export_key_with_progress(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf, output)?;
                 }
             }
         }
@@ -156,7 +149,7 @@ impl Vault {
                 partition_secrets_dir.display()
             ),
         }.ok();
-        
+
         Ok(())
     }
 }
