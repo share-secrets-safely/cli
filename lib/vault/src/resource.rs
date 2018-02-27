@@ -147,16 +147,6 @@ impl Vault {
 
         let mut encrypted = Vec::new();
         for spec in specs {
-            let input = {
-                let mut buf = Vec::new();
-                spec.open_input()?.read_to_end(&mut buf).context(format!(
-                    "Could not read all input from '{}' into buffer.",
-                    spec.source()
-                        .map(|s| format!("{}", s.display()))
-                        .unwrap_or_else(|| "<stdin>".into())
-                ))?;
-                buf
-            };
             {
                 let (partition, spec) = if self.partitions.is_empty() {
                     (self, spec.clone())
@@ -173,6 +163,16 @@ impl Vault {
                     ));
                     let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
                     (secrets_dir, keys)
+                };
+                let input = {
+                    let mut buf = Vec::new();
+                    spec.open_input()?.read_to_end(&mut buf).context(format!(
+                        "Could not read all input from '{}' into buffer.",
+                        spec.source()
+                            .map(|s| format!("{}", s.display()))
+                            .unwrap_or_else(|| "<stdin>".into())
+                    ))?;
+                    buf
                 };
                 let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys)?;
                 spec.open_output_in(secrets_dir, mode, dst_mode, output)?
