@@ -1,0 +1,1 @@
+error: Found 2 viable keys for key-ids (Tester (for testing only) <tester@example.com>, user b <b@example.com>), which is ambiguous. Please specify one with the --gpg-key-id argument.

@@ -19,11 +19,10 @@ title "'vault partition add & remove'"
 (sandboxed
   (with "a single user"
     import_user "$fixture/tester.sec.asc"
-    init_args=( -k etc/keys -r etc/recipients )
 
     (with "an unnamed vault with an explicit secrets directory"
       in-space one/vault
-      "$exe" vault init "${init_args[@]}" --secrets-dir secrets >/dev/null
+      "$exe" vault init -k etc/keys -r etc/recipients --secrets-dir secrets >/dev/null
 
       (when "adding an unnnamed partition"
         it "succeeds" && {
@@ -105,6 +104,21 @@ title "'vault partition add & remove'"
           expect_snapshot "$snapshot/partition-remove-second-by-resource-dir-directory" .
         }
       )
+
+      (when "adding another partition and selecting both keys explicitly by user id"
+        it "succeeds" && {
+          WITH_SNAPSHOT="$snapshot/partition-add-multiple-private-keys" \
+          expect_run $SUCCESSFULLY "$exe" vault partition add with-multiple-keys \
+                          -i tester@example.com -i b@example.com
+        }
+      )
+
+      (when "adding another partition and selecting non-existing user-ids"
+        it "fails with an appropriate error emssate" && {
+          WITH_SNAPSHOT="$snapshot/partition-add-multiple-non-existing-user-ids" \
+          expect_run $WITH_FAILURE "$exe" vault partition add fail -i foo -i bar
+        }
+      )
     )
 
     (with "an unnamed vault and the default secrets directory"
@@ -145,8 +159,22 @@ title "'vault partition add & remove'"
           expect_run $WITH_FAILURE "$exe" vault partition remove 0
         }
       )
+      (with "another private key available"
+        import_user "$fixture/b.sec.asc"
+
+        (when "adding another partition"
+          it "fails thanks to ambiguity" && {
+            WITH_SNAPSHOT="$snapshot/partition-add-ambiguous-private-keys" \
+            expect_run $WITH_FAILURE "$exe" vault partition add failing-one
+          }
+        )
+      )
     )
   )
+)
+
+(sandboxed
+  import_user "$fixture/tester.sec.asc"
 
   (with "a vault with non-unique recipients file configuration across two partition"
     in-space three/vault

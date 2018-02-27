@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::env::{current_dir, set_current_dir};
 use std::fs::{self, OpenOptions};
 use std::fmt;
-use itertools::join;
+use itertools::{join, Itertools};
 use failure::{self, err_msg, Error, ResultExt};
 use gpgme;
 
@@ -129,10 +129,17 @@ pub fn extract_at_least_one_secret_key(
     };
 
     if keys.is_empty() {
-        return Err(err_msg(
-            "No existing GPG key found for which you have a secret key. \
-             Please create one with 'gpg --gen-key' and try again.",
-        ));
+        return Err(if gpg_key_ids.is_empty() {
+            err_msg(
+                "No existing GPG key found for which you have a secret key. \
+                 Please create one with 'gpg --gen-key' and try again.",
+            )
+        } else {
+            format_err!(
+                "No secret key matched any of the given user ids: {}",
+                gpg_key_ids.iter().map(|id| format!("'{}'", id)).join(", ")
+            )
+        });
     }
 
     if keys.len() > 1 && gpg_key_ids.is_empty() {
