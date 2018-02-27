@@ -110,37 +110,68 @@ title "'vault init'"
   (with "a single gpg user"
     import_user "$fixture/tester.sec.asc"
 
-    (when "initializing the vault with a resources directory and without explicit recipients file"
-      in-space one
-      it "succeeds" && {
-        expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets
-      }
+    (when "initializing the vault with a resources directory"
+      (with "no explicit recipients file"
+        in-space one
+        it "succeeds" && {
+          expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir secrets
+        }
 
-      it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
-        expect_snapshot "$snapshot/init-relative-unnamed-recipients" .
-      }
+        it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
+          expect_snapshot "$snapshot/init-relative-unnamed-recipients" .
+        }
+      )
+
+      (with "an explicit recipients file name"
+        in-space two
+        it "succeeds" && {
+          expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file recipients
+        }
+
+        it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
+          expect_snapshot "$snapshot/init-relative-named-recipients" .
+        }
+      )
+
+      (with "an explicit recipients path"
+        in-space three
+        it "succeeds" && {
+          expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file ./recipients
+        }
+
+        it "creates the recipients file at that path" && {
+          expect_snapshot "$snapshot/init-explicit-recipients-path" .
+        }
+      )
     )
 
-    (when "initializing the vault with a resources directory and with an explicit recipients file name"
-      in-space two
-      it "succeeds" && {
-        expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file recipients
-      }
+    (when "initializing the vault with the 'partition support' flag"
+      (with "no explicit secrets dir"
+        in-space four
+        it "fails as it is missing the secrets dir override" && {
+          WITH_SNAPSHOT="$snapshot/init-first-partition-no-secrets-dir" \
+          expect_run $WITH_FAILURE "$exe" vault init --first-partition
+        }
+      )
 
-      it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
-        expect_snapshot "$snapshot/init-relative-named-recipients" .
-      }
-    )
+      (with "a secrets dir that is '.'"
+        in-space five
+        it "fails as it should not be the current dir" && {
+          WITH_SNAPSHOT="$snapshot/init-first-partition-invalid-secrets-dir-dot" \
+          expect_run $WITH_FAILURE "$exe" vault init --first-partition --secrets-dir .
+        }
+      )
 
-    (when "initializing the vault with a resources directory and with an explicit recipients path"
-      in-space three
-      it "succeeds" && {
-        expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file ./recipients
-      }
+      (with "a valid secrets dir"
+        in-space seven
+        it "succeeds" && {
+          expect_run $SUCCESSFULLY "$exe" vault init --first-partition --secrets-dir sec
+        }
 
-      it "creates the recipients file at that path" && {
-        expect_snapshot "$snapshot/init-explicit-recipients-path" .
-      }
+        it "creates the correct vault structure" && {
+          expect_snapshot "$snapshot/init-first-partition-flag" .
+        }
+      )
     )
   )
 )

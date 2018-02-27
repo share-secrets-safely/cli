@@ -67,6 +67,17 @@ where
                     ),
             )
             .arg(
+                Arg::with_name("first-partition")
+                    .long("first-partition")
+                    .short("p")
+                    .required(false)
+                    .requires("secrets-dir")
+                    .help("Setting this flag indicates that you want to add partitions later.\
+                    \
+                    It enforces a configuration which makes your vault suitable, namely it assures \
+                    that you set an explicit secrets directory."),
+            )
+            .arg(
                 Arg::with_name("secrets-dir")
                     .long("secrets-dir")
                     .short("s")

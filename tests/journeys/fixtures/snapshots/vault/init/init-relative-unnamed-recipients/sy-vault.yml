@@ -1,5 +1,5 @@
 ---
 name: ~
-secrets: "./secrets"
+secrets: secrets
 gpg_keys: ".gpg-keys"
-recipients: "./secrets/.gpg-id"
+recipients: "secrets/.gpg-id"

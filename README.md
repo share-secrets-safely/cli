@@ -106,6 +106,7 @@ vaults are displayed when showing them.
  * [x] `vault init` now takes the name explicitly
  * [x] `vault --vault-id` is now `vault --select`
  * [x] Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.
+ * [x] `vault init` is tuned to allow adding partitions later
  * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
  * [x] Strong validation of the vault configuration
