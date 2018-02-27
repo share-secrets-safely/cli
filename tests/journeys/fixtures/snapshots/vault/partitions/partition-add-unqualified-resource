@@ -1,1 +1,1 @@
-Argh, can't use unqualified resources if partitions are used
+error: Spec ':hello' could not be associated with any partition. Prefix it with the partition resource directory.
