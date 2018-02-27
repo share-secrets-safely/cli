@@ -6,6 +6,12 @@ use sheesy_types::WriteMode;
 use std::iter::once;
 
 impl Vault {
+    pub fn all_in_order(&self) -> Vec<&Vault> {
+        let mut all_vaults: Vec<_> = self.partitions.iter().chain(once(self)).collect();
+        all_vaults.sort_by_key(|v| v.index);
+        all_vaults
+    }
+
     pub fn serialize(&self) -> Result<(), Error> {
         self.to_file(
             self.vault_path

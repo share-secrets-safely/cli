@@ -174,11 +174,16 @@ pub fn vault_resource_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultC
 }
 
 pub fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    let mut recipients_file: PathBuf = required_os_arg(args, "recipients-file-path")?;
+    let secrets_dir: PathBuf = required_os_arg(args, "secrets-dir")?;
+    if recipients_file.components().count() == 1 {
+        recipients_file = secrets_dir.join(recipients_file);
+    }
     Ok(VaultContext {
         command: VaultCommand::Init {
             name: args.value_of("name").map(ToOwned::to_owned),
-            recipients_file: required_os_arg(args, "recipients-file-path")?,
-            secrets: required_os_arg(args, "secrets-dir")?,
+            recipients_file: recipients_file,
+            secrets: secrets_dir,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,
             gpg_key_ids: match args.values_of("gpg-key-id") {
                 Some(v) => v.map(Into::into).collect(),

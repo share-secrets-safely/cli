@@ -105,6 +105,47 @@ title "'vault init'"
 )
 
 (sandboxed
+  title "'vault init' and pre-empting future partitions"
+
+  (with "a single gpg user"
+    import_user "$fixture/tester.sec.asc"
+
+    (when "initializing the vault with a resources directory and without explicit recipients file"
+      in-space one
+      it "succeeds" && {
+        expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets
+      }
+
+      it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
+        expect_snapshot "$snapshot/init-relative-unnamed-recipients" .
+      }
+    )
+
+    (when "initializing the vault with a resources directory and with an explicit recipients file name"
+      in-space two
+      it "succeeds" && {
+        expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file recipients
+      }
+
+      it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
+        expect_snapshot "$snapshot/init-relative-named-recipients" .
+      }
+    )
+
+    (when "initializing the vault with a resources directory and with an explicit recipients path"
+      in-space three
+      it "succeeds" && {
+        expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file ./recipients
+      }
+
+      it "creates the recipients file at that path" && {
+        expect_snapshot "$snapshot/init-explicit-recipients-path" .
+      }
+    )
+  )
+)
+
+(sandboxed
   title "'vault init' - with change '--secrets-dir' location"
 
   (with "a single gpg secret key"

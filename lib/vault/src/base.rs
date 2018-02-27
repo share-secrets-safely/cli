@@ -193,8 +193,7 @@ impl Vault {
             VaultKind::Partition => return Err(VaultError::PartitionUnsupported),
             VaultKind::Leader => {
                 let mut file = write_at(path).map_err(|cause| VaultError::from_io_err(cause, path, &IOMode::Write))?;
-                let mut all_vaults: Vec<_> = self.partitions.iter().chain(once(self)).collect();
-                all_vaults.sort_by_key(|v| v.index);
+                let all_vaults = self.all_in_order();
                 for vault in &all_vaults {
                     serde_yaml::to_writer(&mut file, vault)
                         .map_err(|cause| VaultError::Serialization {

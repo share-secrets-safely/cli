@@ -85,8 +85,11 @@ where
                     .takes_value(true)
                     .value_name("path")
                     .help(
-                        "The directory to hold the public keys identified by \
-                         --gpg-key-id, with signatures.",
+                        "The path to the file to hold the fingerprints of all recipients. \
+                         \
+                         If set to just the file name, like 'recipients', it will be interpreted as \
+                         relative to the --secrets-dir. If a path is given, like './recipients', it \
+                         is used as is.",
                     ),
             )
             .arg(
@@ -98,8 +101,9 @@ where
                     .takes_value(true)
                     .value_name("directory")
                     .help(
-                        "The directory to hold the public keys identified by \
-                         --gpg-key-id, with signatures.",
+                        "The directory to hold the public keys of all recipients.\
+                         \
+                         Please note that these keys are exported with signatures.",
                     ),
             )
             .arg(gpg_key_id.clone().long("gpg-key-id").short("i"));

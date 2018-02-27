@@ -2,4 +2,4 @@
 name: "custom-name"
 secrets: "."
 gpg_keys: keys
-recipients: recipients
+recipients: "./recipients"

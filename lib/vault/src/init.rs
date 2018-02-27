@@ -62,6 +62,14 @@ impl Vault {
                 recipients_file.display()
             ));
         }
+        if let Some(recipients_parent_dir) = recipients_file.parent() {
+            if !recipients_parent_dir.is_dir() {
+                create_dir_all(recipients_parent_dir).context(format!(
+                    "Failed to create directory leading to recipients file at '{}'",
+                    recipients_file.display()
+                ))?;
+            }
+        }
         let mut recipients = write_at(&recipients_file).context(format!(
             "Failed to open recipients file at '{}'",
             recipients_file.display()
