@@ -84,7 +84,7 @@ function expect_snapshot () {
     mkdir -p "${expected%/*}"
     cp -R "$actual" "$expected"
   fi
-  expect_run 0 diff -r "$expected" "$actual"
+  expect_run 0 diff -r -N "$expected" "$actual"
 }
 
 function expect_run () {
@@ -104,7 +104,7 @@ function expect_run () {
       fi
       if ! diff "$expected" <(echo -n "$output"); then
         echo 1>&2 "${RED} - FAIL"
-        echo 1>&2 "${WHITE}\$$*"
+        echo 1>&2 "${WHITE}\$ $*"
         echo 1>&2 "Output snapshot did not match snapshot at '$expected'"
         echo 1>&2 "$output"
         exit 1
@@ -113,7 +113,7 @@ function expect_run () {
     echo 1>&2
   else
     echo 1>&2 "${RED} - FAIL"
-    echo 1>&2 "${WHITE}\$$*"
+    echo 1>&2 "${WHITE}\$ $*"
     echo 1>&2 "${RED}Expected actual status $actual_exit_code to be $expected_exit_code"
     echo 1>&2 "$output"
     exit 1

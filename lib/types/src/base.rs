@@ -88,6 +88,7 @@ pub enum VaultCommand {
         selector: String,
     },
     PartitionsAdd {
+        gpg_key_ids: Vec<String>,
         name: Option<String>,
         path: PathBuf,
     },

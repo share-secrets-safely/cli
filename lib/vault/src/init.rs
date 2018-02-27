@@ -1,10 +1,7 @@
-use util::write_at;
-
 use std::path::Path;
 
 use failure::{Error, ResultExt};
 use std::fs::create_dir_all;
-use std::io::Write;
 use base::Vault;
 use util::new_context;
 use util::extract_at_least_one_secret_key;
@@ -62,30 +59,14 @@ impl Vault {
                 recipients_file.display()
             ));
         }
-        if let Some(recipients_parent_dir) = recipients_file.parent() {
-            if !recipients_parent_dir.is_dir() {
-                create_dir_all(recipients_parent_dir).context(format!(
-                    "Failed to create directory leading to recipients file at '{}'",
-                    recipients_file.display()
-                ))?;
-            }
-        }
-        let mut recipients = write_at(&recipients_file).context(format!(
-            "Failed to open recipients file at '{}'",
-            recipients_file.display()
-        ))?;
+
+        let mut recipients_fprs = Vec::new();
         for key in keys {
             let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut output)?;
-
-            writeln!(recipients, "{}", fingerprint).context(format!(
-                "Could not append fingerprint to file at '{}'",
-                recipients_file.display()
-            ))?;
+            recipients_fprs.push(fingerprint);
         }
-        recipients.flush().context(format!(
-            "Failed to flush recipients file at '{}'",
-            recipients_file.display()
-        ))?;
+
+        vault.write_recipients_list(&mut recipients_fprs)?;
         Ok(vault)
     }
 }

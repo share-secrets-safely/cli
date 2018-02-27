@@ -103,6 +103,9 @@ vaults are displayed when showing them.
    * [ ] multi-partition operations work correctly
      * [ ] when adding and removing resources
      * [ ] when adding and removing recipients
+       * [ ] choose partition during `init`
+       * [ ] '"' during add
+       * [ ] '"' during remove
  * [x] `vault init` now takes the name explicitly
  * [x] `vault --vault-id` is now `vault --select`
  * [x] Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.

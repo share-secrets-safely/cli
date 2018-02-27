@@ -4,6 +4,9 @@ use std::io::Write;
 use std::path::Path;
 use sheesy_types::WriteMode;
 use std::iter::once;
+use util::extract_at_least_one_secret_key;
+use util::new_context;
+use util::fingerprint_of;
 
 impl Vault {
     pub fn all_in_order(&self) -> Vec<&Vault> {
@@ -72,7 +75,14 @@ impl Vault {
         writeln!(output, "Removed partition matching selector '{}'", selector).ok();
         Ok(())
     }
-    pub fn add_partition(&mut self, path: &Path, name: Option<&str>, output: &mut Write) -> Result<(), Error> {
+
+    pub fn add_partition(
+        &mut self,
+        path: &Path,
+        name: Option<&str>,
+        gpg_key_ids: &[String],
+        output: &mut Write,
+    ) -> Result<(), Error> {
         let secrets_dir = self.secrets.parent().ok_or_else(|| {
             format_err!(
                 "Expected vault to have secrets directory ('{}') from which a parent directory can be obtained.",
@@ -92,7 +102,7 @@ impl Vault {
             .chain(once(self.index))
             .max()
             .expect("at least one item");
-        self.partitions.push(Vault {
+        let new_partition = Vault {
             name: name.map(ToOwned::to_owned)
                 .or_else(|| path.file_name().map(|f| f.to_string_lossy().into_owned())),
             kind: VaultKind::Partition,
@@ -103,8 +113,18 @@ impl Vault {
             secrets: partition_secrets_dir.clone(),
             gpg_keys: None,
             recipients: recipients_file,
-        });
+        };
 
+        {
+            let mut gpg_ctx = new_context()?;
+            let mut fprs: Vec<_> = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?
+                .iter()
+                .map(|k| fingerprint_of(k))
+                .collect::<Result<_, _>>()?;
+            new_partition.write_recipients_list(&mut fprs)?;
+        }
+
+        self.partitions.push(new_partition);
         self.serialize()?;
         match name {
             Some(name) => writeln!(

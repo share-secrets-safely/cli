@@ -26,6 +26,15 @@ where
     }
 }
 
+fn optional_args<'a, T>(args: &'a ArgMatches, name: &'static str) -> Vec<T>
+where
+    T: From<&'a str>,
+{
+    args.values_of(name)
+        .map(|v| v.map(Into::into).collect())
+        .unwrap_or_else(Vec::new)
+}
+
 fn required_arg<T>(args: &ArgMatches, name: &'static str) -> Result<T, Error>
 where
     T: FromStr,
@@ -59,10 +68,7 @@ pub fn vault_recipients_list(ctx: VaultContext, _args: &ArgMatches) -> Result<Va
 pub fn vault_recipients_init(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::RecipientsInit {
-            gpg_key_ids: match args.values_of("gpg-key-id") {
-                Some(v) => v.map(Into::into).collect(),
-                None => Vec::new(),
-            },
+            gpg_key_ids: optional_args(args, "gpg-key-id"),
         },
         ..ctx
     })
@@ -83,6 +89,7 @@ pub fn vault_recipients_remove(ctx: VaultContext, args: &ArgMatches) -> Result<V
 pub fn vault_partitions_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
     Ok(VaultContext {
         command: VaultCommand::PartitionsAdd {
+            gpg_key_ids: optional_args(args, "gpg-key-id"),
             path: required_os_arg(args, "partition-path")?,
             name: args.value_of("name").map(ToOwned::to_owned),
         },
@@ -188,10 +195,7 @@ pub fn vault_init_from(ctx: VaultContext, args: &ArgMatches) -> Result<VaultCont
             recipients_file,
             secrets,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,
-            gpg_key_ids: match args.values_of("gpg-key-id") {
-                Some(v) => v.map(Into::into).collect(),
-                None => Vec::new(),
-            },
+            gpg_key_ids: optional_args(args, "gpg-key-id"),
         },
         ..ctx
     })

@@ -136,6 +136,7 @@ pub fn extract_at_least_one_secret_key(
     }
 
     if keys.len() > 1 && gpg_key_ids.is_empty() {
+        // TODO: wrap this in a custom error and let the CLI detect the issue
         return Err(format_err!(
             "Found {} viable keys for key-ids ({}), which is ambiguous. \
              Please specify one with the --gpg-key-id argument.",

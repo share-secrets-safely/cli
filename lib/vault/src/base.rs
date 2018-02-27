@@ -10,6 +10,7 @@ use sheesy_types::WriteMode;
 use gpgme;
 use std::collections::HashSet;
 use std::iter::once;
+use std::fs::create_dir_all;
 
 pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
@@ -244,6 +245,14 @@ impl Vault {
         recipients.dedup();
 
         let recipients_path = self.recipients_path();
+        if let Some(recipients_parent_dir) = recipients_path.parent() {
+            if !recipients_parent_dir.is_dir() {
+                create_dir_all(recipients_parent_dir).context(format!(
+                    "Failed to create directory leading to recipients file at '{}'",
+                    recipients_path.display()
+                ))?;
+            }
+        }
         let mut writer = write_at(&recipients_path).context(format!(
             "Failed to open recipients at '{}' file for writing",
             recipients_path.display()

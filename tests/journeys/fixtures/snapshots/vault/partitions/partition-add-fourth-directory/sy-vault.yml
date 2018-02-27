@@ -1,23 +1,23 @@
 ---
 name: ~
-secrets: "../one"
+secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: first
-secrets: "../first"
+secrets: first
 gpg_keys: ~
-recipients: "../first/recipients"
+recipients: first/recipients
 ---
 name: "second-partition"
-secrets: "../second"
+secrets: "./subdir/second"
 gpg_keys: ~
-recipients: "../second/recipients"
+recipients: "./subdir/second/recipients"
 ---
 name: third
-secrets: "../subdir/third"
+secrets: subdir/third
 gpg_keys: ~
-recipients: "../subdir/third/recipients"
+recipients: subdir/third/recipients
 ---
 name: "second-partition"
 secrets: "/tmp/some-empty-dir"

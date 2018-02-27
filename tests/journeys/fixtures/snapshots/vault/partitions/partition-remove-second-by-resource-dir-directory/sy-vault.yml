@@ -1,10 +1,10 @@
 ---
 name: ~
-secrets: "../one"
+secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: first
-secrets: "../first"
+secrets: first
 gpg_keys: ~
-recipients: "../first/recipients"
+recipients: first/recipients

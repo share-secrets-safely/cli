@@ -45,6 +45,9 @@ where
             .takes_value(true)
             .value_name("userid")
             .help("The key-id of the public key identifying a recipient in your gpg keychain.");
+        fn optional_gpg_key_id<'a, 'b>(arg: Arg<'a, 'b>) -> Arg<'a, 'b> {
+            arg.long("gpg-key-id").short("i")
+        }
         let init = App::new("init")
             .about(
                 "Initialize the vault in the current directory. \
@@ -72,10 +75,12 @@ where
                     .short("p")
                     .required(false)
                     .requires("secrets-dir")
-                    .help("Setting this flag indicates that you want to add partitions later.\
-                    \
-                    It enforces a configuration which makes your vault suitable, namely it assures \
-                    that you set an explicit secrets directory."),
+                    .help(
+                        "Setting this flag indicates that you want to add partitions later.\
+                         \
+                         It enforces a configuration which makes your vault suitable, namely it assures \
+                         that you set an explicit secrets directory.",
+                    ),
             )
             .arg(
                 Arg::with_name("secrets-dir")
@@ -117,7 +122,7 @@ where
                          Please note that these keys are exported with signatures.",
                     ),
             )
-            .arg(gpg_key_id.clone().long("gpg-key-id").short("i"));
+            .arg(optional_gpg_key_id(gpg_key_id.clone()));
 
         let list = App::new("list")
             .alias("ls")
@@ -252,7 +257,7 @@ where
                  left intact.\
                  However, the recipients key file will be removed from the vault.",
             )
-            .arg(gpg_key_id.required(true));
+            .arg(gpg_key_id.clone().required(true));
         let list_recipient = App::new("list")
             .alias("ls")
             .about("List the vaults recipients as identified by the recipients file.");
@@ -277,6 +282,11 @@ where
                          the partitions resources directory.",
                     ),
             )
+            .arg(optional_gpg_key_id(gpg_key_id).long_help(
+                "The fingerprint or user ids of the members of the partition.\
+                 \
+                 If unset, it will default to your key, if there is no ambiguity.",
+            ))
             .arg(Arg::with_name("partition-path").required(true).help(
                 "The path at which the partition should store resources.\
                  \

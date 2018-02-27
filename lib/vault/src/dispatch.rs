@@ -17,9 +17,11 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     use sheesy_types::VaultCommand;
     match ctx.command {
         VaultCommand::PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
-        VaultCommand::PartitionsAdd { ref path, ref name } => {
-            vault_from(&ctx)?.add_partition(path, name.as_ref().map(|s| s.as_str()), output)
-        }
+        VaultCommand::PartitionsAdd {
+            ref path,
+            ref name,
+            ref gpg_key_ids,
+        } => vault_from(&ctx)?.add_partition(path, name.as_ref().map(|s| s.as_str()), gpg_key_ids, output),
         VaultCommand::RecipientsRemove { ref gpg_key_ids } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, output),
         VaultCommand::RecipientsAdd {
             ref gpg_key_ids,
