@@ -62,7 +62,7 @@ impl Vault {
 
         let mut recipients_fprs = Vec::new();
         for key in keys {
-            let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut output)?;
+            let (fingerprint, _) = export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut output)?;
             recipients_fprs.push(fingerprint);
         }
 

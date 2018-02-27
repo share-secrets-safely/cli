@@ -1,0 +1,10 @@
+---
+name: ~
+secrets: secrets
+gpg_keys: etc/keys
+recipients: etc/recipients
+---
+name: "private-partition"
+secrets: "private-partition"
+gpg_keys: ~
+recipients: "private-partition/recipients"

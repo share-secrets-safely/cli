@@ -119,8 +119,25 @@ title "'vault partition add & remove'"
           expect_run $WITH_FAILURE "$exe" vault partition add fail -i foo -i bar
         }
       )
-    )
 
+      (with "another private key available"
+        import_user "$fixture/b.sec.asc"
+
+        (when "adding another partition"
+          it "fails thanks to ambiguity" && {
+            WITH_SNAPSHOT="$snapshot/partition-add-ambiguous-private-keys" \
+            expect_run $WITH_FAILURE "$exe" vault partition add failing-one
+          }
+        )
+      )
+    )
+  )
+)
+
+title "vault partition remove failures"
+(sandboxed
+  (with "a single user"
+    import_user "$fixture/tester.sec.asc"
     (with "an unnamed vault and the default secrets directory"
       in-space two/vault
       "$exe" vault init --secrets-dir . >/dev/null
@@ -159,13 +176,28 @@ title "'vault partition add & remove'"
           expect_run $WITH_FAILURE "$exe" vault partition remove 0
         }
       )
-      (with "another private key available"
-        import_user "$fixture/b.sec.asc"
+    )
+  )
+)
 
-        (when "adding another partition"
-          it "fails thanks to ambiguity" && {
-            WITH_SNAPSHOT="$snapshot/partition-add-ambiguous-private-keys" \
-            expect_run $WITH_FAILURE "$exe" vault partition add failing-one
+title "'vault partition add as non-owner"
+(sandboxed
+  (with "a single user"
+    import_user "$fixture/tester.sec.asc"
+
+    (with "an unnamed vault with an explicit secrets directory owned by 'tester'"
+      "$exe" vault init -k etc/keys --first-partition -r etc/recipients --secrets-dir secrets >/dev/null
+
+      (with "another user with access to the vault, which is no recipient"
+        as_user "$fixture/b.sec.asc"
+        (when "adding a new partition"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/partition-add-as-another-user-no-recipient" \
+            expect_run $SUCCESSFULLY "$exe" vault partition add private-partition
+          }
+
+          it "creates the expected folder structure" && {
+            expect_snapshot "$snapshot/partition-add-as-another-user-no-recipient-directory" .
           }
         )
       )
@@ -173,6 +205,8 @@ title "'vault partition add & remove'"
   )
 )
 
+
+title "'vault partition add validation"
 (sandboxed
   import_user "$fixture/tester.sec.asc"
 

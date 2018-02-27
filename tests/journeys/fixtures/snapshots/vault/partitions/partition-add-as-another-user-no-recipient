@@ -1,3 +1,2 @@
 Exported public key for user user b <b@example.com> to 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
-Added recipient user b <b@example.com>
-Re-encrypted 'secret' for new recipient(s)
+Added unnamed partition with resources at 'private-partition'

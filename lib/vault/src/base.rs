@@ -379,18 +379,34 @@ impl Vault {
         self.keys_by_ids(ctx, &recipients_fprs, "recipient")
     }
 
+    fn vault_path_for_display(&self) -> String {
+        self.vault_path
+            .as_ref()
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_else(|| String::from("<unknown>"))
+    }
+
+    pub fn find_gpg_keys_dir(&self) -> Result<PathBuf, Error> {
+        once(self.gpg_keys_dir())
+            .chain(self.partitions.iter().map(|p| p.gpg_keys_dir()))
+            .filter_map(Result::ok)
+            .next()
+            .ok_or_else(|| {
+                format_err!(
+                    "The vault at '{}' does not have a gpg_keys directory configured.",
+                    self.vault_path_for_display()
+                )
+            })
+    }
+
     pub fn gpg_keys_dir(&self) -> Result<PathBuf, Error> {
-        let unknown_path = PathBuf::from("<unknown>");
         self.gpg_keys
             .as_ref()
             .map(|p| self.absolute_path(p))
             .ok_or_else(|| {
                 format_err!(
                     "The vault at '{}' does not have a gpg_keys directory configured.",
-                    self.vault_path
-                        .as_ref()
-                        .unwrap_or_else(|| &unknown_path)
-                        .display()
+                    self.vault_path_for_display()
                 )
             })
     }

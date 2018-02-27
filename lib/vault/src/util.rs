@@ -91,7 +91,7 @@ pub fn export_key(
     gpg_keys_dir: &Path,
     key: &gpgme::Key,
     buf: &mut Vec<u8>,
-) -> Result<String, Error> {
+) -> Result<(String, PathBuf), Error> {
     let fingerprint = fingerprint_of(key)?;
     let key_path = gpg_keys_dir.join(&fingerprint);
     ctx.set_armor(true);
@@ -109,7 +109,7 @@ pub fn export_key(
             key_path.display()
         ))?;
     buf.clear();
-    Ok(fingerprint.to_owned())
+    Ok((fingerprint, key_path))
 }
 
 pub fn extract_at_least_one_secret_key(

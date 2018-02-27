@@ -65,12 +65,12 @@ impl Vault {
             let gpg_keys_dir = self.absolute_path(gpg_keys_dir);
             let mut buf = Vec::new();
             for key in &keys {
-                let fingerprint = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
+                let (_fingerprint, file_path) = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
                 writeln!(
                     output,
-                    "Exported key '{}' for user {}",
-                    fingerprint,
-                    KeyDisplay(key)
+                    "Exported public key for user {} to '{}'",
+                    KeyDisplay(key),
+                    file_path.display()
                 ).ok();
             }
         }

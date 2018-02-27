@@ -7,6 +7,8 @@ use std::iter::once;
 use util::extract_at_least_one_secret_key;
 use util::new_context;
 use util::fingerprint_of;
+use util::export_key;
+use util::KeyDisplay;
 
 impl Vault {
     pub fn all_in_order(&self) -> Vec<&Vault> {
@@ -115,17 +117,32 @@ impl Vault {
             recipients: recipients_file,
         };
 
-        {
-            let mut gpg_ctx = new_context()?;
-            let mut fprs: Vec<_> = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?
-                .iter()
-                .map(|k| fingerprint_of(k))
-                .collect::<Result<_, _>>()?;
-            new_partition.write_recipients_list(&mut fprs)?;
-        }
-
+        let partition = new_partition.clone();
         self.partitions.push(new_partition);
         self.serialize()?;
+
+        {
+            let mut gpg_ctx = new_context()?;
+            let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
+            let mut fprs: Vec<_> = keys.iter()
+                .map(|k| fingerprint_of(k))
+                .collect::<Result<_, _>>()?;
+            partition.write_recipients_list(&mut fprs)?;
+
+            if let Ok(gpg_keys_dir) = self.find_gpg_keys_dir() {
+                let mut buf = Vec::new();
+                for key in &keys {
+                    let (_, key_path) = export_key(&mut gpg_ctx, &gpg_keys_dir, key, &mut buf)?;
+                    writeln!(
+                        output,
+                        "Exported public key for user {} to '{}'",
+                        KeyDisplay(&key),
+                        key_path.display()
+                    ).ok();
+                }
+            }
+        }
+
         match name {
             Some(name) => writeln!(
                 output,
@@ -139,6 +156,7 @@ impl Vault {
                 partition_secrets_dir.display()
             ),
         }.ok();
+        
         Ok(())
     }
 }
