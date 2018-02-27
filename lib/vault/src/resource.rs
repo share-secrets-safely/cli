@@ -158,30 +158,21 @@ impl Vault {
                 buf
             };
             {
-                let (secrets_dir, keys, spec) = if self.partitions.is_empty() {
-                    let (secrets_dir, keys) = if lut[self.index].is_some() {
-                        let &(ref secrets_dir, ref keys) = lut[self.index].as_ref().unwrap();
-                        (secrets_dir, keys)
-                    } else {
-                        lut[self.index] = Some((self.secrets_path(), self.recipient_keys(&mut ctx)?));
-                        let &(ref secrets_dir, ref keys) = lut[self.index].as_ref().unwrap();
-                        (secrets_dir, keys)
-                    };
-                    (secrets_dir.as_path(), keys.as_slice(), spec.clone())
+                let (partition, spec) = if self.partitions.is_empty() {
+                    (self, spec.clone())
                 } else {
-                    let (partition, stripped_spec) = self.partition_by_spec(spec)?;
-                    let (secrets_dir, keys) = if lut[partition.index].is_some() {
-                        let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
-                        (secrets_dir, keys)
-                    } else {
-                        lut[partition.index] = Some((
-                            partition.secrets_path(),
-                            partition.recipient_keys(&mut ctx)?,
-                        ));
-                        let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
-                        (secrets_dir, keys)
-                    };
-                    (secrets_dir.as_path(), keys.as_slice(), stripped_spec)
+                    self.partition_by_spec(spec)?
+                };
+                let (secrets_dir, keys) = if lut[partition.index].is_some() {
+                    let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
+                    (secrets_dir, keys)
+                } else {
+                    lut[partition.index] = Some((
+                        partition.secrets_path(),
+                        partition.recipient_keys(&mut ctx)?,
+                    ));
+                    let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
+                    (secrets_dir, keys)
                 };
                 let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys)?;
                 spec.open_output_in(secrets_dir, mode, dst_mode, output)?
