@@ -1,5 +1,5 @@
 use base::{Vault, VaultKind};
-use failure::{err_msg, Error};
+use failure::{err_msg, Error, ResultExt};
 use std::io::Write;
 use std::path::Path;
 use sheesy_types::WriteMode;
@@ -8,6 +8,7 @@ use util::extract_at_least_one_secret_key;
 use util::new_context;
 use util::fingerprint_of;
 use util::export_key_with_progress;
+use init::assure_empty_directory_exists;
 
 impl Vault {
     pub fn all_in_order(&self) -> Vec<&Vault> {
@@ -126,6 +127,7 @@ impl Vault {
             let mut fprs: Vec<_> = keys.iter()
                 .map(|k| fingerprint_of(k))
                 .collect::<Result<_, _>>()?;
+            assure_empty_directory_exists(&partition_secrets_dir).context("Cannot create secrets directory")?;
             partition.write_recipients_list(&mut fprs)?;
 
             if let Ok(gpg_keys_dir) = self.find_gpg_keys_dir() {

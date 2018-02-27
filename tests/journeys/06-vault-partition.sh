@@ -134,12 +134,12 @@ title "'vault partition add & remove'"
   )
 )
 
-title "vault partition remove failures"
+title "vault partition failures"
 (sandboxed
   (with "a single user"
     import_user "$fixture/tester.sec.asc"
     (with "an unnamed vault and the default secrets directory"
-      in-space two/vault
+      in-space one/vault
       "$exe" vault init --secrets-dir . >/dev/null
 
       (when "adding an unnamed partition"
@@ -175,6 +175,34 @@ title "vault partition remove failures"
           WITH_SNAPSHOT="$snapshot/partition-remove-by-index-failure-cannot-remove-leader" \
           expect_run $WITH_FAILURE "$exe" vault partition remove 0
         }
+      )
+    )
+
+    (with "an unnamed vault and the default secrets directory"
+      in-space two/vault
+      "$exe" vault init --secrets-dir secrets >/dev/null
+
+      (with "an existing non-empty directory at 'partition'"
+        mkdir partition
+        touch partition/some-data
+
+        (when "adding a partition to the same directory"
+          it "fails" && {
+            WITH_SNAPSHOT="$snapshot/partition-add-to-existing-non-empty-directory" \
+            expect_run $WITH_FAILURE "$exe" vault partition add partition
+          }
+        )
+      )
+
+      (with "an existing empty directory at 'partition2'"
+        mkdir partition2
+
+        (when "adding a partition to the same directory"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/partition-add-to-existing-empty-directory" \
+            expect_run $SUCCESSFULLY "$exe" vault partition add partition2
+          }
+        )
       )
     )
   )
