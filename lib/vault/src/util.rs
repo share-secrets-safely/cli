@@ -93,11 +93,11 @@ pub fn export_key_with_progress(
     buf: &mut Vec<u8>,
     output: &mut Write,
 ) -> Result<(String, PathBuf), Error> {
-    let (fingerprint, key_path) = export_key(ctx, &gpg_keys_dir, key, buf)?;
+    let (fingerprint, key_path) = export_key(ctx, gpg_keys_dir, key, buf)?;
     writeln!(
         output,
         "Exported public key for user {} to '{}'",
-        KeyDisplay(&key),
+        KeyDisplay(key),
         key_path.display()
     ).ok();
     Ok((fingerprint, key_path))
