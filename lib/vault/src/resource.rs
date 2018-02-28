@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::fs::{remove_file, File};
+use std::mem;
 
 use mktemp::Temp;
 use itertools::join;
@@ -154,16 +155,20 @@ impl Vault {
                 } else {
                     self.partition_by_spec(spec)?
                 };
-                let (secrets_dir, keys) = if lut[partition.index].is_some() {
-                    let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
-                    (secrets_dir, keys)
-                } else {
-                    lut[partition.index] = Some((
-                        partition.secrets_path(),
-                        partition.recipient_keys(&mut ctx)?,
-                    ));
-                    let &(ref secrets_dir, ref keys) = lut[partition.index].as_ref().unwrap();
-                    (secrets_dir, keys)
+                let (secrets_dir, keys) = match &mut lut[partition.index] {
+                    &mut Some((ref secrets_dir, ref keys)) => (secrets_dir, keys),
+                    none => {
+                        mem::replace(
+                            none,
+                            Some((
+                                partition.secrets_path(),
+                                partition.recipient_keys(&mut ctx)?,
+                            )),
+                        );
+                        let some = none;
+                        let &(ref secrets_dir, ref keys) = some.as_ref().expect("the content that was just put in");
+                        (secrets_dir, keys)
+                    }
                 };
                 let input = {
                     let mut buf = Vec::new();
