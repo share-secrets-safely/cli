@@ -101,7 +101,7 @@ vaults are displayed when showing them.
    * [x] partition add
    * [x] partition remove
    * [ ] multi-partition operations work correctly
-     * [ ] when adding and removing resources
+     * [ ] when adding and removing and showing resources
      * [ ] when adding and removing recipients
        * [ ] choose partition during `init`
        * [ ] '"' during add
