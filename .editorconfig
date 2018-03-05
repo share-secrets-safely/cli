@@ -1,0 +1,8 @@
+# 4 space indentation
+[*.sh]
+indent_style = space
+indent_size = 2
+
+[*.rs]
+indent_style = space
+indent_size = 4
