@@ -79,7 +79,7 @@ However, it's a fun read, and please feel free to make PRs for corrections.
 
 ## Roadmap to Future
 
-As you can see from the version numbers, this projet dispenses major version generously.
+As you can see from the version numbers, this project dispenses major version generously.
 This is mainly because, for the sake of simplicity, there is only a single version number
 for the *CLI* as well as all used libraries.
 
@@ -117,13 +117,32 @@ vaults are displayed when showing them.
    * even though our commands can keep things simple, users can create configuration
      which is ambiguous. We should reject such configurations when needed.
 
+### Roadmap to 3.1
+#### Substitution-Superpowers
+
+Make it easy to generate property-sets by merging structured files together, and
+make said context available to a `handlebars` powered engine to perform substitutions.
+
+This allows to bring together context owned by various entities into a single aggregated
+one, with the possibility for later contexts to override earlier ones.
+
+With this capability, it's also possible to substitute secrets into files, for example
+like this: `vault sub base.json sub/ours.yaml <(vault show secret.yaml) < deployment.yml | kubectl apply -f -`
+
+### Roadmap to 3.2
+#### Improved UX and basic Web of Trust controls
+
+ * [ ] Assure that the error messages provided when we can't find a partition are
+       better and specific to the use case.
+ * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
+  - this includes an option to turn it off (i.e. something like `--always-encrypt`)
+
 ### Roadmap to 4.0
 #### Web of Trust for everyone
 
 The web-of-trust is powerful if used correctly, and helps to assure you are encrypting
 only for trusted keys.
 
- * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
  * [ ] Suggestion engine to learn how to encrypt for everyone in partition(s) with the
        least amount of work. It will suggest 'ownertrust' to well-connected people
        and make available everyone they signed for.
