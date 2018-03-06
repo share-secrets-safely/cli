@@ -228,7 +228,7 @@ impl Vault {
         )
     }
 
-    pub fn list(&self, w: &mut Write) -> Result<(), Error> {
+    pub fn print_resources(&self, w: &mut Write) -> Result<(), Error> {
         for partition in once(self).chain(self.partitions.iter()) {
             writeln!(w, "{}", partition.url())?;
             let dir = partition.secrets_path();

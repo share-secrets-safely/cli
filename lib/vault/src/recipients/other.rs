@@ -5,6 +5,7 @@ use util::{FingerprintUserId, UserIdFingerprint};
 use util::new_context;
 use util::extract_at_least_one_secret_key;
 use util::export_key;
+use std::iter::once;
 
 impl Vault {
     pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
@@ -24,10 +25,19 @@ impl Vault {
         Ok(())
     }
 
-    pub fn list_recipients(&self, output: &mut Write) -> Result<(), Error> {
+    pub fn print_recipients(&self, output: &mut Write) -> Result<(), Error> {
         let mut ctx = new_context()?;
-        for key in self.recipient_keys(&mut ctx)? {
-            writeln!(output, "{}", FingerprintUserId(&key)).ok();
+        if self.partitions.is_empty() {
+            for key in self.recipient_keys(&mut ctx)? {
+                writeln!(output, "{}", FingerprintUserId(&key)).ok();
+            }
+        } else {
+            for partition in once(self).chain(self.partitions.iter()) {
+                writeln!(output, "{}", partition.url())?;
+                for key in partition.recipient_keys(&mut ctx)? {
+                    writeln!(output, "{}", FingerprintUserId(&key)).ok();
+                }
+            }
         }
         Ok(())
     }

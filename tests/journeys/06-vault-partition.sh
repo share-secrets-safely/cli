@@ -62,6 +62,13 @@ title "'vault partition add as non-owner"
               }
             )
 
+            (when "listing recipients"
+              it "fails as it cannot find the prime recipients in the current users keychain" && {
+                WITH_SNAPSHOT="$snapshot/partition-recipients-list-fail-missing-key" \
+                expect_run $WITH_FAILURE "$exe" vault recipients list
+              }
+            )
+
             (when "showing a resource using an unqualified path"
               it "fails as it cannot find the partition" && {
                 WITH_SNAPSHOT="$snapshot/partition-resource-show-unqualified-resource" \
@@ -98,6 +105,13 @@ title "'vault partition add as non-owner"
             )
           )
         )
+      )
+
+      (when "listing recipients (as primary user)"
+        it "fails as it cannot find the sub-partitions recipients key in the keychain" && {
+          WITH_SNAPSHOT="$snapshot/partition-recipients-list-fail-missing-key-as-prime-recipient" \
+          expect_run $WITH_FAILURE "$exe" vault recipients list
+        }
       )
     )
   )

@@ -1,0 +1,6 @@
+syv://secrets
+D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (Tester (for testing only) <tester@example.com>)
+syv://mine@private-partition
+error: Didn't find the key for 1 recipient(s) in the gpg database.
+The following recipient(s) could not be found in the gpg key database:
+7435ACDC03D55429C41637C4DB9831D842C18D28 (No GPG keys directory)

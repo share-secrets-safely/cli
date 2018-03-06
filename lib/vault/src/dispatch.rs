@@ -33,7 +33,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             signing_key_id.as_ref().map(String::as_str),
             output,
         ),
-        VaultCommand::RecipientsList => vault_from(&ctx)?.list_recipients(output),
+        VaultCommand::RecipientsList => vault_from(&ctx)?.print_recipients(output),
         VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
         VaultCommand::Init {
             ref name,
@@ -66,7 +66,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             ref editor,
             ref mode,
         } => vault_from(&ctx)?.edit(spec, editor, mode, try_encrypt, output),
-        VaultCommand::List => vault_from(&ctx)?.list(output),
+        VaultCommand::List => vault_from(&ctx)?.print_resources(output),
         VaultCommand::ResourceShow { ref spec } => vault_from(&ctx)?.decrypt(spec, output).map(|_| ()),
     }
 }

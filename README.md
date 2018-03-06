@@ -110,7 +110,7 @@ vaults are displayed when showing them.
  * [x] `vault --vault-id` is now `vault --select`
  * [x] Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.
  * [x] `vault init` is tuned to allow adding partitions later
- * [ ] Show recipients per partition
+ * [x] Show recipients per partition
  * [x] Strong validation of the vault configuration
    * even though our commands can keep things simple, users can create configuration
      which is ambiguous. We should reject such configurations when needed.
@@ -137,6 +137,7 @@ like this: `vault sub base.json sub/ours.yaml <(vault show secret.yaml) < deploy
    * [ ] resources
  * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
   - this includes an option to turn it off (i.e. something like `--always-encrypt`)
+ * [ ] Don't fail when listing recipients whose keys are not in the keychain
  * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
 
 ### Roadmap to 4.0

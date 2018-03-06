@@ -1,0 +1,4 @@
+syv://secrets
+error: Didn't find the key for 1 recipient(s) in the gpg database. This might mean it wasn't imported yet from the 'etc/keys' directory.
+The following recipient(s) could not be found in the gpg key database:
+D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (Import key-file using 'gpg --import 'etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332')
