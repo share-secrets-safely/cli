@@ -1,1 +1,1 @@
-error: Spec ':hello' could not be associated with any partition. Prefix it with the partition resource directory.
+error: Path 'hello' could not be associated with any partition. Prefix it with the partition resource directory.

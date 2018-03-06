@@ -66,11 +66,8 @@ impl Vault {
 
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
         let mut ctx = new_context()?;
-        let (partition, spec) = self.partition_by_owned_spec(VaultSpec {
-            src: SpecSourceType::Stdin,
-            dst: path.to_owned(),
-        })?;
-        let resolved_absolute_path = partition.secrets_path().join(spec.destination());
+        let (partition, path) = self.partition_by_owned_path(path.to_owned())?;
+        let resolved_absolute_path = partition.secrets_path().join(path);
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
             .map(|f| (f, resolved_gpg_path.to_owned()))
@@ -91,12 +88,12 @@ impl Vault {
 
     pub fn remove(&self, specs: &[PathBuf], output: &mut Write) -> Result<(), Error> {
         for path_to_remove in specs {
+            let (partition, path_to_remove) = self.partition_by_owned_path(path_to_remove.to_owned())?;
             let path = {
                 let spec = VaultSpec {
                     src: SpecSourceType::Stdin,
-                    dst: path_to_remove.clone(),
+                    dst: path_to_remove,
                 };
-                let (partition, spec) = self.partition_by_owned_spec(spec)?;
                 let gpg_path = spec.output_in(&partition.secrets_path(), Destination::ReolveAndAppendGpg)?;
                 if gpg_path.exists() {
                     gpg_path
@@ -122,31 +119,35 @@ impl Vault {
         Ok(encrypted_bytes)
     }
 
-    pub fn partition_by_owned_spec(&self, spec: VaultSpec) -> Result<(&Vault, VaultSpec), Error> {
+    pub fn partition_by_owned_path(&self, path: PathBuf) -> Result<(&Vault, PathBuf), Error> {
         if self.partitions.is_empty() {
-            Ok((self, spec))
+            Ok((self, path))
         } else {
             let partition = once(self)
                 .chain(&self.partitions)
-                .find(|p| spec.dst.starts_with(&p.secrets))
+                .find(|p| path.starts_with(&p.secrets))
                 .ok_or_else(|| {
-                    format_err!("Spec '{}' could not be associated with any partition. Prefix it with the partition resource directory.", spec)
+                    format_err!("Path '{}' could not be associated with any partition. Prefix it with the partition resource directory.", path.display())
                 })?;
             Ok((
                 partition,
-                VaultSpec {
-                    src: spec.src,
-                    dst: spec.dst
-                        .strip_prefix(&partition.secrets)
-                        .expect("success if 'starts_with' succeeds")
-                        .to_owned(),
-                },
+                path.strip_prefix(&partition.secrets)
+                    .expect("success if 'starts_with' succeeds")
+                    .to_owned(),
             ))
         }
     }
+
+    pub fn partition_by_owned_spec(&self, mut spec: VaultSpec) -> Result<(&Vault, VaultSpec), Error> {
+        let (partition, path) = self.partition_by_owned_path(spec.dst)?;
+        spec.dst = path;
+        Ok((partition, spec))
+    }
+
     pub fn partition_by_spec(&self, spec: &VaultSpec) -> Result<(&Vault, VaultSpec), Error> {
         self.partition_by_owned_spec(spec.clone())
     }
+    
     pub fn encrypt(
         &self,
         specs: &[VaultSpec],
