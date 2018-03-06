@@ -66,7 +66,11 @@ impl Vault {
 
     pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
         let mut ctx = new_context()?;
-        let resolved_absolute_path = self.secrets_path().join(path);
+        let (partition, spec) = self.partition_by_owned_spec(VaultSpec {
+            src: SpecSourceType::Stdin,
+            dst: path.to_owned(),
+        })?;
+        let resolved_absolute_path = partition.secrets_path().join(spec.destination());
         let resolved_gpg_path = gpg_output_filename(&resolved_absolute_path)?;
         let (mut input, path_for_decryption) = File::open(&resolved_gpg_path)
             .map(|f| (f, resolved_gpg_path.to_owned()))

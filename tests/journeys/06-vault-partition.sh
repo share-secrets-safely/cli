@@ -54,7 +54,27 @@ title "'vault partition add as non-owner"
             it "creates the gpg file at the right spot" && {
               expect_exists private-partition/hello.gpg
             }
-            # TODO: show resource
+
+            (when "showing a resource using an unqualified path"
+              it "fails as it cannot find the partition" && {
+                WITH_SNAPSHOT="$snapshot/partition-resource-show-unqualified-resource" \
+                expect_run $WITH_FAILURE "$exe" vault show hello
+              }
+            )
+
+            (when "showing a resource using a qualified path"
+              it "succeeds" && {
+                WITH_SNAPSHOT="$snapshot/partition-resource-show-qualified-path" \
+                expect_run $SUCCESSFULLY "$exe" vault show private-partition/hello
+              }
+            )
+
+            (when "showing a non-existing resource using an qualified path"
+              it "fails with an explanatory message" && {
+                WITH_SNAPSHOT="$snapshot/partition-resource-show-qualified-non-existing-resource" \
+                expect_run $WITH_FAILURE "$exe" vault show private-partition/non-existing
+              }
+            )
 
             (when "removing the resource with unqualified path"
               it "fails as it cannot find the partition" && {
