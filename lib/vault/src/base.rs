@@ -229,13 +229,19 @@ impl Vault {
     }
 
     pub fn list(&self, w: &mut Write) -> Result<(), Error> {
-        writeln!(w, "{}", self.url())?;
-        let _change_cwd = ResetCWD::new(&self.secrets_path())?;
-        for entry in glob(GPG_GLOB)
-            .expect("valid pattern")
-            .filter_map(Result::ok)
-        {
-            writeln!(w, "{}", strip_ext(&entry).display())?;
+        for partition in once(self).chain(self.partitions.iter()) {
+            writeln!(w, "{}", partition.url())?;
+            let dir = partition.secrets_path();
+            if !dir.is_dir() {
+                continue;
+            }
+            let _change_cwd = ResetCWD::new(&dir)?;
+            for entry in glob(GPG_GLOB)
+                .expect("valid pattern")
+                .filter_map(Result::ok)
+            {
+                writeln!(w, "{}", strip_ext(&entry).display())?;
+            }
         }
         Ok(())
     }

@@ -4,7 +4,7 @@ secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
-name: "private-partition"
+name: mine
 secrets: "private-partition"
 gpg_keys: ~
 recipients: "private-partition/recipients"

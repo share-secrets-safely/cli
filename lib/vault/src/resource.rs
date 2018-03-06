@@ -147,7 +147,7 @@ impl Vault {
     pub fn partition_by_spec(&self, spec: &VaultSpec) -> Result<(&Vault, VaultSpec), Error> {
         self.partition_by_owned_spec(spec.clone())
     }
-    
+
     pub fn encrypt(
         &self,
         specs: &[VaultSpec],

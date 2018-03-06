@@ -101,7 +101,7 @@ vaults are displayed when showing them.
    * [x] partition add
    * [x] partition remove
    * [ ] multi-partition operations work correctly
-     * [ ] when adding and removing and showing resources
+     * [x] when adding, removing, listing and showing resources
      * [ ] when adding and removing recipients
        * [ ] choose partition during `init`
        * [ ] '"' during add
@@ -110,9 +110,7 @@ vaults are displayed when showing them.
  * [x] `vault --vault-id` is now `vault --select`
  * [x] Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.
  * [x] `vault init` is tuned to allow adding partitions later
- * [ ] Show vault with all partitions as tree
  * [ ] Show recipients per partition
- * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
  * [x] Strong validation of the vault configuration
    * even though our commands can keep things simple, users can create configuration
      which is ambiguous. We should reject such configurations when needed.
@@ -134,8 +132,12 @@ like this: `vault sub base.json sub/ours.yaml <(vault show secret.yaml) < deploy
 
  * [ ] Assure that the error messages provided when we can't find a partition are
        better and specific to the use case.
+ * [ ] Tree mode for lists of
+   * [ ] recipients
+   * [ ] resources
  * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
   - this includes an option to turn it off (i.e. something like `--always-encrypt`)
+ * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
 
 ### Roadmap to 4.0
 #### Web of Trust for everyone

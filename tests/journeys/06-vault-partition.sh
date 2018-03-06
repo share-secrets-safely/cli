@@ -24,10 +24,10 @@ title "'vault partition add as non-owner"
 
       (with "another user with access to the vault, which is no recipient"
         as_user "$fixture/b.sec.asc"
-        (when "adding a new partition"
+        (when "adding a new named partition"
           it "succeeds" && {
             WITH_SNAPSHOT="$snapshot/partition-add-as-another-user-no-recipient" \
-            expect_run $SUCCESSFULLY "$exe" vault partition add private-partition
+            expect_run $SUCCESSFULLY "$exe" vault partition add --name mine private-partition
           }
 
           it "creates the expected folder structure" && {
@@ -55,6 +55,13 @@ title "'vault partition add as non-owner"
               expect_exists private-partition/hello.gpg
             }
 
+            (when "listing resources"
+              it "succeeds and shows all resources in all partitions" && {
+                WITH_SNAPSHOT="$snapshot/partition-resource-list" \
+                expect_run $SUCCESSFULLY "$exe" vault list
+              }
+            )
+
             (when "showing a resource using an unqualified path"
               it "fails as it cannot find the partition" && {
                 WITH_SNAPSHOT="$snapshot/partition-resource-show-unqualified-resource" \
@@ -62,7 +69,7 @@ title "'vault partition add as non-owner"
               }
             )
 
-            (when "showing a resource using a qualified path"
+            (when "showing a resource using a qualified path (by path)"
               it "succeeds" && {
                 WITH_SNAPSHOT="$snapshot/partition-resource-show-qualified-path" \
                 expect_run $SUCCESSFULLY "$exe" vault show private-partition/hello
