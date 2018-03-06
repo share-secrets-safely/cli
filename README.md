@@ -125,7 +125,7 @@ This allows to bring together context owned by various entities into a single ag
 one, with the possibility for later contexts to override earlier ones.
 
 With this capability, it's also possible to substitute secrets into files, for example
-like this: `vault sub base.json sub/ours.yaml <(vault show secret.yaml) < deployment.yml | kubectl apply -f -`
+like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deployment.yml | kubectl apply -f -`
 
 ### Roadmap to 3.2
 #### Improved UX and basic Web of Trust controls
