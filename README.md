@@ -131,37 +131,22 @@ like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deploy
 #### Improved UX and basic Web of Trust controls
 
  * [ ] Assure that the error messages provided when we can't find a partition are
-       better and specific to the use case.
+    better and specific to the use case.
  * [ ] Tree mode for lists of
    * [ ] recipients
    * [ ] resources
  * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
-  - this includes an option to turn it off (i.e. something like `--always-encrypt`)
+   * this includes an option to turn it off (i.e. something like `--always-encrypt`)
  * [ ] Don't fail when listing recipients whose keys are not in the keychain
  * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
 
 ### Roadmap to 4.0
-#### Web of Trust for everyone
-
-The web-of-trust is powerful if used correctly, and helps to assure you are encrypting
-only for trusted keys.
-
- * [ ] Suggestion engine to learn how to encrypt for everyone in partition(s) with the
-       least amount of work. It will suggest 'ownertrust' to well-connected people
-       and make available everyone they signed for.
- * [ ] suggest to import keys or do it for the user
- * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
- * [ ] possibly allow to disable ownertrust using 'always-trust'
-
-
-### Roadmap to 5.0
 
 #### Adding the `extract` subcommand
 
 The `extract` capability makes it feasilbe to store secrets in structured files
 like YAML or JSON, as it allows to extract pieces of data in various ways.
-That way, you can easily substitute secrets into configuration files using the
-well-known `{{handlebar}}` syntax.
+Think `jq` but with native support for YAML files.
 
 #### Sub-Commands as standalone programs
 
@@ -176,7 +161,7 @@ stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
 
-### Roadmap to 5.1
+### Roadmap to 4.1
 
 #### Add the `pass` subcommand
 
@@ -187,6 +172,19 @@ stand-in for pass.
 
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
+
+### Roadmap to 5.0
+#### Web of Trust for everyone
+
+The web-of-trust is powerful if used correctly, and helps to assure you are encrypting
+only for trusted keys.
+
+ * [ ] Suggestion engine to learn how to encrypt for everyone in partition(s) with the
+       least amount of work. It will suggest 'ownertrust' to well-connected people
+       and make available everyone they signed for.
+ * [ ] suggest to import keys or do it for the user
+ * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
+
 
 ## Development Practices
 
