@@ -270,6 +270,21 @@ where
                  left intact.\
                  However, the recipients key file will be removed from the vault.",
             )
+            .arg(
+                Arg::with_name("partition")
+                    .long("partition")
+                    .alias("from")
+                    .short("f")
+                    .required(false)
+                    .value_name("partition")
+                    .multiple(true)
+                    .takes_value(true)
+                    .help(
+                        "Identifies the partition to remove the recipient from. This can be done either using its name \
+                         or its secrets directory.\
+                         If unset, the recipient will be added to naturally selected vault, see the --select flag.",
+                    ),
+            )
             .arg(gpg_key_id.clone().required(true));
         let list_recipient = App::new("list")
             .alias("ls")

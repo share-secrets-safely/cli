@@ -78,6 +78,7 @@ pub enum VaultCommand {
     },
     RecipientsRemove {
         gpg_key_ids: Vec<String>,
+        partitions: Vec<String>,
     },
     RecipientsAdd {
         partitions: Vec<String>,

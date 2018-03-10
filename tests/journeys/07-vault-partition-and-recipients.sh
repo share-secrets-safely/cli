@@ -90,7 +90,63 @@ title "'vault partition add"
                 expect_run $WITH_FAILURE "$exe" vault show p1/one
               }
             )
+
+            (when "removing themselves from all partitions they are member of"
+              (with "not explicitly imported (missing) keys"
+                it "fails" && {
+                  WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-no-import" \
+                  expect_run $WITH_FAILURE "$exe" vault recipient remove a@example.com --from p3
+                }
+                it "does not alter the configuration" && {
+                  expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-no-import-directory" etc
+                }
+              )
+              (when "removing themselves from a partition they are not member of"
+                it "fails" && {
+                  WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p1-fail" \
+                  expect_run $WITH_FAILURE "$exe" vault recipient remove a@example.com --from p1
+                }
+                it "does not alter the configuration" && {
+                  expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p1-fail-directory" etc
+                }
+              )
+              (with "explicitly imported keys (TODO: UX issue)"
+                { import_user "$fixture/tester.sec.asc"
+                  gpg --sign-key --yes --batch tester@example.com
+                } &>/dev/null
+
+                (when "removing from a single partitition (p3)"
+                  it "succeeds" && {
+                    WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-with-import" \
+                    expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --from p3
+                  }
+                  it "writes the configuration correctly, but does not delete its key from the gpg-keys-dir as it's still used in another partition" && {
+                    expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-directory" etc
+                  }
+                )
+                (when "removing from the last remaining assigned partitition (p2)"
+                  it "succeeds" && {
+                    WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-with-import" \
+                    expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --partition second
+                  }
+
+                  it "writes the configuration correctly, and removes its key" && {
+                    expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-directory" etc
+                  }
+                )
+              )
+            )
           )
+        )
+
+        (when "removing themselves from the a partition so it is empty"
+          it "fails" && {
+            WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-remove-oneself-from-p3-fails" \
+            expect_run $WITH_FAILURE "$exe" vault recipient remove tester@example.com --from p3
+          }
+          it "did not alter the configuration as one cannot remove oneself if one is the last recipient" && {
+            expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-remove-oneself-from-p3-fails-directory" etc
+          }
         )
       )
     )

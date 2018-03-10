@@ -1,0 +1,1 @@
+error: Cannot remove user Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332) from 'etc/p3' as it would be empty afterwards.

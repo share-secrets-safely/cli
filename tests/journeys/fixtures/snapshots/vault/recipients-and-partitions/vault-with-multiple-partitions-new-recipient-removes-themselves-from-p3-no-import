@@ -1,0 +1,5 @@
+error: Didn't find the key for 1 recipient(s) in the gpg database.
+The following recipient(s) could not be found in the gpg key database:
+D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (No GPG keys directory)
+All recipients found in gpg database:
+1E1114E11B362B46B53E1ABAEF17047AB488BD82 (user a (a test account user a) <a@example.com>)

@@ -97,15 +97,15 @@ Partitions are just another vault with individual config, but operations on vaul
 aware of partitions. This allows sharing key-lists, for example, and alters the way
 vaults are displayed when showing them.
 
- * [ ] `multi-vault` aka *partitions*
+ * [x] `multi-vault` aka *partitions*
    * [x] partition add
    * [x] partition remove
-   * [ ] multi-partition operations work correctly
+   * [x] multi-partition operations work correctly
      * [x] when adding, removing, listing and showing resources
-     * [ ] when adding and removing recipients
-       * [ ] choose partition during `init`
-       * [ ] '"' during add
-       * [ ] '"' during remove
+     * [x] when adding and removing recipients
+       * [x] choose partition during `init`
+       * [x] '"' during add
+       * [x] '"' during remove
  * [x] `vault init` now takes the name explicitly
  * [x] `vault --vault-id` is now `vault --select`
  * [x] Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.

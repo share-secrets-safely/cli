@@ -29,7 +29,10 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             recipients_file.as_ref().map(|f| f.as_path()),
             output,
         ),
-        VaultCommand::RecipientsRemove { ref gpg_key_ids } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, output),
+        VaultCommand::RecipientsRemove {
+            ref partitions,
+            ref gpg_key_ids,
+        } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, partitions, output),
         VaultCommand::RecipientsAdd {
             ref partitions,
             ref gpg_key_ids,

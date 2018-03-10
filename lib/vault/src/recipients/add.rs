@@ -90,7 +90,7 @@ impl Vault {
         Ok(())
     }
 
-    fn partitions_by_name_or_path(&self, partitions: &[String]) -> Result<Vec<&Vault>, Error> {
+    pub fn partitions_by_name_or_path(&self, partitions: &[String]) -> Result<Vec<&Vault>, Error> {
         if partitions.is_empty() {
             Ok(vec![self])
         } else {
