@@ -3,6 +3,7 @@ extern crate clap;
 extern crate conv;
 #[macro_use]
 extern crate failure;
+extern crate gpgme;
 #[macro_use]
 extern crate lazy_static;
 extern crate sheesy_extract as extract;
@@ -10,6 +11,7 @@ extern crate sheesy_vault as vault;
 
 mod cli;
 mod parse;
+mod dispatch;
 
 use clap::ArgMatches;
 use failure::Error;
@@ -91,7 +93,7 @@ fn main() {
             };
             let sout = stdout();
             let mut lock = sout.lock();
-            add_vault_context(vault::dispatch::do_it(context, &mut lock))
+            add_vault_context(dispatch::do_it(context, &mut lock))
         }
         _ => usage_and_exit(&matches),
     };

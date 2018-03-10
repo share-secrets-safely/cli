@@ -4,10 +4,7 @@ use std::io::Write;
 use std::path::Path;
 use spec::WriteMode;
 use std::iter::once;
-use util::extract_at_least_one_secret_key;
-use util::new_context;
-use util::fingerprint_of;
-use util::export_key_with_progress;
+use util::{export_key_with_progress, extract_at_least_one_secret_key, fingerprint_of, new_context};
 use init::assure_empty_directory_exists;
 
 impl Vault {

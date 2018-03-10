@@ -1,11 +1,11 @@
-use base::{Vault, VaultExt};
+use vault::{Vault, VaultExt};
 use dispatch::VaultContext;
 use failure::Error;
 use std::io::Write;
 use gpgme;
-use error::first_cause_of_type;
-use spec::WriteMode;
-use spec::Destination;
+use vault::WriteMode;
+use vault::Destination;
+use vault::error::first_cause_of_type;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_selector)

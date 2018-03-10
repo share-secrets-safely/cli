@@ -1,7 +1,5 @@
 use std::path::PathBuf;
-use spec::VaultSpec;
-use spec::CreateMode;
-use spec::SigningMode;
+use vault::{CreateMode, SigningMode, VaultSpec};
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum VaultCommand {

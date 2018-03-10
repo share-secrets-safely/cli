@@ -1,6 +1,6 @@
 use conv::TryInto;
 use vault::CreateMode;
-use vault::dispatch::{VaultCommand, VaultContext};
+use dispatch::{VaultCommand, VaultContext};
 use clap::{App, ArgMatches, Shell};
 use failure::{err_msg, Error, ResultExt};
 use std::io::stdout;

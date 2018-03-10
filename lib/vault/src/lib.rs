@@ -20,7 +20,6 @@ extern crate yaml_rust;
 pub mod error;
 mod util;
 mod base;
-pub mod dispatch;
 mod recipients;
 mod spec;
 mod init;
@@ -28,5 +27,5 @@ mod resource;
 mod partitions;
 
 pub use spec::*;
-pub use base::Vault;
+pub use base::{Vault, VaultExt};
 pub use util::print_causes;

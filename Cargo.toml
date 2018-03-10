@@ -24,6 +24,7 @@ clap = "~2.31"
 failure = "~0.1.1"
 conv = "0.3.3"
 lazy_static = "1.0.0"
+gpgme = { version = "0.7.0" }
 
 [dependencies.sheesy-extract]
 path = "lib/extract"
