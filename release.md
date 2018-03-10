@@ -1,4 +1,24 @@
-## V2.0.0: Better user experience and documentation
+## V3.0: Better user experience and documentation
+
+Partitions are just another vault with individual config, but operations on vaults are
+aware of partitions. This allows sharing of keys for example, and alters the way
+vaults are displayed when showing them.
+
+### Features
+
+ * **add** partitions and **remove** them
+ * **initialize new vaults** with **partitions** in mind
+ * **show recipients** per **partition**
+
+### Improvements
+ * Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.
+ * Strong validation of the vault configuration to assure consistency
+
+### Breaking Changes
+
+ * `vault --vault-id` is now `vault --select`
+
+## V2.0: Better user experience and documentation
 
 Besides the many improvements, you will also find [a complete book][book] about
 the capabilities so far!
@@ -41,7 +61,7 @@ These improvements make handling paths consistent and less suprising.
 `s3` now officially is `sy` on the command-line, and spelled `sheesy`. Crates
 were renamed accordingly, too.
 
-## V1.0.0: The very first release!
+## V1.0: The very first release!
 
 This is the first usable version, providing only the minimal amount of features.
 A lot of the value contained is a fully automated system for quality assurance

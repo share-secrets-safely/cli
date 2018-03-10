@@ -90,31 +90,6 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 3.0
-#### Partition Support
-
-Partitions are just another vault with individual config, but operations on vaults are
-aware of partitions. This allows sharing key-lists, for example, and alters the way
-vaults are displayed when showing them.
-
- * [x] `multi-vault` aka *partitions*
-   * [x] partition add
-   * [x] partition remove
-   * [x] multi-partition operations work correctly
-     * [x] when adding, removing, listing and showing resources
-     * [x] when adding and removing recipients
-       * [x] choose partition during `init`
-       * [x] '"' during add
-       * [x] '"' during remove
- * [x] `vault init` now takes the name explicitly
- * [x] `vault --vault-id` is now `vault --select`
- * [x] Allow `sy vault` to operate anywhere with a `.gpg-id` file, like pass.
- * [x] `vault init` is tuned to allow adding partitions later
- * [x] Show recipients per partition
- * [x] Strong validation of the vault configuration
-   * even though our commands can keep things simple, users can create configuration
-     which is ambiguous. We should reject such configurations when needed.
-
 ### Roadmap to 3.1
 #### Substitution-Superpowers
 
