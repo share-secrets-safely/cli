@@ -291,6 +291,7 @@ where
             .about("List the vaults recipients as identified by the recipients file.");
         let recipients = App::new("recipients")
             .alias("recipient")
+            .setting(AppSettings::VersionlessSubcommands)
             .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
             .subcommand(add_recipient)
             .subcommand(remove_recipient)
@@ -338,6 +339,7 @@ where
             );
         let partitions = App::new("partitions")
             .alias("partition")
+            .setting(AppSettings::VersionlessSubcommands)
             .about(
                 "A partition is essentially another vault, as such it has its own recipients list, name, \
                  keys directory place to store resources.\
@@ -350,6 +352,7 @@ where
             .subcommand(remove_partition);
 
         let vault = App::new("vault")
+            .setting(AppSettings::VersionlessSubcommands)
             .about("a variety of vault interactions")
             .subcommand(init)
             .subcommand(add_resource)

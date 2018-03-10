@@ -14,7 +14,7 @@ SUCCESSFULLY=0
 fixture="$root/fixtures"
 snapshot="$fixture/snapshots/vault/recipients-and-partitions"
 
-title "'vault partition add"
+title "'vault partitions & recipients"
 (sandboxed
   (with "a first user"
     import_user "$fixture/tester.sec.asc"

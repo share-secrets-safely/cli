@@ -12,7 +12,7 @@ DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volu
 MUSL_DOCKER_ARGS=$(DOCKER_ARGS) $(MY_MUSL_IMAGE)
 HOST_DEPLOYABLE=$(shell echo sy-cli-$$(uname -s)-$$(uname -m).tar.gz)
 LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
-DOCKER_DOCS_ARGS_NO_CMD=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume -it $(DOCS_IMAGE)
+DOCKER_DOCS_ARGS_NO_CMD=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume $(DOCS_IMAGE)
 DOCKER_DOCS_ARGS=$(DOCKER_DOCS_ARGS_NO_CMD) termbook build ./doc
 CAST=getting-started.cast
 
@@ -49,7 +49,7 @@ docs: build-docs-image $(MUSL_EXE)
 	$(DOCKER_DOCS_ARGS)
 
 docs-no-deps:
-	$(DOCKER_DOCS_ARGS) '1.*'
+	$(DOCKER_DOCS_ARGS) '1.9.*'
 
 watch-docs: build-docs-image $(MUSL_EXE)
 	watchexec -w doc $(MAKE) docs-no-deps
@@ -81,16 +81,16 @@ $(LINUX_DEPLOYABLE): $(RELEASE_MUSL_EXE)
 	$(MUSL_DOCKER_ARGS) strip --strip-all $<
 	gpg --yes --output $<.gpg --detach-sig $<
 	tar czf $@ -C $(dir $<) $(notdir $<) $(notdir $<).gpg
-	
+
 deployable-linux: $(LINUX_DEPLOYABLE)
 
 $(HOST_DEPLOYABLE): $(RELEASE_EXE)
 	strip $<
 	gpg --yes --output $<.gpg --detach-sig $<
 	tar czf $@ -C $(dir $<) $(notdir $<) $(notdir $<).gpg
-	
+
 deployable-host: $(HOST_DEPLOYABLE)
-	
+
 update-homebrew: $(HOST_DEPLOYABLE) $(LINUX_DEPLOYABLE)
 	@set -ex; ./bin/update-homebrew-formula.sh $$(git tag | tail -1) ./pkg/brew/sheesy.rb.in ./pkg/brew/sheesy.rb
 

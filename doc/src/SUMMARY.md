@@ -16,3 +16,6 @@
     - [vault recipients add](./vault/recipients/add.md)
     - [vault recipients list](./vault/recipients/list.md)
     - [vault recipients remove](./vault/recipients/remove.md)
+  - [vault partitions](./vault/partitions/about.md)
+    - [vault partitions add](./vault/partitions/add.md)
+    - [vault partitions remove](./vault/partitions/remove.md)
