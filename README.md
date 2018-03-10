@@ -76,7 +76,6 @@ However, it's a fun read, and please feel free to make PRs for corrections.
  * GPG2 is required to use the 'sign-key' operation. The latter is required when
    trying to add new unverified recipients via `vault recipients add <fingerprint>`.
 
-
 ## Roadmap to Future
 
 As you can see from the version numbers, this project dispenses major version generously.
@@ -103,6 +102,23 @@ With this capability, it's also possible to substitute secrets into files, for e
 like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deployment.yml | kubectl apply -f -`
 
 ### Roadmap to 3.2
+
+#### Adding the `merge` subcommand
+
+The `merge` subcommand allows to combine json or yaml files.
+This is useful to partition context and data according to your needs, yet use
+all of the values in combination for substitution.
+This is particularly useful if some of that content was just decrypted from a vault.
+
+### Roadmap to 3.3
+
+#### Adding the `extract` subcommand
+
+The `extract` capability makes it feasible to store secrets in structured files
+like YAML or JSON, as it allows to extract pieces of data in various ways.
+Think `jq` but with native support for YAML files.
+
+### Roadmap to 3.4
 #### Improved UX and basic Web of Trust controls
 
  * [ ] Assure that the error messages provided when we can't find a partition are
@@ -116,12 +132,6 @@ like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deploy
  * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
 
 ### Roadmap to 4.0
-
-#### Adding the `extract` subcommand
-
-The `extract` capability makes it feasilbe to store secrets in structured files
-like YAML or JSON, as it allows to extract pieces of data in various ways.
-Think `jq` but with native support for YAML files.
 
 #### Sub-Commands as standalone programs
 
