@@ -6,7 +6,7 @@ use util::{strip_ext, write_at, FingerprintUserId, ResetCWD};
 use error::{IOMode, VaultError};
 use failure::{err_msg, Error, ResultExt};
 use glob::glob;
-use sheesy_types::WriteMode;
+use spec::WriteMode;
 use gpgme;
 use std::collections::HashSet;
 use std::iter::once;

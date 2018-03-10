@@ -7,6 +7,9 @@ use std::fmt;
 use itertools::{join, Itertools};
 use failure::{self, err_msg, Error, ResultExt};
 use gpgme;
+use std::ffi::OsStr;
+use std::process::Command;
+use std::process::Stdio;
 
 pub fn strip_ext(p: &Path) -> PathBuf {
     let mut p = p.to_owned();
@@ -189,5 +192,48 @@ impl ResetCWD {
 impl Drop for ResetCWD {
     fn drop(&mut self) {
         self.cwd.as_ref().map(set_current_dir).ok();
+    }
+}
+
+pub fn run_editor(editor: &OsStr, path_to_edit: &Path) -> Result<(), Error> {
+    let mut running_program = Command::new(editor)
+        .arg(path_to_edit)
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .context(format!(
+            "Failed to start editor program at '{}'.",
+            editor.to_string_lossy()
+        ))?;
+    let status = running_program
+        .wait()
+        .context("Failed to wait for editor to exit.")?;
+    if !status.success() {
+        return Err(format_err!(
+            "Editor '{}' failed. Edit aborted.",
+            editor.to_string_lossy()
+        ));
+    }
+    Ok(())
+}
+
+pub fn print_causes<E, W>(e: E, mut w: W)
+where
+    E: Into<Error>,
+    W: Write,
+{
+    let e = e.into();
+    let causes = e.causes().collect::<Vec<_>>();
+    let num_causes = causes.len();
+    for (index, cause) in causes.iter().enumerate() {
+        if index == 0 {
+            writeln!(w, "{}", cause).ok();
+            if num_causes > 1 {
+                writeln!(w, "Caused by: ").ok();
+            }
+        } else {
+            writeln!(w, " {}: {}", num_causes - index, cause).ok();
+        }
     }
 }

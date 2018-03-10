@@ -6,13 +6,11 @@ extern crate failure;
 #[macro_use]
 extern crate lazy_static;
 extern crate sheesy_extract as extract;
-extern crate sheesy_types;
 extern crate sheesy_vault as vault;
 
 mod cli;
 mod parse;
 
-use sheesy_types::print_causes;
 use clap::ArgMatches;
 use failure::Error;
 use std::io::{stderr, stdout, Write};
@@ -21,6 +19,7 @@ use std::convert::Into;
 use cli::CLI;
 use parse::*;
 use vault::error::{first_cause_of_type, DecryptionError};
+use vault::print_causes;
 
 fn add_vault_context<T>(r: Result<T, Error>) -> Result<T, Error> {
     r.map_err(|e| {
@@ -92,7 +91,7 @@ fn main() {
             };
             let sout = stdout();
             let mut lock = sout.lock();
-            add_vault_context(vault::do_it(context, &mut lock))
+            add_vault_context(vault::dispatch::do_it(context, &mut lock))
         }
         _ => usage_and_exit(&matches),
     };

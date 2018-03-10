@@ -8,11 +8,11 @@ use glob::glob;
 use util::{fingerprint_of, UserIdFingerprint};
 use gpgme::{self, Key};
 use itertools::Itertools;
-use sheesy_types::print_causes;
 use mktemp::Temp;
 use error::EncryptionError;
 use util::write_at;
 use util::strip_ext;
+use print_causes;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {

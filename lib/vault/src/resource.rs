@@ -9,10 +9,11 @@ use gpgme;
 use base::Vault;
 use failure::{Error, ResultExt};
 use error::FailExt;
-use sheesy_types::{gpg_output_filename, CreateMode, Destination, SpecSourceType, VaultSpec, WriteMode};
+use spec::{gpg_output_filename, SpecSourceType, VaultSpec};
+use spec::{CreateMode, Destination, WriteMode};
 use error::{DecryptionError, EncryptionError};
 use util::{new_context, strip_ext, write_at};
-use sheesy_types::run_editor;
+use util::run_editor;
 use std::iter::once;
 
 fn encrypt_buffer(ctx: &mut gpgme::Context, input: &[u8], keys: &[gpgme::Key]) -> Result<Vec<u8>, Error> {

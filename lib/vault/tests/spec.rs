@@ -1,7 +1,7 @@
 extern crate conv;
-extern crate sheesy_types;
+extern crate sheesy_vault;
 
-use sheesy_types::*;
+use sheesy_vault::{SpecSourceType, VaultSpec, VaultSpecError};
 
 use conv::TryFrom;
 use std::path::PathBuf;

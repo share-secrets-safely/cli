@@ -5,7 +5,7 @@ use std::fs::create_dir_all;
 use base::Vault;
 use util::new_context;
 use util::extract_at_least_one_secret_key;
-use sheesy_types::WriteMode;
+use spec::WriteMode;
 use std::io::Write;
 use util::export_key_with_progress;
 

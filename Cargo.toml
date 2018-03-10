@@ -25,10 +25,6 @@ failure = "~0.1.1"
 conv = "0.3.3"
 lazy_static = "1.0.0"
 
-[dependencies.sheesy-types]
-path = "lib/types"
-version = "3.0.0"
-
 [dependencies.sheesy-extract]
 path = "lib/extract"
 version = "3.0.0"

@@ -2,7 +2,7 @@ use failure::{err_msg, Error, ResultExt};
 use std::io::Write;
 use base::Vault;
 use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
-use sheesy_types::SigningMode;
+use spec::SigningMode;
 use std::iter::once;
 
 impl Vault {

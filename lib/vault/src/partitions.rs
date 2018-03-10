@@ -2,7 +2,7 @@ use base::{Vault, VaultKind};
 use failure::{err_msg, Error, ResultExt};
 use std::io::Write;
 use std::path::Path;
-use sheesy_types::WriteMode;
+use spec::WriteMode;
 use std::iter::once;
 use util::extract_at_least_one_secret_key;
 use util::new_context;

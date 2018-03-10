@@ -11,8 +11,7 @@ use std::path::{Path, PathBuf};
 use std::path::Component;
 use std::env;
 use std::ffi::OsString;
-use super::{Destination, WriteMode};
-use base::run_editor;
+use util::run_editor;
 
 lazy_static!{
     static ref EDITOR: PathBuf = PathBuf::from(env::var_os("EDITOR").unwrap_or_else(||OsString::from("vim")));
@@ -263,5 +262,38 @@ mod tests_gpg_output_filename {
             gpg_output_filename(Path::new("a/file.ext")).unwrap(),
             PathBuf::from("a/file.ext.gpg")
         )
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum Destination {
+    ReolveAndAppendGpg,
+    Unchanged,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum WriteMode {
+    AllowOverwrite,
+    RefuseOverwrite,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum SigningMode {
+    None,
+    Public,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum CreateMode {
+    Create,
+    NoCreate,
+}
+
+impl WriteMode {
+    pub fn refuse_overwrite(self) -> bool {
+        match self {
+            WriteMode::AllowOverwrite => false,
+            WriteMode::RefuseOverwrite => true,
+        }
     }
 }

@@ -14,7 +14,7 @@ done
 git commit -am "bumping version to $version"
 git tag -s -F "${notes_path}" "$version"
 
-for lib in lib/types lib/extract lib/vault .; do
+for lib in lib/extract lib/vault .; do
   (
     cd $lib
     cargo publish

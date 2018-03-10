@@ -1,23 +1,21 @@
-extern crate sheesy_types;
-
 use base::{Vault, VaultExt};
-use sheesy_types::VaultContext;
+use dispatch::VaultContext;
 use failure::Error;
-use sheesy_types::WriteMode;
-use sheesy_types::Destination;
 use std::io::Write;
 use gpgme;
 use error::first_cause_of_type;
+use spec::WriteMode;
+use spec::Destination;
 
 fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_selector)
 }
 
 fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
-    use sheesy_types::VaultCommand;
+    use dispatch::VaultCommand::*;
     match ctx.command {
-        VaultCommand::PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
-        VaultCommand::PartitionsAdd {
+        PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
+        PartitionsAdd {
             ref recipients_file,
             ref path,
             ref name,
@@ -29,11 +27,11 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             recipients_file.as_ref().map(|f| f.as_path()),
             output,
         ),
-        VaultCommand::RecipientsRemove {
+        RecipientsRemove {
             ref partitions,
             ref gpg_key_ids,
         } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, partitions, output),
-        VaultCommand::RecipientsAdd {
+        RecipientsAdd {
             ref partitions,
             ref gpg_key_ids,
             ref sign,
@@ -45,9 +43,9 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             partitions,
             output,
         ),
-        VaultCommand::RecipientsList => vault_from(&ctx)?.print_recipients(output),
-        VaultCommand::RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
-        VaultCommand::Init {
+        RecipientsList => vault_from(&ctx)?.print_recipients(output),
+        RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
+        Init {
             ref name,
             ref gpg_key_ids,
             ref gpg_keys_dir,
@@ -65,21 +63,21 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             )?;
             Ok(())
         }
-        VaultCommand::ResourceRemove { ref specs } => vault_from(&ctx)?.remove(specs, output),
-        VaultCommand::ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(
+        ResourceRemove { ref specs } => vault_from(&ctx)?.remove(specs, output),
+        ResourceAdd { ref specs } => vault_from(&ctx)?.encrypt(
             specs,
             WriteMode::RefuseOverwrite,
             Destination::ReolveAndAppendGpg,
             output,
         ),
-        VaultCommand::ResourceEdit {
+        ResourceEdit {
             ref spec,
             try_encrypt,
             ref editor,
             ref mode,
         } => vault_from(&ctx)?.edit(spec, editor, mode, try_encrypt, output),
-        VaultCommand::List => vault_from(&ctx)?.print_resources(output),
-        VaultCommand::ResourceShow { ref spec } => vault_from(&ctx)?.decrypt(spec, output).map(|_| ()),
+        List => vault_from(&ctx)?.print_resources(output),
+        ResourceShow { ref spec } => vault_from(&ctx)?.decrypt(spec, output).map(|_| ()),
     }
 }
 

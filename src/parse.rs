@@ -1,7 +1,6 @@
-extern crate sheesy_types;
-
 use conv::TryInto;
-use sheesy_types::{CreateMode, VaultCommand, VaultContext};
+use vault::CreateMode;
+use vault::dispatch::{VaultCommand, VaultContext};
 use clap::{App, ArgMatches, Shell};
 use failure::{err_msg, Error, ResultExt};
 use std::io::stdout;
@@ -10,7 +9,7 @@ use std::str::FromStr;
 use std::convert::Into;
 use std::ffi::OsStr;
 use cli::CLI;
-use sheesy_types::SigningMode;
+use vault::SigningMode;
 use std::path::PathBuf;
 
 fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
