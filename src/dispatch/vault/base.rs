@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use vault::{CreateMode, SigningMode, VaultSpec};
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub enum VaultCommand {
+pub enum Command {
     ResourceEdit {
         editor: PathBuf,
         try_encrypt: bool,
@@ -52,8 +52,8 @@ pub enum VaultCommand {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct VaultContext {
+pub struct Context {
     pub vault_path: PathBuf,
     pub vault_selector: String,
-    pub command: VaultCommand,
+    pub command: Command,
 }

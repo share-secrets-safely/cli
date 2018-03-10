@@ -1,0 +1,17 @@
+[package]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+name = "sheesy-substitute"
+version = "3.0.0"
+
+description = "A simple substitution engine to aid putting secret values into data files."
+license = "MIT"
+repository = "https://github.com/Byron/share-secrets-safely"
+homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/substitute"
+documentation = "https://docs.rs/sheesy-substitute"
+
+[badges]
+travis-ci = { repository = "Byron/share-secrets-safely" }
+
+[dependencies]
+failure = "0.1.1"
+conv = "0.3.3"

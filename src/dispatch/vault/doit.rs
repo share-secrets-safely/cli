@@ -1,5 +1,5 @@
 use vault::{Vault, VaultExt};
-use dispatch::VaultContext;
+use dispatch::vault::Context;
 use failure::Error;
 use std::io::Write;
 use gpgme;
@@ -7,12 +7,12 @@ use vault::WriteMode;
 use vault::Destination;
 use vault::error::first_cause_of_type;
 
-fn vault_from(ctx: &VaultContext) -> Result<Vault, Error> {
+fn vault_from(ctx: &Context) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_selector)
 }
 
-fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
-    use dispatch::VaultCommand::*;
+fn inner_do_it(ctx: Context, output: &mut Write) -> Result<(), Error> {
+    use dispatch::vault::Command::*;
     match ctx.command {
         PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
         PartitionsAdd {
@@ -83,7 +83,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
-pub fn do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
+pub fn do_it(ctx: Context, output: &mut Write) -> Result<(), Error> {
     inner_do_it(ctx, output).map_err(|failure| {
         let gpg_error_code = match first_cause_of_type::<gpgme::Error>(&failure) {
             Some(gpg_err) => Some(gpg_err.code()),

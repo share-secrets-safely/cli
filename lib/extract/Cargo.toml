@@ -2,6 +2,7 @@
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "sheesy-extract"
 version = "3.0.0"
+publish = false
 
 description = "Extraction functions used by 'share-secrets-safely' CLI. Use it to extract data from YAML files."
 license = "MIT"

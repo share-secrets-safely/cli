@@ -26,8 +26,8 @@ conv = "0.3.3"
 lazy_static = "1.0.0"
 gpgme = { version = "0.7.0" }
 
-[dependencies.sheesy-extract]
-path = "lib/extract"
+[dependencies.sheesy-substitute]
+path = "lib/substitute"
 version = "3.0.0"
 
 [dependencies.sheesy-vault]

@@ -292,11 +292,12 @@ where
         let recipients = App::new("recipients")
             .alias("recipient")
             .setting(AppSettings::VersionlessSubcommands)
+            .setting(AppSettings::DeriveDisplayOrder)
             .about("Interact with recipients of a vault. They can encrypt and decrypt its contents.")
+            .subcommand(init_recipient)
             .subcommand(add_recipient)
-            .subcommand(remove_recipient)
             .subcommand(list_recipient)
-            .subcommand(init_recipient);
+            .subcommand(remove_recipient);
         let add_partition = App::new("add")
             .alias("insert")
             .about("Adds a partition to the vault.")
@@ -340,6 +341,7 @@ where
         let partitions = App::new("partitions")
             .alias("partition")
             .setting(AppSettings::VersionlessSubcommands)
+            .setting(AppSettings::DeriveDisplayOrder)
             .about(
                 "A partition is essentially another vault, as such it has its own recipients list, name, \
                  keys directory place to store resources.\
@@ -351,16 +353,48 @@ where
             .subcommand(add_partition)
             .subcommand(remove_partition);
 
+        let substitute = App::new("substitute")
+            .alias("sub")
+            .about("Substitutes templates using structured data.")
+            .arg(
+                Arg::with_name("data")
+                    .required(false)
+                    .multiple(false)
+                    .takes_value(true)
+                    .long("data")
+                    .short("d")
+                    .value_name("data")
+                    .help(
+                        "Structured data in YAML or JSON format to use when instantiating/substituting the template.",
+                    ),
+            )
+            .arg(
+                Arg::with_name("spec")
+                    .required(false)
+                    .multiple(true)
+                    .takes_value(true)
+                    .value_name("template-spec")
+                    .help(
+                        "Identifies the how to map template files to output.\
+                         The syntax is '<src>:<dst>'.\
+                         <src> and <dst> are a relative or absolute paths to the source templates or \
+                         destination files respectively.\
+                         If <src> is unspecified, the template will be read from stdin, e.g. ':output'.\
+                         If <dst> is unspecified, the substituted template will be output to stdout, e.g 'input.hbs:' \
+                         or 'input.hbs'.",
+                    ),
+            );
         let vault = App::new("vault")
             .setting(AppSettings::VersionlessSubcommands)
+            .setting(AppSettings::DeriveDisplayOrder)
             .about("a variety of vault interactions")
             .subcommand(init)
             .subcommand(add_resource)
+            .subcommand(edit_resource)
+            .subcommand(show_resource)
+            .subcommand(list)
             .subcommand(remove_resource)
             .subcommand(recipients)
-            .subcommand(show_resource)
-            .subcommand(edit_resource)
-            .subcommand(list)
             .subcommand(partitions)
             .arg(
                 Arg::with_name("vault-selector")
@@ -395,10 +429,12 @@ where
             });
         let app: App = app_from_crate!()
             .setting(AppSettings::VersionlessSubcommands)
+            .setting(AppSettings::DeriveDisplayOrder)
             .name(CLI::name())
             .after_help("Read more on https://byron.github.io/share-secrets-safely")
             .version(include_str!("../VERSION"))
             .subcommand(vault)
+            .subcommand(substitute)
             .subcommand(completions);
 
         Self { app }
