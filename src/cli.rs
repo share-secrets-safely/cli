@@ -48,6 +48,19 @@ where
         fn optional_gpg_key_id<'a, 'b>(arg: Arg<'a, 'b>) -> Arg<'a, 'b> {
             arg.long("gpg-key-id").short("i")
         }
+        let recipients_file_arg = Arg::with_name("recipients-file-path")
+            .long("recipients-file")
+            .short("r")
+            .required(false)
+            .takes_value(true)
+            .value_name("path")
+            .help(
+                "The path to the file to hold the fingerprints of all recipients. \
+                 \
+                 If set to just the file name, like 'recipients', it will be interpreted as \
+                 relative to the --secrets-dir. If a path is given, like './recipients', it \
+                 is used as is.",
+            );
         let init = App::new("init")
             .about(
                 "Initialize the vault in the current directory. \
@@ -92,22 +105,7 @@ where
                     .value_name("path")
                     .help("The directory which stores the vaults secrets."),
             )
-            .arg(
-                Arg::with_name("recipients-file-path")
-                    .long("recipients-file")
-                    .default_value(".gpg-id")
-                    .short("r")
-                    .required(false)
-                    .takes_value(true)
-                    .value_name("path")
-                    .help(
-                        "The path to the file to hold the fingerprints of all recipients. \
-                         \
-                         If set to just the file name, like 'recipients', it will be interpreted as \
-                         relative to the --secrets-dir. If a path is given, like './recipients', it \
-                         is used as is.",
-                    ),
-            )
+            .arg(recipients_file_arg.clone().default_value(".gpg-id"))
             .arg(
                 Arg::with_name("gpg-keys-dir")
                     .long("gpg-keys-dir")
@@ -212,6 +210,21 @@ where
         let add_recipient = App::new("add")
             .alias("insert")
             .arg(
+                Arg::with_name("partition")
+                    .long("partition")
+                    .alias("to")
+                    .short("p")
+                    .required(false)
+                    .value_name("partition")
+                    .multiple(true)
+                    .takes_value(true)
+                    .help(
+                        "Identifies the partition to add the recipient to. This can be done either using its name \
+                         or its secrets directory.\
+                         If unset, the recipient will be added to naturally selected vault, see the --select flag.",
+                    ),
+            )
+            .arg(
                 Arg::with_name("signing-key")
                     .long("signing-key")
                     .takes_value(true)
@@ -278,10 +291,11 @@ where
                     .required(false)
                     .takes_value(true)
                     .help(
-                        "The name of the partitions vault to use. If unset, it will default to the basename name of \
+                        "The name of the partitions vault to use. If unset, it will default to the basename of \
                          the partitions resources directory.",
                     ),
             )
+            .arg(recipients_file_arg)
             .arg(optional_gpg_key_id(gpg_key_id).long_help(
                 "The fingerprint or user ids of the members of the partition.\
                  \

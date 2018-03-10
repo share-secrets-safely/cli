@@ -1,0 +1,98 @@
+#!/bin/bash
+
+set -eu
+exe=${1:?First argument is the executable under test}
+
+root="$(cd "${0%/*}" && pwd)"
+exe="$root/../../$exe"
+# shellcheck source=./tests/gpg-helpers.sh
+source "$root/../gpg-helpers.sh"
+
+WITH_FAILURE=1
+SUCCESSFULLY=0
+
+fixture="$root/fixtures"
+snapshot="$fixture/snapshots/vault/recipients-and-partitions"
+
+title "'vault partition add"
+(sandboxed
+  (with "a first user"
+    import_user "$fixture/tester.sec.asc"
+
+    (with "a vault ready for partitions and a resource"
+      { "$exe" vault init --secrets-dir p1 \
+                          --gpg-keys-dir etc/keys \
+                          --recipients-file etc/p1
+        echo 1 | "$exe" vault add :one
+      } &>/dev/bull
+
+      (with "a two more partitions"
+        { "$exe" vault partition add --recipients-file etc/p2 --name second p2
+          "$exe" vault partition add --recipients-file etc/p3 --name third p3
+          echo 2 | "$exe" vault add :p2/two
+          echo 3 | "$exe" vault add :p3/three
+        } &>/dev/null
+
+        precondition "the vault structure is what we expect" && {
+          expect_snapshot "$snapshot/precondition-vault-with-multiple-partitions" etc
+        }
+
+        (when "impersonating another user"
+          as_user "$fixture/a.sec.asc"
+
+          (when "adding the other user as recipient choosing the partition explicitly"
+            it "succeeds, even though it's the same outcome as when the partition was not chosen" && {
+              WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-recipient-init" \
+              expect_run $SUCCESSFULLY "$exe" vault --select p2 recipients init
+            }
+
+            it "adds the public key to the gpg-keys directory" && {
+              expect_snapshot "$snapshot/vault-with-multiple-partitions-after-recipient-init" etc
+            }
+          )
+        )
+
+        (when "adding the new (trusted) user a partition does not exist"
+          it "fails" && {
+            WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-recipient-add-to-unknown" \
+            expect_run $WITH_FAILURE "$exe" vault recipients add a@example.com --to unknown
+          }
+        )
+
+        (when "adding the new (trusted) user to both partitions by path and by name respectively"
+          it "succeeds" && {
+            WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-recipient-add-to-multiple" \
+            expect_run $SUCCESSFULLY "$exe" vault recipients add B488BD82 --to p2 --partition third
+          }
+
+          it "creates the correct configuration" && {
+            expect_snapshot "$snapshot/vault-with-multiple-partitions-after-recipient-add" etc
+          }
+
+          (when "impersonating the newly added user"
+            as_user "$fixture/a.sec.asc"
+
+            (when "showing the resource in partition p2"
+              it "succeeds" && {
+                WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-show-resource-in-p2" \
+                expect_run $SUCCESSFULLY "$exe" vault show p2/two
+              }
+            )
+            (when "showing the resource in partition p3"
+              it "succeeds" && {
+                WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-show-resource-in-p3" \
+                expect_run $SUCCESSFULLY "$exe" vault show p3/three
+              }
+            )
+            (when "showing the resource in partition p1 (which is not encrypted for this user)"
+              it "fails" && {
+                WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-show-resource-in-p1" \
+                expect_run $WITH_FAILURE "$exe" vault show p1/one
+              }
+            )
+          )
+        )
+      )
+    )
+  )
+)

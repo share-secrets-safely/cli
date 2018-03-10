@@ -13,8 +13,7 @@ use util::FingerprintUserId;
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]
 pub struct DecryptionError {
-    #[cause]
-    pub cause: gpgme::Error,
+    #[cause] pub cause: gpgme::Error,
 }
 
 impl DecryptionError {
@@ -94,23 +93,19 @@ pub enum VaultError {
     Validation(failure::Error),
     PartitionUnsupported,
     ReadFile {
-        #[cause]
-        cause: io::Error,
+        #[cause] cause: io::Error,
         path: PathBuf,
     },
     WriteFile {
-        #[cause]
-        cause: io::Error,
+        #[cause] cause: io::Error,
         path: PathBuf,
     },
     Deserialization {
-        #[cause]
-        cause: serde_yaml::Error,
+        #[cause] cause: serde_yaml::Error,
         path: PathBuf,
     },
     Serialization {
-        #[cause]
-        cause: serde_yaml::Error,
+        #[cause] cause: serde_yaml::Error,
         path: PathBuf,
     },
 }

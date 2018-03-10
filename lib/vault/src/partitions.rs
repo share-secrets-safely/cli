@@ -27,7 +27,10 @@ impl Vault {
         ).map_err(Into::into)
     }
 
-    pub fn partition_index(selector: &str, partitions: &[Vault], leader_index: Option<usize>) -> Result<usize, Error> {
+    pub fn partition_index<'a, I>(selector: &str, partitions: I, leader_index: Option<usize>) -> Result<usize, Error>
+    where
+        I: IntoIterator<Item = &'a Vault>,
+    {
         let index: Result<usize, _> = selector.parse();
         Ok(match index {
             Ok(index) => {
@@ -40,14 +43,14 @@ impl Vault {
                     }
                 };
                 partitions
-                    .iter()
+                    .into_iter()
                     .find(|v| v.index == index)
                     .map(|v| v.index)
                     .ok_or_else(|| format_err!("Could not find partition with index {}", index))?
             }
             Err(_) => {
                 let selector_as_path = Path::new(selector);
-                let mut matches = partitions.iter().filter_map(|v| {
+                let mut matches = partitions.into_iter().filter_map(|v| {
                     if v.secrets.as_path() == selector_as_path {
                         Some(v.index)
                     } else {
@@ -83,6 +86,7 @@ impl Vault {
         path: &Path,
         name: Option<&str>,
         gpg_key_ids: &[String],
+        recipients_file: Option<&Path>,
         output: &mut Write,
     ) -> Result<(), Error> {
         let secrets_dir = self.secrets.parent().ok_or_else(|| {
@@ -92,12 +96,15 @@ impl Vault {
             )
         })?;
         let partition_secrets_dir = secrets_dir.join(path);
-        let recipients_file = partition_secrets_dir.join(self.recipients.file_name().ok_or_else(|| {
-            format_err!(
-                "Expected vault to have a recipients file ('{}') from which a filename can be obtained",
-                self.recipients.display()
-            )
-        })?);
+        let recipients_file = match recipients_file {
+            Some(p) => p.to_owned(),
+            None => partition_secrets_dir.join(self.recipients.file_name().ok_or_else(|| {
+                format_err!(
+                    "Expected vault to have a recipients file ('{}') from which a filename can be obtained",
+                    self.recipients.display()
+                )
+            })?),
+        };
         let max_index = self.partitions
             .iter()
             .map(|v| v.index)

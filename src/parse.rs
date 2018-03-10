@@ -87,8 +87,10 @@ pub fn vault_recipients_remove(ctx: VaultContext, args: &ArgMatches) -> Result<V
 }
 
 pub fn vault_partitions_add(ctx: VaultContext, args: &ArgMatches) -> Result<VaultContext, Error> {
+    let recipients_file: Option<PathBuf> = args.value_of_os("recipients-file-path").map(Into::into);
     Ok(VaultContext {
         command: VaultCommand::PartitionsAdd {
+            recipients_file,
             gpg_key_ids: optional_args(args, "gpg-key-id"),
             path: required_os_arg(args, "partition-path")?,
             name: args.value_of("name").map(ToOwned::to_owned),
@@ -114,6 +116,7 @@ pub fn vault_recipients_add(ctx: VaultContext, args: &ArgMatches) -> Result<Vaul
             } else {
                 SigningMode::Public
             },
+            partitions: optional_args(args, "partition"),
             signing_key_id: args.value_of("signing-key").map(ToOwned::to_owned),
             gpg_key_ids: args.values_of("gpg-key-id")
                 .expect("Clap to assure this is a required arg")

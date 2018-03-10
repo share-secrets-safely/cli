@@ -80,6 +80,7 @@ pub enum VaultCommand {
         gpg_key_ids: Vec<String>,
     },
     RecipientsAdd {
+        partitions: Vec<String>,
         gpg_key_ids: Vec<String>,
         signing_key_id: Option<String>,
         sign: SigningMode,
@@ -88,6 +89,7 @@ pub enum VaultCommand {
         selector: String,
     },
     PartitionsAdd {
+        recipients_file: Option<PathBuf>,
         gpg_key_ids: Vec<String>,
         name: Option<String>,
         path: PathBuf,

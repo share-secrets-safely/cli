@@ -19,7 +19,7 @@ name = "sy"
 path = "src/main.rs"
 
 [dependencies]
-clap = "~2.29.0"
+clap = "~2.31"
 failure = "~0.1.1"
 conv = "0.3.3"
 lazy_static = "1.0.0"

@@ -18,12 +18,20 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
     match ctx.command {
         VaultCommand::PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
         VaultCommand::PartitionsAdd {
+            ref recipients_file,
             ref path,
             ref name,
             ref gpg_key_ids,
-        } => vault_from(&ctx)?.add_partition(path, name.as_ref().map(|s| s.as_str()), gpg_key_ids, output),
+        } => vault_from(&ctx)?.add_partition(
+            path,
+            name.as_ref().map(|s| s.as_str()),
+            gpg_key_ids,
+            recipients_file.as_ref().map(|f| f.as_path()),
+            output,
+        ),
         VaultCommand::RecipientsRemove { ref gpg_key_ids } => vault_from(&ctx)?.remove_recipients(gpg_key_ids, output),
         VaultCommand::RecipientsAdd {
+            ref partitions,
             ref gpg_key_ids,
             ref sign,
             ref signing_key_id,
@@ -31,6 +39,7 @@ fn inner_do_it(ctx: VaultContext, output: &mut Write) -> Result<(), Error> {
             gpg_key_ids,
             *sign,
             signing_key_id.as_ref().map(String::as_str),
+            partitions,
             output,
         ),
         VaultCommand::RecipientsList => vault_from(&ctx)?.print_recipients(output),
