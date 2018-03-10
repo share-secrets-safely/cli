@@ -10,6 +10,7 @@ homepage = "https://github.com/Byron/share-secrets-safely"
 documentation = "https://byron.github.io/share-secrets-safely"
 keywords = ["gnupg", "pgp", "crypto"]
 readme = "README.md"
+exclude = ["HomebrewFormula", "tests/**", "pkg/**", "lib/**", "etc/**", "doc/**", "bin/**"]
 
 [badges]
 travis-ci = { repository = "Byron/share-secrets-safely" }
