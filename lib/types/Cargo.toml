@@ -1,6 +1,6 @@
 [package]
 name = "sheesy-types"
-version = "2.0.0"
+version = "3.0.0"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "Types used by 'share-secrets-safely' crates."
 license = "MIT"
