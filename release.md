@@ -1,4 +1,4 @@
-## V3.0: Better user experience and documentation
+## V3.0: Support for Partitions
 
 Partitions are just another vault with individual config, but operations on vaults are
 aware of partitions. This allows sharing of keys for example, and alters the way
