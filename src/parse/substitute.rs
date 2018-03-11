@@ -1,6 +1,6 @@
 use failure::Error;
 use clap::ArgMatches;
-use substitute::{Spec, StreamOrPath};
+use tools::substitute::{Spec, StreamOrPath};
 
 use super::util::required_os_arg;
 use std::ffi::OsString;

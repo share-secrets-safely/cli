@@ -6,7 +6,7 @@ extern crate failure;
 extern crate gpgme;
 #[macro_use]
 extern crate lazy_static;
-extern crate sheesy_substitute as substitute;
+extern crate sheesy_tools as tools;
 extern crate sheesy_vault as vault;
 
 mod cli;
@@ -14,7 +14,7 @@ mod parse;
 mod dispatch;
 
 use clap::ArgMatches;
-use substitute::substitute;
+use tools::substitute::substitute;
 use failure::Error;
 use std::io::{stderr, stdout, Write};
 use std::process;

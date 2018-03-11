@@ -1,7 +1,7 @@
-extern crate sheesy_substitute;
+extern crate sheesy_tools;
 
-use sheesy_substitute::Spec;
-use sheesy_substitute::StreamOrPath::*;
+use sheesy_tools::substitute::Spec;
+use sheesy_tools::substitute::StreamOrPath::*;
 use std::path::PathBuf;
 
 #[cfg(test)]

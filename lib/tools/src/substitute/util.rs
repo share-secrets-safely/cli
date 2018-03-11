@@ -1,0 +1,60 @@
+use failure::{Error, Fail, ResultExt};
+use json;
+use yaml;
+
+use std::io::Read;
+
+pub use super::spec::*;
+use std::io::Cursor;
+
+pub fn validate(data: &StreamOrPath, specs: &[Spec]) -> Result<(), Error> {
+    if specs.is_empty() {
+        bail!("No spec provided, neither from standard input, nor from file")
+    }
+    let count_of_specs_needing_stdin = specs.iter().filter(|s| s.src.is_stream()).count();
+    if count_of_specs_needing_stdin > 1 {
+        bail!("Cannot read more than one template spec from standard input")
+    }
+    if data.is_stream() && count_of_specs_needing_stdin == 1 {
+        bail!("Data is read from standard input, as well as one template. Please choose one")
+    }
+    if let Some(spec_which_overwrites_input) = specs
+        .iter()
+        .filter_map(|s| {
+            use self::StreamOrPath::*;
+            match (&s.src, &s.dst) {
+                (&Path(ref src), &Path(ref dst)) => src.canonicalize()
+                    .and_then(|src| dst.canonicalize().map(|dst| (src, dst)))
+                    .ok()
+                    .and_then(|(src, dst)| if src == dst { Some(s) } else { None }),
+                _ => None,
+            }
+        })
+        .next()
+    {
+        bail!(
+            "Refusing to overwrite input file at '{}' with output",
+            spec_which_overwrites_input.src
+        )
+    }
+    Ok(())
+}
+
+pub fn de_json_or_yaml<R: Read>(mut reader: R) -> Result<json::Value, Error> {
+    let mut buf = Vec::<u8>::new();
+    reader
+        .read_to_end(&mut buf)
+        .context("Could not read input stream data deserialization")?;
+
+    Ok(
+        match yaml::from_reader::<_, yaml::Value>(Cursor::new(&buf)) {
+            Ok(v) => yaml::from_value(v).context("Could not transform YAML value into JSON")?,
+            Err(yaml_err) => json::from_reader(reader).map_err(|json_err| {
+                json_err
+                    .context("JSON deserialization failed")
+                    .context(yaml_err.context("YAML deserialization failed"))
+                    .context("Could not deserialize data, tried YAML and JSON")
+            })?,
+        },
+    )
+}
