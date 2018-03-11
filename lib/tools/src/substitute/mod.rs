@@ -67,10 +67,12 @@ pub fn substitute(input_data: &StreamOrPath, specs: &[Spec], separator: &OsStr) 
 
         let mut istream = spec.src.open_as_input()?;
         hbs.register_template_source(spec.src.short_name(), &mut istream)
-            .context(format!(
-                "Failed to register handlebars template at '{}'",
-                spec.src.name()
-            ))?;
+            .with_context(|_| {
+                format!(
+                    "Failed to register handlebars template at '{}'",
+                    spec.src.name()
+                )
+            })?;
 
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
@@ -78,10 +80,12 @@ pub fn substitute(input_data: &StreamOrPath, specs: &[Spec], separator: &OsStr) 
         }
 
         hbs.render_to_write(spec.src.short_name(), &dataset, &mut ostream)
-            .context(format!(
-                "Could instantiate template or writing to '{}' failed",
-                spec.dst.name()
-            ))?;
+            .with_context(|_| {
+                format!(
+                    "Could instantiate template or writing to '{}' failed",
+                    spec.dst.name()
+                )
+            })?;
     }
     Ok(())
 }

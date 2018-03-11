@@ -22,7 +22,7 @@ pub fn generate(mut app: App, args: &ArgMatches) -> Result<(), Error> {
         .and_then(|s| {
             Shell::from_str(s)
                 .map_err(err_msg)
-                .context(format!("The shell '{}' is unsupported", s))
+                .with_context(|_| format!("The shell '{}' is unsupported", s))
                 .map_err(Into::into)
         })?;
     app.gen_completions_to(CLI::name(), shell, &mut stdout());

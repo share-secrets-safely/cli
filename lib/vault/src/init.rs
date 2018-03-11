@@ -18,10 +18,12 @@ pub enum DirectoryInfo {
 pub fn assure_empty_directory_exists(dir: &Path) -> Result<DirectoryInfo, Error> {
     Ok(if dir.is_dir() {
         let num_entries = dir.read_dir()
-            .context(format!(
-                "Failed to open directory '{}' to see if it is empty",
-                dir.display()
-            ))?
+            .with_context(|_| {
+                format!(
+                    "Failed to open directory '{}' to see if it is empty",
+                    dir.display()
+                )
+            })?
             .count();
         if num_entries > 0 {
             bail!(
@@ -31,7 +33,7 @@ pub fn assure_empty_directory_exists(dir: &Path) -> Result<DirectoryInfo, Error>
         }
         DirectoryInfo::Existed
     } else {
-        create_dir_all(&dir).context(format!("Failed to create directory at '{}'", dir.display()))?;
+        create_dir_all(&dir).with_context(|_| format!("Failed to create directory at '{}'", dir.display()))?;
         DirectoryInfo::Created
     })
 }
@@ -60,7 +62,7 @@ impl Vault {
 
         let gpg_keys_dir = vault.absolute_path(gpg_keys_dir);
         let recipients_file = vault.absolute_path(recipients_file);
-        assure_empty_directory_exists(&gpg_keys_dir).context("Cannot create gpg keys directory")?;
+        assure_empty_directory_exists(&gpg_keys_dir).with_context(|_| "Cannot create gpg keys directory")?;
 
         let mut bytes_buf = Vec::new();
         if recipients_file.is_file() {

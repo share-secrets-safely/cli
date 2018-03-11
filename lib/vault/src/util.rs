@@ -22,7 +22,7 @@ pub fn fingerprints_of_keys(keys: &[gpgme::Key]) -> Result<Vec<(&gpgme::Key, Str
     keys.iter()
         .map(|k| fingerprint_of(k).map(|fpr| (k, fpr)))
         .collect::<Result<Vec<_>, _>>()
-        .context("Unexpectedly failed to obtain fingerprint")
+        .with_context(|_| "Unexpectedly failed to obtain fingerprint")
         .map_err(Into::into)
 }
 pub fn write_at(path: &Path) -> io::Result<fs::File> {
@@ -119,15 +119,15 @@ pub fn export_key(
         [key].iter().map(|k| *k),
         gpgme::ExportMode::empty(),
         &mut *buf,
-    ).context(err_msg(
-        "Failed to export at least one public key with signatures.",
-    ))?;
+    ).with_context(|_| err_msg("Failed to export at least one public key with signatures."))?;
     write_at(&key_path)
         .and_then(|mut f| f.write_all(buf))
-        .context(format!(
-            "Could not write public key file at '{}'",
-            key_path.display()
-        ))?;
+        .with_context(|_| {
+            format!(
+                "Could not write public key file at '{}'",
+                key_path.display()
+            )
+        })?;
     buf.clear();
     Ok((fingerprint, key_path))
 }
@@ -181,10 +181,12 @@ pub struct ResetCWD {
 impl ResetCWD {
     pub fn new(next_cwd: &Path) -> Result<Self, Error> {
         let prev_cwd = current_dir();
-        set_current_dir(next_cwd).context(format!(
-            "Failed to temporarily change the working directory to '{}'",
-            next_cwd.display()
-        ))?;
+        set_current_dir(next_cwd).with_context(|_| {
+            format!(
+                "Failed to temporarily change the working directory to '{}'",
+                next_cwd.display()
+            )
+        })?;
         Ok(ResetCWD { cwd: prev_cwd })
     }
 }
@@ -202,13 +204,15 @@ pub fn run_editor(editor: &OsStr, path_to_edit: &Path) -> Result<(), Error> {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
-        .context(format!(
-            "Failed to start editor program at '{}'.",
-            editor.to_string_lossy()
-        ))?;
+        .with_context(|_| {
+            format!(
+                "Failed to start editor program at '{}'.",
+                editor.to_string_lossy()
+            )
+        })?;
     let status = running_program
         .wait()
-        .context("Failed to wait for editor to exit.")?;
+        .with_context(|_| "Failed to wait for editor to exit.")?;
     if !status.success() {
         return Err(format_err!(
             "Editor '{}' failed. Edit aborted.",

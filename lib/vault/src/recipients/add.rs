@@ -18,26 +18,28 @@ impl Vault {
         let partitions: Vec<&Vault> = self.partitions_by_name_or_path(partitions)?;
         for partition in partitions {
             if let SigningMode::Public = sign {
-                let gpg_keys_dir = self.find_gpg_keys_dir().context(
-                    "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured",
-                )?;
+                let gpg_keys_dir = self.find_gpg_keys_dir().with_context(|_| {
+                    "Adding unverified recipients requires you to use a vault that has the `gpg-keys` directory configured"
+                })?;
                 let imported_gpg_keys_ids = partition.import_keys(&mut gpg_ctx, &gpg_keys_dir, gpg_key_ids, output)?;
                 let signing_key = partition
                     .find_signing_key(&mut gpg_ctx, signing_key_id)
-                    .context(
+                    .with_context(|_| {
                         "Did not manage to find suitable signing key \
-                         for re-exporting the recipient keys.",
-                    )?;
+                         for re-exporting the recipient keys."
+                    })?;
                 gpg_ctx.add_signer(&signing_key)?;
                 for key_fpr_to_sign in imported_gpg_keys_ids {
                     let key_to_sign = gpg_ctx.find_key(&key_fpr_to_sign)?;
                     gpg_ctx
                         .sign_key(&key_to_sign, None::<&[u8]>, None)
-                        .context(format_err!(
-                            "Could not sign key of recipient {} with signing key {}",
-                            key_fpr_to_sign,
-                            UserIdFingerprint(&signing_key)
-                        ))?;
+                        .with_context(|_| {
+                            format_err!(
+                                "Could not sign key of recipient {} with signing key {}",
+                                key_fpr_to_sign,
+                                UserIdFingerprint(&signing_key)
+                            )
+                        })?;
                     writeln!(
                         output,
                         "Signed recipients key {} with signing key {}",

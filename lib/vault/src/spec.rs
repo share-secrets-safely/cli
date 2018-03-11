@@ -115,10 +115,12 @@ impl VaultSpec {
         let output_file = self.output_in(root, dst_mode)?;
         if let Some(d) = output_file.parent() {
             if !d.is_dir() {
-                create_dir_all(d).context(format!(
-                    "Failed to created intermediate directory at '{}'",
-                    d.display()
-                ))?;
+                create_dir_all(d).with_context(|_| {
+                    format!(
+                        "Failed to created intermediate directory at '{}'",
+                        d.display()
+                    )
+                })?;
                 writeln!(
                     output,
                     "Created intermediate directory at '{}'",
@@ -137,28 +139,32 @@ impl VaultSpec {
             .create(true)
             .truncate(true)
             .open(&output_file)
-            .context(format!(
-                "Could not open destination file at '{}' for writing.",
-                output_file.display()
-            ))?)
+            .with_context(|_| {
+                format!(
+                    "Could not open destination file at '{}' for writing.",
+                    output_file.display()
+                )
+            })?)
     }
 
     pub fn open_input(&self) -> Result<Box<Read>, Error> {
         Ok(match self.src {
             SpecSourceType::Path(ref p) => {
-                Box::new(File::open(p).context(format!("Could not open input file at '{}'", p.display()))?)
+                Box::new(File::open(p).with_context(|_| format!("Could not open input file at '{}'", p.display()))?)
             }
             SpecSourceType::Stdin => {
                 if atty::is(atty::Stream::Stdin) {
-                    let tempfile = Temp::new_file().context("Failed to obtain temporary file for editing.")?;
+                    let tempfile = Temp::new_file().with_context(|_| "Failed to obtain temporary file for editing.")?;
                     let tempfile_path = tempfile.to_path_buf();
                     run_editor(EDITOR.as_os_str(), &tempfile_path)?;
                     Box::new(TemporaryFile {
                         _tempfile: tempfile,
-                        open_file: File::open(&tempfile_path).context(format!(
-                            "Could not open temporary file '{}' for reading.",
-                            tempfile_path.display()
-                        ))?,
+                        open_file: File::open(&tempfile_path).with_context(|_| {
+                            format!(
+                                "Could not open temporary file '{}' for reading.",
+                                tempfile_path.display()
+                            )
+                        })?,
                     })
                 } else {
                     Box::new(stdin())
