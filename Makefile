@@ -125,4 +125,4 @@ interactive-linux-musl: build-musl-image
 	$(DOCKER_ARGS) -it $(MY_MUSL_IMAGE)
 
 lint-scripts:
-	find . -not \( -path '*target/*' -or -path "*cargo*" \) -name '*.sh' -type f | while read -r sf; do shellcheck -x "$$sf"; done
+	find . -not \( -name 'included-*' -or -path '*target/*' -or -path "*cargo*" \) -name '*.sh' -type f | while read -r sf; do shellcheck -x "$$sf"; done
