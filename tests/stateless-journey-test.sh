@@ -65,10 +65,10 @@ title "'merge' subcommand"
           expect_run $WITH_FAILURE "$exe" merge "$template/complex.yml"
         }
       )
-      (with "a conflicting nested scalar value from stdin"
-        it "succeeds, as there is no conflict" && {
-          echo "a_nested_map.another_nested_map.hello: world" | \
-          WITH_SNAPSHOT="$snapshot/yaml-conflicting-nested-scalar-stdin-complex-yaml-file-to-stdout" \
+      (with "a conflicting array value from stdin"
+        it "fails" && {
+          echo "a_sequence: [foo]" | \
+          WITH_SNAPSHOT="$snapshot/yaml-conflicting-array-value-stdin-complex-yaml-file-to-stdout" \
           expect_run $WITH_FAILURE "$exe" merge "$template/complex.yml"
         }
       )
@@ -143,7 +143,7 @@ title "'substitute' subcommand"
   (with "input as yaml"
     (with "single template from a file (absolute path)"
       (when "outputting to stdout"
-        it "outputs the substituted data to stdout" && {
+        it "outputs the substituted data" && {
           echo "the-answer: 42" | \
           WITH_SNAPSHOT="$snapshot/data-stdin-yaml-single-template-stdout" \
           expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs"
@@ -298,6 +298,19 @@ YAML
 )
 
 title "'substitute' subcommand error cases"
+(with "invalid data in no known format"
+  it "fails" && {
+    WITH_SNAPSHOT="$snapshot/fail-invalid-data-format" \
+    expect_run $WITH_FAILURE "$exe" substitute -d <(echo 'a: *b') "$template/the-answer.hbs"
+  }
+)
+(with "multi-document yaml as input"
+  it "fails" && {
+    WITH_SNAPSHOT="$snapshot/fail-invalid-data-format-multi-document-yaml" \
+    expect_run $WITH_FAILURE "$exe" substitute -d <(echo $'---\n---') "$template/the-answer.hbs"
+  }
+)
+
 (with "a spec that tries to write the output to the input template"
   (with "a single spec"
     it "fails as it refuses" && {

@@ -55,20 +55,6 @@ a_nested_map:
 # Maps don't have to have string keys.
 0.25: a float key
 
-# Keys can also be complex, like multi-line objects
-# We use ? followed by a space to indicate the start of a complex key.
-? |
-  This is a key
-  that has multiple lines
-: and this is its value
-
-# YAML also allows mapping between sequences with the complex key syntax
-# Some language parsers might complain
-# An example
-? - Manchester United
-  - Real Madrid
-: [ 2001-01-01, 2002-02-02 ]
-
 # Sequences (equivalent to lists or arrays) look like this
 # (note that the '-' counts as indentation):
 a_sequence:
@@ -115,14 +101,6 @@ bar: &bar
 
 # YAML also has tags, which you can use to explicitly declare types.
 explicit_string: !!str 0.5
-# Some parsers implement language specific tags, like this one for Python's
-# complex number type.
-python_complex_number: !!python/complex 1+2j
-
-# We can also use yaml complex keys with language specific tags
-? !!python/tuple [5, 7]
-: Fifty Seven
-# Would be {(5, 7): 'Fifty Seven'} in Python
 
 ####################
 # EXTRA YAML TYPES #
@@ -133,14 +111,6 @@ python_complex_number: !!python/complex 1+2j
 datetime: 2001-12-15T02:59:43.1Z
 datetime_with_spaces: 2001-12-14 21:59:43.10 -5
 date: 2002-12-14
-
-# The !!binary tag indicates that a string is actually a base64-encoded
-# representation of a binary blob.
-gif_file: !!binary |
-  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
-  OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+
-  +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC
-  AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=
 
 # YAML also has a set type, which looks like this:
 set:

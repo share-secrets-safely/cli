@@ -1,0 +1,6 @@
+error: Could not deserialize data, tried JSON and YAML
+Caused by: 
+ 4: JSON deserialization failed
+ 3: expected value at line 1 column 1
+ 2: YAML deserialization failed
+ 1: while parsing node, found unknown anchor at line 1 column 4

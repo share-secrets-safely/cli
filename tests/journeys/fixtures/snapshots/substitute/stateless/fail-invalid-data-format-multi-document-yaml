@@ -1,0 +1,6 @@
+error: Could not deserialize data, tried JSON and YAML
+Caused by: 
+ 4: JSON deserialization failed
+ 3: invalid number at line 1 column 2
+ 2: YAML deserialization failed
+ 1: deserializing from YAML containing more than one document is not supported
