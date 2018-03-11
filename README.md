@@ -89,21 +89,9 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 3.1
-#### Substitution-Superpowers
-
-Make it easy to generate property-sets by merging structured files together, and
-make said context available to a `handlebars` powered engine to perform substitutions.
-
-This allows to bring together context owned by various entities into a single aggregated
-one, with the possibility for later contexts to override earlier ones.
-
-With this capability, it's also possible to substitute secrets into files, for example
-like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deployment.yml | kubectl apply -f -`
-
 ### Roadmap to 3.2
 
-#### Adding the `merge` subcommand
+#### The `merge` subcommand
 
 The `merge` subcommand allows to combine json or yaml files.
 This is useful to partition context and data according to your needs, yet use

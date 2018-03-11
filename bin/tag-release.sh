@@ -12,7 +12,7 @@ while read -r cf; do
 done
 
 git commit -am "bumping version to $version"
-git tag -s -F "${notes_path}" "$version"
+git tag -s --cleanup=verbatim -F "${notes_path}" "$version"
 
 for lib in lib/substitute lib/vault .; do
   (

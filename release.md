@@ -1,3 +1,16 @@
+#### V3.1: Substitution-Superpowers
+
+Make it easy to generate property-sets by merging structured files together, and
+make said context available to a `handlebars` powered engine to perform substitutions.
+
+This allows to bring together context owned by various entities into a single aggregated
+one, with the possibility for later contexts to override earlier ones.
+
+With this capability, it's also possible to substitute secrets into files, for example
+like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deployment.yml | kubectl apply -f -`.
+
+Read more [in the documentation](https://byron.github.io/share-secrets-safely/tools/substitute.html).
+
 ## V3.0: Support for Partitions
 
 Partitions are just another vault with individual config, but operations on vaults are
