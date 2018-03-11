@@ -65,11 +65,11 @@ fn de_json_or_yaml<R: Read>(mut reader: R) -> Result<json::Value, Error> {
     )
 }
 
-pub fn substitute(input_data: StreamOrPath, specs: &[Spec], separator: &OsStr) -> Result<(), Error> {
+pub fn substitute(input_data: &StreamOrPath, specs: &[Spec], separator: &OsStr) -> Result<(), Error> {
     use StreamOrPath::*;
     let mut own_specs = Vec::new();
 
-    let (dataset, specs) = match input_data {
+    let (dataset, specs) = match *input_data {
         Stream => if atty::is(atty::Stream::Stdin) {
             bail!("Stdin is a TTY. Cannot substitute a template without any data.")
         } else {
@@ -94,7 +94,7 @@ pub fn substitute(input_data: StreamOrPath, specs: &[Spec], separator: &OsStr) -
         ),
     };
 
-    validate(&input_data, specs)?;
+    validate(input_data, specs)?;
 
     let mut seen_file_outputs = BTreeSet::new();
     let mut seen_writes_to_stdout = 0;
@@ -103,13 +103,13 @@ pub fn substitute(input_data: StreamOrPath, specs: &[Spec], separator: &OsStr) -
     hbs.register_escape_fn(no_escape);
 
     for spec in specs {
-        let append = match &spec.dst {
-            &Path(ref p) => {
+        let append = match spec.dst {
+            Path(ref p) => {
                 let seen = seen_file_outputs.contains(p);
                 seen_file_outputs.insert(p);
                 seen
             }
-            &Stream => {
+            Stream => {
                 seen_writes_to_stdout += 1;
                 false
             }
@@ -124,7 +124,7 @@ pub fn substitute(input_data: StreamOrPath, specs: &[Spec], separator: &OsStr) -
 
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
-            ostream.write(separator.as_bytes())?;
+            ostream.write_all(separator.as_bytes())?;
         }
 
         hbs.render_to_write(spec.src.short_name(), &dataset, &mut ostream)
