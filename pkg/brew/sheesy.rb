@@ -7,10 +7,10 @@ class Sheesy < Formula
 
   if OS.mac?
       url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-Darwin-x86_64.tar.gz"
-      sha256 "f3fd98555908be0c629fac009872a9ba935984bbd66a62f929a5022486142796"
+      sha256 "43f43b16c672de95a1991cb29b3083247f540446ef8f828f663a8ebe3fadfaab"
   elsif OS.linux?
       url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-linux-musl-x86_64.tar.gz"
-      sha256 "f04c8153cd157a1ad8437afc1209238cbf5d9341ea9b7a9d4dc476759d479b5d"
+      sha256 "ed0c81da14f323b4a8397d9813a9bb0a48c42e079ff4c4f7c8ef90e7392ec86c"
   end
 
   def install
