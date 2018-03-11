@@ -158,7 +158,31 @@ snapshot="$fixture/snapshots/substitute/stateless"
   )
 )
 
-title "(TODO) 'substitute' with templates referencing other templates (TODO)"
+title "'substitute' with templates referencing other templates"
+(with "data from stdin"
+  (with "indication for rendering partial 0"
+    (with "multiple partials and a template"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/data-stdin-partial-0-output-stdout" \
+        expect_run $SUCCESSFULLY "$exe" substitute "$template/partials/base0.hbs:/dev/null" "$template/partials/base1.hbs:/dev/null" "$template/partials/template.hbs" <<YAML
+title: example 0
+parent: base0
+YAML
+      }
+    )
+  )
+  (with "indication for rendering partial 1"
+    (with "multiple partials and a template"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/data-stdin-partial-1-output-stdout" \
+        expect_run $SUCCESSFULLY "$exe" substitute "$template/partials/base1.hbs:/dev/null" "$template/partials/template.hbs" <<YAML
+title: other example
+parent: base1
+YAML
+      }
+    )
+  )
+)
 
 title "'substitute' subcommand error cases"
 (with "a spec that tries to write the output to the input template"

@@ -1,0 +1,8 @@
+<html>
+  <head>other example</head>
+  <body>
+    <div><h1>Derived from base1.hbs</h1></div>
+  <p>Rendered in partial, parent is base1</p>
+
+  </body>
+</html>
