@@ -338,7 +338,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
     App::new("vault")
         .setting(AppSettings::VersionlessSubcommands)
         .setting(AppSettings::DeriveDisplayOrder)
-        .about("a variety of vault interactions")
+        .about("Various commands to store and retrieve secrets and control who has access.")
         .subcommand(init)
         .subcommand(add_resource)
         .subcommand(edit_resource)
