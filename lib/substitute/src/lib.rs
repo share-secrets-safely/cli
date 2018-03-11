@@ -6,6 +6,7 @@ use conv::TryFrom;
 
 use std::path::PathBuf;
 use std::fmt;
+use std::ffi::OsStr;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Spec;
@@ -39,6 +40,6 @@ impl<'a> TryFrom<&'a str> for Spec {
     }
 }
 
-pub fn substitute(_data: Option<PathBuf>, _specs: &[Spec]) -> Result<(), Error> {
+pub fn substitute(_data: Option<PathBuf>, _specs: &[Spec], _separator: &OsStr) -> Result<(), Error> {
     Ok(())
 }

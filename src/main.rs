@@ -70,29 +70,29 @@ fn main() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
-            substitute(context.data, &context.specs)
+            substitute(context.data, &context.specs, &context.separator)
         }
         ("vault", Some(args)) => {
-            let mut context = ok_or_exit(parse::vault::vault_context_from(args));
+            let mut context = ok_or_exit(parse::vault::context_from(args));
             context = match args.subcommand() {
                 ("partitions", Some(args)) => match args.subcommand() {
-                    ("add", Some(args)) => ok_or_exit(parse::vault::vault_partitions_add(context, args)),
-                    ("remove", Some(args)) => ok_or_exit(parse::vault::vault_partitions_remove(context, args)),
+                    ("add", Some(args)) => ok_or_exit(parse::vault::partitions_add(context, args)),
+                    ("remove", Some(args)) => ok_or_exit(parse::vault::partitions_remove(context, args)),
                     _ => usage_and_exit(&matches),
                 },
                 ("recipients", Some(args)) => match args.subcommand() {
-                    ("add", Some(args)) => ok_or_exit(parse::vault::vault_recipients_add(context, args)),
-                    ("remove", Some(args)) => ok_or_exit(parse::vault::vault_recipients_remove(context, args)),
-                    ("init", Some(args)) => ok_or_exit(parse::vault::vault_recipients_init(context, args)),
-                    ("list", Some(args)) => ok_or_exit(parse::vault::vault_recipients_list(context, args)),
-                    _ => ok_or_exit(parse::vault::vault_recipients_list(context, args)),
+                    ("add", Some(args)) => ok_or_exit(parse::vault::recipients_add(context, args)),
+                    ("remove", Some(args)) => ok_or_exit(parse::vault::recipients_remove(context, args)),
+                    ("init", Some(args)) => ok_or_exit(parse::vault::recipients_init(context, args)),
+                    ("list", Some(args)) => ok_or_exit(parse::vault::recipients_list(context, args)),
+                    _ => ok_or_exit(parse::vault::recipients_list(context, args)),
                 },
-                ("init", Some(args)) => ok_or_exit(parse::vault::vault_init_from(context, args)),
-                ("add", Some(args)) => ok_or_exit(parse::vault::vault_resource_add(context, args)),
+                ("init", Some(args)) => ok_or_exit(parse::vault::init_from(context, args)),
+                ("add", Some(args)) => ok_or_exit(parse::vault::resource_add(context, args)),
                 ("remove", Some(args)) => ok_or_exit(parse::vault::vault_resource_remove(context, args)),
-                ("show", Some(args)) => ok_or_exit(parse::vault::vault_resource_show(context, args)),
-                ("edit", Some(args)) => ok_or_exit(parse::vault::vault_resource_edit(context, args)),
-                ("list", Some(args)) => ok_or_exit(parse::vault::vault_resource_list(context, args)),
+                ("show", Some(args)) => ok_or_exit(parse::vault::resource_show(context, args)),
+                ("edit", Some(args)) => ok_or_exit(parse::vault::resource_edit(context, args)),
+                ("list", Some(args)) => ok_or_exit(parse::vault::resource_list(context, args)),
                 _ => context,
             };
             let sout = stdout();

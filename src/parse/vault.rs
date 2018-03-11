@@ -10,7 +10,7 @@ use dispatch::vault::{Command, Context};
 
 use super::util::{optional_args, required_arg, required_os_arg};
 
-pub fn vault_context_from(args: &ArgMatches) -> Result<Context, Error> {
+pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         vault_path: required_os_arg(args, "config-file")?,
         vault_selector: required_arg(args, "vault-selector")?,
@@ -18,14 +18,14 @@ pub fn vault_context_from(args: &ArgMatches) -> Result<Context, Error> {
     })
 }
 
-pub fn vault_recipients_list(ctx: Context, _args: &ArgMatches) -> Result<Context, Error> {
+pub fn recipients_list(ctx: Context, _args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::RecipientsList,
         ..ctx
     })
 }
 
-pub fn vault_recipients_init(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn recipients_init(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::RecipientsInit {
             gpg_key_ids: optional_args(args, "gpg-key-id"),
@@ -34,7 +34,7 @@ pub fn vault_recipients_init(ctx: Context, args: &ArgMatches) -> Result<Context,
     })
 }
 
-pub fn vault_recipients_remove(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn recipients_remove(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::RecipientsRemove {
             partitions: optional_args(args, "partition"),
@@ -47,7 +47,7 @@ pub fn vault_recipients_remove(ctx: Context, args: &ArgMatches) -> Result<Contex
     })
 }
 
-pub fn vault_partitions_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn partitions_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     let recipients_file: Option<PathBuf> = args.value_of_os("recipients-file-path").map(Into::into);
     Ok(Context {
         command: Command::PartitionsAdd {
@@ -60,7 +60,7 @@ pub fn vault_partitions_add(ctx: Context, args: &ArgMatches) -> Result<Context, 
     })
 }
 
-pub fn vault_partitions_remove(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn partitions_remove(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::PartitionsRemove {
             selector: required_arg(args, "partition-selector")?,
@@ -69,7 +69,7 @@ pub fn vault_partitions_remove(ctx: Context, args: &ArgMatches) -> Result<Contex
     })
 }
 
-pub fn vault_recipients_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn recipients_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::RecipientsAdd {
             sign: if args.is_present("verified") {
@@ -88,7 +88,7 @@ pub fn vault_recipients_add(ctx: Context, args: &ArgMatches) -> Result<Context, 
     })
 }
 
-pub fn vault_resource_show(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn resource_show(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::ResourceShow {
             spec: required_os_arg(args, "path")?,
@@ -97,14 +97,14 @@ pub fn vault_resource_show(ctx: Context, args: &ArgMatches) -> Result<Context, E
     })
 }
 
-pub fn vault_resource_list(ctx: Context, _args: &ArgMatches) -> Result<Context, Error> {
+pub fn resource_list(ctx: Context, _args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::List,
         ..ctx
     })
 }
 
-pub fn vault_resource_edit(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn resource_edit(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::ResourceEdit {
             spec: required_os_arg(args, "path")?,
@@ -132,7 +132,7 @@ pub fn vault_resource_remove(ctx: Context, args: &ArgMatches) -> Result<Context,
     })
 }
 
-pub fn vault_resource_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn resource_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         command: Command::ResourceAdd {
             specs: match args.values_of("spec") {
@@ -144,7 +144,7 @@ pub fn vault_resource_add(ctx: Context, args: &ArgMatches) -> Result<Context, Er
     })
 }
 
-pub fn vault_init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
+pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     let mut recipients_file: PathBuf = required_os_arg(args, "recipients-file-path")?;
     let secrets: PathBuf = required_os_arg(args, "secrets-dir")?;
     if args.is_present("first-partition") && secrets == Path::new(".") {

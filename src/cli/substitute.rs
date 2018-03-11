@@ -5,6 +5,20 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
         .alias("sub")
         .about("Substitutes templates using structured data.")
         .arg(
+            Arg::with_name("separator")
+                .required(false)
+                .multiple(false)
+                .takes_value(true)
+                .long("separator")
+                .short("s")
+                .default_value("\n")
+                .value_name("separator")
+                .help("The string to use to separate multiple documents that are written to the same stream.\
+                       This can be useful to output a multi-document YAML file from multiple input tempates \
+                       to stdout if the separator is '---'.\
+                       The separator is also used when writing multiple templates into the same file, like in 'a:out b:out'."),
+        )
+        .arg(
             Arg::with_name("data")
                 .required(false)
                 .multiple(false)

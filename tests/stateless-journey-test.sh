@@ -78,6 +78,16 @@ snapshot="$fixture/snapshots/substitute/stateless"
             expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-output" output
           }
         )
+        (when "writing to the same output file again"
+          it "succeeds" && {
+            echo "the-answer: 42" | \
+            WITH_SNAPSHOT="$snapshot/data-stdin-yaml-multi-template-to-same-file-again" \
+            expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs:output"
+          }
+          it "overwrites the previous output file entirely" && {
+            expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-again-output" output
+          }
+        )
       )
       (sandbox
         (with "the explicit document separator"
