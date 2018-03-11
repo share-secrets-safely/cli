@@ -1,6 +1,5 @@
 use failure::Error;
 use clap::ArgMatches;
-use conv::TryFrom;
 use substitute::Spec;
 
 use super::util::required_os_arg;
@@ -19,7 +18,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
         separator: required_os_arg(args, "separator")?,
         data: args.value_of_os("data").map(Into::into),
         specs: match args.values_of("spec") {
-            Some(v) => v.map(Spec::try_from).collect::<Result<_, _>>()?,
+            Some(v) => v.map(Spec::from).collect(),
             None => Vec::new(),
         },
     })

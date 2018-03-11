@@ -1,4 +1,3 @@
-extern crate conv;
 extern crate sheesy_substitute;
 
 use sheesy_substitute::Spec;
@@ -8,11 +7,10 @@ use std::path::PathBuf;
 #[cfg(test)]
 mod parse {
     use super::*;
-    use conv::TryFrom;
 
     #[test]
     fn empty() {
-        let actual = Spec::try_from("").unwrap();
+        let actual = Spec::from("");
         assert_eq!(
             actual,
             Spec {
@@ -26,7 +24,7 @@ mod parse {
 
     #[test]
     fn colon() {
-        let actual = Spec::try_from(":").unwrap();
+        let actual = Spec::from(":");
         assert_eq!(
             actual,
             Spec {
@@ -40,7 +38,7 @@ mod parse {
 
     #[test]
     fn stream_path() {
-        let actual = Spec::try_from(":foo").unwrap();
+        let actual = Spec::from(":foo");
         assert_eq!(
             actual,
             Spec {
@@ -54,7 +52,7 @@ mod parse {
 
     #[test]
     fn path_stream() {
-        let actual = Spec::try_from("foo:").unwrap();
+        let actual = Spec::from("foo:");
         assert_eq!(
             actual,
             Spec {
@@ -68,7 +66,7 @@ mod parse {
 
     #[test]
     fn path_path() {
-        let actual = Spec::try_from("foo:bar").unwrap();
+        let actual = Spec::from("foo:bar");
         assert_eq!(
             actual,
             Spec {
@@ -82,7 +80,7 @@ mod parse {
 
     #[test]
     fn absolute_path_absolute_path() {
-        let actual = Spec::try_from("/foo/sub:/bar/sub").unwrap();
+        let actual = Spec::from("/foo/sub:/bar/sub");
         assert_eq!(
             actual,
             Spec {

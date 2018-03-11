@@ -340,7 +340,6 @@ dependencies = [
 name = "sheesy-substitute"
 version = "3.0.0"
 dependencies = [
- "conv 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

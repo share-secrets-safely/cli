@@ -1,5 +1,3 @@
-use conv::TryFrom;
-
 use std::path::PathBuf;
 use std::fmt::{self, Write};
 
@@ -42,15 +40,6 @@ impl Spec {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct SpecError(pub String);
-
-impl fmt::Display for SpecError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(&self.0)
-    }
-}
-
 impl fmt::Display for Spec {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::StreamOrPath::*;
@@ -66,19 +55,11 @@ impl fmt::Display for Spec {
     }
 }
 
-impl ::std::error::Error for SpecError {
-    fn description(&self) -> &str {
-        "The spec was invalid."
-    }
-}
-
-impl<'a> TryFrom<&'a str> for Spec {
-    type Err = SpecError;
-
-    fn try_from(src: &'a str) -> Result<Self, Self::Err> {
+impl<'a> From<&'a str> for Spec {
+    fn from(src: &'a str) -> Self {
         use self::StreamOrPath::*;
         let mut it = src.splitn(2, Spec::sep());
-        Ok(match (it.next(), it.next()) {
+        match (it.next(), it.next()) {
             (None, Some(_)) | (None, None) => unreachable!(),
             (Some(p), None) => Spec {
                 src: StreamOrPath::from(p),
@@ -88,6 +69,6 @@ impl<'a> TryFrom<&'a str> for Spec {
                 src: StreamOrPath::from(p1),
                 dst: StreamOrPath::from(p2),
             },
-        })
+        }
     }
 }

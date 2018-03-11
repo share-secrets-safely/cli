@@ -1,4 +1,3 @@
-extern crate conv;
 extern crate failure;
 
 use std::path::PathBuf;
