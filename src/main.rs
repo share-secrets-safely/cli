@@ -15,6 +15,7 @@ mod dispatch;
 
 use clap::ArgMatches;
 use tools::substitute::substitute;
+use tools::merge::merge;
 use failure::Error;
 use std::io::{stderr, stdout, Write};
 use std::process;
@@ -69,6 +70,10 @@ fn main() {
 
     let res = match matches.subcommand() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
+        ("merge", Some(args)) => {
+            let context = ok_or_exit(parse::merge::context_from(args));
+            merge(&context.mode, &context.cmds)
+        }
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
             substitute(&context.data, &context.specs, &context.separator)

@@ -14,8 +14,8 @@ SUCCESSFULLY=0
 
 fixture="$root/journeys/fixtures"
 
-# # shellcheck source=./tests/included-stateless-merge.sh
-# source "$root/included-stateless-merge.sh"
+# shellcheck source=./tests/included-stateless-merge.sh
+source "$root/included-stateless-merge.sh"
 
 # shellcheck source=./tests/included-stateless-substitute.sh
 source "$root/included-stateless-substitute.sh"

@@ -4,6 +4,9 @@ use clap::AppSettings;
 mod completions;
 mod vault;
 mod substitute;
+mod merge;
+
+pub use self::merge::OutputMode;
 
 pub struct CLI<'a, 'b>
 where
@@ -29,6 +32,7 @@ where
             .version(include_str!("../../VERSION"))
             .subcommand(vault::cli())
             .subcommand(substitute::cli())
+            .subcommand(merge::cli())
             .subcommand(completions::cli());
 
         Self { app }
