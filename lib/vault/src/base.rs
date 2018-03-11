@@ -36,14 +36,21 @@ impl Default for VaultKind {
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Vault {
     pub name: Option<String>,
-    #[serde(skip)] pub kind: VaultKind,
-    #[serde(skip)] pub index: usize,
-    #[serde(skip)] pub partitions: Vec<Vault>,
-    #[serde(skip)] pub resolved_at: PathBuf,
-    #[serde(skip)] pub vault_path: Option<PathBuf>,
-    #[serde(default = "secrets_default")] pub secrets: PathBuf,
+    #[serde(skip)]
+    pub kind: VaultKind,
+    #[serde(skip)]
+    pub index: usize,
+    #[serde(skip)]
+    pub partitions: Vec<Vault>,
+    #[serde(skip)]
+    pub resolved_at: PathBuf,
+    #[serde(skip)]
+    pub vault_path: Option<PathBuf>,
+    #[serde(default = "secrets_default")]
+    pub secrets: PathBuf,
     pub gpg_keys: Option<PathBuf>,
-    #[serde(default = "recipients_default")] pub recipients: PathBuf,
+    #[serde(default = "recipients_default")]
+    pub recipients: PathBuf,
 }
 
 impl Default for Vault {

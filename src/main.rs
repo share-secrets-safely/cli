@@ -49,6 +49,7 @@ where
     match r {
         Ok(r) => r,
         Err(e) => {
+            stdout().flush().ok();
             write!(stderr(), "error: ").ok();
             print_causes(e, stderr());
             process::exit(1);

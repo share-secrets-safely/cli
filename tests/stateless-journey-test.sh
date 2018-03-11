@@ -2,8 +2,10 @@
 
 set -eu -o pipefail
 exe=${1:?First argument is the executable under test}
+exe="$(cd "${exe%/*}" && pwd)/${exe##*/}"
 
-root="$(cd "${0%/*}" && pwd)"
+rela_root="${0%/*}"
+root="$(cd "${rela_root}" && pwd)"
 # shellcheck source=./tests/gpg-helpers.sh
 source "$root/gpg-helpers.sh"
 
@@ -27,20 +29,37 @@ snapshot="$fixture/snapshots/substitute/stateless"
   )
   (with "input as yaml"
     (with "single template from a file (absolute path)"
-      it "outputs the substituted data to stdout" && {
-        echo "the-answer: 42" | \
-        WITH_SNAPSHOT="$snapshot/data-stdin-yaml-single-template-stdout" \
-        expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs"
-      }
+      (when "outputting to stdout"
+        it "outputs the substituted data to stdout" && {
+          echo "the-answer: 42" | \
+          WITH_SNAPSHOT="$snapshot/data-stdin-yaml-single-template-stdout" \
+          expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs"
+        }
+      )
+      (sandbox
+        (when "outputting to a file within a non-existing directory"
+          it "succeeds" && {
+            echo "the-answer: 42" | \
+            WITH_SNAPSHOT="$snapshot/data-stdin-yaml-single-template-file-non-existing-directory" \
+            expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs:some/sub/directory/output"
+          }
+
+          it "creates the subdirectory which contains the file" && {
+            expect_snapshot "$snapshot/data-stdin-yaml-single-template-output-file-with-nonexisting-directory" .
+          }
+        )
+      )
     )
     (sandbox
       (with "single template from a file (relative path)"
         cp "$template/the-answer.hbs" template.hbs
-        it "outputs the substituted data to stdout" && {
-          echo "the-answer: 42" | \
-          WITH_SNAPSHOT="$snapshot/data-stdin-yaml-single-relative-template-stdout" \
-          expect_run $SUCCESSFULLY "$exe" substitute template.hbs
-        }
+        (when "outputting to stdout"
+          it "outputs the substituted data to stdout" && {
+            echo "the-answer: 42" | \
+            WITH_SNAPSHOT="$snapshot/data-stdin-yaml-single-relative-template-stdout" \
+            expect_run $SUCCESSFULLY "$exe" substitute template.hbs
+          }
+        )
       )
     )
     (with "multiple templates from a file (absolute path)"
@@ -55,7 +74,7 @@ snapshot="$fixture/snapshots/substitute/stateless"
         it "outputs the substituted data to stdout" && {
           echo "the-answer: 42" | \
           WITH_SNAPSHOT="$snapshot/data-stdin-yaml-multi-template-stdout-explicit-separator" \
-          expect_run $SUCCESSFULLY "$exe" substitute --separator "\\n<->\\n" "$template/the-answer.hbs" "$template/the-answer.hbs"
+          expect_run $SUCCESSFULLY "$exe" substitute --separator $'<->\n' "$template/the-answer.hbs" "$template/the-answer.hbs"
         }
       )
     )
@@ -74,7 +93,7 @@ snapshot="$fixture/snapshots/substitute/stateless"
             expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs:output" "$template/the-answer.hbs:output"
           }
 
-          it "produces the expected output" && {
+          it "produces the expected output, which is a single document separated by the document separator" && {
             expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-output" output
           }
         )
@@ -94,7 +113,7 @@ snapshot="$fixture/snapshots/substitute/stateless"
           it "succeeds" && {
             echo "the-answer: 42" | \
             WITH_SNAPSHOT="$snapshot/data-stdin-yaml-multi-template-to-same-file-explicit-separator" \
-            expect_run $SUCCESSFULLY "$exe" substitute -s "\\n---\\n" "$template/the-answer.hbs:output" "$template/the-answer.hbs:$PWD/output"
+            expect_run $SUCCESSFULLY "$exe" substitute -s $'---\n' "$template/the-answer.hbs:$PWD/output" "$template/the-answer.hbs:$PWD/output"
           }
           it "produces the expected output" && {
             expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-explicit-separator-output" output
@@ -131,7 +150,7 @@ snapshot="$fixture/snapshots/substitute/stateless"
             expect_run $SUCCESSFULLY "$exe" substitute -d <(echo "to-what: world") :output
           }
           it "produces the expected output" && {
-            expect_snapshot "$snapshot/template-stdin-hbs-output-stdout-to-file" output
+            expect_snapshot "$snapshot/template-stdin-hbs-output-stdout-to-file-output" output
           }
         )
       )
@@ -139,13 +158,14 @@ snapshot="$fixture/snapshots/substitute/stateless"
   )
 )
 
+title "(TODO) 'substitute' with templates referencing other templates (TODO)"
 
 title "'substitute' subcommand error cases"
 (with "a spec that tries to write the output to the input template"
   (with "a single spec"
     it "fails as it refuses" && {
       WITH_SNAPSHOT="$snapshot/fail-source-is-destination-single-spec" \
-      expect_run $WITH_FAILURE "$exe" substitute -d <(echo does not matter) "$fixture/the-answer.hbs:$fixture/the-answer.hbs"
+      expect_run $WITH_FAILURE "$exe" substitute -d <(echo does not matter) "$rela_root/journeys/fixtures/substitute/the-answer.hbs:$template/the-answer.hbs"
     }
   )
 )
@@ -153,6 +173,32 @@ title "'substitute' subcommand error cases"
   it "fails as this cannot be done" && {
     WITH_SNAPSHOT="$snapshot/fail-multiple-templates-from-stdin" \
     expect_run $WITH_FAILURE "$exe" substitute -d <(echo does not matter) :first.out :second.out
+  }
+)
+(with "data from stdin and template from stdin"
+  it "fails" && {
+    WITH_SNAPSHOT="$snapshot/fail-data-stdin-template-stdin" \
+    expect_run $WITH_FAILURE "$exe" substitute :output
+  }
+)
+(with "no data specification and no spec"
+  it "fails" && {
+    WITH_SNAPSHOT="$snapshot/fail-no-data-and-no-specs" \
+    expect_run $WITH_FAILURE "$exe" substitute
+  }
+)
+(with "data from stdin specification and no spec"
+  it "fails" && {
+    echo "foo: 42" | \
+    WITH_SNAPSHOT="$snapshot/fail-data-stdin-and-no-specs" \
+    expect_run $WITH_FAILURE "$exe" substitute
+  }
+)
+(with "data used in the template is missing"
+  it "fails" && {
+    echo 'hi: 42' | \
+    WITH_SNAPSHOT="$snapshot/fail-data-stdin-template-misses-key" \
+    expect_run $WITH_FAILURE "$exe" sub "$template/the-answer.hbs"
   }
 )
 

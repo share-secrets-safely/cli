@@ -1,0 +1,1 @@
+error: Stdin is a TTY. Cannot substitute a template without any data.

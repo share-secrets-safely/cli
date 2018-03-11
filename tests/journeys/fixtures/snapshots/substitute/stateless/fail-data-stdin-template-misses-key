@@ -1,0 +1,4 @@
+<Q>: What is the answer to everything?
+<A>: error: Could instantiate template or writing to 'stream' failed
+Caused by: 
+ 1: Error rendering "the-answer" line 2, col 6: Value not found in strict mode.
