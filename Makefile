@@ -49,7 +49,7 @@ docs: build-docs-image $(MUSL_EXE)
 	$(DOCKER_DOCS_ARGS)
 
 docs-no-deps:
-	$(DOCKER_DOCS_ARGS) '1.9.*'
+	$(DOCKER_DOCS_ARGS) '2.*'
 
 watch-docs: build-docs-image $(MUSL_EXE)
 	watchexec -w doc $(MAKE) docs-no-deps

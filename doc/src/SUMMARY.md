@@ -19,3 +19,5 @@
   - [vault partitions](./vault/partitions/about.md)
     - [vault partitions add](./vault/partitions/add.md)
     - [vault partitions remove](./vault/partitions/remove.md)
+- [Tooling](./tools/about.md)
+  - [substitute](./tools/substitute.md)
