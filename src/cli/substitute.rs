@@ -31,7 +31,8 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .long("data")
                 .short("d")
                 .value_name("data")
-                .help("Structured data in YAML or JSON format to use when instantiating/substituting the template."),
+                .help("Structured data in YAML or JSON format to use when instantiating/substituting the template. \
+                       If set, everything from standard input is interpreted as template."),
         )
         .arg(
             Arg::with_name("spec")
@@ -43,9 +44,10 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                      The syntax is '<src>:<dst>'. \
                      <src> and <dst> are a relative or absolute paths to the source templates or \
                      destination files respectively. \
-                     If <src> is unspecified, the template will be read from stdin, e.g. ':output'. \
+                     If <src> is unspecified, the template will be read from stdin, e.g. ':output'. Only one spec can read from stdin. \
                      If <dst> is unspecified, the substituted template will be output to stdout, e.g 'input.hbs:' \
-                     or 'input.hbs'.",
+                     or 'input.hbs'. Multiple templates are separated by the '--separator' accordingly. This is particularly useful for YAML files,\
+                     where the separator should be `$'---\\n'`",
                 ),
         )
 }

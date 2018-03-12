@@ -98,6 +98,17 @@ This is useful to partition context and data according to your needs, yet use
 all of the values in combination for substitution.
 This is particularly useful if some of that content was just decrypted from a vault.
 
+ * [ ] **Support for merges**
+   * [ ] with conflicts
+   * [ ] with overwrite rules
+   * [ ] pull keys up one level before merging
+
+ * **improvements to substitute**
+  * [ ] `--verify` - try to decode substituted values and fail on error
+
+ * **general improvements**
+  * [ ] Unify naming scheme of all deployables to make curling code easier
+
 ### Roadmap to 3.3
 
 #### Adding the `extract` subcommand
