@@ -1,13 +1,5 @@
 use clap::{App, Arg};
 
-arg_enum!{
-    #[derive(PartialEq, Debug)]
-    pub enum OutputMode {
-        Json,
-        Yaml
-    }
-}
-
 pub fn cli<'a, 'b>() -> App<'a, 'b> {
     App::new("merge")
         .alias("show")
@@ -24,7 +16,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .required(false)
                 .value_name("mode")
                 .default_value("json")
-                .possible_values(&OutputMode::variants())
+                .possible_values(&["json", "yaml"])
                 .case_insensitive(true)
                 .help("Specifies how the merged result should be serialized."),
         )

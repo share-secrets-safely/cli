@@ -6,8 +6,6 @@ mod vault;
 mod substitute;
 mod merge;
 
-pub use self::merge::OutputMode;
-
 pub struct CLI<'a, 'b>
 where
     'a: 'b,

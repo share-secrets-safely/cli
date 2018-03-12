@@ -1,3 +1,4 @@
+extern crate atty;
 #[macro_use]
 extern crate clap;
 extern crate conv;
@@ -15,7 +16,7 @@ mod dispatch;
 
 use clap::ArgMatches;
 use tools::substitute::substitute;
-use tools::merge::merge;
+use tools::merge::{merge, show};
 use failure::Error;
 use std::io::{stderr, stdout, Write};
 use std::process;
@@ -72,7 +73,16 @@ fn main() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
         ("merge", Some(args)) => {
             let context = ok_or_exit(parse::merge::context_from(args));
-            merge(&context.mode, &context.cmds)
+            let merged_value = ok_or_exit(merge(&context.cmds));
+
+            let sout = stdout();
+            let mut lock = sout.lock();
+            ok_or_exit(show(
+                context.mode.parse().expect("clap to work"),
+                &merged_value,
+                lock,
+            ));
+            Ok(())
         }
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
