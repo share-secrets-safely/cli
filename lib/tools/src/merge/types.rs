@@ -31,8 +31,8 @@ impl FromStr for OutputMode {
 }
 
 #[derive(Default)]
-struct NeverDrop {
-    clashed_keys: Vec<String>,
+pub struct NeverDrop {
+    pub clashed_keys: Vec<String>,
 }
 
 impl fmt::Display for NeverDrop {

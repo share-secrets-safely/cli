@@ -538,6 +538,9 @@ dependencies = [
 name = "treediff"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "yaml-rust 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "ucd-util"

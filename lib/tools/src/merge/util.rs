@@ -5,6 +5,7 @@ use yaml;
 use yaml_rust;
 use yaml_rust::YamlEmitter;
 use treediff::{diff, tools};
+use super::types::NeverDrop;
 
 pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<json::Value, Error> {
     let mut buf = String::new();
@@ -24,24 +25,25 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<js
             })
             .and_then(|v| match v.len() {
                 0 => panic!("Deserialized a YAML without a single value"),
-                1 => Ok(yaml_rust_to_json(&v[0], &mut String::new())),
+                1 => Ok(yaml_rust_to_json(&v[0])),
                 _ => {
-                    unimplemented!()
-                    //                    let mut m = tools::Merger::with_filter(yamls[0].clone(), NeverDrop::default());
-                    //                    for docs in yamls.as_slice().windows(2) {
-                    //                        diff(&docs[0], &docs[1], &mut m);
-                    //                    }
-                    //                    if m.filter().clashed_keys.len() > 0 {
-                    //                        return Err(format!("{}", m.filter()).into());
-                    //                    }
+                    let mut m = tools::Merger::with_filter(v[0].clone(), NeverDrop::default());
+                    for docs in v.as_slice().windows(2) {
+                        diff(&docs[0], &docs[1], &mut m);
+                    }
+                    if m.filter().clashed_keys.len() > 0 {
+                        return Err(format_err!("{}", m.filter()).context("The merge failed due to conflicts"));
+                    }
+                    Ok(yaml_rust_to_json(&m.into_inner()))
                 }
             })?,
     })
 }
 
-fn yaml_rust_to_json(only_document: &yaml_rust::Yaml, buf: &mut String) -> json::Value {
+fn yaml_rust_to_json(only_document: &yaml_rust::Yaml) -> json::Value {
+    let mut buf = String::new();
     {
-        let mut emitter = YamlEmitter::new(buf);
+        let mut emitter = YamlEmitter::new(&mut buf);
         emitter
             .dump(only_document)
             .expect("dumping a valid yaml into a string to work");
