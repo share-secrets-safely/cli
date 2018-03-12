@@ -18,7 +18,7 @@ atty = "0.2.8"
 serde_json = "1.0.11"
 serde_yaml = "0.7.3"
 handlebars = "0.32.0"
-serde = "1.0.27"
+serde = "1.0"
 yaml-rust = "0.4.0"
 
 [dependencies.treediff]

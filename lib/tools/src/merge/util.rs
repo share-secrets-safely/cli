@@ -25,7 +25,7 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<js
             })
             .and_then(|v| match v.len() {
                 0 => panic!("Deserialized a YAML without a single value"),
-                1 => Ok(yaml_rust_to_json(&v[0])),
+                1 => panic!("We expect single-document yaml files to be read by serde"),
                 _ => {
                     let mut m = tools::Merger::with_filter(v[0].clone(), NeverDrop::default());
                     for docs in v.as_slice().windows(2) {
