@@ -5,6 +5,8 @@ extern crate handlebars;
 extern crate serde;
 extern crate serde_json as json;
 extern crate serde_yaml as yaml;
+extern crate treediff;
+extern crate yaml_rust;
 
 pub mod substitute;
 pub mod merge;

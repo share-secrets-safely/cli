@@ -3,9 +3,11 @@ use json;
 use yaml;
 use serde::Serialize;
 
+use std::io;
 mod types;
 pub use self::types::*;
-use std::io;
+
+mod util;
 
 pub fn merge(_cmds: &[Command]) -> Result<json::Value, Error> {
     Ok(json::Value::Null)
