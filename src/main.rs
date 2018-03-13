@@ -16,7 +16,7 @@ mod dispatch;
 
 use clap::ArgMatches;
 use tools::substitute::substitute;
-use tools::merge::{merge, show};
+use tools::merge::reduce;
 use failure::Error;
 use std::io::{stderr, stdout, Write};
 use std::process;
@@ -72,17 +72,8 @@ fn main() {
     let res = match matches.subcommand() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
         ("merge", Some(args)) => {
-            let context = ok_or_exit(parse::merge::context_from(args));
-            let merged_value = ok_or_exit(merge(&context.cmds));
-
-            let sout = stdout();
-            let mut lock = sout.lock();
-            ok_or_exit(show(
-                context.mode.parse().expect("clap to work"),
-                &merged_value,
-                lock,
-            ));
-            Ok(())
+            let cmds = ok_or_exit(parse::merge::context_from(args));
+            reduce(cmds, None).map(|_| ())
         }
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));

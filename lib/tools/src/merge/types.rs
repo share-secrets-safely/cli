@@ -1,4 +1,5 @@
 use failure::Error;
+use json;
 
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -6,11 +7,27 @@ use std::str::FromStr;
 use std::borrow::Cow;
 use treediff::tools::MutableFilter;
 use std::fmt;
+use std::io;
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct State {
+    pub output_mode: OutputMode,
+    pub value: json::Value,
+}
+
+impl Default for State {
+    fn default() -> Self {
+        State {
+            output_mode: OutputMode::Json,
+            value: json::Value::Null,
+        }
+    }
+}
+
 pub enum Command {
     MergeStdin,
     MergePath(PathBuf),
+    Serialize(Box<io::Write>),
+    SetOutputMode(OutputMode),
 }
 
 pub enum OutputMode {
