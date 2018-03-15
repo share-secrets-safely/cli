@@ -102,9 +102,12 @@ This is particularly useful if some of that content was just decrypted from a va
    * [ ] with conflicts
    * [ ] with overwrite rules
    * [ ] pull keys up one level before merging
+   * [ ] merge complete environment into data at specified key (or the root)
 
  * **improvements to substitute**
   * [ ] `--verify` - try to decode substituted values and fail on error
+  * [ ] control the escape characters to allow passwords to be escaped properly, as needed, depending on the output format.
+        Otherwise there is the chance of producing invalid YAML.
 
  * **general improvements**
   * [ ] Unify naming scheme of all deployables to make curling code easier
