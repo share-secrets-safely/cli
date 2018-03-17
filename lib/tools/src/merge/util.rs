@@ -15,7 +15,7 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<js
 
     Ok(match json::from_str(&buf) {
         Ok(v) => v,
-        Err(json_err) => yaml_rust::YamlLoader::load_from_str(&buf)
+        Err(json_err) => yaml::from_str(&buf)
             .map_err(|yaml_err| {
                 yaml_err
                     .context("YAML deserialization failed")
@@ -23,19 +23,23 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<js
                     .context("JSON deserialization failed")
                     .context("Could not deserialize data, tried JSON and YAML")
             })
-            .and_then(|v| match v.len() {
-                0 => panic!("Deserialized a YAML without a single value"),
-                1 => panic!("We expect single-document yaml files to be read by serde"),
-                _ => {
-                    let mut m = tools::Merger::with_filter(v[0].clone(), NeverDrop::default());
-                    for docs in v.as_slice().windows(2) {
-                        diff(&docs[0], &docs[1], &mut m);
-                    }
-                    if m.filter().clashed_keys.len() > 0 {
-                        return Err(format_err!("{}", m.filter()).context("The merge failed due to conflicts"));
-                    }
-                    Ok(yaml_rust_to_json(&m.into_inner()))
-                }
+            .or_else(|err| {
+                yaml_rust::YamlLoader::load_from_str(&buf)
+                    .map_err(|yaml_err| yaml_err.context(err).context("Deserialization failed permanently"))
+                    .and_then(|v| match v.len() {
+                        0 => panic!("Deserialized a YAML without a single value"),
+                        1 => panic!("We expect single-document yaml files to be read by serde"),
+                        _ => {
+                            let mut m = tools::Merger::with_filter(v[0].clone(), NeverDrop::default());
+                            for docs in v.as_slice().windows(2) {
+                                diff(&docs[0], &docs[1], &mut m);
+                            }
+                            if m.filter().clashed_keys.len() > 0 {
+                                return Err(format_err!("{}", m.filter()).context("The merge failed due to conflicts"));
+                            }
+                            Ok(yaml_rust_to_json(&m.into_inner()))
+                        }
+                    })
             })?,
     })
 }

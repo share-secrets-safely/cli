@@ -1,4 +1,4 @@
-use failure::Error;
+use failure::{Error, ResultExt};
 use json;
 use yaml;
 use serde::Serialize;
@@ -7,6 +7,7 @@ use std::io;
 mod types;
 pub use self::types::*;
 use std::io::stdin;
+use std::fs::File;
 
 mod util;
 
@@ -17,14 +18,21 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>) -> Result<State,
     for cmd in cmds {
         match cmd {
             MergeStdin => {
-                let _value_to_merge = util::de_json_or_yaml_document_support(stdin())?;
+                let value_to_merge = util::de_json_or_yaml_document_support(stdin())?;
+                state.value = value_to_merge
+                // TODO: merge it into what exists
+            }
+            MergePath(path) => {
+                let reader =
+                    File::open(&path).context(format!("Failed to open file at '{}' for reading", path.display()))?;
+                let value_to_merge = util::de_json_or_yaml_document_support(reader)?;
+                state.value = value_to_merge;
                 // TODO: merge it into what exists
             }
             SetOutputMode(mode) => {
                 state.output_mode = mode;
             }
             Serialize(write) => show(&state.output_mode, &state.value, write)?,
-            _ => unimplemented!(),
         }
     }
     Ok(state)

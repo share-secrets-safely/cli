@@ -79,12 +79,8 @@ impl MutableFilter for NeverDrop {
         _new: &'a V,
         _self: &mut V,
     ) -> Option<Cow<'a, V>> {
-        self.clashed_keys.push(
-            keys.iter()
-                .map(|k| format!("{}", k))
-                .collect::<Vec<_>>()
-                .join("."),
-        );
+        self.clashed_keys
+            .push(keys.iter().map(|k| format!("{}", k)).collect::<Vec<_>>().join("."));
         Some(Cow::Borrowed(old))
     }
 }

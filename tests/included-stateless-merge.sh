@@ -33,14 +33,14 @@ title "'merge' subcommand"
       (with "a single similar value"
         it "succeeds, as there is no conflict" && {
           echo "$INPUT" | \
-          WITH_SNAPSHOT="$snapshot/fail-yaml-stdin-with-yaml-file-same-scalar-value-to-stdout" \
+          WITH_SNAPSHOT="$snapshot/yaml-stdin-with-yaml-file-same-scalar-value-to-stdout" \
           expect_run $SUCCESSFULLY "$exe" merge "$template/good-answer.yml"
         }
       )
     )
     (with "a two similar complex yaml files"
       it "succeeds, as there is no conflict" && {
-        WITH_SNAPSHOT="$snapshot/fail-no-stdin-with-two-similar-complex-yaml-files-to-stdout" \
+        WITH_SNAPSHOT="$snapshot/no-stdin-with-two-similar-complex-yaml-files-to-stdout" \
         expect_run $SUCCESSFULLY "$exe" merge "$template/complex.yml" "$template/complex.yml"
       }
     )
