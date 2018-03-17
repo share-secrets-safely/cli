@@ -46,16 +46,14 @@ pub fn de_json_or_yaml<R: Read>(mut reader: R) -> Result<json::Value, Error> {
         .read_to_end(&mut buf)
         .context("Could not read input stream data deserialization")?;
 
-    Ok(
-        match json::from_reader::<_, json::Value>(Cursor::new(&buf)) {
-            Ok(v) => v,
-            Err(json_err) => yaml::from_reader(Cursor::new(&buf)).map_err(|yaml_err| {
-                yaml_err
-                    .context("YAML deserialization failed")
-                    .context(json_err)
-                    .context("JSON deserialization failed")
-                    .context("Could not deserialize data, tried JSON and YAML")
-            })?,
-        },
-    )
+    Ok(match json::from_reader::<_, json::Value>(Cursor::new(&buf)) {
+        Ok(v) => v,
+        Err(json_err) => yaml::from_reader(Cursor::new(&buf)).map_err(|yaml_err| {
+            yaml_err
+                .context("YAML deserialization failed")
+                .context(json_err)
+                .context("JSON deserialization failed")
+                .context("Could not deserialize data, tried JSON and YAML")
+        })?,
+    })
 }

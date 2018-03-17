@@ -14,10 +14,12 @@ fn mk_help(kind: &str, prefix: &str) -> String {
 lazy_static! {
     static ref EDITOR: Result<String, env::VarError> = env::var("EDITOR");
     static ref PARTITION_HELP: String = mk_help("partition", "");
-    static ref VAULT_HELP: String = mk_help("vault",
+    static ref VAULT_HELP: String = mk_help(
+        "vault",
         "Specify the vault which should be the leader.\
          This is particularly relevant for operations with partitions.\
-         It has no effect during 'vault init'.");
+         It has no effect during 'vault init'."
+    );
 }
 
 pub fn cli<'a, 'b>() -> App<'a, 'b> {
@@ -104,9 +106,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(optional_gpg_key_id(gpg_key_id.clone()));
 
-    let list = App::new("list")
-        .alias("ls")
-        .about("List the vault's content.");
+    let list = App::new("list").alias("ls").about("List the vault's content.");
     let resource_path = Arg::with_name("path")
         .required(true)
         .multiple(false)
@@ -127,16 +127,11 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                      the editor. This assures you do not accidentally loose your edits.",
                 ),
         )
-        .arg(
-            Arg::with_name("no-create")
-                .long("no-create")
-                .required(false)
-                .help(
-                    "If set, the resource you are editing must exist. \
-                     Otherwise it will be created on the fly, allowing you to \
-                     add new resources by editing them.",
-                ),
-        )
+        .arg(Arg::with_name("no-create").long("no-create").required(false).help(
+            "If set, the resource you are editing must exist. \
+             Otherwise it will be created on the fly, allowing you to \
+             add new resources by editing them.",
+        ))
         .arg(
             Arg::with_name("editor")
                 .long("editor")
@@ -155,9 +150,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
              a temporary file, open up the $EDITOR you have specified, and re-encrypt the \
              changed content before deleting it on disk.",
         );
-    let show_resource = App::new("show")
-        .about("Decrypt a resource")
-        .arg(resource_path.clone());
+    let show_resource = App::new("show").about("Decrypt a resource").arg(resource_path.clone());
     let spec = Arg::with_name("spec")
         .required(true)
         .multiple(false)
@@ -218,17 +211,12 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                      also current recipients.",
                 ),
         )
-        .arg(
-            Arg::with_name("verified")
-                .long("verified")
-                .required(false)
-                .help(
-                    "If specified, you indicate that the user id to be added truly belongs to a person you know \
-                     and that you have verified that relationship already. \
-                     You have used `gpg --sign-key <recipient>` or have set the owner trust to ultimate so that you \
-                     can encrypt for the recipient.",
-                ),
-        )
+        .arg(Arg::with_name("verified").long("verified").required(false).help(
+            "If specified, you indicate that the user id to be added truly belongs to a person you know \
+             and that you have verified that relationship already. \
+             You have used `gpg --sign-key <recipient>` or have set the owner trust to ultimate so that you \
+             can encrypt for the recipient.",
+        ))
         .arg(gpg_key_id.clone().required(true))
         .about(
             "Add a new recipient. This will re-encrypt all the vaults content.\

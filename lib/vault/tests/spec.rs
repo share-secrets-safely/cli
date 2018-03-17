@@ -23,10 +23,7 @@ fn it_cannot_have_just_a_separator() {
     let invalid = ":";
     assert_eq!(
         VaultSpec::try_from(invalid),
-        Err(VaultSpecError(format!(
-            "'{}' does not contain a destination.",
-            invalid
-        ),))
+        Err(VaultSpecError(format!("'{}' does not contain a destination.", invalid),))
     )
 }
 
@@ -49,7 +46,7 @@ fn it_is_ok_to_not_specify_a_source_to_signal_stdin() {
         Ok(VaultSpec {
             src: SpecSourceType::Stdin,
             dst: PathBuf::from("other/path"),
-        })
+        },)
     )
 }
 
@@ -60,7 +57,7 @@ fn it_is_created_from_relative_source_and_relative_destination() {
         Ok(VaultSpec {
             src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("other/path"),
-        })
+        },)
     )
 }
 
@@ -71,7 +68,7 @@ fn it_is_created_from_relative_source_fills_destination_with_source_when_using_a
         Ok(VaultSpec {
             src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("relative/path"),
-        })
+        },)
     )
 }
 
@@ -82,7 +79,7 @@ fn it_is_created_from_relative_source_fills_destination_with_source() {
         Ok(VaultSpec {
             src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("relative/path"),
-        })
+        },)
     )
 }
 
@@ -105,7 +102,7 @@ fn it_do_allow_relative_parent_directories_if_destination_is_specified() {
         Ok(VaultSpec {
             src: SpecSourceType::Path(PathBuf::from("../relative")),
             dst: PathBuf::from("destination"),
-        })
+        },)
     )
 }
 #[test]
@@ -115,7 +112,7 @@ fn it_does_allow_relative_parent_directories_in_destinations_if_that_is_what_the
         Ok(VaultSpec {
             src: SpecSourceType::Path(PathBuf::from("../relative")),
             dst: PathBuf::from("../other"),
-        })
+        },)
     )
 }
 
@@ -145,7 +142,7 @@ fn it_does_allow_an_absolute_destination_if_it_is_specified() {
         Ok(VaultSpec {
             src: SpecSourceType::Path(PathBuf::from("relative/path")),
             dst: PathBuf::from("/absolute/path"),
-        })
+        },)
     )
 }
 

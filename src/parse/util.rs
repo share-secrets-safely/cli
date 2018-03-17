@@ -9,10 +9,7 @@ where
 {
     match args.value_of_os(name).map(Into::into) {
         Some(t) => Ok(t),
-        None => Err(format_err!(
-            "BUG: expected clap argument '{}' to be set",
-            name
-        )),
+        None => Err(format_err!("BUG: expected clap argument '{}' to be set", name)),
     }
 }
 
@@ -33,9 +30,6 @@ where
     match args.value_of(name).map(FromStr::from_str) {
         Some(Ok(t)) => Ok(t),
         Some(Err(e)) => Err(e.into()),
-        None => Err(format_err!(
-            "BUG: expected clap argument '{}' to be set",
-            name
-        )),
+        None => Err(format_err!("BUG: expected clap argument '{}' to be set", name)),
     }
 }

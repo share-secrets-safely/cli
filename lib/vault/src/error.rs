@@ -136,16 +136,10 @@ impl fmt::Display for VaultError {
                 "Failed to deserialize vault configuration file at '{}'",
                 path.display()
             ),
-            WriteFile { ref path, .. } => writeln!(
-                f,
-                "Failed to write vault configuration file at '{}'",
-                path.display()
-            ),
-            ReadFile { ref path, .. } => writeln!(
-                f,
-                "Failed to read vault configuration file at '{}'",
-                path.display()
-            ),
+            WriteFile { ref path, .. } => {
+                writeln!(f, "Failed to write vault configuration file at '{}'", path.display())
+            }
+            ReadFile { ref path, .. } => writeln!(f, "Failed to read vault configuration file at '{}'", path.display()),
         }
     }
 }

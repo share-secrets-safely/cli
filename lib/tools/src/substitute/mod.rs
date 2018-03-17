@@ -28,10 +28,7 @@ pub fn substitute(input_data: &StreamOrPath, specs: &[Spec], separator: &OsStr) 
             (de_json_or_yaml(locked_stdin)?, specs)
         },
         Path(ref p) => (
-            de_json_or_yaml(File::open(&p).context(format!(
-                "Could not open input data file at '{}'",
-                p.display()
-            ))?)?,
+            de_json_or_yaml(File::open(&p).context(format!("Could not open input data file at '{}'", p.display()))?)?,
             if specs.is_empty() {
                 own_specs.push(Spec {
                     src: Stream,
@@ -67,12 +64,7 @@ pub fn substitute(input_data: &StreamOrPath, specs: &[Spec], separator: &OsStr) 
 
         let mut istream = spec.src.open_as_input()?;
         hbs.register_template_source(spec.src.short_name(), &mut istream)
-            .with_context(|_| {
-                format!(
-                    "Failed to register handlebars template at '{}'",
-                    spec.src.name()
-                )
-            })?;
+            .with_context(|_| format!("Failed to register handlebars template at '{}'", spec.src.name()))?;
 
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
@@ -80,12 +72,7 @@ pub fn substitute(input_data: &StreamOrPath, specs: &[Spec], separator: &OsStr) 
         }
 
         hbs.render_to_write(spec.src.short_name(), &dataset, &mut ostream)
-            .with_context(|_| {
-                format!(
-                    "Could instantiate template or writing to '{}' failed",
-                    spec.dst.name()
-                )
-            })?;
+            .with_context(|_| format!("Could instantiate template or writing to '{}' failed", spec.dst.name()))?;
     }
     Ok(())
 }

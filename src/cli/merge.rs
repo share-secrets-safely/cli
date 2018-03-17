@@ -25,6 +25,8 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .takes_value(true)
                 .required(false)
                 .multiple(true)
-                .help("The path to the file to include. It must be in a format that can be output using the --output flag."),
+                .help(
+                "The path to the file to include. It must be in a format that can be output using the --output flag.",
+            ),
         )
 }

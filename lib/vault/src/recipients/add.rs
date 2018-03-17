@@ -31,15 +31,13 @@ impl Vault {
                 gpg_ctx.add_signer(&signing_key)?;
                 for key_fpr_to_sign in imported_gpg_keys_ids {
                     let key_to_sign = gpg_ctx.find_key(&key_fpr_to_sign)?;
-                    gpg_ctx
-                        .sign_key(&key_to_sign, None::<&[u8]>, None)
-                        .with_context(|_| {
-                            format_err!(
-                                "Could not sign key of recipient {} with signing key {}",
-                                key_fpr_to_sign,
-                                UserIdFingerprint(&signing_key)
-                            )
-                        })?;
+                    gpg_ctx.sign_key(&key_to_sign, None::<&[u8]>, None).with_context(|_| {
+                        format_err!(
+                            "Could not sign key of recipient {} with signing key {}",
+                            key_fpr_to_sign,
+                            UserIdFingerprint(&signing_key)
+                        )
+                    })?;
                     writeln!(
                         output,
                         "Signed recipients key {} with signing key {}",
@@ -53,9 +51,7 @@ impl Vault {
                 let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
 
                 if keys_iter.finish()?.is_truncated() {
-                    return Err(err_msg(
-                        "The key list was truncated unexpectedly, while iterating it",
-                    ));
+                    return Err(err_msg("The key list was truncated unexpectedly, while iterating it"));
                 }
                 keys
             };
@@ -101,11 +97,7 @@ impl Vault {
                 .map(|s| Vault::partition_index(s, once(self).chain(self.partitions.iter()), None))
                 .collect::<Result<_, _>>()?;
             let mut all_partitions = self.all_in_order();
-            all_partitions.retain(|v| {
-                partitions
-                    .iter()
-                    .any(|partition_index| v.index == *partition_index)
-            });
+            all_partitions.retain(|v| partitions.iter().any(|partition_index| v.index == *partition_index));
             Ok(all_partitions)
         }
     }

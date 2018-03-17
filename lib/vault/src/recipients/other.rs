@@ -16,11 +16,7 @@ impl Vault {
         let mut buf = Vec::new();
         for key in keys {
             export_key(&mut gpg_ctx, &gpg_keys_dir, &key, &mut buf)?;
-            writeln!(
-                output,
-                "Exported public key for {}.",
-                UserIdFingerprint(&key)
-            ).ok();
+            writeln!(output, "Exported public key for {}.", UserIdFingerprint(&key)).ok();
         }
         Ok(())
     }

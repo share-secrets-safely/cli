@@ -82,8 +82,7 @@ impl Vault {
         ctx.decrypt(&mut input, &mut output)
             .map_err(|e: gpgme::Error| DecryptionError::caused_by(e, "Failed to decrypt data."))?;
 
-        w.write_all(&output)
-            .context("Could not write out all decrypted data.")?;
+        w.write_all(&output).context("Could not write out all decrypted data.")?;
         Ok(path_for_decryption)
     }
 
@@ -168,10 +167,7 @@ impl Vault {
                     none => {
                         mem::replace(
                             none,
-                            Some((
-                                partition.secrets_path(),
-                                partition.recipient_keys(&mut ctx)?,
-                            )),
+                            Some((partition.secrets_path(), partition.recipient_keys(&mut ctx)?)),
                         );
                         let some = none;
                         let &(ref secrets_dir, ref keys) = some.as_ref().expect("the content that was just put in");
@@ -202,9 +198,7 @@ impl Vault {
             output,
             "Added {}.",
             join(
-                encrypted_destinations
-                    .iter()
-                    .map(|p| format!("'{}'", p.display())),
+                encrypted_destinations.iter().map(|p| format!("'{}'", p.display())),
                 ", "
             )
         ).ok();

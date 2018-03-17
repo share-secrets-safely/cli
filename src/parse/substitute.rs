@@ -15,8 +15,7 @@ pub struct Context {
 pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         separator: required_os_arg(args, "separator")?,
-        data: args.value_of_os("data")
-            .map_or(StreamOrPath::Stream, Into::into),
+        data: args.value_of_os("data").map_or(StreamOrPath::Stream, Into::into),
         specs: match args.values_of("spec") {
             Some(v) => v.map(Spec::from).collect(),
             None => Vec::new(),

@@ -64,11 +64,7 @@ impl Vault {
                                     .filter_map(|i| i.fingerprint().map(ToOwned::to_owned).ok())
                                     .collect::<Vec<_>>()
                             });
-                        writeln!(
-                            output,
-                            "Imported recipient key at path '{}'",
-                            fpr_path.display()
-                        ).ok();
+                        writeln!(output, "Imported recipient key at path '{}'", fpr_path.display()).ok();
                         res
                     })
                     .or_else(|err| {
@@ -160,9 +156,7 @@ impl Vault {
             .filter_map(key_is_in_recipients_list)
             .collect();
         match signing_keys.len() {
-            0 => Err(err_msg(
-                "Didn't find a single secret key suitable to sign keys.",
-            )),
+            0 => Err(err_msg("Didn't find a single secret key suitable to sign keys.")),
             1 => Ok(signing_keys.pop().expect("one entry")),
             _ => Err(format_err!(
                 "Multiple keys are suitable for signing, which is ambiguous.\n{}",
@@ -201,15 +195,10 @@ impl Vault {
         };
         let mut buf = Vec::new();
         File::open(&fpr_path)
-            .context(format!(
-                "Could not open key file '{}' for reading",
-                fpr_path.display()
-            ))
+            .context(format!("Could not open key file '{}' for reading", fpr_path.display()))
             .and_then(|mut f| {
-                f.read_to_end(&mut buf).context(format!(
-                    "Could not read key file at '{}'.",
-                    fpr_path.display()
-                ))
+                f.read_to_end(&mut buf)
+                    .context(format!("Could not read key file at '{}'.", fpr_path.display()))
             })?;
         Ok((fpr_path, buf))
     }
@@ -222,10 +211,7 @@ impl Vault {
         let secrets_dir = self.secrets_path();
         let files_to_reencrypt: Vec<_> = {
             let _change_cwd = ResetCWD::new(&secrets_dir)?;
-            glob(GPG_GLOB)
-                .expect("valid pattern")
-                .filter_map(Result::ok)
-                .collect()
+            glob(GPG_GLOB).expect("valid pattern").filter_map(Result::ok).collect()
         };
         for encrypted_file_path in files_to_reencrypt {
             let tempfile = Temp::new_file().context(format!(
@@ -234,23 +220,21 @@ impl Vault {
             ))?;
             {
                 let mut plain_writer = write_at(&tempfile.to_path_buf())?;
-                self.decrypt(&encrypted_file_path, &mut plain_writer)
-                    .context(format!(
-                        "Could not decrypt '{}' to re-encrypt for new recipients.",
-                        encrypted_file_path.display()
-                    ))?;
+                self.decrypt(&encrypted_file_path, &mut plain_writer).context(format!(
+                    "Could not decrypt '{}' to re-encrypt for new recipients.",
+                    encrypted_file_path.display()
+                ))?;
             }
             {
                 let mut plain_reader = File::open(tempfile.to_path_buf())?;
-                ctx.encrypt(&keys, &mut plain_reader, &mut obuf)
-                    .map_err(|e| {
-                        EncryptionError::caused_by(
-                            e,
-                            format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
-                            ctx,
-                            &keys,
-                        )
-                    })?;
+                ctx.encrypt(&keys, &mut plain_reader, &mut obuf).map_err(|e| {
+                    EncryptionError::caused_by(
+                        e,
+                        format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
+                        ctx,
+                        &keys,
+                    )
+                })?;
             }
             write_at(&secrets_dir.join(&encrypted_file_path))
                 .context(format!(

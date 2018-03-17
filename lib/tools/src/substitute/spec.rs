@@ -43,10 +43,8 @@ impl StreamOrPath {
             StreamOrPath::Stream => Box::new(stdout()),
             StreamOrPath::Path(ref p) => {
                 if let Some(dir) = p.parent() {
-                    create_dir_all(dir).context(format!(
-                        "Could not create directory leading towards '{}'",
-                        p.display(),
-                    ))?;
+                    create_dir_all(dir)
+                        .context(format!("Could not create directory leading towards '{}'", p.display(),))?;
                 }
                 Box::new(OpenOptions::new()
                     .create(true)

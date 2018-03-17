@@ -13,8 +13,8 @@ use std::env;
 use std::ffi::OsString;
 use util::run_editor;
 
-lazy_static!{
-    static ref EDITOR: PathBuf = PathBuf::from(env::var_os("EDITOR").unwrap_or_else(||OsString::from("vim")));
+lazy_static! {
+    static ref EDITOR: PathBuf = PathBuf::from(env::var_os("EDITOR").unwrap_or_else(|| OsString::from("vim")));
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -65,14 +65,10 @@ impl ::std::error::Error for VaultSpecError {
 pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
     let file_name = path.file_name()
         .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
-    Ok(path.parent()
-        .expect("path with filename to have a root")
-        .join(format!(
-            "{}.gpg",
-            file_name
-                .to_str()
-                .expect("filename to be decodeable with UTF8",)
-        )))
+    Ok(path.parent().expect("path with filename to have a root").join(format!(
+        "{}.gpg",
+        file_name.to_str().expect("filename to be decodeable with UTF8",)
+    )))
 }
 
 struct TemporaryFile {
@@ -115,17 +111,9 @@ impl VaultSpec {
         let output_file = self.output_in(root, dst_mode)?;
         if let Some(d) = output_file.parent() {
             if !d.is_dir() {
-                create_dir_all(d).with_context(|_| {
-                    format!(
-                        "Failed to created intermediate directory at '{}'",
-                        d.display()
-                    )
-                })?;
-                writeln!(
-                    output,
-                    "Created intermediate directory at '{}'",
-                    d.display()
-                ).ok();
+                create_dir_all(d)
+                    .with_context(|_| format!("Failed to created intermediate directory at '{}'", d.display()))?;
+                writeln!(output, "Created intermediate directory at '{}'", d.display()).ok();
             }
         }
         if mode.refuse_overwrite() && output_file.exists() {
@@ -228,10 +216,7 @@ impl<'a> TryFrom<&'a str> for VaultSpec {
                 src: validate(src)?,
                 dst: PathBuf::from(if dst.is_empty() {
                     if src.is_empty() {
-                        return Err(VaultSpecError(format!(
-                            "'{}' does not contain a destination.",
-                            input
-                        )));
+                        return Err(VaultSpecError(format!("'{}' does not contain a destination.", input)));
                     }
                     src
                 } else if dst.contains(SEPARATOR) {

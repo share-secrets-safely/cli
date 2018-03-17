@@ -236,10 +236,7 @@ impl Vault {
                 continue;
             }
             let _change_cwd = ResetCWD::new(&dir)?;
-            for entry in glob(GPG_GLOB)
-                .expect("valid pattern")
-                .filter_map(Result::ok)
-            {
+            for entry in glob(GPG_GLOB).expect("valid pattern").filter_map(Result::ok) {
                 writeln!(w, "{}", strip_ext(&entry).display())?;
             }
         }
@@ -279,12 +276,10 @@ impl Vault {
 
     pub fn recipients_list(&self) -> Result<Vec<String>, Error> {
         let recipients_file_path = self.recipients_path();
-        let rfile = File::open(&recipients_file_path)
-            .map(BufReader::new)
-            .context(format!(
-                "Could not open recipients file at '{}' for reading",
-                recipients_file_path.display()
-            ))?;
+        let rfile = File::open(&recipients_file_path).map(BufReader::new).context(format!(
+            "Could not open recipients file at '{}' for reading",
+            recipients_file_path.display()
+        ))?;
         Ok(rfile.lines().collect::<Result<_, _>>().context(format!(
             "Could not read all recipients from file at '{}'",
             recipients_file_path.display()
@@ -297,10 +292,8 @@ impl Vault {
         ids: &[String],
         type_of_ids_for_errors: &str,
     ) -> Result<Vec<gpgme::Key>, Error> {
-        ctx.find_keys(ids).context(format!(
-            "Could not iterate keys for given {}s",
-            type_of_ids_for_errors
-        ))?;
+        ctx.find_keys(ids)
+            .context(format!("Could not iterate keys for given {}s", type_of_ids_for_errors))?;
         let (keys, missing): (Vec<gpgme::Key>, Vec<String>) = ids.iter().map(|id| (ctx.find_key(id), id)).fold(
             (Vec::new(), Vec::new()),
             |(mut keys, mut missing), (r, id)| {
@@ -365,10 +358,7 @@ impl Vault {
             },
         ];
         if !keys.is_empty() {
-            msg.push(format!(
-                "All {}s found in gpg database:",
-                type_of_ids_for_errors
-            ));
+            msg.push(format!("All {}s found in gpg database:", type_of_ids_for_errors));
             msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
         }
         Err(err_msg(msg.join("\n")))
@@ -406,15 +396,12 @@ impl Vault {
     }
 
     pub fn gpg_keys_dir(&self) -> Result<PathBuf, Error> {
-        self.gpg_keys
-            .as_ref()
-            .map(|p| self.absolute_path(p))
-            .ok_or_else(|| {
-                format_err!(
-                    "The vault at '{}' does not have a gpg_keys directory configured.",
-                    self.vault_path_for_display()
-                )
-            })
+        self.gpg_keys.as_ref().map(|p| self.absolute_path(p)).ok_or_else(|| {
+            format_err!(
+                "The vault at '{}' does not have a gpg_keys directory configured.",
+                self.vault_path_for_display()
+            )
+        })
     }
 }
 
@@ -425,10 +412,7 @@ pub trait VaultExt {
 impl VaultExt for Vec<Vault> {
     fn select(mut self, selector: &str) -> Result<Vault, Error> {
         let leader_index = Vault::partition_index(selector, self.iter(), None)?;
-        for (_, vault) in self.iter_mut()
-            .enumerate()
-            .filter(|&(vid, _)| vid != leader_index)
-        {
+        for (_, vault) in self.iter_mut().enumerate().filter(|&(vid, _)| vid != leader_index) {
             vault.kind = VaultKind::Partition;
         }
 
@@ -472,9 +456,7 @@ fn split_documents<R: Read>(mut r: R) -> Result<Vec<String>, Error> {
             let mut out_str = String::new();
             {
                 let mut emitter = YamlEmitter::new(&mut out_str);
-                emitter
-                    .dump(d)
-                    .expect("dumping a valid yaml into a string to work");
+                emitter.dump(d).expect("dumping a valid yaml into a string to work");
             }
             out_str
         })
@@ -535,17 +517,11 @@ mod tests_utils {
 
     #[test]
     fn it_will_always_remove_current_dirs_including_the_first_one() {
-        assert_eq!(
-            format!("{}", normalize(Path::new("./././a")).display()),
-            "a"
-        )
+        assert_eq!(format!("{}", normalize(Path::new("./././a")).display()), "a")
     }
     #[test]
     fn it_does_not_alter_parent_dirs() {
-        assert_eq!(
-            format!("{}", normalize(Path::new("./../.././a")).display()),
-            "../../a"
-        )
+        assert_eq!(format!("{}", normalize(Path::new("./../.././a")).display()), "../../a")
     }
 }
 

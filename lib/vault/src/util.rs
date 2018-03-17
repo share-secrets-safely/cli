@@ -26,11 +26,7 @@ pub fn fingerprints_of_keys(keys: &[gpgme::Key]) -> Result<Vec<(&gpgme::Key, Str
         .map_err(Into::into)
 }
 pub fn write_at(path: &Path) -> io::Result<fs::File> {
-    OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .open(path)
+    OpenOptions::new().create(true).write(true).truncate(true).open(path)
 }
 
 pub struct UserIdFingerprint<'a>(pub &'a gpgme::Key);
@@ -115,19 +111,11 @@ pub fn export_key(
     let fingerprint = fingerprint_of(key)?;
     let key_path = gpg_keys_dir.join(&fingerprint);
     ctx.set_armor(true);
-    ctx.export_keys(
-        [key].iter().map(|k| *k),
-        gpgme::ExportMode::empty(),
-        &mut *buf,
-    ).with_context(|_| err_msg("Failed to export at least one public key with signatures."))?;
+    ctx.export_keys([key].iter().map(|k| *k), gpgme::ExportMode::empty(), &mut *buf)
+        .with_context(|_| err_msg("Failed to export at least one public key with signatures."))?;
     write_at(&key_path)
         .and_then(|mut f| f.write_all(buf))
-        .with_context(|_| {
-            format!(
-                "Could not write public key file at '{}'",
-                key_path.display()
-            )
-        })?;
+        .with_context(|_| format!("Could not write public key file at '{}'", key_path.display()))?;
     buf.clear();
     Ok((fingerprint, key_path))
 }
@@ -141,9 +129,7 @@ pub fn extract_at_least_one_secret_key(
         let keys: Vec<_> = keys_iter.by_ref().collect::<Result<_, _>>()?;
 
         if keys_iter.finish()?.is_truncated() {
-            return Err(err_msg(
-                "The key list was truncated unexpectedly, while iterating it",
-            ));
+            return Err(err_msg("The key list was truncated unexpectedly, while iterating it"));
         }
         keys
     };
@@ -204,12 +190,7 @@ pub fn run_editor(editor: &OsStr, path_to_edit: &Path) -> Result<(), Error> {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
-        .with_context(|_| {
-            format!(
-                "Failed to start editor program at '{}'.",
-                editor.to_string_lossy()
-            )
-        })?;
+        .with_context(|_| format!("Failed to start editor program at '{}'.", editor.to_string_lossy()))?;
     let status = running_program
         .wait()
         .with_context(|_| "Failed to wait for editor to exit.")?;

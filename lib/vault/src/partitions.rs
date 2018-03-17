@@ -33,10 +33,7 @@ impl Vault {
             Ok(index) => {
                 if let Some(leader_index) = leader_index {
                     if leader_index == index {
-                        bail!(
-                            "Refusing to remove the leading partition at index {}",
-                            index
-                        )
+                        bail!("Refusing to remove the leading partition at index {}", index)
                     }
                 };
                 partitions
@@ -58,10 +55,7 @@ impl Vault {
                 });
                 match (matches.next(), matches.next()) {
                     (Some(index), None) => index,
-                    (Some(_), Some(_)) => bail!(
-                        "Multiple partitions matched the ambiguous selector '{}'",
-                        selector
-                    ),
+                    (Some(_), Some(_)) => bail!("Multiple partitions matched the ambiguous selector '{}'", selector),
                     _ => bail!("No partition matched the given selector '{}'", selector),
                 }
             }
@@ -128,9 +122,7 @@ impl Vault {
         {
             let mut gpg_ctx = new_context()?;
             let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
-            let mut fprs: Vec<_> = keys.iter()
-                .map(|k| fingerprint_of(k))
-                .collect::<Result<_, _>>()?;
+            let mut fprs: Vec<_> = keys.iter().map(|k| fingerprint_of(k)).collect::<Result<_, _>>()?;
             assure_empty_directory_exists(&partition_secrets_dir).context("Cannot create secrets directory")?;
             partition.write_recipients_list(&mut fprs)?;
 

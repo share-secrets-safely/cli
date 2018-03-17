@@ -18,18 +18,10 @@ pub enum DirectoryInfo {
 pub fn assure_empty_directory_exists(dir: &Path) -> Result<DirectoryInfo, Error> {
     Ok(if dir.is_dir() {
         let num_entries = dir.read_dir()
-            .with_context(|_| {
-                format!(
-                    "Failed to open directory '{}' to see if it is empty",
-                    dir.display()
-                )
-            })?
+            .with_context(|_| format!("Failed to open directory '{}' to see if it is empty", dir.display()))?
             .count();
         if num_entries > 0 {
-            bail!(
-                "Refusing to write into non-empty directory at '{}'",
-                dir.display()
-            )
+            bail!("Refusing to write into non-empty directory at '{}'", dir.display())
         }
         DirectoryInfo::Existed
     } else {

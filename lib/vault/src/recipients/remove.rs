@@ -29,9 +29,7 @@ impl Vault {
                 let (keys_and_fprs_to_remove, missing) = keys_and_fprs.into_iter().fold(
                     (Vec::new(), Vec::new()),
                     |(mut keys, mut missing), (k, fpr)| {
-                        let found = recipient_keys_and_fprs
-                            .iter()
-                            .any(|&(_, ref rkfpr)| *rkfpr == fpr);
+                        let found = recipient_keys_and_fprs.iter().any(|&(_, ref rkfpr)| *rkfpr == fpr);
                         if found {
                             keys.push((k, fpr));
                         } else {
@@ -44,10 +42,7 @@ impl Vault {
                 if !missing.is_empty() {
                     return Err(format_err!(
                         "The following key(s) for removal could not be found in the recipients list.\n{}",
-                        missing
-                            .iter()
-                            .map(|k| format!("{}", UserIdFingerprint(k)))
-                            .join("\n")
+                        missing.iter().map(|k| format!("{}", UserIdFingerprint(k))).join("\n")
                     ));
                 }
                 let recipient_keys_and_fprs = recipient_keys_and_fprs
@@ -73,15 +68,9 @@ impl Vault {
                     }
                     let fingerprint_path = gpg_keys_dir.join(fpr);
                     if fingerprint_path.is_file() {
-                        remove_file(&fingerprint_path).context(format!(
-                            "Failed to remove key file at '{}'",
-                            fingerprint_path.display(),
-                        ))?;
-                        writeln!(
-                            output,
-                            "Removed key file at '{}'",
-                            fingerprint_path.display()
-                        )
+                        remove_file(&fingerprint_path)
+                            .context(format!("Failed to remove key file at '{}'", fingerprint_path.display(),))?;
+                        writeln!(output, "Removed key file at '{}'", fingerprint_path.display())
                     } else {
                         writeln!(
                             output,

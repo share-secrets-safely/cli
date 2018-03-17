@@ -13,10 +13,7 @@ pub fn generate(mut app: App, args: &ArgMatches) -> Result<(), Error> {
         .map(|s| {
             Path::new(s)
                 .file_name()
-                .map(|f| {
-                    f.to_str()
-                        .expect("os-string to str conversion to work for filename")
-                })
+                .map(|f| f.to_str().expect("os-string to str conversion to work for filename"))
                 .unwrap_or(s)
         })
         .and_then(|s| {
