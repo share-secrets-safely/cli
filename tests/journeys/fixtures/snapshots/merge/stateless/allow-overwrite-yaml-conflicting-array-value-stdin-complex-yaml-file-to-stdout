@@ -1,0 +1,96 @@
+{
+  "0.25": "a float key",
+  "Keys can be quoted too.": "Useful if you want to put a ':' in your key.",
+  "a_nested_map": {
+    "another_key": "Another Value",
+    "another_nested_map": {
+      "hello": "hello"
+    },
+    "key": "value"
+  },
+  "a_number_value": 100,
+  "a_sequence": [
+    "foo",
+    "Item 2",
+    0.5,
+    "Item 4",
+    {
+      "another_key": "another_value",
+      "key": "value"
+    },
+    [
+      "This is a sequence",
+      "inside another sequence"
+    ],
+    [
+      [
+        "Nested sequence indicators",
+        "can be collapsed"
+      ]
+    ]
+  ],
+  "anchored_content": "This string will appear as the value of two keys.",
+  "and quotes are optional": {
+    "key": [
+      3,
+      2,
+      1,
+      "takeoff"
+    ]
+  },
+  "another_key": "Another value goes here.",
+  "bar": {
+    "<<": {
+      "name": "Everyone has same name"
+    },
+    "age": 20
+  },
+  "base": {
+    "name": "Everyone has same name"
+  },
+  "boolean": true,
+  "date": "2002-12-14",
+  "datetime": "2001-12-15T02:59:43.1Z",
+  "datetime_with_spaces": "2001-12-14 21:59:43.10 -5",
+  "double quotes": "have many: \", \u0000, \t, ☺, \r\n == \r\n, and more.",
+  "explicit_string": "0.5",
+  "folded_style": "This entire block of text will be the value of 'folded_style', but this time, all newlines will be replaced with a single space.\nBlank lines, like above, are converted to a newline character.\n\n    'More-indented' lines keep their newlines, too -\n    this text will appear over two lines.\n",
+  "foo": {
+    "<<": {
+      "name": "Everyone has same name"
+    },
+    "age": 10
+  },
+  "however": "A string, enclosed in quotes.",
+  "json_map": {
+    "key": "value"
+  },
+  "json_seq": [
+    3,
+    2,
+    1,
+    "takeoff"
+  ],
+  "key": "value",
+  "key with spaces": "value",
+  "literal_block": "This entire block of text will be the value of the 'literal_block' key,\nwith line breaks being preserved.\n\nThe literal continues until de-dented, and the leading indentation is\nstripped.\n\n    Any lines that are 'more-indented' keep the rest of their indentation -\n    these lines will be indented by 4 spaces.\n",
+  "null_value": null,
+  "or": {
+    "item1": null,
+    "item2": null,
+    "item3": null
+  },
+  "other_anchor": "This string will appear as the value of two keys.",
+  "scientific_notation": 1000000000000.0,
+  "set": {
+    "item1": null,
+    "item2": null,
+    "item3": null
+  },
+  "set2": {
+    "item1": null,
+    "item2": null,
+    "item3": null
+  },
+  "single quotes": "have 'one' escape pattern"
+}

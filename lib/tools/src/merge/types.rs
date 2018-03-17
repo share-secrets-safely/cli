@@ -7,10 +7,10 @@ use std::str::FromStr;
 use std::borrow::Cow;
 use treediff::tools::MutableFilter;
 use std::fmt;
-use std::io;
 
 pub struct State {
     pub output_mode: OutputMode,
+    pub merge_mode: MergeMode,
     pub value: Option<json::Value>,
 }
 
@@ -18,18 +18,28 @@ impl Default for State {
     fn default() -> Self {
         State {
             output_mode: OutputMode::Json,
+            merge_mode: MergeMode::NoOverwrite,
             value: None,
         }
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum MergeMode {
+    Overwrite,
+    NoOverwrite,
+}
+
+#[derive(Debug)]
 pub enum Command {
     MergeStdin,
     MergePath(PathBuf),
-    Serialize(Box<io::Write>),
+    SetMergeMode(MergeMode),
+    Serialize,
     SetOutputMode(OutputMode),
 }
 
+#[derive(Debug)]
 pub enum OutputMode {
     Json,
     Yaml,
@@ -47,9 +57,18 @@ impl FromStr for OutputMode {
     }
 }
 
-#[derive(Default)]
 pub struct NeverDrop {
+    pub mode: MergeMode,
     pub clashed_keys: Vec<String>,
+}
+
+impl NeverDrop {
+    pub fn with_mode(mode: &MergeMode) -> Self {
+        NeverDrop {
+            mode: mode.clone(),
+            clashed_keys: Vec::new(),
+        }
+    }
 }
 
 impl fmt::Display for NeverDrop {
@@ -76,11 +95,16 @@ impl MutableFilter for NeverDrop {
         &mut self,
         keys: &[K],
         old: &'a V,
-        _new: &'a V,
+        new: &'a V,
         _self: &mut V,
     ) -> Option<Cow<'a, V>> {
-        self.clashed_keys
-            .push(keys.iter().map(|k| format!("{}", k)).collect::<Vec<_>>().join("."));
-        Some(Cow::Borrowed(old))
+        match self.mode {
+            MergeMode::NoOverwrite => {
+                self.clashed_keys
+                    .push(keys.iter().map(|k| format!("{}", k)).collect::<Vec<_>>().join("."));
+                Some(Cow::Borrowed(old))
+            }
+            MergeMode::Overwrite => Some(Cow::Borrowed(new)),
+        }
     }
 }

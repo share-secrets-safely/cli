@@ -100,7 +100,7 @@ This is particularly useful if some of that content was just decrypted from a va
 
  * [ ] **Support for merges**
    * [x] with conflicts
-   * [ ] with overwrite rules
+   * [x] with overwrite rules
    * [ ] pull keys up one level before merging
    * [ ] merge complete environment into data at specified key (or the root)
    * [ ] set individual values, see google apis rs

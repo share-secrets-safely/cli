@@ -47,23 +47,71 @@ title "'merge' subcommand"
   )
 )
 
+title "'merge' overwrite control"
+(with "a file"
+  (with "another file conflicting with the first"
+    (with "overwrite enabled"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/allow-overwrite-no-stdin-with-two-conflicting-files-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge "$template/good-answer.yml" --overwrite "$template/wrong-answer.yml"
+      }
+    )
+    (with "overwrite disabled"
+      it "fails" && {
+        WITH_SNAPSHOT="$snapshot/fail-no-stdin-with-two-conflicting-files-to-stdout" \
+        expect_run $WITH_FAILURE "$exe" merge "$template/good-answer.yml" --overwrite --no-overwrite "$template/wrong-answer.yml"
+      }
+    )
+  )
+  (with "a conflicting file from stdin"
+    (with "overwrite enabeld"
+      it "succeeds as all overwrite arguments are applied to the input from stdin" && {
+        cat "$template/good-answer.yml" | \
+        WITH_SNAPSHOT="$snapshot/allow-overwrite-file-from-stdin-with-one-conflicting-file-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge --overwrite --no-overwrite --overwrite "$template/wrong-answer.yml"
+      }
+    )
+  )
+)
+
 title "'merge' conflicts"
 (with "a single complex yaml file"
   (with "a conflicting nested scalar value from stdin"
-    it "fails" && {
-      echo '{ "a_nested_map" : { "another_nested_map" : { "hello": "world"}}}' | \
-      WITH_SNAPSHOT="$snapshot/fail-yaml-conflicting-nested-scalar-stdin-complex-yaml-file-to-stdout" \
-      expect_run $WITH_FAILURE "$exe" merge "$template/complex.yml"
-    }
+    INPUT='{ "a_nested_map" : { "another_nested_map" : { "hello": "world"}}}'
+    (with "default overwrite settings"
+      it "fails" && {
+        cat "$template/complex.yml" | \
+        WITH_SNAPSHOT="$snapshot/fail-yaml-conflicting-nested-scalar-stdin-complex-yaml-file-to-stdout" \
+        expect_run $WITH_FAILURE "$exe" merge <(echo "$INPUT")
+      }
+    )
+    (with "overwrite enabled"
+      it "succeeds" && {
+        cat "$template/complex.yml" | \
+        WITH_SNAPSHOT="$snapshot/allow-overwrite-yaml-conflicting-nested-scalar-stdin-complex-yaml-file-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge --overwrite <(echo "$INPUT")
+      }
+    )
   )
   (with "a conflicting array value from stdin"
-    it "fails" && {
-      echo "a_sequence: [foo]" | \
-      WITH_SNAPSHOT="$snapshot/fail-yaml-conflicting-array-value-stdin-complex-yaml-file-to-stdout" \
-      expect_run $WITH_FAILURE "$exe" merge "$template/complex.yml"
-    }
+    INPUT="a_sequence: [foo]"
+    (with "default overwrite settings"
+      it "fails" && {
+        cat "$template/complex.yml" | \
+        WITH_SNAPSHOT="$snapshot/fail-yaml-conflicting-array-value-stdin-complex-yaml-file-to-stdout" \
+        expect_run $WITH_FAILURE "$exe" merge <(echo "$INPUT")
+      }
+    )
+    (with "overwrite enabled"
+      it "succeeds" && {
+        cat "$template/complex.yml" | \
+        WITH_SNAPSHOT="$snapshot/allow-overwrite-yaml-conflicting-array-value-stdin-complex-yaml-file-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge --overwrite <(echo "$INPUT")
+      }
+    )
   )
 )
+
 (with "a single conflicting file"
   (with "conflicting scalar value from stdin as yaml"
     it "fails as it refuses to overwrite keys" && {
@@ -74,17 +122,34 @@ title "'merge' conflicts"
 )
 (with "a single multi-document file with conflicts"
   (when "fed from stdin"
-    it "fails as it refuses to overwrite keys" && {
-      cat "$template/multi-docs-conflict.yml" | \
-      WITH_SNAPSHOT="$snapshot/fail-multi-doc-yaml-with-conflict-from-stdin-to-stdout" \
-      expect_run $WITH_FAILURE "$exe" merge
-    }
+    (with "default overwrite settings"
+      it "fails as it refuses to overwrite keys" && {
+        cat "$template/multi-docs-conflict.yml" | \
+        WITH_SNAPSHOT="$snapshot/fail-multi-doc-yaml-with-conflict-from-stdin-to-stdout" \
+        expect_run $WITH_FAILURE "$exe" merge
+      }
+    )
+    (with "with overwrite enabled"
+      it "succeeds" && {
+        cat "$template/multi-docs-conflict.yml" | \
+        WITH_SNAPSHOT="$snapshot/allow-overwrite-multi-doc-yaml-with-conflict-from-stdin-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge --overwrite
+      }
+    )
   )
   (when "fed as file"
-    it "fails as it refuses to overwrite keys" && {
-      WITH_SNAPSHOT="$snapshot/fail-multi-doc-yaml-with-conflict-from-file-to-stdout" \
-      expect_run $WITH_FAILURE "$exe" merge "$template/multi-docs-conflict.yml"
-    }
+    (with "default overwrite settings"
+      it "fails as it refuses to overwrite keys" && {
+        WITH_SNAPSHOT="$snapshot/fail-multi-doc-yaml-with-conflict-from-file-to-stdout" \
+        expect_run $WITH_FAILURE "$exe" merge "$template/multi-docs-conflict.yml"
+      }
+    )
+    (with "with overwrite enabled"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/allow-overwrite-multi-doc-yaml-with-conflict-from-file-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge --overwrite "$template/multi-docs-conflict.yml"
+      }
+    )
   )
 )
 

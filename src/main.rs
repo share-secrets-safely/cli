@@ -73,7 +73,10 @@ fn main() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
         ("merge", Some(args)) => {
             let cmds = ok_or_exit(parse::merge::context_from(args));
-            reduce(cmds, None).map(|_| ())
+
+            let sout = stdout();
+            let mut lock = sout.lock();
+            reduce(cmds, None, &mut lock).map(|_| ())
         }
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));

@@ -9,6 +9,24 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
              Merging a single file is explicitly valid and can be used to check for syntax errors.",
         )
         .arg(
+            Arg::with_name("no-overwrite")
+                .long("no-overwrite")
+                .takes_value(false)
+                .required(false)
+                .multiple(true)
+                .help("If set, values in the merged document may not overwrite values already present. This is enabled by default,\
+                       and can be explicitly turned off with --overwrite."),
+        )
+        .arg(
+            Arg::with_name("overwrite")
+                .long("overwrite")
+                .takes_value(false)
+                .required(false)
+                .multiple(true)
+                .help("If set, values in the merged document can overwrite values already present. This is disabled by default,\
+                       and can be explicitly turned off with --no-overwrite."),
+        )
+        .arg(
             Arg::with_name("output")
                 .short("o")
                 .long("output")

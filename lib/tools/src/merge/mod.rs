@@ -3,35 +3,37 @@ use json;
 use yaml;
 use serde::Serialize;
 
-use std::io;
 mod types;
 pub use self::types::*;
-use std::io::stdin;
+use std::io::{self, stdin};
 use std::fs::File;
 use treediff::{diff, tools};
 
 mod util;
 
-pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>) -> Result<State, Error> {
+pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut io::Write) -> Result<State, Error> {
     use self::Command::*;
     let mut state = initial_state.unwrap_or_else(State::default);
 
     for cmd in cmds {
         match cmd {
+            SetMergeMode(mode) => {
+                state.merge_mode = mode;
+            }
             MergeStdin => {
-                let value_to_merge = util::de_json_or_yaml_document_support(stdin())?;
+                let value_to_merge = util::de_json_or_yaml_document_support(stdin(), &state)?;
                 state = merge(value_to_merge, state)?;
             }
             MergePath(path) => {
                 let reader =
                     File::open(&path).context(format!("Failed to open file at '{}' for reading", path.display()))?;
-                let value_to_merge = util::de_json_or_yaml_document_support(reader)?;
+                let value_to_merge = util::de_json_or_yaml_document_support(reader, &state)?;
                 state = merge(value_to_merge, state)?;
             }
             SetOutputMode(mode) => {
                 state.output_mode = mode;
             }
-            Serialize(write) => show(&state.output_mode, &state.value, write)?,
+            Serialize => show(&state.output_mode, &state.value, &mut output)?,
         }
     }
     Ok(state)
@@ -55,8 +57,8 @@ fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
             Ok(state)
         }
         Some(existing_value) => {
-            let mut m = tools::Merger::with_filter(src.clone(), NeverDrop::default());
-            diff(&src, &existing_value, &mut m);
+            let mut m = tools::Merger::with_filter(existing_value.clone(), NeverDrop::with_mode(&state.merge_mode));
+            diff(&existing_value, &src, &mut m);
 
             if m.filter().clashed_keys.len() > 0 {
                 Err(format_err!("{}", m.filter())
