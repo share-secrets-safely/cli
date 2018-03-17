@@ -49,20 +49,23 @@ where
 }
 
 fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
-    if state.value == json::Value::Null {
-        state.value = src;
-        return Ok(state);
-    }
+    match state.value {
+        None => {
+            state.value = Some(src);
+            Ok(state)
+        }
+        Some(existing_value) => {
+            let mut m = tools::Merger::with_filter(src.clone(), NeverDrop::default());
+            diff(&src, &existing_value, &mut m);
 
-    let mut m = tools::Merger::with_filter(src.clone(), NeverDrop::default());
-    diff(&src, &state.value, &mut m);
-
-    if m.filter().clashed_keys.len() > 0 {
-        Err(format_err!("{}", m.filter())
-            .context("The merge failed due to conflicts")
-            .into())
-    } else {
-        state.value = m.into_inner();
-        Ok(state)
+            if m.filter().clashed_keys.len() > 0 {
+                Err(format_err!("{}", m.filter())
+                    .context("The merge failed due to conflicts")
+                    .into())
+            } else {
+                state.value = Some(m.into_inner());
+                Ok(state)
+            }
+        }
     }
 }

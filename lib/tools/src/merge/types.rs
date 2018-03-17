@@ -11,14 +11,14 @@ use std::io;
 
 pub struct State {
     pub output_mode: OutputMode,
-    pub value: json::Value,
+    pub value: Option<json::Value>,
 }
 
 impl Default for State {
     fn default() -> Self {
         State {
             output_mode: OutputMode::Json,
-            value: json::Value::Null,
+            value: None,
         }
     }
 }
