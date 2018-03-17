@@ -50,36 +50,26 @@ title "'merge' subcommand"
 title "'merge' conflicts"
 (with "a single complex yaml file"
   (with "a conflicting nested scalar value from stdin"
-    it "succeeds, as there is no conflict" && {
-      echo "a_nested_map.another_nested_map.hello: world" | \
-      WITH_SNAPSHOT="$snapshot/yaml-conflicting-nested-scalar-stdin-complex-yaml-file-to-stdout" \
+    it "fails" && {
+      echo '{ "a_nested_map" : { "another_nested_map" : { "hello": "world"}}}' | \
+      WITH_SNAPSHOT="$snapshot/fail-yaml-conflicting-nested-scalar-stdin-complex-yaml-file-to-stdout" \
       expect_run $WITH_FAILURE "$exe" merge "$template/complex.yml"
     }
   )
   (with "a conflicting array value from stdin"
     it "fails" && {
       echo "a_sequence: [foo]" | \
-      WITH_SNAPSHOT="$snapshot/yaml-conflicting-array-value-stdin-complex-yaml-file-to-stdout" \
+      WITH_SNAPSHOT="$snapshot/fail-yaml-conflicting-array-value-stdin-complex-yaml-file-to-stdout" \
       expect_run $WITH_FAILURE "$exe" merge "$template/complex.yml"
     }
   )
 )
 (with "a single conflicting file"
-  (with "conflicting scalar value"
-    (with "yaml format"
-      it "fails as it refuses to overwrite keys" && {
-        echo "$INPUT" | \
-        WITH_SNAPSHOT="$snapshot/fail-yaml-stdin-with-yaml-file-conflicting-scalar-to-stdout" \
-        expect_run $WITH_FAILURE "$exe" merge "$template/wrong-answer.yml"
-      }
-    )
-    (with "json format"
-      it "fails as it merges safely by default" && {
-        echo "$INPUT" | \
-        WITH_SNAPSHOT="$snapshot/fail-yaml-stdin-with-yaml-file-conflicting-scalar-to-stdout" \
-        expect_run $WITH_FAILURE "$exe" merge "$template/wrong-answer.json"
-      }
-    )
+  (with "conflicting scalar value from stdin as yaml"
+    it "fails as it refuses to overwrite keys" && {
+      WITH_SNAPSHOT="$snapshot/fail-yaml-stdin-with-yaml-file-conflicting-scalar-to-stdout" \
+      expect_run $WITH_FAILURE "$exe" merge "$template/wrong-answer.yml" < "$template/good-answer.yml"
+    }
   )
 )
 

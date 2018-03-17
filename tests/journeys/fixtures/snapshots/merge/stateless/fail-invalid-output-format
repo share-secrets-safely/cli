@@ -1,0 +1,8 @@
+error: 'foobar' isn't a valid value for '--output <mode>'
+	[possible values: json, yaml]
+
+
+USAGE:
+    sy merge --output <mode>
+
+For more information try --help

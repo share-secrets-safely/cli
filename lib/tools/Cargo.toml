@@ -22,5 +22,5 @@ serde = "1.0"
 yaml-rust = "0.4.0"
 
 [dependencies.treediff]
-features = ["with-yaml-rust"]
+features = ["with-yaml-rust", "with-serde-json"]
 version = "3.0.0"
