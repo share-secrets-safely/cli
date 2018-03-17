@@ -3,6 +3,44 @@
 template="$fixture/merge"
 snapshot="$fixture/snapshots/merge/stateless"
 
+title "'merge' environment"
+(with "the 'environment' arg set"
+  (with "no explicit filter"
+    it "succeeds and merges the all environment variables into the root" && {
+      WITH_SNAPSHOT="$snapshot/environment-unfiltered-at-root" \
+      TEST_MARKER_VARIABLE=value \
+      expect_run_sh $SUCCESSFULLY "$exe merge -o json --environment | grep '\"TEST_MARKER_VARIABLE\": \"value\",' "
+    }
+  )
+  (with "explicit filter that has matches"
+    it "succeeds and merges the all matching environment variables into the root" && {
+      WITH_SNAPSHOT="$snapshot/environment-filtered-at-root" \
+      TEST_MARKER_STRING=value \
+      TEST_MARKER_INT=42 \
+      TEST_MARKER_INT_NEGATIVE=-42 \
+      TEST_MARKER_FLOAT=42.5 \
+      TEST_MARKER_FLOAT_NEGATIVE=-42.5 \
+      TEST_MARKER_BOOL_TRUE=true \
+      TEST_MARKER_BOOL_FALSE=false \
+      TEST_MARKER_INVALID_JSON="{'a':}" \
+      TEST_MARKER_COMPLEX='{"a":1, "b":2, "c": [1,2,3], "d": "val"}' \
+      expect_run $SUCCESSFULLY $exe merge -o yaml '--environment=TEST_*'
+    }
+  )
+  (with "explicit filter that matches nothing"
+    it "succeeds as we believe that errors should happpen later during substitution" && {
+      WITH_SNAPSHOT="$snapshot/environment-filtered-no-match-at-root" \
+      expect_run $SUCCESSFULLY $exe merge -o json --environment=foobarbaz
+    }
+  )
+  (with "invalid environment pattern"
+    it "fails" && {
+      WITH_SNAPSHOT="$snapshot/fail-environment-invalid-filter" \
+      expect_run $WITH_FAILURE $exe merge --environment=][
+    }
+  )
+)
+
 title "'merge' subcommand"
 (with "yaml from stdin"
   INPUT="answer: 42"
@@ -55,6 +93,12 @@ title "'merge' overwrite control"
         WITH_SNAPSHOT="$snapshot/allow-overwrite-no-stdin-with-two-conflicting-files-to-stdout" \
         expect_run $SUCCESSFULLY "$exe" merge "$template/good-answer.yml" --overwrite "$template/wrong-answer.yml"
       }
+      (when "followed by another conflicting document"
+        it "succeeds as the overwrite mode persists - it must be toggled" && {
+          WITH_SNAPSHOT="$snapshot/allow-overwrite-no-stdin-with-two-conflicting-files-to-stdout-overwrite-persists" \
+          expect_run $SUCCESSFULLY "$exe" merge "$template/good-answer.yml" --overwrite "$template/wrong-answer.yml" "$template/good-answer.yml"
+        }
+      )
     )
     (with "overwrite disabled"
       it "fails" && {

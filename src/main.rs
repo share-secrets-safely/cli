@@ -7,6 +7,7 @@ extern crate failure;
 extern crate gpgme;
 #[macro_use]
 extern crate lazy_static;
+extern crate glob;
 extern crate sheesy_tools as tools;
 extern crate sheesy_vault as vault;
 
@@ -71,7 +72,7 @@ fn main() {
 
     let res = match matches.subcommand() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
-        ("merge", Some(args)) => {
+        ("process", Some(args)) => {
             let cmds = ok_or_exit(parse::merge::context_from(args));
 
             let sout = stdout();

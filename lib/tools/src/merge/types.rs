@@ -7,21 +7,13 @@ use std::str::FromStr;
 use std::borrow::Cow;
 use treediff::tools::MutableFilter;
 use std::fmt;
+use glob;
 
+#[derive(Default)]
 pub struct State {
     pub output_mode: OutputMode,
     pub merge_mode: MergeMode,
     pub value: Option<json::Value>,
-}
-
-impl Default for State {
-    fn default() -> Self {
-        State {
-            output_mode: OutputMode::Json,
-            merge_mode: MergeMode::NoOverwrite,
-            value: None,
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -30,10 +22,17 @@ pub enum MergeMode {
     NoOverwrite,
 }
 
+impl Default for MergeMode {
+    fn default() -> Self {
+        MergeMode::NoOverwrite
+    }
+}
+
 #[derive(Debug)]
 pub enum Command {
     MergeStdin,
     MergePath(PathBuf),
+    MergeEnvironment(glob::Pattern),
     SetMergeMode(MergeMode),
     Serialize,
     SetOutputMode(OutputMode),
@@ -43,6 +42,12 @@ pub enum Command {
 pub enum OutputMode {
     Json,
     Yaml,
+}
+
+impl Default for OutputMode {
+    fn default() -> Self {
+        OutputMode::Json
+    }
 }
 
 impl FromStr for OutputMode {

@@ -7,6 +7,7 @@ mod types;
 pub use self::types::*;
 use std::io::{self, stdin};
 use std::fs::File;
+use std::env::vars;
 use treediff::{diff, tools};
 
 mod util;
@@ -23,6 +24,16 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
             MergeStdin => {
                 let value_to_merge = util::de_json_or_yaml_document_support(stdin(), &state)?;
                 state = merge(value_to_merge, state)?;
+            }
+            MergeEnvironment(pattern) => {
+                let mut map = vars().filter(|&(ref var, _)| pattern.matches(var)).fold(
+                    json::Map::new(),
+                    |mut m, (var, value)| {
+                        m.insert(var, json::from_str(&value).unwrap_or_else(|_| json::Value::from(value)));
+                        m
+                    },
+                );
+                state = merge(json::Value::from(map), state)?;
             }
             MergePath(path) => {
                 let reader =

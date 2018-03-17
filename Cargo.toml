@@ -26,6 +26,7 @@ conv = "0.3.3"
 lazy_static = "1.0.0"
 gpgme = { version = "0.7.0" }
 atty = "0.2.8"
+glob = "0.2.11"
 
 [dependencies.sheesy-tools]
 path = "lib/tools"

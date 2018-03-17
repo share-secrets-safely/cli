@@ -1,4 +1,5 @@
 use atty;
+use glob;
 use failure::Error;
 use clap::ArgMatches;
 use tools::merge::{Command, MergeMode, OutputMode};
@@ -29,6 +30,20 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
             Command::SetMergeMode(MergeMode::NoOverwrite)
         }));
 
+        let env_cmds = if args.occurrences_of("environment") > 0 {
+            match (args.values_of("environment"), args.indices_of("environment")) {
+                (Some(v), Some(i)) => v.map(|v| {
+                    Command::MergeEnvironment(glob::Pattern::new(v).expect("clap to work"))
+                }).zip(i)
+                    .collect(),
+                (None, None) => Vec::new(),
+                _ => unreachable!("expecting clap to work"),
+            }
+        } else {
+            Vec::new()
+        };
+        cmds.extend(env_cmds);
+
         cmds.sort_by_key(|&(_, index)| index);
         let mut cmds: Vec<_> = cmds.into_iter().map(|(c, _)| c).collect();
 
@@ -49,6 +64,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
         if !cmds.iter().any(|c| match *c {
             Command::MergeStdin => true,
             Command::MergePath(_) => true,
+            Command::MergeEnvironment(_) => true,
             _ => false,
         }) {
             bail!("Please provide structured data from standard input or from a file.");
