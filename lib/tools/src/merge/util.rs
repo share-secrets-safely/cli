@@ -15,17 +15,18 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<js
 
     Ok(match json::from_str(&buf) {
         Ok(v) => v,
-        Err(json_err) => yaml::from_str(&buf)
-            .map_err(|yaml_err| {
-                yaml_err
-                    .context("YAML deserialization failed")
-                    .context(json_err)
-                    .context("JSON deserialization failed")
-                    .context("Could not deserialize data, tried JSON and YAML")
-            })
-            .or_else(|err| {
+        Err(json_err) => yaml::from_str(&buf).map_err(|yaml_err| (yaml_err, json_err)).or_else(
+            |(yaml_err, json_err)| {
                 yaml_rust::YamlLoader::load_from_str(&buf)
-                    .map_err(|yaml_err| yaml_err.context(err).context("Deserialization failed permanently"))
+                    .map_err(|rust_yaml_err| {
+                        yaml_err
+                            .context("YAML deserialization failed")
+                            .context(json_err)
+                            .context("JSON deserialization failed")
+                            .context(rust_yaml_err)
+                            .context("rust-yaml deserialization failed")
+                            .context("Could not deserialize data, tried JSON and YAML. The data might be malformed")
+                    })
                     .and_then(|v| match v.len() {
                         0 => panic!("Deserialized a YAML without a single value"),
                         1 => panic!("We expect single-document yaml files to be read by serde"),
@@ -40,7 +41,8 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R) -> Result<js
                             Ok(yaml_rust_to_json(&m.into_inner()))
                         }
                     })
-            })?,
+            },
+        )?,
     })
 }
 

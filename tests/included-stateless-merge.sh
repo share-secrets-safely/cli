@@ -72,6 +72,21 @@ title "'merge' conflicts"
     }
   )
 )
+(with "a single multi-document file with conflicts"
+  (when "fed from stdin"
+    it "fails as it refuses to overwrite keys" && {
+      cat "$template/multi-docs-conflict.yml" | \
+      WITH_SNAPSHOT="$snapshot/fail-multi-doc-yaml-with-conflict-from-stdin-to-stdout" \
+      expect_run $WITH_FAILURE "$exe" merge
+    }
+  )
+  (when "fed as file"
+    it "fails as it refuses to overwrite keys" && {
+      WITH_SNAPSHOT="$snapshot/fail-multi-doc-yaml-with-conflict-from-file-to-stdout" \
+      expect_run $WITH_FAILURE "$exe" merge "$template/multi-docs-conflict.yml"
+    }
+  )
+)
 
 title "'merge' subcommand errors"
 (with "invalid output format"
@@ -98,7 +113,7 @@ title "'merge' subcommand errors"
   )
   (with "json format"
     it "fails" && {
-      echo "invalid-json" | \
+      echo '{"hi}' | \
       WITH_SNAPSHOT="$snapshot/fail-invalid-json-stdin" \
       expect_run $WITH_FAILURE "$exe" merge
     }

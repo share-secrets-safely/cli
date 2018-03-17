@@ -99,10 +99,11 @@ all of the values in combination for substitution.
 This is particularly useful if some of that content was just decrypted from a vault.
 
  * [ ] **Support for merges**
-   * [ ] with conflicts
+   * [x] with conflicts
    * [ ] with overwrite rules
    * [ ] pull keys up one level before merging
    * [ ] merge complete environment into data at specified key (or the root)
+   * [ ] set individual values, see google apis rs
 
  * **improvements to substitute**
   * [ ] `--verify` - try to decode substituted values and fail on error

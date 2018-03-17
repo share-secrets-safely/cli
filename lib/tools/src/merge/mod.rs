@@ -12,25 +12,6 @@ use treediff::{diff, tools};
 
 mod util;
 
-fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
-    if state.value == json::Value::Null {
-        state.value = src;
-        return Ok(state);
-    }
-
-    let mut m = tools::Merger::with_filter(src.clone(), NeverDrop::default());
-    diff(&src, &state.value, &mut m);
-
-    if m.filter().clashed_keys.len() > 0 {
-        Err(format_err!("{}", m.filter())
-            .context("The merge failed due to conflicts")
-            .into())
-    } else {
-        state.value = m.into_inner();
-        Ok(state)
-    }
-}
-
 pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>) -> Result<State, Error> {
     use self::Command::*;
     let mut state = initial_state.unwrap_or_else(State::default);
@@ -56,7 +37,7 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>) -> Result<State,
     Ok(state)
 }
 
-pub fn show<V, W>(output_mode: &OutputMode, value: &V, ostream: W) -> Result<(), Error>
+fn show<V, W>(output_mode: &OutputMode, value: &V, ostream: W) -> Result<(), Error>
 where
     V: Serialize,
     W: io::Write,
@@ -64,5 +45,24 @@ where
     match *output_mode {
         OutputMode::Json => json::to_writer_pretty(ostream, value).map_err(Into::into),
         OutputMode::Yaml => yaml::to_writer(ostream, value).map_err(Into::into),
+    }
+}
+
+fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
+    if state.value == json::Value::Null {
+        state.value = src;
+        return Ok(state);
+    }
+
+    let mut m = tools::Merger::with_filter(src.clone(), NeverDrop::default());
+    diff(&src, &state.value, &mut m);
+
+    if m.filter().clashed_keys.len() > 0 {
+        Err(format_err!("{}", m.filter())
+            .context("The merge failed due to conflicts")
+            .into())
+    } else {
+        state.value = m.into_inner();
+        Ok(state)
     }
 }

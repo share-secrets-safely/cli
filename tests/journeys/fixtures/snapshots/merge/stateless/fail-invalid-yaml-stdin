@@ -1,0 +1,8 @@
+error: Could not deserialize data, tried JSON and YAML. The data might be malformed
+Caused by: 
+ 6: rust-yaml deserialization failed
+ 5: block sequence entries are not allowed in this context at line 1 column 4
+ 4: JSON deserialization failed
+ 3: expected value at line 1 column 1
+ 2: YAML deserialization failed
+ 1: block sequence entries are not allowed in this context at line 1 column 4

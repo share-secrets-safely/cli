@@ -20,6 +20,13 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
         }
         cmds.insert(0, Command::SetOutputMode(output_mode));
         cmds.push(Command::Serialize(Box::new(stdout())));
+        if !cmds.iter().any(|c| match *c {
+            Command::MergeStdin => true,
+            Command::MergePath(_) => true,
+            _ => false,
+        }) {
+            bail!("Please provide structured data from standard input or from a file.");
+        }
         cmds
     })
 }
