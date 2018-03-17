@@ -106,7 +106,7 @@ fn main() {
             let mut lock = sout.lock();
             amend_error_info(dispatch::vault::do_it(context, &mut lock))
         }
-        _ => usage_and_exit(&matches),
+        _ => panic!("Expected clap to prevent this"),
     };
 
     ok_or_exit(res);
