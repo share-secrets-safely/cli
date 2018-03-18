@@ -7,6 +7,7 @@ use std::ffi::OsString;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Context {
+    pub validate: bool,
     pub separator: OsString,
     pub data: StreamOrPath,
     pub specs: Vec<Spec>,
@@ -15,6 +16,7 @@ pub struct Context {
 pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         separator: required_os_arg(args, "separator")?,
+        validate: args.is_present("validate"),
         data: args.value_of_os("data").map_or(StreamOrPath::Stream, Into::into),
         specs: match args.values_of("spec") {
             Some(v) => v.map(Spec::from).collect(),

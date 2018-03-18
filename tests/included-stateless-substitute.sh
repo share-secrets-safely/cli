@@ -225,3 +225,19 @@ title "'substitute' subcommand error cases"
     expect_run $WITH_FAILURE "$exe" sub "$template/the-answer.hbs"
   }
 )
+(with "--verify"
+  (with "invalid data"
+    it "fails" && {
+      echo 'secret: sec"ret' | \
+      WITH_SNAPSHOT="$snapshot/fail-validation-data-stdin-json-template" \
+      expect_run $WITH_FAILURE "$exe" sub --validate "$template/data.json.hbs"
+    }
+  )
+  (with "valid data"
+    it "succeeds" && {
+      echo 'secret: geheim' | \
+      WITH_SNAPSHOT="$snapshot/validation-success-data-stdin-json-template" \
+      expect_run $SUCCESSFULLY "$exe" sub --validate "$template/data.json.hbs"
+    }
+  )
+)

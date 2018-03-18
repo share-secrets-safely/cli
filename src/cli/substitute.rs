@@ -24,6 +24,14 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                             The separator is also used when writing multiple templates into the same file, like in 'a:out b:out'.")
         )
         .arg(
+            Arg::with_name("validate")
+                .required(false)
+                .long("validate")
+                .short("v")
+                .help("If set, the instantiated template will be parsed as YAML or JSON. \
+                       If both of them are invalid, the command will fail.")
+        )
+        .arg(
             Arg::with_name("data")
                 .required(false)
                 .multiple(false)

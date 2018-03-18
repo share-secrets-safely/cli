@@ -109,7 +109,7 @@ This is particularly useful if some of that content was just decrypted from a va
    * [x] set individual values, simpy via 'a/b/c=42' or 'a.b.0=30'
 
  * **improvements to substitute**
-  * [ ] `--verify` - try to decode substituted values and fail on error
+  * [x] `--verify` - try to decode substituted values and fail on error
   * [ ] control the escape characters to allow passwords to be escaped properly, as needed, depending on the output format.
         Otherwise there is the chance of producing invalid YAML.
 

@@ -81,7 +81,7 @@ fn main() {
         }
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
-            substitute(&context.data, &context.specs, &context.separator)
+            substitute(&context.data, &context.specs, &context.separator, context.validate)
         }
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(parse::vault::context_from(args));

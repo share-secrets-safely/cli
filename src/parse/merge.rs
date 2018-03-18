@@ -41,7 +41,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
                     Command::MergeStdin
                 } else {
                     match v.to_str().map(|v| (v, v.find('='))) {
-                        Some((v, Some(idx))) => Command::MergeValue(v[..idx].to_owned(), v[idx+1..].to_owned()),
+                        Some((v, Some(idx))) => Command::MergeValue(v[..idx].to_owned(), v[idx + 1..].to_owned()),
                         _ => Command::MergePath(PathBuf::from(v)),
                     }
                 }
