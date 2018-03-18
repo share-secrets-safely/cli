@@ -91,7 +91,7 @@ $(HOST_DEPLOYABLE): $(RELEASE_EXE)
 
 deployable-host: $(HOST_DEPLOYABLE)
 
-update-homebrew: $(HOST_DEPLOYABLE) $(LINUX_DEPLOYABLE)
+update-homebrew:
 	@set -ex; ./bin/update-homebrew-formula.sh $$(git tag | tail -1) ./pkg/brew/sheesy.rb.in ./pkg/brew/sheesy.rb
 
 tag-release: bin/tag-release.sh release.md VERSION
