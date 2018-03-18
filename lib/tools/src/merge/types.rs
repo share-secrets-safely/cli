@@ -11,6 +11,7 @@ use glob;
 
 #[derive(Default)]
 pub struct State {
+    pub insert_next_at: Option<String>,
     pub output_mode: OutputMode,
     pub merge_mode: MergeMode,
     pub value: Option<json::Value>,
@@ -30,6 +31,7 @@ impl Default for MergeMode {
 
 #[derive(Debug)]
 pub enum Command {
+    InsertNextMergeAt(String),
     MergeStdin,
     MergePath(PathBuf),
     MergeEnvironment(glob::Pattern),

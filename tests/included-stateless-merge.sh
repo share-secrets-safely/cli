@@ -5,6 +5,28 @@ snapshot="$fixture/snapshots/merge/stateless"
 
 title "'merge' environment"
 (with "the 'environment' arg set"
+  (with "with the --at option set"
+    (when "there is no conflict"
+      it "succeeds and merges the all matching environment variables into the root and is depleted" && {
+        WITH_SNAPSHOT="$snapshot/environment-filtered-at-existing-key-a" \
+        TEST_MARKER_STRING=value \
+        TEST_MARKER_COMPLEX='{"a":1, "b":2, "c": [1,2,3], "d": "val"}' \
+        expect_run $SUCCESSFULLY $exe merge -o yaml --at a --environment='TEST_*' --environment='TEST_*'
+      }
+    )
+    (when "value exists but is no map"
+      it "fails as a map is required" && {
+        WITH_SNAPSHOT="$snapshot/fail-environment-filtered-at-existing-key-a-which-is-no-map" \
+        expect_run $WITH_FAILURE $exe merge <(echo 'a: 42') --at a --environment='TEST_*'
+      }
+    )
+    (when "value exists and is a map without conflicts"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/environment-filtered-at-non-existing-key-a" \
+        expect_run $WITH_FAILURE $exe merge --at a --environment='TEST_*'
+      }
+    )
+  )
   (with "no explicit filter"
     it "succeeds and merges the all environment variables into the root" && {
       WITH_SNAPSHOT="$snapshot/environment-unfiltered-at-root" \

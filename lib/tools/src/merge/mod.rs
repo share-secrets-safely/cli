@@ -9,6 +9,7 @@ use std::io::{self, stdin};
 use std::fs::File;
 use std::env::vars;
 use treediff::{diff, tools};
+use std::mem;
 
 mod util;
 
@@ -18,6 +19,9 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
 
     for cmd in cmds {
         match cmd {
+            InsertNextMergeAt(at) => {
+                state.insert_next_at = Some(at);
+            }
             SetMergeMode(mode) => {
                 state.merge_mode = mode;
             }
@@ -61,6 +65,42 @@ where
     }
 }
 
+fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value, Error> {
+    Ok(match pointer {
+        Some(mut pointer) => {
+            if pointer.find('/').is_none() {
+                pointer = pointer.replace('.', "/");
+            }
+            let mut root = json::Value::Null;
+            {
+                let mut cursor = &mut root;
+
+                for elm in pointer.split('/') {
+                    match cursor {
+                        &mut json::Value::Null => {
+                            let index: Result<usize, _> = elm.parse();
+                            match index {
+                                Ok(index) => {
+                                    let a = json::Value::Array(vec![json::Value::Null; index + 1]);
+                                    mem::replace(cursor, a);
+                                    match cursor {
+                                        &mut json::Value::Array(ref mut v) => &mut v[index],
+                                        _ => unreachable!(),
+                                    }
+                                }
+                                _ => unimplemented!(), //                                Err(_) => json::Value::from(json::Map::new())
+                            }
+                        }
+                        _ => unimplemented!(),
+                    }
+                }
+            }
+            root
+        }
+        None => v,
+    })
+}
+
 fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
     match state.value {
         None => {
@@ -69,6 +109,7 @@ fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
         }
         Some(existing_value) => {
             let mut m = tools::Merger::with_filter(existing_value.clone(), NeverDrop::with_mode(&state.merge_mode));
+            let src = insert_json_at(state.insert_next_at.take(), src)?;
             diff(&existing_value, &src, &mut m);
 
             if m.filter().clashed_keys.len() > 0 {

@@ -16,6 +16,21 @@ where
     }
 }
 
+fn optional_args_with_value<F>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(Command, usize)>
+where
+    F: Fn(&str) -> Command,
+{
+    if args.occurrences_of(name) > 0 {
+        match (args.values_of(name), args.indices_of(name)) {
+            (Some(v), Some(i)) => v.map(|v| into(v)).zip(i).collect(),
+            (None, None) => Vec::new(),
+            _ => unreachable!("expecting clap to work"),
+        }
+    } else {
+        Vec::new()
+    }
+}
+
 pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
     Ok({
         let mut cmds = match (args.values_of_os("path"), args.indices_of("path")) {
@@ -30,19 +45,13 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
             Command::SetMergeMode(MergeMode::NoOverwrite)
         }));
 
-        let env_cmds = if args.occurrences_of("environment") > 0 {
-            match (args.values_of("environment"), args.indices_of("environment")) {
-                (Some(v), Some(i)) => v.map(|v| {
-                    Command::MergeEnvironment(glob::Pattern::new(v).expect("clap to work"))
-                }).zip(i)
-                    .collect(),
-                (None, None) => Vec::new(),
-                _ => unreachable!("expecting clap to work"),
-            }
-        } else {
-            Vec::new()
-        };
-        cmds.extend(env_cmds);
+        let env_cmds = optional_args_with_value(args, "environment", |s| {
+            Command::MergeEnvironment(glob::Pattern::new(s).expect("clap to work"))
+        });
+        cmds.extend(env_cmds.into_iter());
+
+        let at_cmds = optional_args_with_value(args, "at", |s| Command::InsertNextMergeAt(s.to_owned()));
+        cmds.extend(at_cmds.into_iter());
 
         cmds.sort_by_key(|&(_, index)| index);
         let mut cmds: Vec<_> = cmds.into_iter().map(|(c, _)| c).collect();
@@ -54,6 +63,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
             let at_position = cmds.iter()
                 .position(|cmd| match *cmd {
                     Command::MergePath(_) => true,
+                    Command::MergeEnvironment(_) => true,
                     _ => false,
                 })
                 .unwrap_or(cmds.len());

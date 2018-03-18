@@ -11,6 +11,18 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
              Merging a single file is explicitly valid and can be used to check for syntax errors.",
         )
         .arg(
+            Arg::with_name("at")
+                .long("at")
+                .short("a")
+                .takes_value(true)
+                .value_name("pointer")
+                .required(false)
+                .multiple(true)
+                .help("Use a JSON pointer to specify an existing mapping at which the next merged value should be placed.
+                       This affects only the next following --environment or <path>."
+                )
+        )
+        .arg(
             Arg::with_name("environment")
                 .long("environment")
                 .short("e")
