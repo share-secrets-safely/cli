@@ -89,37 +89,6 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 3.2
-
-#### The `merge` subcommand
-
-The `merge` subcommand allows to combine json or yaml files.
-This is useful to partition context and data according to your needs, yet use
-all of the values in combination for substitution.
-This is particularly useful if some of that content was just decrypted from a vault.
-
- * [x] **Support for merges**
-   * [x] with conflicts
-   * [x] with overwrite rules
-   * [x] move keys to root level before merging
-   * [x] insert keys at given value while merging for
-     * [x] object paths, e.g `a.b.c` or `a/b/c`
-     * [x] for array paths e.g. `a.0.c.1` or `a/0/c/1`
-   * [x] merge complete environment into data, or whatever matches the given glob
-   * [x] set individual values, simpy via 'a/b/c=42' or 'a.b.0=30'
- * [x] control the escape characters to allow passwords to be escaped properly, as needed, depending on the output format.
-       Otherwise there is the chance of producing invalid YAML.
-
- * **improvements to substitute**
-   * [x] `--verify` - try to decode substituted values and fail on error
-
- * **general improvements**
-   * [x] Unify naming scheme of all deployables to make curling code easier
-   * [x] find a better name for merge, given that merging is just a side-effect.
-      With the action driven interface, it can do pretty much everything on the data
-      it has so far. Some commands effect the merging, some pull out and/or print data.
-      That way, extract is not a separate subcommand.
-
 ### Roadmap to 3.3
 
 #### Adding the `extract` subcommand
@@ -128,7 +97,6 @@ The `extract` capability makes it feasible to store secrets in structured files
 like YAML or JSON, as it allows to extract pieces of data in various ways.
 Think `jq` but with native support for YAML files.
 
-### Roadmap to 3.4
 #### Improved UX and basic Web of Trust controls
 
  * [ ] Assure that the error messages provided when we can't find a partition are
