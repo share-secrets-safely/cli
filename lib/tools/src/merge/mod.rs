@@ -62,12 +62,17 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
             SetOutputMode(mode) => {
                 state.output_mode = mode;
             }
-            Serialize => show(&state.output_mode, &state.value, &mut output)?,
+            Serialize => {
+                state.value = match state.value {
+                    Some(value) => Some(apply_transforms(value, state.insert_next_at.take())?),
+                    None => None,
+                };
+
+                show(&state.output_mode, &state.value, &mut output)?
+            }
         }
     }
-    if let Some(pos) = state.insert_next_at.take() {
-        bail!("The insertion position named '{}' was not consumed", pos)
-    }
+
     Ok(state)
 }
 
@@ -110,16 +115,20 @@ fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value
     })
 }
 
+fn apply_transforms(src: json::Value, insert_next_at: Option<String>) -> Result<json::Value, Error> {
+    insert_json_at(insert_next_at, src)
+}
+
 fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
+    let src = apply_transforms(src, state.insert_next_at.take())?;
+
     match state.value {
         None => {
-            let src = insert_json_at(state.insert_next_at.take(), src)?;
             state.value = Some(src);
             Ok(state)
         }
         Some(existing_value) => {
             let mut m = tools::Merger::with_filter(existing_value.clone(), NeverDrop::with_mode(&state.merge_mode));
-            let src = insert_json_at(state.insert_next_at.take(), src)?;
             diff(&existing_value, &src, &mut m);
 
             if m.filter().clashed_keys.len() > 0 {

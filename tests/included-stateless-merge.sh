@@ -132,6 +132,11 @@ title "'merge' subcommand"
   )
 )
 
+title "'merge' - change position"
+(with "nested data"
+
+)
+
 title "'merge' --at and stdin"
 (with "data from stdin"
   INPUT="from-stdin: 42"
@@ -162,9 +167,9 @@ title "'merge' --at and stdin"
   }
 )
 (with "an unconsumed --at flag"
-  it "fails as it must be consumed" && {
-    WITH_SNAPSHOT="$snapshot/fail-unconsumed-at-flag" \
-    expect_run $WITH_FAILURE "$exe" merge "$template/good-answer.yml" --at c
+  it "succeeds as it applies the operation to the final value" && {
+    WITH_SNAPSHOT="$snapshot/unconsumed-at-flag-applies-to-final-value" \
+    expect_run $SUCCESSFULLY "$exe" merge "$template/good-answer.yml" --at c
   }
 )
 
