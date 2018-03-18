@@ -9,7 +9,7 @@ class Sheesy < Formula
       url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-Darwin-x86_64.tar.gz"
       sha256 "${OSX_SHA256}"
   elsif OS.linux?
-      url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-linux-musl-x86_64.tar.gz"
+      url "https://github.com/Byron/share-secrets-safely/releases/download/#{version}/sy-cli-Linux-x86_64.tar.gz"
       sha256 "${LINUX_SHA256}"
   end
 

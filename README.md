@@ -111,11 +111,11 @@ This is particularly useful if some of that content was just decrypted from a va
        Otherwise there is the chance of producing invalid YAML.
 
  * **improvements to substitute**
-  * [x] `--verify` - try to decode substituted values and fail on error
+   * [x] `--verify` - try to decode substituted values and fail on error
 
  * **general improvements**
-  * [ ] Unify naming scheme of all deployables to make curling code easier
-  * [x] find a better name for merge, given that merging is just a side-effect.
+   * [x] Unify naming scheme of all deployables to make curling code easier
+   * [x] find a better name for merge, given that merging is just a side-effect.
       With the action driven interface, it can do pretty much everything on the data
       it has so far. Some commands effect the merging, some pull out and/or print data.
       That way, extract is not a separate subcommand.

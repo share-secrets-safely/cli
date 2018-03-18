@@ -11,7 +11,7 @@ CARGO_CACHE_ARGS=-v $$PWD/.docker-cargo-cache:/usr/local/cargo/registry
 DOCKER_ARGS=docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm
 MUSL_DOCKER_ARGS=$(DOCKER_ARGS) $(MY_MUSL_IMAGE)
 HOST_DEPLOYABLE=$(shell echo sy-cli-$$(uname -s)-$$(uname -m).tar.gz)
-LINUX_DEPLOYABLE=sy-cli-linux-musl-x86_64.tar.gz
+LINUX_DEPLOYABLE=sy-cli-Linux-x86_64.tar.gz
 DOCKER_DOCS_ARGS_NO_CMD=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume $(DOCS_IMAGE)
 DOCKER_DOCS_ARGS=$(DOCKER_DOCS_ARGS_NO_CMD) termbook build ./doc
 CAST=getting-started.cast

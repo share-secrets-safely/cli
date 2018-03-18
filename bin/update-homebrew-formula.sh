@@ -11,7 +11,7 @@ TEMPLATE_FILE="${2:?}"
 HOMEBREW_FILE="${3:?}"
 
 OSX_FILE=sy-cli-Darwin-x86_64.tar.gz
-LINUX_FILE=sy-cli-linux-musl-x86_64.tar.gz
+LINUX_FILE=sy-cli-Linux-x86_64.tar.gz
 
 [[ -f $OSX_FILE && -f $LINUX_FILE ]] || {
     echo 1>&2 "Need both files '$OSX_FILE' and '$LINUX_FILE' to be available"

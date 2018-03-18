@@ -45,7 +45,7 @@ pushd "$sandbox_tempdir" >/dev/null
 ```
 
 ```bash,use=sandboxed,exec
-curl --fail -Lso sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/3.0.0/sy-cli-linux-musl-x86_64.tar.gz
+curl --fail -Lso sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/3.2.0/sy-cli-Linux-x86_64.tar.gz
 tar xzf sy.tar.gz
 # verify 'sy' was built by one of the maintainers
 gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc) 2>/dev/null
