@@ -1,6 +1,4 @@
-### V3.2: Master-Merger
-
-#### The `merge` subcommand
+## V3.2: Master-Merger
 
 The `merge` subcommand allows to combine JSON or YAML files.
 This is useful to partition context and data according to your needs, yet use
@@ -29,7 +27,7 @@ It is particularly useful if some of that content was just decrypted from a vaul
       it has so far. Some commands effect the merging, some pull out and/or print data.
       That way, extract is not a separate subcommand.
       
-#### V3.1: Substitution-Superpowers
+## V3.1: Substitution-Superpowers
 
 Make it easy to generate property-sets by merging structured files together, and
 make said context available to a `handlebars` powered engine to perform substitutions.
