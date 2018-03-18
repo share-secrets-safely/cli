@@ -33,6 +33,9 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
 
     for cmd in cmds {
         match cmd {
+            SelectNextMergeAt(at) => {
+                state.select_next_at = Some(at);
+            }
             InsertNextMergeAt(at) => {
                 state.insert_next_at = Some(at);
             }
@@ -64,7 +67,11 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
             }
             Serialize => {
                 state.value = match state.value {
-                    Some(value) => Some(apply_transforms(value, state.insert_next_at.take())?),
+                    Some(value) => Some(apply_transforms(
+                        value,
+                        state.insert_next_at.take(),
+                        state.select_next_at.take(),
+                    )?),
                     None => None,
                 };
 
@@ -87,14 +94,32 @@ where
     }
 }
 
+fn into_pointer(p: String) -> String {
+    let mut p = if p.find('/').is_none() { p.replace('.', "/") } else { p };
+    if !p.starts_with('/') {
+        p.insert(0, '/');
+    }
+    p
+}
+
+fn select_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value, Error> {
+    match pointer {
+        Some(mut pointer) => {
+            pointer = into_pointer(pointer);
+            v.pointer(&pointer)
+                .map(|v| v.to_owned())
+                .ok_or_else(|| format_err!("No value at pointer '{}'", pointer))
+        }
+        None => Ok(v),
+    }
+}
+
 fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value, Error> {
     Ok(match pointer {
         Some(mut pointer) => {
-            if pointer.find('/').is_none() {
-                pointer = pointer.replace('.', "/");
-            }
+            pointer = into_pointer(pointer);
             let mut current = v;
-            for elm in pointer.rsplit('/') {
+            for elm in pointer.rsplit('/').filter(|s| !s.is_empty()) {
                 let index: Result<usize, _> = elm.parse();
                 match index {
                     Ok(index) => {
@@ -115,12 +140,16 @@ fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value
     })
 }
 
-fn apply_transforms(src: json::Value, insert_next_at: Option<String>) -> Result<json::Value, Error> {
-    insert_json_at(insert_next_at, src)
+fn apply_transforms(
+    src: json::Value,
+    insert_at: Option<String>,
+    select_at: Option<String>,
+) -> Result<json::Value, Error> {
+    select_json_at(select_at, src).and_then(|src| insert_json_at(insert_at, src))
 }
 
 fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
-    let src = apply_transforms(src, state.insert_next_at.take())?;
+    let src = apply_transforms(src, state.insert_next_at.take(), state.select_next_at.take())?;
 
     match state.value {
         None => {

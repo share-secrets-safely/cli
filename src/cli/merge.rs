@@ -11,7 +11,23 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
              Merging a single file is explicitly valid and can be used to check for syntax errors.",
         )
         .arg(
+            Arg::with_name("select")
+                .alias("from")
+                .long("select")
+                .short("s")
+                .takes_value(true)
+                .value_name("pointer")
+                .required(false)
+                .multiple(true)
+                .help("Use a JSON pointer to specify which sub-value to use.. \
+                       This affects only the next following --environment or <path>. \
+                       Valid specifications are for example '0/a/b/4' or 'a.b.0', and they must point to a valid value. \
+                       If it is specified last, without a following merged value, a sub-value is selected from the aggregated value."
+                )
+        )
+        .arg(
             Arg::with_name("at")
+                .alias("to")
                 .long("at")
                 .short("a")
                 .takes_value(true)
@@ -20,7 +36,8 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .multiple(true)
                 .help("Use a JSON pointer to specify an existing mapping at which the next merged value should be placed. \
                        This affects only the next following --environment or <path>. \
-                       Valid specifications are for example '0/a/b/4' or 'a.b.0'."
+                       Valid specifications are for example '0/a/b/4' or 'a.b.0'. \
+                       If it is specified last, without a following merged value, the entire aggregated value so far is moved."
                 )
         )
         .arg(

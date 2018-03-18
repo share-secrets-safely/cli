@@ -61,6 +61,8 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
 
         let at_cmds = optional_args_with_value(args, "at", |s| Command::InsertNextMergeAt(s.to_owned()));
         cmds.extend(at_cmds.into_iter());
+        let select_cmds = optional_args_with_value(args, "select", |s| Command::SelectNextMergeAt(s.to_owned()));
+        cmds.extend(select_cmds.into_iter());
 
         cmds.sort_by_key(|&(_, index)| index);
         let mut cmds: Vec<_> = cmds.into_iter().map(|(c, _)| c).collect();

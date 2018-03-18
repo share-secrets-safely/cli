@@ -132,9 +132,46 @@ title "'merge' subcommand"
   )
 )
 
-title "'merge' - change position"
-(with "nested data"
-
+title "'merge' - selecting trees"
+(with "an object with a scalar value"
+  (with "no --to specification"
+    it "succeeds" && {
+      WITH_SNAPSHOT="$snapshot/select-single-scalar-value" \
+      expect_run $SUCCESSFULLY "$exe" process --select=a <(echo a: 42)
+    }
+  )
+  (with "--to specification"
+    it "succeeds" && {
+      WITH_SNAPSHOT="$snapshot/select-single-scalar-value-with-move" \
+      expect_run $SUCCESSFULLY "$exe" process --select=a --to=c.d.e <(echo a: 42)
+    }
+  )
+)
+(with "a nested object with an array"
+  it "succeeds" && {
+    WITH_SNAPSHOT="$snapshot/select-nested-scalar-value-array" \
+    expect_run $SUCCESSFULLY "$exe" process --select=a/b <(echo '{"a":{"b":[1,2,3]}}')
+  }
+)
+(when "selecting a value without a following merge"
+  (with "no --to specification"
+    it "succeeds and applies the transformation to the merged result" && {
+      WITH_SNAPSHOT="$snapshot/select-nested-scalar-value-array-on-merged-value" \
+      expect_run $SUCCESSFULLY "$exe" process <(echo '{"a":{"b":[1,2,3]}}') <(echo c: 42) --select c
+    }
+  )
+  (with "--to specification"
+    it "succeeds and applies the transformation to the merged result" && {
+      WITH_SNAPSHOT="$snapshot/select-nested-scalar-value-array-on-merged-value-with-move" \
+      expect_run $SUCCESSFULLY "$exe" process <(echo '{"a":{"b":[1,2,3]}}') <(echo c: 42) --from c --to a.b
+    }
+  )
+)
+(with "a selection pointer which points to no object"
+  it "fails" && {
+    WITH_SNAPSHOT="$snapshot/fail-select-non-existing-object" \
+    expect_run $WITH_FAILURE "$exe" show -s=foo <(echo 'a: 42')
+  }
 )
 
 title "'merge' --at and stdin"

@@ -11,6 +11,7 @@ use glob;
 
 #[derive(Default)]
 pub struct State {
+    pub select_next_at: Option<String>,
     pub insert_next_at: Option<String>,
     pub output_mode: OutputMode,
     pub merge_mode: MergeMode,
@@ -32,6 +33,7 @@ impl Default for MergeMode {
 #[derive(Debug)]
 pub enum Command {
     InsertNextMergeAt(String),
+    SelectNextMergeAt(String),
     MergeStdin,
     MergePath(PathBuf),
     MergeEnvironment(glob::Pattern),

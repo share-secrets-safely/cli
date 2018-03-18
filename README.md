@@ -101,7 +101,7 @@ This is particularly useful if some of that content was just decrypted from a va
  * [ ] **Support for merges**
    * [x] with conflicts
    * [x] with overwrite rules
-   * [ ] move keys to root level before merging
+   * [x] move keys to root level before merging
    * [x] insert keys at given value while merging for
      * [x] object paths, e.g `a.b.c` or `a/b/c`
      * [x] for array paths e.g. `a.0.c.1` or `a/0/c/1`
@@ -115,7 +115,7 @@ This is particularly useful if some of that content was just decrypted from a va
 
  * **general improvements**
   * [ ] Unify naming scheme of all deployables to make curling code easier
-  * [ ] find a better name for merge, given that merging is just a side-effect.
+  * [x] find a better name for merge, given that merging is just a side-effect.
       With the action driven interface, it can do pretty much everything on the data
       it has so far. Some commands effect the merging, some pull out and/or print data.
       That way, extract is not a separate subcommand.
