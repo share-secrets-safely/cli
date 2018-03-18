@@ -18,8 +18,9 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .value_name("pointer")
                 .required(false)
                 .multiple(true)
-                .help("Use a JSON pointer to specify an existing mapping at which the next merged value should be placed.
-                       This affects only the next following --environment or <path>."
+                .help("Use a JSON pointer to specify an existing mapping at which the next merged value should be placed. \
+                       This affects only the next following --environment or <path>. \
+                       Valid specifications are for example '0/a/b/4' or 'a.b.0'."
                 )
         )
         .arg(

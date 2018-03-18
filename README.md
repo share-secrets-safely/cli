@@ -102,9 +102,9 @@ This is particularly useful if some of that content was just decrypted from a va
    * [x] with conflicts
    * [x] with overwrite rules
    * [ ] move keys to root level before merging
-   * [ ] insert keys at given value while merging for
-     * [ ] object paths, e.g `a.b.c` or `a/b/c`
-     * [ ] for array paths e.g. `a.0.c.1` or `a/0/c/1`
+   * [x] insert keys at given value while merging for
+     * [x] object paths, e.g `a.b.c` or `a/b/c`
+     * [x] for array paths e.g. `a.0.c.1` or `a/0/c/1`
    * [x] merge complete environment into data, or whatever matches the given glob
    * [ ] set individual values, see google apis rs
 

@@ -91,11 +91,20 @@ title "'merge' subcommand"
       }
     )
     (with "explicit yaml output"
-      it "outputs yaml" && {
-        echo "$INPUT" | \
-        WITH_SNAPSHOT="$snapshot/yaml-stdin-to-stdout-as-yaml" \
-        expect_run $SUCCESSFULLY "$exe" merge -o yaml
-      }
+      (with "no --at flag"
+        it "outputs yaml" && {
+          echo "$INPUT" | \
+          WITH_SNAPSHOT="$snapshot/yaml-stdin-to-stdout-as-yaml" \
+          expect_run $SUCCESSFULLY "$exe" merge -o yaml
+        }
+      )
+      (with "--at set"
+        it "outputs yaml at the correct position" && {
+          echo "$INPUT" | \
+          WITH_SNAPSHOT="$snapshot/yaml-stdin-with-at-to-stdout-as-yaml" \
+          expect_run $SUCCESSFULLY "$exe" merge -o yaml -at a.b
+        }
+      )
     )
   )
   (with "the default merge mode"
@@ -121,6 +130,42 @@ title "'merge' subcommand"
       }
     )
   )
+)
+
+title "'merge' --at and stdin"
+(with "data from stdin"
+  INPUT="from-stdin: 42"
+  (with "no location specification for stdin"
+    (with "--at before a path to merge"
+      it "succeeds and applies the --at to stdin" && {
+        echo "$INPUT" | \
+        WITH_SNAPSHOT="$snapshot/json-stdin-at-before-path-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge --at=a.b "$template/good-answer.yml"
+      }
+    )
+  )
+  (with "location specification for stdin"
+    (with "--at before a path to merge"
+      it "succeeds and applies the --at to the path" && {
+        echo "$INPUT" | \
+        WITH_SNAPSHOT="$snapshot/json-stdin-at-before-path-with-explicit-stdin-marker-to-stdout" \
+        expect_run $SUCCESSFULLY "$exe" merge - --at=a.b "$template/good-answer.yml"
+      }
+    )
+  )
+)
+(with "--at at various locations"
+  it "succeeds and consumes the --at flags for each merge" && {
+    cat "$template/good-answer.yml" | \
+    WITH_SNAPSHOT="$snapshot/json-stdin-at-before-path-with-explicit-stdin-marker-and-various-at-flags-to-stdout" \
+    expect_run $SUCCESSFULLY "$exe" merge - --at=a.b "$template/good-answer.yml" <(echo 'foo: bar') --at=c "$template/good-answer.yml"
+  }
+)
+(with "an unconsumed --at flag"
+  it "fails as it must be consumed" && {
+    WITH_SNAPSHOT="$snapshot/fail-unconsumed-at-flag" \
+    expect_run $WITH_FAILURE "$exe" merge "$template/good-answer.yml" --at c
+  }
 )
 
 title "'merge' overwrite control"
@@ -240,6 +285,12 @@ title "'merge' subcommand errors"
   it "fails" && {
     WITH_SNAPSHOT="$snapshot/fail-invalid-output-format" \
     expect_run $WITH_FAILURE "$exe" merge --output foobar
+  }
+)
+(with "multiple mentions of stdin"
+  it "fails" && {
+    WITH_SNAPSHOT="$snapshot/fail-use-of-stdin-more-than-once" \
+    expect_run $WITH_FAILURE "$exe" merge - -
   }
 )
 (with "no data from stdin"

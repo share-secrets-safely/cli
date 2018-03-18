@@ -12,7 +12,22 @@ use treediff::{diff, tools};
 
 mod util;
 
+fn validate(cmds: &[Command]) -> Result<(), Error> {
+    let num_merge_stdin_cmds = cmds.iter()
+        .filter(|c| if let &Command::MergeStdin = *c { true } else { false })
+        .count();
+    if num_merge_stdin_cmds > 1 {
+        bail!(
+            "Cannot read from stdin more than once, found {} invocations",
+            num_merge_stdin_cmds
+        );
+    }
+    Ok(())
+}
+
 pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut io::Write) -> Result<State, Error> {
+    validate(&cmds)?;
+
     use self::Command::*;
     let mut state = initial_state.unwrap_or_else(State::default);
 
@@ -49,6 +64,9 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
             }
             Serialize => show(&state.output_mode, &state.value, &mut output)?,
         }
+    }
+    if let Some(pos) = state.insert_next_at.take() {
+        bail!("The insertion position named '{}' was not consumed", pos)
     }
     Ok(state)
 }
