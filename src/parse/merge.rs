@@ -40,7 +40,10 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
                     has_seen_merge_stdin = true;
                     Command::MergeStdin
                 } else {
-                    Command::MergePath(PathBuf::from(v))
+                    match v.to_str().map(|v| (v, v.find('='))) {
+                        Some((v, Some(idx))) => Command::MergeValue(v[..idx].to_owned(), v[idx+1..].to_owned()),
+                        _ => Command::MergePath(PathBuf::from(v)),
+                    }
                 }
             }).zip(i)
                 .collect(),
@@ -74,6 +77,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
             let at_position = cmds.iter()
                 .position(|cmd| match *cmd {
                     Command::MergePath(_) => true,
+                    Command::MergeValue(_, _) => true,
                     Command::MergeEnvironment(_) => true,
                     _ => false,
                 })
@@ -84,6 +88,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
 
         if !cmds.iter().any(|c| match *c {
             Command::MergeStdin => true,
+            Command::MergeValue(_, _) => true,
             Command::MergePath(_) => true,
             Command::MergeEnvironment(_) => true,
             _ => false,

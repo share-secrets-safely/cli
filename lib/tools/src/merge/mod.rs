@@ -25,6 +25,12 @@ fn validate(cmds: &[Command]) -> Result<(), Error> {
     Ok(())
 }
 
+fn to_json(s: String, state: &State) -> json::Value {
+    let mut reader = io::Cursor::new(s);
+    util::de_json_or_yaml_document_support(&mut reader, state)
+        .unwrap_or_else(|_| json::Value::from(reader.into_inner()))
+}
+
 pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut io::Write) -> Result<State, Error> {
     validate(&cmds)?;
 
@@ -42,6 +48,15 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
             SetMergeMode(mode) => {
                 state.merge_mode = mode;
             }
+            MergeValue(pointer, value) => {
+                let value_to_merge = to_json(value, &state);
+                let prev_insert_next_at = state.insert_next_at;
+                state.insert_next_at = Some(pointer);
+
+                state = merge(value_to_merge, state)?;
+
+                state.insert_next_at = prev_insert_next_at;
+            }
             MergeStdin => {
                 let value_to_merge = util::de_json_or_yaml_document_support(stdin(), &state)?;
                 state = merge(value_to_merge, state)?;
@@ -50,7 +65,7 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
                 let mut map = vars().filter(|&(ref var, _)| pattern.matches(var)).fold(
                     json::Map::new(),
                     |mut m, (var, value)| {
-                        m.insert(var, json::from_str(&value).unwrap_or_else(|_| json::Value::from(value)));
+                        m.insert(var, to_json(value, &state));
                         m
                     },
                 );

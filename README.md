@@ -98,7 +98,7 @@ This is useful to partition context and data according to your needs, yet use
 all of the values in combination for substitution.
 This is particularly useful if some of that content was just decrypted from a vault.
 
- * [ ] **Support for merges**
+ * [x] **Support for merges**
    * [x] with conflicts
    * [x] with overwrite rules
    * [x] move keys to root level before merging
@@ -106,7 +106,7 @@ This is particularly useful if some of that content was just decrypted from a va
      * [x] object paths, e.g `a.b.c` or `a/b/c`
      * [x] for array paths e.g. `a.0.c.1` or `a/0/c/1`
    * [x] merge complete environment into data, or whatever matches the given glob
-   * [ ] set individual values, see google apis rs
+   * [x] set individual values, simpy via 'a/b/c=42' or 'a.b.0=30'
 
  * **improvements to substitute**
   * [ ] `--verify` - try to decode substituted values and fail on error

@@ -3,6 +3,28 @@
 template="$fixture/merge"
 snapshot="$fixture/snapshots/merge/stateless"
 
+title "'merge' - setting values"
+(when "setting values of various types"
+  (with "no conflicts"
+    it "succeeds" && {
+      WITH_SNAPSHOT="$snapshot/set-various-values-without-conflict" \
+      expect_run $SUCCESSFULLY "$exe" show -o yaml z= a=42 b=true c=false d=42 e=value f=13.234 x.0.s.t='{"a": [1,2,3]}'
+    }
+  )
+  (with "conflicts"
+    it "fails" && {
+      WITH_SNAPSHOT="$snapshot/fail-set-various-values-with-conflict" \
+      expect_run $WITH_FAILURE "$exe" show -o yaml a.b=42 c=3 a.b=43
+    }
+  )
+  (with "conflicts and overwrite enabled"
+    it "succeeds" && {
+      WITH_SNAPSHOT="$snapshot/set-various-values-with-conflict-and-overwrite" \
+      expect_run $SUCCESSFULLY "$exe" show -o yaml a.b=42 c=3 --overwrite a.b=43
+    }
+  )
+)
+
 title "'merge' environment"
 (with "the 'environment' arg set"
   (with "with the --at option set"
@@ -60,7 +82,7 @@ title "'merge' environment"
       TEST_MARKER_FLOAT_NEGATIVE=-42.5 \
       TEST_MARKER_BOOL_TRUE=true \
       TEST_MARKER_BOOL_FALSE=false \
-      TEST_MARKER_INVALID_JSON="{'a':}" \
+      TEST_MARKER_INVALID_JSON="{'a:}" \
       TEST_MARKER_COMPLEX='{"a":1, "b":2, "c": [1,2,3], "d": "val"}' \
       expect_run $SUCCESSFULLY $exe merge -o yaml '--environment=TEST_*'
     }

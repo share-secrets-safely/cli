@@ -32,6 +32,7 @@ impl Default for MergeMode {
 
 #[derive(Debug)]
 pub enum Command {
+    MergeValue(String, String),
     InsertNextMergeAt(String),
     SelectNextMergeAt(String),
     MergeStdin,

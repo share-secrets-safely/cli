@@ -56,6 +56,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("no-overwrite")
+                .alias("no-override")
                 .long("no-overwrite")
                 .takes_value(false)
                 .required(false)
@@ -65,6 +66,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("overwrite")
+                .alias("override")
                 .long("overwrite")
                 .takes_value(false)
                 .required(false)
@@ -86,11 +88,13 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("path")
+                .value_name("path-or-value")
                 .takes_value(true)
                 .required(false)
                 .multiple(true)
                 .help(
-                "The path to the file to include. It must be in a format that can be output using the --output flag.",
+                "The path to the file to include. It must be in a format that can be output using the --output flag. \
+                 Alternatively it can be a value assignment like 'a=42' or a.b.c=value.",
             ),
         )
 }
