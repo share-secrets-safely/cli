@@ -8,10 +8,26 @@ title "'merge' environment"
   (with "with the --at option set"
     (when "there is no conflict"
       it "succeeds and merges the all matching environment variables into the root and is depleted" && {
-        WITH_SNAPSHOT="$snapshot/environment-filtered-at-existing-key-a" \
+        WITH_SNAPSHOT="$snapshot/environment-filtered-at-new-key-a" \
         TEST_MARKER_STRING=value \
         TEST_MARKER_COMPLEX='{"a":1, "b":2, "c": [1,2,3], "d": "val"}' \
         expect_run $SUCCESSFULLY $exe merge -o yaml --at a --environment='TEST_*' --environment='TEST_*'
+      }
+    )
+    (when "the --at flag is nested and starts with an array"
+      it "succeeds and merges the all matching environment variables into the root and is depleted" && {
+        WITH_SNAPSHOT="$snapshot/environment-filtered-at-new-nested-key-with-array" \
+        TEST_MARKER_STRING=value \
+        TEST_MARKER_COMPLEX='{"a":1, "b":2, "c": [1,2,3], "d": "val"}' \
+        expect_run $SUCCESSFULLY $exe merge -o yaml --at 3/a/0/b --environment='TEST_*' --environment='TEST_*'
+      }
+    )
+    (when "the --at flag is nested and starts with an object"
+      it "succeeds and merges the all matching environment variables into the root and is depleted" && {
+        WITH_SNAPSHOT="$snapshot/environment-filtered-at-new-nested-key-with-object" \
+        TEST_MARKER_STRING=value \
+        TEST_MARKER_COMPLEX='{"a":1, "b":2, "c": [1,2,3], "d": "val"}' \
+        expect_run $SUCCESSFULLY $exe merge -o yaml --at a.2.b.0 --environment='TEST_*' --environment='TEST_*'
       }
     )
     (when "value exists but is no map"
@@ -22,8 +38,8 @@ title "'merge' environment"
     )
     (when "value exists and is a map without conflicts"
       it "succeeds" && {
-        WITH_SNAPSHOT="$snapshot/environment-filtered-at-non-existing-key-a" \
-        expect_run $WITH_FAILURE $exe merge --at a --environment='TEST_*'
+        WITH_SNAPSHOT="$snapshot/empty-environment-filtered-at-non-existing-key-a" \
+        expect_run $SUCCESSFULLY $exe merge --at a --environment='TEST_*'
       }
     )
   )

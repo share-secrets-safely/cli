@@ -9,7 +9,6 @@ use std::io::{self, stdin};
 use std::fs::File;
 use std::env::vars;
 use treediff::{diff, tools};
-use std::mem;
 
 mod util;
 
@@ -71,31 +70,23 @@ fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value
             if pointer.find('/').is_none() {
                 pointer = pointer.replace('.', "/");
             }
-            let mut root = json::Value::Null;
-            {
-                let mut cursor = &mut root;
-
-                for elm in pointer.split('/') {
-                    match cursor {
-                        &mut json::Value::Null => {
-                            let index: Result<usize, _> = elm.parse();
-                            match index {
-                                Ok(index) => {
-                                    let a = json::Value::Array(vec![json::Value::Null; index + 1]);
-                                    mem::replace(cursor, a);
-                                    match cursor {
-                                        &mut json::Value::Array(ref mut v) => &mut v[index],
-                                        _ => unreachable!(),
-                                    }
-                                }
-                                _ => unimplemented!(), //                                Err(_) => json::Value::from(json::Map::new())
-                            }
-                        }
-                        _ => unimplemented!(),
+            let mut current = v;
+            for elm in pointer.rsplit('/') {
+                let index: Result<usize, _> = elm.parse();
+                match index {
+                    Ok(index) => {
+                        let mut a = vec![json::Value::Null; index + 1];
+                        a[index] = current;
+                        current = json::Value::from(a);
+                    }
+                    Err(_) => {
+                        let mut map = json::Map::new();
+                        map.insert(elm.to_owned(), current);
+                        current = json::Value::from(map)
                     }
                 }
             }
-            root
+            current
         }
         None => v,
     })
@@ -104,6 +95,7 @@ fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value
 fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
     match state.value {
         None => {
+            let src = insert_json_at(state.insert_next_at.take(), src)?;
             state.value = Some(src);
             Ok(state)
         }

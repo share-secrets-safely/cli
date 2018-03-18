@@ -1,0 +1,15 @@
+---
+- ~
+- ~
+- ~
+- a:
+    - b:
+        TEST_MARKER_COMPLEX:
+          a: 1
+          b: 2
+          c:
+            - 1
+            - 2
+            - 3
+          d: val
+        TEST_MARKER_STRING: value

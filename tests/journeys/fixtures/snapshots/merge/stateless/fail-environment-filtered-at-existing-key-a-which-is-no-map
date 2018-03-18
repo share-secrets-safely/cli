@@ -1,0 +1,4 @@
+error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+a
