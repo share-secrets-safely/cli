@@ -16,9 +16,9 @@ where
     }
 }
 
-fn optional_args_with_value<F>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(Command, usize)>
+fn optional_args_with_value<F, T>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(T, usize)>
 where
-    F: Fn(&str) -> Command,
+    F: Fn(&str) -> T,
 {
     if args.occurrences_of(name) > 0 {
         match (args.values_of(name), args.indices_of(name)) {

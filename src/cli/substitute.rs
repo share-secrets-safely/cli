@@ -24,6 +24,19 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                             The separator is also used when writing multiple templates into the same file, like in 'a:out b:out'.")
         )
         .arg(
+            Arg::with_name("replace")
+                .long("replace")
+                .takes_value(true)
+                .value_name("find-this:replace-with-that")
+                .required(false)
+                .multiple(true)
+                .use_delimiter(true)
+                .value_delimiter(":")
+                .help("A simple find & replace for values for the string data to be placed into the template. \
+                       The word to find is the first specified argument, the second one is the word to replace it with, \
+                       e.g. -r=foo:bar.")
+        )
+        .arg(
             Arg::with_name("validate")
                 .required(false)
                 .long("validate")

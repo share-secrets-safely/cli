@@ -107,11 +107,11 @@ This is particularly useful if some of that content was just decrypted from a va
      * [x] for array paths e.g. `a.0.c.1` or `a/0/c/1`
    * [x] merge complete environment into data, or whatever matches the given glob
    * [x] set individual values, simpy via 'a/b/c=42' or 'a.b.0=30'
+ * [x] control the escape characters to allow passwords to be escaped properly, as needed, depending on the output format.
+       Otherwise there is the chance of producing invalid YAML.
 
  * **improvements to substitute**
   * [x] `--verify` - try to decode substituted values and fail on error
-  * [ ] control the escape characters to allow passwords to be escaped properly, as needed, depending on the output format.
-        Otherwise there is the chance of producing invalid YAML.
 
  * **general improvements**
   * [ ] Unify naming scheme of all deployables to make curling code easier

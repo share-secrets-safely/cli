@@ -3,6 +3,28 @@
 template="$fixture/substitute"
 snapshot="$fixture/snapshots/substitute/stateless"
 
+title "'substitute' with find & replace"
+(with "stdin for data"
+  (with "input as yaml containing a character that needs escaping in JSON"
+    INPUT='secret: $sec"cret'
+    (with "a data-template from file"
+      precondition "fails without replacements" && {
+        echo "$INPUT" | \
+        WITH_SNAPSHOT="$snapshot/fail-data-stdin-json-data-validated-stdout" \
+        expect_run $WITH_FAILURE "$exe" substitute --validate "$template/data.json.hbs"
+      }
+      
+      (with "replacements to escape the offending character"
+        it "succeeds thanks to replacements" && {
+          echo "$INPUT" | \
+          WITH_SNAPSHOT="$snapshot/data-stdin-json-data-validated-fix-with-replacements-stdout" \
+          expect_run $SUCCESSFULLY "$exe" substitute --validate --replace='":\"' --replace='sec:geheim:cret:niss' "$template/data.json.hbs"
+        }
+      )
+    )
+  )
+)
+
 title "'substitute' subcommand"
 (with "stdin for data"
   (with "input as json"
@@ -223,6 +245,13 @@ title "'substitute' subcommand error cases"
     echo 'hi: 42' | \
     WITH_SNAPSHOT="$snapshot/fail-data-stdin-template-misses-key" \
     expect_run $WITH_FAILURE "$exe" sub "$template/the-answer.hbs"
+  }
+)
+(with "not enough replacement values"
+  it "fails" && {
+    echo 'hi: 42' | \
+    WITH_SNAPSHOT="$snapshot/fail-not-enough-replacements" \
+    expect_run $WITH_FAILURE "$exe" sub "$template/the-answer.hbs" --replace=foo
   }
 )
 (with "--verify"

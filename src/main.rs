@@ -8,6 +8,7 @@ extern crate gpgme;
 #[macro_use]
 extern crate lazy_static;
 extern crate glob;
+extern crate itertools;
 extern crate sheesy_tools as tools;
 extern crate sheesy_vault as vault;
 
@@ -81,7 +82,13 @@ fn main() {
         }
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
-            substitute(&context.data, &context.specs, &context.separator, context.validate)
+            substitute(
+                &context.data,
+                &context.specs,
+                &context.separator,
+                context.validate,
+                &context.replacements,
+            )
         }
         ("vault", Some(args)) => {
             let mut context = ok_or_exit(parse::vault::context_from(args));

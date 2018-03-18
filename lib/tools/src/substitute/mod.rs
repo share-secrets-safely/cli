@@ -3,6 +3,7 @@ mod spec;
 mod util;
 
 use atty;
+use json;
 use yaml_rust;
 use failure::{err_msg, Error, ResultExt};
 use handlebars::{no_escape, Handlebars};
@@ -21,6 +22,7 @@ pub fn substitute(
     specs: &[Spec],
     separator: &OsStr,
     try_deserialize: bool,
+    replacements: &[(String, String)],
 ) -> Result<(), Error> {
     use self::StreamOrPath::*;
     let mut own_specs = Vec::new();
@@ -48,6 +50,7 @@ pub fn substitute(
     };
 
     validate(input_data, specs)?;
+    let dataset = substitute_in_data(dataset, replacements);
 
     let mut seen_file_outputs = BTreeSet::new();
     let mut seen_writes_to_stdout = 0;
@@ -104,4 +107,28 @@ pub fn substitute(
         }
     }
     Ok(())
+}
+
+fn substitute_in_data(mut d: json::Value, r: &[(String, String)]) -> json::Value {
+    if r.is_empty() {
+        return d;
+    }
+
+    {
+        use json::Value::*;
+        let mut stack = vec![&mut d];
+        while let Some(v) = stack.pop() {
+            match *v {
+                String(ref mut s) => {
+                    *s = r.iter()
+                        .fold(s.to_owned(), |s, &(ref f, ref t)| s.replace(f.as_str(), &t))
+                }
+                Array(ref mut v) => stack.extend(v.iter_mut()),
+                Object(ref mut m) => stack.extend(m.iter_mut().map(|(_, v)| v)),
+                _ => continue,
+            }
+        }
+    }
+
+    d
 }
