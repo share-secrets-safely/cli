@@ -76,21 +76,18 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
         if atty::isnt(atty::Stream::Stdin) && !has_seen_merge_stdin {
             let at_position = cmds.iter()
                 .position(|cmd| match *cmd {
-                    Command::MergePath(_) => true,
-                    Command::MergeValue(_, _) => true,
-                    Command::MergeEnvironment(_) => true,
+                    Command::MergePath(_) | Command::MergeValue(_, _) | Command::MergeEnvironment(_) => true,
                     _ => false,
                 })
-                .unwrap_or(cmds.len());
+                .unwrap_or_else(|| cmds.len());
             cmds.insert(at_position, Command::MergeStdin)
         }
         cmds.push(Command::Serialize);
 
         if !cmds.iter().any(|c| match *c {
-            Command::MergeStdin => true,
-            Command::MergeValue(_, _) => true,
-            Command::MergePath(_) => true,
-            Command::MergeEnvironment(_) => true,
+            Command::MergeStdin | Command::MergeValue(_, _) | Command::MergePath(_) | Command::MergeEnvironment(_) => {
+                true
+            }
             _ => false,
         }) {
             bail!("Please provide structured data from standard input or from a file.");

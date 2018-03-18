@@ -121,7 +121,7 @@ fn substitute_in_data(mut d: json::Value, r: &[(String, String)]) -> json::Value
             match *v {
                 String(ref mut s) => {
                     *s = r.iter()
-                        .fold(s.to_owned(), |s, &(ref f, ref t)| s.replace(f.as_str(), &t))
+                        .fold(s.to_owned(), |s, &(ref f, ref t)| s.replace(f.as_str(), t))
                 }
                 Array(ref mut v) => stack.extend(v.iter_mut()),
                 Object(ref mut m) => stack.extend(m.iter_mut().map(|(_, v)| v)),

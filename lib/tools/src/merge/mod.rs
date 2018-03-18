@@ -14,7 +14,7 @@ mod util;
 
 fn validate(cmds: &[Command]) -> Result<(), Error> {
     let num_merge_stdin_cmds = cmds.iter()
-        .filter(|c| if let &Command::MergeStdin = *c { true } else { false })
+        .filter(|c| if let Command::MergeStdin = **c { true } else { false })
         .count();
     if num_merge_stdin_cmds > 1 {
         bail!(
@@ -175,7 +175,7 @@ fn merge(src: json::Value, mut state: State) -> Result<State, Error> {
             let mut m = tools::Merger::with_filter(existing_value.clone(), NeverDrop::with_mode(&state.merge_mode));
             diff(&existing_value, &src, &mut m);
 
-            if m.filter().clashed_keys.len() > 0 {
+            if !m.filter().clashed_keys.is_empty() {
                 Err(format_err!("{}", m.filter())
                     .context("The merge failed due to conflicts")
                     .into())

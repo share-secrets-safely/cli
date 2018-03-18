@@ -21,7 +21,4 @@ handlebars = "0.32.0"
 serde = "1.0"
 yaml-rust = "0.4.0"
 glob = "0.2.11"
-
-[dependencies.treediff]
-features = ["with-yaml-rust", "with-serde-json"]
-version = "3.0.0"
+treediff = {version = "3.0.0", features = ["with-yaml-rust", "with-serde-json"]}
