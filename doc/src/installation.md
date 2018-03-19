@@ -4,7 +4,7 @@
 This is by far the easiest way to get the binary. Just execute the following code:
 
 ```bash
-brew tap byron/share-secrets-safely https://github.com/Byron/share-secrets-safely.git
+brew tap byron/share-secrets-safely
 brew install sheesy
 ```
 
