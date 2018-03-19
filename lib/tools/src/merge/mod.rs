@@ -109,8 +109,12 @@ where
     }
 }
 
-fn into_pointer(p: String) -> String {
-    let mut p = if p.find('/').is_none() { p.replace('.', "/") } else { p };
+fn into_pointer(p: &str) -> String {
+    let mut p = if p.find('/').is_none() {
+        p.replace('.', "/")
+    } else {
+        p.to_owned()
+    };
     if !p.starts_with('/') {
         p.insert(0, '/');
     }
@@ -119,9 +123,9 @@ fn into_pointer(p: String) -> String {
 
 fn select_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value, Error> {
     match pointer {
-        Some(mut pointer) => {
-            pointer = into_pointer(pointer);
-            v.pointer(&pointer)
+        Some(pointer) => {
+            let json_pointer = into_pointer(&pointer);
+            v.pointer(&json_pointer)
                 .map(|v| v.to_owned())
                 .ok_or_else(|| format_err!("No value at pointer '{}'", pointer))
         }
@@ -132,7 +136,7 @@ fn select_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value
 fn insert_json_at(pointer: Option<String>, v: json::Value) -> Result<json::Value, Error> {
     Ok(match pointer {
         Some(mut pointer) => {
-            pointer = into_pointer(pointer);
+            pointer = into_pointer(&pointer);
             let mut current = v;
             for elm in pointer.rsplit('/').filter(|s| !s.is_empty()) {
                 let index: Result<usize, _> = elm.parse();
