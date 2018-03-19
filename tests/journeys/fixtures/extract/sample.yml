@@ -1,0 +1,14 @@
+a: 42
+b: a simple string with spaces
+c:
+  complex:
+    a: 1
+    b:
+      - some string
+      - 42
+  str: another string with some spaces and exclamation!
+  c:
+    - a: 130
+array:
+  - 1
+  - 2

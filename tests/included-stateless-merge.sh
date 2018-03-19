@@ -381,3 +381,10 @@ title "'merge' subcommand errors"
     }
   )
 )
+(with "an --at pointer in dot format that does not exist"
+  it "fails" && {
+    echo "a: ~" | \
+    WITH_SNAPSHOT="$snapshot/fail-invalid-dotted-pointer" \
+    expect_run $WITH_FAILURE "$exe" show --from a.b.c
+  }
+)
