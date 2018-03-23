@@ -136,6 +136,20 @@ stand-in for pass.
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
 
+### Roadmap to 4.2
+
+#### More powerful substitution
+
+When looking at helm it becomes evident how much more filters would be needed to effectively
+adjust yaml files.
+This can be done either by adding all sorts of default filters, or add another substitution
+engine which sports most of them by default.
+
+* **ideas for handlebars filters**
+  - base64
+  - truncate
+
+
 ### Roadmap to 5.0
 #### Web of Trust for everyone
 
