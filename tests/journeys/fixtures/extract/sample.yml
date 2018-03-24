@@ -10,6 +10,7 @@ c:
   null: null
   c:
     - a: 130
+boolean: true
 array:
   - 1
   - 2

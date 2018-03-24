@@ -133,10 +133,13 @@ where
         None => {
             for v in value {
                 match *v {
+                    json::Value::Bool(ref v) => writeln!(ostream, "{}", v),
                     json::Value::Number(ref v) => writeln!(ostream, "{}", v),
                     json::Value::String(ref v) => writeln!(ostream, "{}", v),
                     json::Value::Null => continue,
-                    _ => unreachable!("We should never try to print complex values here - this is a bug."),
+                    json::Value::Object(_) | json::Value::Array(_) => {
+                        unreachable!("We should never try to print complex values here - this is a bug.")
+                    }
                 }?;
             }
             Ok(())

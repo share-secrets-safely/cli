@@ -13,6 +13,12 @@ title "'extract' - extracting values by pointer"
           expect_run $SUCCESSFULLY "$exe" extract -o=json /a < "$template/sample.yml"
         }
       )
+      (when "it points to a boolean"
+        it "succeeds" && {
+          WITH_SNAPSHOT="$snapshot/single-boolean-as-json" \
+          expect_run $SUCCESSFULLY "$exe" extract -o=json boolean < "$template/sample.yml"
+        }
+      )
       (when "it points to a null"
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/single-null-as-yaml" \
@@ -31,6 +37,12 @@ title "'extract' - extracting values by pointer"
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/single-scalar" \
           expect_run $SUCCESSFULLY "$exe" extract /a < "$template/sample.yml"
+        }
+      )
+      (when "it points to a scalar"
+        it "succeeds" && {
+          WITH_SNAPSHOT="$snapshot/single-boolean" \
+          expect_run $SUCCESSFULLY "$exe" extract boolean < "$template/sample.yml"
         }
       )
       (when "it points to a string"
