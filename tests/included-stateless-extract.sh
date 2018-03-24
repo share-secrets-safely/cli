@@ -1,7 +1,7 @@
 #!/bin/bash
 
 template="$fixture/extract"
-snapshot="$fixture/snapshots/extract/stateless"
+snapshot="$fixture/snapshots/extract"
 
 title "'extract' - extracting values by pointer"
 (with "a value that exists"

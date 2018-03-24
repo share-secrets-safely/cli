@@ -1,7 +1,7 @@
 #!/bin/bash
 
 template="$fixture/merge"
-snapshot="$fixture/snapshots/merge/stateless"
+snapshot="$fixture/snapshots/merge"
 
 title "'merge' - setting values"
 (when "setting values of various types"

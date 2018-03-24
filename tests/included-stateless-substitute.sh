@@ -1,7 +1,7 @@
 #!/bin/bash
 
 template="$fixture/substitute"
-snapshot="$fixture/snapshots/substitute/stateless"
+snapshot="$fixture/snapshots/substitute"
 
 title "'substitute' with find & replace"
 (with "stdin for data"
