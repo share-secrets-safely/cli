@@ -10,6 +10,7 @@ use gpgme;
 use std::ffi::OsStr;
 use std::process::Command;
 use std::process::Stdio;
+use TrustModel;
 
 pub fn strip_ext(p: &Path) -> PathBuf {
     let mut p = p.to_owned();
@@ -221,4 +222,16 @@ where
             writeln!(w, " {}: {}", num_causes - index, cause).ok();
         }
     }
+}
+
+pub fn flags_for_model(model: &TrustModel) -> gpgme::EncryptFlags {
+    let mut flags = gpgme::EncryptFlags::empty();
+    flags.set(
+        gpgme::EncryptFlags::ALWAYS_TRUST,
+        match *model {
+            TrustModel::Always => true,
+            TrustModel::WebOfTrustDefault => false,
+        },
+    );
+    flags
 }

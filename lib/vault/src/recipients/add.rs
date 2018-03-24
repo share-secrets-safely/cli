@@ -83,7 +83,7 @@ impl Vault {
                 writeln!(output, "Added recipient {}", KeyDisplay(&key)).ok();
             }
             partition.write_recipients_list(&mut recipients)?;
-            partition.reencrypt(&mut gpg_ctx, output)?;
+            partition.reencrypt(&mut gpg_ctx, &self.trust_model, output)?;
         }
         Ok(())
     }

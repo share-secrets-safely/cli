@@ -15,10 +15,18 @@ use error::{DecryptionError, EncryptionError};
 use util::{new_context, strip_ext, write_at};
 use util::run_editor;
 use std::iter::once;
+use TrustModel;
+use util::flags_for_model;
 
-fn encrypt_buffer(ctx: &mut gpgme::Context, input: &[u8], keys: &[gpgme::Key]) -> Result<Vec<u8>, Error> {
+fn encrypt_buffer(
+    ctx: &mut gpgme::Context,
+    input: &[u8],
+    keys: &[gpgme::Key],
+    model: &TrustModel,
+) -> Result<Vec<u8>, Error> {
     let mut encrypted_bytes = Vec::<u8>::new();
-    ctx.encrypt(keys, input, &mut encrypted_bytes)
+    let flags = flags_for_model(model);
+    ctx.encrypt_with_flags(keys, input, &mut encrypted_bytes, flags)
         .map_err(|e: gpgme::Error| EncryptionError::caused_by(e, "Failed to encrypt data.".into(), ctx, keys))?;
     Ok(encrypted_bytes)
 }
@@ -115,7 +123,7 @@ impl Vault {
         let mut ctx = new_context()?;
         let keys = self.recipient_keys(&mut ctx)?;
 
-        let encrypted_bytes = encrypt_buffer(&mut ctx, input, &keys)?;
+        let encrypted_bytes = encrypt_buffer(&mut ctx, input, &keys, &self.trust_model)?;
         Ok(encrypted_bytes)
     }
 
@@ -184,7 +192,7 @@ impl Vault {
                     ))?;
                     buf
                 };
-                let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys)?;
+                let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys, &self.trust_model)?;
                 spec.open_output_in(secrets_dir, mode, dst_mode, output)?
                     .write_all(&encrypted_bytes)
                     .context(format!(

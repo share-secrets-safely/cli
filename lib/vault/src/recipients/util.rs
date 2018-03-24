@@ -13,6 +13,8 @@ use error::EncryptionError;
 use util::write_at;
 use util::strip_ext;
 use print_causes;
+use TrustModel;
+use util::flags_for_model;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
@@ -203,7 +205,7 @@ impl Vault {
         Ok((fpr_path, buf))
     }
 
-    pub fn reencrypt(&self, ctx: &mut gpgme::Context, output: &mut Write) -> Result<(), Error> {
+    pub fn reencrypt(&self, ctx: &mut gpgme::Context, model: &TrustModel, output: &mut Write) -> Result<(), Error> {
         let keys = self.recipient_keys(ctx)?;
 
         let mut obuf = Vec::new();
@@ -227,14 +229,15 @@ impl Vault {
             }
             {
                 let mut plain_reader = File::open(tempfile.to_path_buf())?;
-                ctx.encrypt(&keys, &mut plain_reader, &mut obuf).map_err(|e| {
-                    EncryptionError::caused_by(
-                        e,
-                        format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
-                        ctx,
-                        &keys,
-                    )
-                })?;
+                ctx.encrypt_with_flags(&keys, &mut plain_reader, &mut obuf, flags_for_model(model))
+                    .map_err(|e| {
+                        EncryptionError::caused_by(
+                            e,
+                            format!("Failed to re-encrypt {}.", encrypted_file_path.display()),
+                            ctx,
+                            &keys,
+                        )
+                    })?;
             }
             write_at(&secrets_dir.join(&encrypted_file_path))
                 .context(format!(
