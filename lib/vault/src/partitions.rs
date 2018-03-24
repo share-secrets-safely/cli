@@ -6,6 +6,7 @@ use spec::WriteMode;
 use std::iter::once;
 use util::{export_key_with_progress, extract_at_least_one_secret_key, fingerprint_of, new_context};
 use init::assure_empty_directory_exists;
+use TrustModel;
 
 impl Vault {
     pub fn all_in_order(&self) -> Vec<&Vault> {
@@ -113,7 +114,7 @@ impl Vault {
             secrets: partition_secrets_dir.clone(),
             gpg_keys: None,
             recipients: recipients_file,
-            trust_model: self.trust_model.clone(),
+            trust_model: TrustModel::default(),
         };
 
         let partition = new_partition.clone();
