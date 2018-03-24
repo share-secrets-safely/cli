@@ -1,0 +1,6 @@
+---
+name: ~
+trust_model: always
+secrets: "./secrets"
+gpg_keys: "./etc/keys"
+recipients: "./etc/recipients"

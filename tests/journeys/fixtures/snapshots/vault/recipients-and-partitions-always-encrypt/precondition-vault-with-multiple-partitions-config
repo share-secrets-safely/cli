@@ -1,0 +1,18 @@
+---
+name: ~
+trust_model: always
+secrets: p1
+gpg_keys: etc/keys
+recipients: etc/p1
+---
+name: second
+trust_model: always
+secrets: p2
+gpg_keys: ~
+recipients: etc/p2
+---
+name: third
+trust_model: always
+secrets: p3
+gpg_keys: ~
+recipients: etc/p3

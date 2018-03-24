@@ -101,8 +101,7 @@ for adoption, there should be a way to turn it off and delegate trust checking t
 Also given the way the vault is typically used, we should disable it by default, and make enabling
 it optional to more advanced teams.
 
- * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
-   * this includes an option to turn it off (i.e. something like `--always-encrypt`)
+ * [x] Configure web-of-trust options on per-partition basis and use that when encrypting.
  * [ ] Don't fail when listing recipients whose keys are not in the keychain
  * [ ] Assure that the error messages provided when we can't find a partition are
     better and specific to the use case.
