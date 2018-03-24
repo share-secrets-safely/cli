@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use vault::{CreateMode, SigningMode, VaultSpec};
+use vault::{CreateMode, SigningMode, TrustModel, VaultSpec};
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum Command {
@@ -20,6 +20,7 @@ pub enum Command {
     },
     Init {
         name: Option<String>,
+        trust_model: TrustModel,
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
         secrets: PathBuf,

@@ -93,15 +93,39 @@ to settle from 5.0.
 
 #### Improved UX and basic Web of Trust controls
 
+Having spend some time reading up on the issue, and having realized that there is a reason
+the 'Web of Trust' model as implemented by GPG/PGP are not particularly wide-spread for a reason,
+for adoption, there should be a way to turn it off and delegate trust checking to external sources
+(_like [keybase.io][keybase]_).
+
+Also given the way the vault is typically used, we should disable it by default, and make enabling
+it optional to more advanced teams.
+
+ * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
+   * this includes an option to turn it off (i.e. something like `--always-encrypt`)
+ * [ ] Don't fail when listing recipients whose keys are not in the keychain
  * [ ] Assure that the error messages provided when we can't find a partition are
     better and specific to the use case.
  * [ ] Tree mode for lists of
    * [ ] recipients
    * [ ] resources
- * [ ] Configure web-of-trust options on per-partition basis and use that when encrypting.
-   * this includes an option to turn it off (i.e. something like `--always-encrypt`)
- * [ ] Don't fail when listing recipients whose keys are not in the keychain
  * [ ] _Option to auto-import keys when encrypting resources (how does it work with WoT?)_
+ 
+[keybase]: https://keybase.io
+
+### Roadmap to 3.4
+
+#### More powerful substitution
+
+When looking at helm it becomes evident how much more filters would be needed to effectively
+adjust yaml files.
+This can be done either by adding all sorts of default filters, or add another substitution
+engine which sports most of them by default.
+
+* **ideas for handlebars filters**
+  - base64
+  - truncate
+
 
 ### Roadmap to 4.0
 
@@ -129,19 +153,6 @@ stand-in for pass.
 
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
-
-### Roadmap to 4.2
-
-#### More powerful substitution
-
-When looking at helm it becomes evident how much more filters would be needed to effectively
-adjust yaml files.
-This can be done either by adding all sorts of default filters, or add another substitution
-engine which sports most of them by default.
-
-* **ideas for handlebars filters**
-  - base64
-  - truncate
 
 
 ### Roadmap to 5.0

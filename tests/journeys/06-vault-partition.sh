@@ -20,7 +20,7 @@ title "'vault partition add as non-owner"
     import_user "$fixture/tester.sec.asc"
 
     (with "an unnamed vault with an explicit secrets directory owned by 'tester'"
-      "$exe" vault init -k etc/keys --first-partition -r etc/recipients --secrets-dir secrets >/dev/null
+      "$exe" vault init --trust-model=web-of-trust -k etc/keys --first-partition -r etc/recipients --secrets-dir secrets >/dev/null
 
       (with "another user with access to the vault, which is no recipient"
         as_user "$fixture/b.sec.asc"
@@ -124,7 +124,7 @@ title "'vault partition add & remove'"
 
     (with "an unnamed vault with an explicit secrets directory"
       in-space one/vault
-      "$exe" vault init -k etc/keys -r etc/recipients --secrets-dir secrets >/dev/null
+      "$exe" vault init --trust-model=web-of-trust -k etc/keys -r etc/recipients --secrets-dir secrets >/dev/null
 
       (when "adding an unnnamed partition"
         it "succeeds" && {

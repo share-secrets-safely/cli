@@ -29,7 +29,7 @@ title "'vault init'"
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
       WITH_SNAPSHOT="$snapshot/successful-init" \
-      expect_run $SUCCESSFULLY "$exe" vault init
+      expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust
     }
     it "creates a valid vault configuration file, \
         exports the public portion of the key to the correct spot and \
@@ -114,7 +114,7 @@ title "'vault init'"
       (with "no explicit recipients file"
         in-space one
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir secrets
+          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --secrets-dir secrets
         }
 
         it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
@@ -125,7 +125,7 @@ title "'vault init'"
       (with "an explicit recipients file name"
         in-space two
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file recipients
+          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --secrets-dir ./secrets --recipients-file recipients
         }
 
         it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
@@ -136,7 +136,7 @@ title "'vault init'"
       (with "an explicit recipients path"
         in-space three
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --secrets-dir ./secrets --recipients-file ./recipients
+          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --secrets-dir ./secrets --recipients-file ./recipients
         }
 
         it "creates the recipients file at that path" && {
@@ -165,7 +165,7 @@ title "'vault init'"
       (with "a valid secrets dir"
         in-space seven
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --first-partition --secrets-dir sec
+          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --first-partition --secrets-dir sec
         }
 
         it "creates the correct vault structure" && {
@@ -189,7 +189,7 @@ title "'vault init'"
         WITH_SNAPSHOT="$snapshot/init-with-at-argument" \
         expect_run $SUCCESSFULLY "$exe" vault \
           -c $vault_dir/vault.yml \
-          init --name customized --secrets-dir secrets -k ./etc/keys -r ./etc/recipients
+          init --trust-model=web-of-trust --name customized --secrets-dir secrets -k ./etc/keys -r ./etc/recipients
       }
 
       it "creates the expected folder structure" && {
@@ -238,7 +238,7 @@ title "'vault init'"
   (with "a an absolute vault directory (and a custom name)"
     it "succeeds" && {
       expect_run $SUCCESSFULLY "$exe" vault --config-file "$vault_dir/vault.yml" \
-        init -n custom-name --gpg-keys-dir keys --recipients-file recipients
+        init --trust-model=web-of-trust -n custom-name --gpg-keys-dir keys --recipients-file recipients
     }
     it "creates the correct folder structure" && {
       expect_snapshot "$snapshot/init-single-user-absolute-directory" "$vault_dir"
@@ -297,7 +297,7 @@ EDITOR
     (with "a selected gpg key and a vault name"
       it "succeeds as it just follow instructions" && {
         WITH_SNAPSHOT="$snapshot/init-with-key-specified-explicitly" \
-        expect_run $SUCCESSFULLY "$exe" vault init --name vault-name --gpg-key-id c@example.com
+        expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --name vault-name --gpg-key-id c@example.com
       }
 
       it "creates a valid vault configuration file, \
@@ -322,7 +322,7 @@ EDITOR
   (with "multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
       WITH_SNAPSHOT="$snapshot/init-with-multiple-specified-keys" \
-      expect_run $SUCCESSFULLY "$exe" vault init --gpg-key-id c@example.com --gpg-key-id tester@example.com
+      expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --gpg-key-id c@example.com --gpg-key-id tester@example.com
     }
 
     it "creates the expected folder structure" && {

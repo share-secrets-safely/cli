@@ -80,6 +80,21 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 ),
         )
         .arg(
+            Arg::with_name("trust-model")
+                .long("trust-model")
+                .default_value("always")
+                .required(false)
+                .takes_value(true)
+                .value_name("model")
+                .possible_values(&["web-of-trust", "always"])
+                .help(
+                    "The model by which keys to encrypt for are verified to truly belong to the person. \
+                     'always': whenever a key has been added to the vault, it is trusted without your intervention. \
+                     'web-of-trust': the standard GPG web of trust with default rules. In the most simple case, you will \
+                     need to sign a key prior to be able to encrypt for it.",
+                ),
+        )
+        .arg(
             Arg::with_name("secrets-dir")
                 .long("secrets-dir")
                 .short("s")

@@ -46,6 +46,7 @@ fn inner_do_it(ctx: Context, output: &mut Write) -> Result<(), Error> {
         RecipientsList => vault_from(&ctx)?.print_recipients(output),
         RecipientsInit { ref gpg_key_ids } => vault_from(&ctx)?.init_recipients(gpg_key_ids, output),
         Init {
+            ref trust_model,
             ref name,
             ref gpg_key_ids,
             ref gpg_keys_dir,
@@ -59,6 +60,7 @@ fn inner_do_it(ctx: Context, output: &mut Write) -> Result<(), Error> {
                 recipients_file,
                 &ctx.vault_path,
                 name.clone(),
+                trust_model.clone(),
                 output,
             )?;
             Ok(())

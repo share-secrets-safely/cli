@@ -113,6 +113,7 @@ impl Vault {
             secrets: partition_secrets_dir.clone(),
             gpg_keys: None,
             recipients: recipients_file,
+            trust_model: self.trust_model.clone(),
         };
 
         let partition = new_partition.clone();

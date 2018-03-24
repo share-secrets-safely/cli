@@ -8,6 +8,7 @@ use util::extract_at_least_one_secret_key;
 use spec::WriteMode;
 use std::io::Write;
 use util::export_key_with_progress;
+use TrustModel;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum DirectoryInfo {
@@ -38,6 +39,7 @@ impl Vault {
         recipients_file: &Path,
         vault_path: &Path,
         name: Option<String>,
+        trust_model: TrustModel,
         output: &mut Write,
     ) -> Result<Self, Error> {
         let vault = Vault {
@@ -45,6 +47,7 @@ impl Vault {
             recipients: recipients_file.to_owned(),
             name,
             secrets: secrets.to_owned(),
+            trust_model,
             ..Default::default()
         }.set_resolved_at(vault_path)?;
 

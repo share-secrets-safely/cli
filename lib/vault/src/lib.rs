@@ -27,5 +27,5 @@ mod resource;
 mod partitions;
 
 pub use spec::*;
-pub use base::{Vault, VaultExt};
+pub use base::{TrustModel, Vault, VaultExt};
 pub use util::print_causes;

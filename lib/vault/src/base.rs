@@ -11,6 +11,7 @@ use gpgme;
 use std::collections::HashSet;
 use std::iter::once;
 use std::fs::create_dir_all;
+use std::str::FromStr;
 
 pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
@@ -33,6 +34,40 @@ impl Default for VaultKind {
     }
 }
 
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Hash, Ord, PartialOrd)]
+#[serde(rename_all = "snake_case")]
+pub enum TrustModel {
+    WebOfTrustDefault,
+    Always,
+}
+
+impl Default for TrustModel {
+    fn default() -> Self {
+        TrustModel::WebOfTrustDefault
+    }
+}
+
+impl TrustModel {
+    pub fn skip_if(&self) -> bool {
+        match *self {
+            TrustModel::WebOfTrustDefault => true,
+            _ => false,
+        }
+    }
+}
+
+impl FromStr for TrustModel {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, <Self as FromStr>::Err> {
+        Ok(match s {
+            "web-of-trust" => TrustModel::WebOfTrustDefault,
+            "always" => TrustModel::Always,
+            _ => return Err(format!("Unknown trust model: '{}'", s)),
+        })
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Vault {
     pub name: Option<String>,
@@ -46,6 +81,8 @@ pub struct Vault {
     pub resolved_at: PathBuf,
     #[serde(skip)]
     pub vault_path: Option<PathBuf>,
+    #[serde(default, skip_serializing_if = "TrustModel::skip_if")]
+    pub trust_model: TrustModel,
     #[serde(default = "secrets_default")]
     pub secrets: PathBuf,
     pub gpg_keys: Option<PathBuf>,
@@ -59,6 +96,7 @@ impl Default for Vault {
             kind: VaultKind::default(),
             index: 0,
             partitions: Default::default(),
+            trust_model: Default::default(),
             vault_path: None,
             name: None,
             secrets: secrets_default(),
@@ -88,6 +126,7 @@ impl Vault {
                             secrets: PathBuf::from("."),
                             gpg_keys: None,
                             recipients: recipients_default(),
+                            trust_model: Default::default(),
                         };
                         vault = vault.set_resolved_at(&recipients_path
                             .parent()

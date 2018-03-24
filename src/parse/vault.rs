@@ -1,11 +1,11 @@
 use conv::TryInto;
-use failure::Error;
+use failure::{err_msg, Error};
 use clap::ArgMatches;
 
 use std::path::{Path, PathBuf};
 use std::convert::Into;
 
-use vault::{CreateMode, SigningMode};
+use vault::{CreateMode, SigningMode, TrustModel};
 use dispatch::vault::{Command, Context};
 
 use super::util::{optional_args, required_arg, required_os_arg};
@@ -147,6 +147,11 @@ pub fn resource_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
 pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     let mut recipients_file: PathBuf = required_os_arg(args, "recipients-file-path")?;
     let secrets: PathBuf = required_os_arg(args, "secrets-dir")?;
+    let trust_model: TrustModel = args.value_of("trust-model")
+        .expect("clap to work")
+        .parse()
+        .map_err(|err| err_msg(err))?;
+
     if args.is_present("first-partition") && secrets == Path::new(".") {
         bail!("If --first-partition is present, --secrets-dir must not be set to '.' or left unset");
     }
@@ -157,6 +162,7 @@ pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
         command: Command::Init {
             name: args.value_of("name").map(ToOwned::to_owned),
             recipients_file,
+            trust_model,
             secrets,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,
             gpg_key_ids: optional_args(args, "gpg-key-id"),
