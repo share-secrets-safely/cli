@@ -1,0 +1,3 @@
+error: Failed to open file at 'file-that-does-not-exist' for reading
+Caused by: 
+ 1: No such file or directory (os error 2)

@@ -5,6 +5,8 @@ mod completions;
 mod vault;
 mod substitute;
 mod merge;
+mod extract;
+mod util;
 
 pub struct CLI<'a, 'b>
 where
@@ -32,6 +34,7 @@ where
             .subcommand(vault::cli())
             .subcommand(substitute::cli())
             .subcommand(merge::cli())
+            .subcommand(extract::cli())
             .subcommand(completions::cli());
 
         Self { app }

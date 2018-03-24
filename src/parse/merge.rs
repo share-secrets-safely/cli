@@ -3,6 +3,7 @@ use glob;
 use failure::Error;
 use clap::ArgMatches;
 use tools::merge::{Command, MergeMode, OutputMode};
+use parse::util::optional_args_with_value;
 
 use std::path::PathBuf;
 
@@ -13,21 +14,6 @@ where
     match args.indices_of(name) {
         Some(v) => v.map(|i| (into(), i)).collect(),
         None => Vec::new(),
-    }
-}
-
-fn optional_args_with_value<F, T>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(T, usize)>
-where
-    F: Fn(&str) -> T,
-{
-    if args.occurrences_of(name) > 0 {
-        match (args.values_of(name), args.indices_of(name)) {
-            (Some(v), Some(i)) => v.map(|v| into(v)).zip(i).collect(),
-            (None, None) => Vec::new(),
-            _ => unreachable!("expecting clap to work"),
-        }
-    } else {
-        Vec::new()
     }
 }
 

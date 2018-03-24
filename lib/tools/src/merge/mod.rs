@@ -39,6 +39,19 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
 
     for cmd in cmds {
         match cmd {
+            SelectToBuffer(pointer) => {
+                let json_pointer = into_pointer(&pointer);
+                match state.value {
+                    Some(ref value) => state.buffer.push(
+                        value
+                            .pointer(&json_pointer)
+                            .ok_or_else(|| format_err!("There is no value at '{}'", pointer))?
+                            .clone(),
+                    ),
+                    None => bail!("There is no value to fetch from yet"),
+                }
+            }
+            SerializeBuffer => show_buffer(state.output_mode.as_ref(), &state.buffer, &mut output)?,
             SelectNextMergeAt(at) => {
                 state.select_next_at = Some(at);
             }
@@ -78,7 +91,7 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
                 state = merge(value_to_merge, state)?;
             }
             SetOutputMode(mode) => {
-                state.output_mode = mode;
+                state.output_mode = Some(mode);
             }
             Serialize => {
                 state.value = match state.value {
@@ -90,7 +103,7 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
                     None => None,
                 };
 
-                show(&state.output_mode, &state.value, &mut output)?
+                show(state.output_mode.as_ref(), &state.value, &mut output)?
             }
         }
     }
@@ -98,14 +111,48 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
     Ok(state)
 }
 
-fn show<V, W>(output_mode: &OutputMode, value: &V, ostream: W) -> Result<(), Error>
+fn show_buffer<W>(output_mode: Option<&OutputMode>, value: &[json::Value], mut ostream: W) -> Result<(), Error>
+where
+    W: io::Write,
+{
+    let has_complex_value = value.iter().any(|v| match *v {
+        json::Value::Array(_) | json::Value::Object(_) => true,
+        _ => false,
+    });
+
+    let output_mode = match output_mode {
+        None => if has_complex_value {
+            Some(&OutputMode::Json)
+        } else {
+            None
+        },
+        Some(mode) => Some(mode),
+    };
+
+    match output_mode {
+        None => {
+            for v in value {
+                match *v {
+                    json::Value::Number(ref v) => writeln!(ostream, "{}", v),
+                    json::Value::String(ref v) => writeln!(ostream, "{}", v),
+                    json::Value::Null => continue,
+                    _ => unreachable!("We should never try to print complex values here - this is a bug."),
+                }?;
+            }
+            Ok(())
+        }
+        mode @ Some(_) => show(mode, value, ostream),
+    }
+}
+
+fn show<V, W>(output_mode: Option<&OutputMode>, value: V, ostream: W) -> Result<(), Error>
 where
     V: Serialize,
     W: io::Write,
 {
-    match *output_mode {
-        OutputMode::Json => json::to_writer_pretty(ostream, value).map_err(Into::into),
-        OutputMode::Yaml => yaml::to_writer(ostream, value).map_err(Into::into),
+    match output_mode {
+        Some(&OutputMode::Json) | None => json::to_writer_pretty(ostream, &value).map_err(Into::into),
+        Some(&OutputMode::Yaml) => yaml::to_writer(ostream, &value).map_err(Into::into),
     }
 }
 

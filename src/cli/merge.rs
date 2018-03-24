@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use glob;
+use cli::util::output_formats;
 
 pub fn cli<'a, 'b>() -> App<'a, 'b> {
     App::new("process")
@@ -19,7 +20,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .value_name("pointer")
                 .required(false)
                 .multiple(true)
-                .help("Use a JSON pointer to specify which sub-value to use.. \
+                .help("Use a JSON pointer to specify which sub-value to use. \
                        This affects only the next following --environment or <path>. \
                        Valid specifications are for example '0/a/b/4' or 'a.b.0', and they must point to a valid value. \
                        If it is specified last, without a following merged value, a sub-value is selected from the aggregated value."
@@ -82,7 +83,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .required(false)
                 .value_name("mode")
                 .default_value("json")
-                .possible_values(&["json", "yaml"])
+                .possible_values(output_formats())
                 .case_insensitive(true)
                 .help("Specifies how the merged result should be serialized."),
         )
@@ -93,7 +94,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 .required(false)
                 .multiple(true)
                 .help(
-                "The path to the file to include. It must be in a format that can be output using the --output flag. \
+                "The path to the file to include, or '-' to read from standard input. It must be in a format that can be output using the --output flag. \
                  Alternatively it can be a value assignment like 'a=42' or a.b.c=value.",
             ),
         )

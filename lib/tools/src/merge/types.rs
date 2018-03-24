@@ -13,9 +13,10 @@ use glob;
 pub struct State {
     pub select_next_at: Option<String>,
     pub insert_next_at: Option<String>,
-    pub output_mode: OutputMode,
+    pub output_mode: Option<OutputMode>,
     pub merge_mode: MergeMode,
     pub value: Option<json::Value>,
+    pub buffer: Vec<json::Value>,
 }
 
 #[derive(Debug, Clone)]
@@ -35,11 +36,13 @@ pub enum Command {
     MergeValue(String, String),
     InsertNextMergeAt(String),
     SelectNextMergeAt(String),
+    SelectToBuffer(String),
     MergeStdin,
     MergePath(PathBuf),
     MergeEnvironment(glob::Pattern),
     SetMergeMode(MergeMode),
     Serialize,
+    SerializeBuffer,
     SetOutputMode(OutputMode),
 }
 

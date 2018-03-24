@@ -1,3 +1,12 @@
+### V3.3: Value extraction and basic trust controls
+
+#### The `extract` subcommand
+
+The `extract` capability makes it feasible to store secrets in structured files
+like YAML or JSON, as it allows to extract pieces of data in various ways.
+Think basic `jq` but with native support for YAML files.
+
+
 ## V3.2: Master-Merger
 
 The `merge` subcommand allows to combine JSON or YAML files.

@@ -91,12 +91,6 @@ to settle from 5.0.
 
 ### Roadmap to 3.3
 
-#### Adding the `extract` subcommand
-
-The `extract` capability makes it feasible to store secrets in structured files
-like YAML or JSON, as it allows to extract pieces of data in various ways.
-Think `jq` but with native support for YAML files.
-
 #### Improved UX and basic Web of Trust controls
 
  * [ ] Assure that the error messages provided when we can't find a partition are

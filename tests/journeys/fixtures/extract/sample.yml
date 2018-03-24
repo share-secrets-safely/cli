@@ -7,6 +7,7 @@ c:
       - some string
       - 42
   str: another string with some spaces and exclamation!
+  null: null
   c:
     - a: 130
 array:

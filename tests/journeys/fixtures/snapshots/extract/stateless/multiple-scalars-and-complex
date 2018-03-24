@@ -1,0 +1,13 @@
+[
+  42,
+  "a simple string with spaces",
+  42,
+  "some string",
+  {
+    "a": 1,
+    "b": [
+      "some string",
+      42
+    ]
+  }
+]

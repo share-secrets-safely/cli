@@ -1,0 +1,7 @@
+error: The following required arguments were not provided:
+    <pointer>...
+
+USAGE:
+    sy extract [OPTIONS] <pointer>...
+
+For more information try --help
