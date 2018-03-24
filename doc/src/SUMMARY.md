@@ -21,4 +21,5 @@
     - [vault partitions remove](./vault/partitions/remove.md)
 - [Tooling](./tools/about.md)
   - [substitute](./tools/substitute.md)
-  - [merge](./tools/process.md)
+  - [process](./tools/process.md)
+  - [extract](./tools/extract.md)
