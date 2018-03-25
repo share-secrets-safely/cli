@@ -1,7 +1,7 @@
 [package]
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "sheesy-cli"
-version = "3.2.0"
+version = "3.3.0"
 
 description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults."
 license = "LGPL-2.1"
@@ -31,10 +31,10 @@ itertools = "0.7.7"
 
 [dependencies.sheesy-tools]
 path = "lib/tools"
-version = "3.2.0"
+version = "3.3.0"
 
 [dependencies.sheesy-vault]
 path = "lib/vault"
-version = "3.2.0"
+version = "3.3.0"
 
 [workspace]
