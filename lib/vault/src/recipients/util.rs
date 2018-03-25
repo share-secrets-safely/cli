@@ -210,6 +210,7 @@ impl Vault {
         ctx: &mut gpgme::Context,
         model: &TrustModel,
         gpg_keys_dir: Option<&Path>,
+        has_multiple_partitions: bool,
         output: &mut Write,
     ) -> Result<(), Error> {
         let keys = self.recipient_keys(ctx, gpg_keys_dir)?;
@@ -217,6 +218,13 @@ impl Vault {
         let mut obuf = Vec::new();
 
         let secrets_dir = self.secrets_path();
+        let qualified = |p: &Path| {
+            if has_multiple_partitions {
+                secrets_dir.join(p)
+            } else {
+                p.to_owned()
+            }
+        };
         let files_to_reencrypt: Vec<_> = {
             let _change_cwd = ResetCWD::new(&secrets_dir)?;
             glob(GPG_GLOB).expect("valid pattern").filter_map(Result::ok).collect()
@@ -225,7 +233,7 @@ impl Vault {
             let tempfile = Temp::new_file().with_context(|_| {
                 format!(
                     "Failed to create temporary file to hold decrypted '{}'",
-                    secrets_dir.join(&encrypted_file_path).display()
+                    qualified(&encrypted_file_path).display()
                 )
             })?;
             {
@@ -234,7 +242,7 @@ impl Vault {
                     .with_context(|_| {
                         format!(
                             "Could not decrypt '{}' to re-encrypt for new recipients.",
-                            secrets_dir.join(&encrypted_file_path).display()
+                            qualified(&encrypted_file_path).display()
                         )
                     })?;
             }
@@ -244,10 +252,7 @@ impl Vault {
                     .map_err(|e| {
                         EncryptionError::caused_by(
                             e,
-                            format!(
-                                "Failed to re-encrypt '{}'.",
-                                secrets_dir.join(&encrypted_file_path).display()
-                            ),
+                            format!("Failed to re-encrypt '{}'.", qualified(&encrypted_file_path).display()),
                             ctx,
                             &keys,
                         )
@@ -257,14 +262,14 @@ impl Vault {
                 .with_context(|_| {
                     format!(
                         "Could not open '{}' to write encrypted data",
-                        secrets_dir.join(&encrypted_file_path).display()
+                        qualified(&encrypted_file_path).display()
                     )
                 })
                 .and_then(|mut w| {
                     w.write_all(&obuf).with_context(|_| {
                         format!(
                             "Failed to write out encrypted data to '{}'",
-                            secrets_dir.join(&encrypted_file_path).display()
+                            qualified(&encrypted_file_path).display()
                         )
                     })
                 })?;
@@ -273,7 +278,7 @@ impl Vault {
             writeln!(
                 output,
                 "Re-encrypted '{}' for new recipient(s)",
-                strip_ext(&encrypted_file_path).display()
+                strip_ext(&qualified(&encrypted_file_path)).display()
             ).ok();
         }
         Ok(())

@@ -2,9 +2,9 @@ Imported recipient key at path 'etc/keys/1E1114E11B362B46B53E1ABAEF17047AB488BD8
 Signed recipients key user a (a test account user a) <a@example.com> (1E1114E11B362B46B53E1ABAEF17047AB488BD82) with signing key Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
 Exported public key for user user a (a test account user a) <a@example.com> to 'etc/keys/1E1114E11B362B46B53E1ABAEF17047AB488BD82'
 Added recipient user a (a test account user a) <a@example.com>
-Re-encrypted 'two' for new recipient(s)
+Re-encrypted 'p2/two' for new recipient(s)
 Imported recipient key at path 'etc/keys/1E1114E11B362B46B53E1ABAEF17047AB488BD82'
 Signed recipients key user a (a test account user a) <a@example.com> (1E1114E11B362B46B53E1ABAEF17047AB488BD82) with signing key Tester (for testing only) <tester@example.com> (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
 Exported public key for user user a (a test account user a) <a@example.com> to 'etc/keys/1E1114E11B362B46B53E1ABAEF17047AB488BD82'
 Added recipient user a (a test account user a) <a@example.com>
-Re-encrypted 'three' for new recipient(s)
+Re-encrypted 'p3/three' for new recipient(s)

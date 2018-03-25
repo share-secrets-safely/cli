@@ -18,6 +18,7 @@ impl Vault {
     ) -> Result<(), Error> {
         let mut gpg_ctx = new_context()?;
         let partitions: Vec<&Vault> = self.partitions_by_name_or_path(partitions)?;
+        let has_multiple_partitions = !self.partitions.is_empty();
 
         for partition in partitions {
             if let SigningMode::Public = sign {
@@ -92,6 +93,7 @@ impl Vault {
                 self.gpg_keys_dir_for_auto_import(partition)
                     .as_ref()
                     .map(PathBuf::as_ref),
+                has_multiple_partitions,
                 output,
             )?;
         }

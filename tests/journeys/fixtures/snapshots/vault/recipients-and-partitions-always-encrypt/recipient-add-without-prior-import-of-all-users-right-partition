@@ -1,5 +1,5 @@
 Exported public key for user user b <b@example.com> to 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
 Added recipient user b <b@example.com>
-Re-encrypted 'added-by-new-user' for new recipient(s)
-Re-encrypted 'two' for new recipient(s)
-Re-encrypted 'with-editor' for new recipient(s)
+Re-encrypted 'p2/added-by-new-user' for new recipient(s)
+Re-encrypted 'p2/two' for new recipient(s)
+Re-encrypted 'p2/with-editor' for new recipient(s)

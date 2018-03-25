@@ -17,6 +17,7 @@ impl Vault {
     ) -> Result<(), Error> {
         let mut ctx = new_context()?;
         let partitions = self.partitions_by_name_or_path(partitions)?;
+        let has_multiple_partitions = !self.partitions.is_empty();
         let gpg_keys_dir_independent_of_auto_import = self.find_gpg_keys_dir().ok();
 
         for partition in partitions {
@@ -99,6 +100,7 @@ impl Vault {
                 &mut ctx,
                 &self.find_trust_model(partition),
                 gpg_keys_dir.as_ref().map(PathBuf::as_path),
+                has_multiple_partitions,
                 output,
             )?;
         }

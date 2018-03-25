@@ -102,7 +102,7 @@ Also given the way the vault is typically used, we should disable it by default,
 it optional to more advanced teams.
 
  * [x] Configure web-of-trust options on per-partition basis and use that when encrypting.
- * [ ] Option to auto-import keys when encrypting resources, which is enabled by default.
+ * [x] Option to auto-import keys when encrypting resources, which is enabled by default.
  * [ ] Don't fail when listing recipients whose keys are not in the keychain.
  * [ ] Assure that the error messages provided when we can't find a partition are
     better and specific to the use case.
