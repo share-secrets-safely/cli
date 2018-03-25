@@ -18,7 +18,7 @@ snapshot="$fixture/snapshots/vault/recipients/remove"
   title "vault recipient remove"
   (with "a vault with multiple secrets and multiple recipients"
     { import_user "$fixture/tester.sec.asc"
-      "$exe" vault init --gpg-keys-dir ./keys
+      "$exe" vault init --trust-model=web-of-trust --no-auto-import --gpg-keys-dir ./keys
       echo a | "$exe" vault add :a
       echo b | "$exe" vault add :subdir/b
       gpg --import "$fixture/b.pub.asc" 2>&1

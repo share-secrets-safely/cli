@@ -24,13 +24,13 @@ impl Vault {
     pub fn print_recipients(&self, output: &mut Write) -> Result<(), Error> {
         let mut ctx = new_context()?;
         if self.partitions.is_empty() {
-            for key in self.recipient_keys(&mut ctx)? {
+            for key in self.recipient_keys(&mut ctx, None)? {
                 writeln!(output, "{}", FingerprintUserId(&key)).ok();
             }
         } else {
             for partition in once(self).chain(self.partitions.iter()) {
                 writeln!(output, "{}", partition.url())?;
-                for key in partition.recipient_keys(&mut ctx)? {
+                for key in partition.recipient_keys(&mut ctx, None)? {
                     writeln!(output, "{}", FingerprintUserId(&key)).ok();
                 }
             }

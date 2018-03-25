@@ -1,4 +1,7 @@
+Imported recipient key at path 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
+Imported recipient key at path 'etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
 Removed key file at 'etc/keys/1E1114E11B362B46B53E1ABAEF17047AB488BD82'
 Wrote changed recipients to file at 'etc/p2'
 Re-encrypted 'added-by-new-user' for new recipient(s)
 Re-encrypted 'two' for new recipient(s)
+Re-encrypted 'with-editor' for new recipient(s)

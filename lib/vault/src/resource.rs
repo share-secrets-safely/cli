@@ -53,15 +53,20 @@ impl Vault {
                 })?
         };
         if try_encrypt {
-            self.encrypt_buffer(b"")
-                .context("Aborted edit operation as you cannot encrypt resources.")?;
+            let (partition, _) = self.partition_by_owned_path(tempfile_path.clone())?;
+            self.encrypt_buffer(
+                b"",
+                self.gpg_keys_dir_for_auto_import(partition)
+                    .as_ref()
+                    .map(PathBuf::as_path),
+            ).context("Aborted edit operation as you cannot encrypt resources.")?;
         }
         run_editor(editor.as_os_str(), &tempfile_path)?;
         let mut zero = Vec::new();
         self.encrypt(
             &[
                 VaultSpec {
-                    src: SpecSourceType::Path(tempfile_path),
+                    src: SpecSourceType::Path(tempfile_path.clone()),
                     dst: decrypted_file_path,
                 },
             ],
@@ -119,9 +124,9 @@ impl Vault {
         Ok(())
     }
 
-    pub fn encrypt_buffer(&self, input: &[u8]) -> Result<Vec<u8>, Error> {
+    pub fn encrypt_buffer(&self, input: &[u8], gpg_keys_dir: Option<&Path>) -> Result<Vec<u8>, Error> {
         let mut ctx = new_context()?;
-        let keys = self.recipient_keys(&mut ctx)?;
+        let keys = self.recipient_keys(&mut ctx, gpg_keys_dir)?;
 
         let encrypted_bytes = encrypt_buffer(
             &mut ctx,
@@ -178,9 +183,13 @@ impl Vault {
                 let (secrets_dir, keys) = match &mut lut[partition.index] {
                     &mut Some((ref secrets_dir, ref keys)) => (secrets_dir, keys),
                     none => {
+                        let gpg_keys_dir = self.gpg_keys_dir_for_auto_import(partition);
                         mem::replace(
                             none,
-                            Some((partition.secrets_path(), partition.recipient_keys(&mut ctx)?)),
+                            Some((
+                                partition.secrets_path(),
+                                partition.recipient_keys(&mut ctx, gpg_keys_dir.as_ref().map(PathBuf::as_path))?,
+                            )),
                         );
                         let some = none;
                         let &(ref secrets_dir, ref keys) = some.as_ref().expect("the content that was just put in");

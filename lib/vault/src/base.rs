@@ -12,6 +12,7 @@ use std::collections::HashSet;
 use std::iter::once;
 use std::fs::create_dir_all;
 use std::str::FromStr;
+use std::io;
 
 pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
@@ -325,6 +326,7 @@ impl Vault {
         ctx: &mut gpgme::Context,
         ids: &[String],
         type_of_ids_for_errors: &str,
+        gpg_keys_dir: Option<&Path>,
     ) -> Result<Vec<gpgme::Key>, Error> {
         ctx.find_keys(ids)
             .context(format!("Could not iterate keys for given {}s", type_of_ids_for_errors))?;
@@ -345,6 +347,13 @@ impl Vault {
         let diff: isize = ids.len() as isize - keys.len() as isize;
         let mut msg = vec![
             if diff > 0 {
+                if let Some(dir) = gpg_keys_dir {
+                    // TODO: take output as paramter, don't hardcode stdout!
+                    self.import_keys(ctx, dir, &missing, &mut io::stdout())
+                        .context("Could not auto-import all required keys")?;
+                    return self.keys_by_ids(ctx, ids, type_of_ids_for_errors, None);
+                }
+
                 let mut msg = format!(
                     "Didn't find the key for {} {}(s) in the gpg database.{}",
                     diff,
@@ -398,7 +407,11 @@ impl Vault {
         Err(err_msg(msg.join("\n")))
     }
 
-    pub fn recipient_keys(&self, ctx: &mut gpgme::Context) -> Result<Vec<gpgme::Key>, Error> {
+    pub fn recipient_keys(
+        &self,
+        ctx: &mut gpgme::Context,
+        gpg_keys_dir: Option<&Path>,
+    ) -> Result<Vec<gpgme::Key>, Error> {
         let recipients_fprs = self.recipients_list()?;
         if recipients_fprs.is_empty() {
             return Err(format_err!(
@@ -406,7 +419,7 @@ impl Vault {
                 self.recipients.display()
             ));
         }
-        self.keys_by_ids(ctx, &recipients_fprs, "recipient")
+        self.keys_by_ids(ctx, &recipients_fprs, "recipient", gpg_keys_dir)
     }
 
     fn vault_path_for_display(&self) -> String {
@@ -416,6 +429,8 @@ impl Vault {
             .unwrap_or_else(|| String::from("<unknown>"))
     }
 
+    /// TODO: change this to be similar to `find_trust_model()`
+    /// as it's OK to let partitions override the master vault settings
     pub fn find_gpg_keys_dir(&self) -> Result<PathBuf, Error> {
         once(self.gpg_keys_dir())
             .chain(self.partitions.iter().map(|p| p.gpg_keys_dir()))
@@ -427,6 +442,19 @@ impl Vault {
                     self.vault_path_for_display()
                 )
             })
+    }
+
+    pub fn gpg_keys_dir_for_auto_import(&self, partition: &Vault) -> Option<PathBuf> {
+        let auto_import = partition
+            .auto_import
+            .clone()
+            .or(self.auto_import.clone())
+            .unwrap_or(false);
+        if auto_import {
+            self.find_gpg_keys_dir().ok()
+        } else {
+            None
+        }
     }
 
     pub fn gpg_keys_dir(&self) -> Result<PathBuf, Error> {

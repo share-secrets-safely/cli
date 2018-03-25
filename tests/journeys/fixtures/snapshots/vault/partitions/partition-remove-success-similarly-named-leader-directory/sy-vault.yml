@@ -1,5 +1,6 @@
 ---
 name: same
+auto_import: ~
 trust_model: ~
 secrets: one
 gpg_keys: ".gpg-keys"

@@ -1,5 +1,6 @@
 ---
 name: ~
+auto_import: true
 trust_model: always
 secrets: "./secrets"
 gpg_keys: "./etc/keys"

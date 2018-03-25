@@ -1,29 +1,34 @@
 ---
 name: ~
+auto_import: false
 trust_model: "gpg-web-of-trust"
 secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: first
+auto_import: ~
 trust_model: ~
 secrets: first
 gpg_keys: ~
 recipients: first/recipients
 ---
 name: "second-partition"
+auto_import: ~
 trust_model: ~
 secrets: "./subdir/second"
 gpg_keys: ~
 recipients: "./subdir/second/recipients"
 ---
 name: third
+auto_import: ~
 trust_model: ~
 secrets: subdir/third
 gpg_keys: ~
 recipients: subdir/third/recipients
 ---
 name: "second-partition"
+auto_import: ~
 trust_model: ~
 secrets: "/tmp/some-empty-dir"
 gpg_keys: ~

@@ -15,7 +15,7 @@ fixture="$root/fixtures"
 snapshot="$fixture/snapshots/vault/always-encrypt"
 
 (sandboxed
-  title "'vault' init -- always encrypt"
+  title "'vault' init -- always encrypt and auto-import"
   (with "a vault initialized for a single recipient and an existing secret and custom secrets dir and default trust model"
     { import_user "$fixture/tester.sec.asc"
       mkdir secrets
@@ -43,10 +43,6 @@ snapshot="$fixture/snapshots/vault/always-encrypt"
           }
         )
         (when "trying to encrypt a new file without a signed tester@example.com key"
-          {
-            gpg --import './etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
-          } &>/dev/null
-
           it "succeeds" && {
             echo other-secret | \
             WITH_SNAPSHOT="$snapshot/add-success-as-unknown-user" \
@@ -141,26 +137,68 @@ title "'vault partitions & recipients -- always encrypt"
             }
           )
 
-          (when "removing themselves from all partitions they are member of"
-            (when "removing from a single partitition (p3)"
-              it "succeeds" && {
-                WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-with-import" \
-                expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --from p3
-              }
-              it "writes the configuration correctly, but does not delete its key from the gpg-keys-dir as it's still used in another partition" && {
-                expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-directory" etc
-              }
+          (when "removing from a single partitition (p3)"
+            it "succeeds" && {
+              WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-with-import" \
+              expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --from p3
+            }
+            it "writes the configuration correctly, but does not delete its key from the gpg-keys-dir as it's still used in another partition" && {
+              expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-directory" etc
+            }
+          )
+        )
+        (when "when impersonating as the other user (again to get a clean keyring)"
+          as_user "$fixture/a.sec.asc" &>/dev/null
+          
+          (when "adding new resource from stdin with a tty attached"
+            editor="$PWD/my-add-editor.sh"
+            (
+              cat <<'EDITOR' > "$editor"
+#!/bin/bash -e
+file_to_edit=${1:?}
+echo -n "$file_to_edit" > /tmp/vault-add-file-to-edit
+echo "vault add from editor" > $file_to_edit
+EDITOR
+              chmod +x "$editor"
             )
-            (when "removing from the last remaining assigned partitition (p2)"
-              it "succeeds" && {
-                WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-with-import" \
-                expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --partition second
-              }
+            export EDITOR="$editor"
+            it "succeeds" && {
+              WITH_SNAPSHOT="$snapshot/resource-add-from-stdin-with-editor" \
+              expect_run $SUCCESSFULLY "$exe" vault add :p2/with-editor
+            }
+          )
+        )
+        (when "when impersonating as the other user (again to get a clean keyring)"
+          { as_user "$fixture/a.sec.asc" &>/dev/null
+            gpg --import "$fixture/b.pub.asc"
+          } &>/dev/null
+          
+          (when "adding a new user to a partition we are not a member of"
+            it "fails" && {
+              WITH_SNAPSHOT="$snapshot/fail-recipient-add-without-prior-import-of-all-users-wrong-partition" \
+              expect_run $WITH_FAILURE "$exe" vault recipients add --verified b@example.com --to p3
+            }
+          )
+          (when "adding a new user to a partition we are a member of"
+            it "succeeds" && {
+              WITH_SNAPSHOT="$snapshot/recipient-add-without-prior-import-of-all-users-right-partition" \
+              expect_run $SUCCESSFULLY "$exe" vault recipients add --verified b@example.com --to p2
+            }
+          )
+        )
+        
+        (when "when impersonating as the other user (again to get a clean keyring)"
+          as_user "$fixture/a.sec.asc" &>/dev/null
+          
+          (when "removing from the last remaining assigned partitition (p2)"
+            it "succeeds" && {
+              WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-with-import" \
+              expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --partition second
+            }
 
-              it "writes the configuration correctly, and removes its key" && {
-                expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-directory" etc
-              }
-            )
+            it "writes the configuration correctly, and removes its key" && {
+              expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-directory" etc
+            }
           )
         )
       )

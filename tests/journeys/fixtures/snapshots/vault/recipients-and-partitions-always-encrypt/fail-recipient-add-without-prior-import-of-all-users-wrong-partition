@@ -1,0 +1,8 @@
+Exported public key for user user b <b@example.com> to 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
+Added recipient user b <b@example.com>
+Imported recipient key at path 'etc/keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
+error: Export your public key using 'sy vault recipient init', then ask one of the existing recipients to import your public key using 'sy vault recipients add <your-userid>.'
+Caused by: 
+ 3: Could not decrypt 'p3/added-by-new-user.gpg' to re-encrypt for new recipients.
+ 2: The content was not encrypted for you.
+ 1: No secret key (gpg error 17)

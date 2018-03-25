@@ -6,6 +6,7 @@ use itertools::Itertools;
 use std::fs::remove_file;
 use util::fingerprints_of_keys;
 use std::iter::once;
+use std::path::PathBuf;
 
 impl Vault {
     pub fn remove_recipients(
@@ -16,11 +17,17 @@ impl Vault {
     ) -> Result<(), Error> {
         let mut ctx = new_context()?;
         let partitions = self.partitions_by_name_or_path(partitions)?;
-        let gpg_keys_dir = self.find_gpg_keys_dir();
+        let gpg_keys_dir_independent_of_auto_import = self.find_gpg_keys_dir().ok();
 
         for partition in partitions {
-            let keys_for_ids = partition.keys_by_ids(&mut ctx, gpg_key_ids, "user-id")?;
-            let recipients_keys = partition.recipient_keys(&mut ctx)?;
+            let gpg_keys_dir = self.gpg_keys_dir_for_auto_import(partition);
+            let keys_for_ids = partition.keys_by_ids(
+                &mut ctx,
+                gpg_key_ids,
+                "user-id",
+                gpg_keys_dir.as_ref().map(PathBuf::as_path),
+            )?;
+            let recipients_keys = partition.recipient_keys(&mut ctx, gpg_keys_dir.as_ref().map(PathBuf::as_path))?;
 
             let (keys_and_fprs_to_remove, mut remaining_recipients_fprs) = {
                 let keys_and_fprs = fingerprints_of_keys(&keys_for_ids)?;
@@ -62,7 +69,7 @@ impl Vault {
                     )
                 }
 
-                if let Ok(gpg_keys_dir) = gpg_keys_dir.as_ref() {
+                if let Some(gpg_keys_dir) = gpg_keys_dir_independent_of_auto_import.as_ref() {
                     if self.recipient_used_in_other_partitions(&fpr, partition.index)? {
                         continue;
                     }
@@ -88,7 +95,12 @@ impl Vault {
                 written_file.display()
             ).ok();
 
-            partition.reencrypt(&mut ctx, &self.find_trust_model(partition), output)?;
+            partition.reencrypt(
+                &mut ctx,
+                &self.find_trust_model(partition),
+                gpg_keys_dir.as_ref().map(PathBuf::as_path),
+                output,
+            )?;
         }
         Ok(())
     }

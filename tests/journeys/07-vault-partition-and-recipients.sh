@@ -22,6 +22,8 @@ title "'vault partitions & recipients"
     (with "a vault ready for partitions and a resource"
       { "$exe" vault init --secrets-dir p1 \
                           --gpg-keys-dir etc/keys \
+                          --trust-model web-of-trust \
+                          --no-auto-import \
                           --recipients-file etc/p1
         echo 1 | "$exe" vault add :one
       } &>/dev/bull

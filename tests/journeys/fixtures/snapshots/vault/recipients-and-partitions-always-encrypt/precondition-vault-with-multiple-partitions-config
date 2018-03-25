@@ -1,17 +1,20 @@
 ---
 name: ~
+auto_import: true
 trust_model: always
 secrets: p1
 gpg_keys: etc/keys
 recipients: etc/p1
 ---
 name: second
+auto_import: ~
 trust_model: ~
 secrets: p2
 gpg_keys: ~
 recipients: etc/p2
 ---
 name: third
+auto_import: ~
 trust_model: ~
 secrets: p3
 gpg_keys: ~

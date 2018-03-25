@@ -1,11 +1,13 @@
 ---
 name: ~
+auto_import: false
 trust_model: "gpg-web-of-trust"
 secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: first
+auto_import: ~
 trust_model: ~
 secrets: first
 gpg_keys: ~

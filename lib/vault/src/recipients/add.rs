@@ -5,6 +5,7 @@ use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, 
 use spec::SigningMode;
 use std::iter::once;
 use TrustModel;
+use std::path::PathBuf;
 
 impl Vault {
     pub fn add_recipients(
@@ -17,6 +18,7 @@ impl Vault {
     ) -> Result<(), Error> {
         let mut gpg_ctx = new_context()?;
         let partitions: Vec<&Vault> = self.partitions_by_name_or_path(partitions)?;
+
         for partition in partitions {
             if let SigningMode::Public = sign {
                 let gpg_keys_dir = self.find_gpg_keys_dir().with_context(|_| {
@@ -84,7 +86,14 @@ impl Vault {
                 writeln!(output, "Added recipient {}", KeyDisplay(&key)).ok();
             }
             partition.write_recipients_list(&mut recipients)?;
-            partition.reencrypt(&mut gpg_ctx, &self.find_trust_model(partition), output)?;
+            partition.reencrypt(
+                &mut gpg_ctx,
+                &self.find_trust_model(partition),
+                self.gpg_keys_dir_for_auto_import(partition)
+                    .as_ref()
+                    .map(PathBuf::as_ref),
+                output,
+            )?;
         }
         Ok(())
     }
