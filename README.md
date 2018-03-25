@@ -120,7 +120,7 @@ stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
  
-### Roadmap to 4.1
+### Roadmap to 4.2
 
 #### Add the `pass` subcommand
 
