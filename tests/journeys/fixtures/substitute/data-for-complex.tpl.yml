@@ -1,0 +1,30 @@
+page:
+  title: Introduction
+  
+user:
+  name: Harald
+  
+customer:
+  name: anonymous
+
+product:
+  title: BarPackFoo
+  
+site:
+  pages:
+    - category: one
+    - category: ~
+    - category: two
+  users:
+    - Harald
+    - Schneider
+    - Meier
+    
+null: ~
+array:
+  - 1
+  - 2
+  - 3
+  - 4
+  
+

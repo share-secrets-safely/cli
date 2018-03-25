@@ -90,7 +90,7 @@ pub fn substitute(
 
             let rendered = tpl.render(&dataset).map_err(|err| {
                 format_err!("{}", err).context(format!(
-                    "Failed to instantiate template from template at '{}'",
+                    "Failed to render template from template at '{}'",
                     spec.src.short_name()
                 ))
             })?;

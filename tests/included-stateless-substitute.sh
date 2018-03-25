@@ -167,6 +167,14 @@ title "'substitute' subcommand"
   )
 )
 
+title "'substitute' complex example"
+(when "feeding a complex example"
+  it "succeeds and produces the correct output" && {
+    WITH_SNAPSHOT="$snapshot/template-from-complex-template" \
+    expect_run $SUCCESSFULLY "$exe" substitute "$template/complex.tpl" < "$template/data-for-complex.tpl.yml"
+  }
+)
+
 title "'substitute' subcommand error cases"
 (with "invalid data in no known format"
   it "fails" && {

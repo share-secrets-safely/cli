@@ -1,4 +1,4 @@
-error: Failed to instantiate template from template at 'the-answer'
+error: Failed to render template from template at 'the-answer'
 Caused by: 
  1: liquid: Invalid index
   with:
