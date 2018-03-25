@@ -27,8 +27,10 @@ impl Vault {
                 gpg_key_ids,
                 "user-id",
                 gpg_keys_dir.as_ref().map(PathBuf::as_path),
+                output,
             )?;
-            let recipients_keys = partition.recipient_keys(&mut ctx, gpg_keys_dir.as_ref().map(PathBuf::as_path))?;
+            let recipients_keys =
+                partition.recipient_keys(&mut ctx, gpg_keys_dir.as_ref().map(PathBuf::as_path), output)?;
 
             let (keys_and_fprs_to_remove, mut remaining_recipients_fprs) = {
                 let keys_and_fprs = fingerprints_of_keys(&keys_for_ids)?;

@@ -327,6 +327,7 @@ impl Vault {
         ids: &[String],
         type_of_ids_for_errors: &str,
         gpg_keys_dir: Option<&Path>,
+        output: &mut io::Write,
     ) -> Result<Vec<gpgme::Key>, Error> {
         ctx.find_keys(ids)
             .context(format!("Could not iterate keys for given {}s", type_of_ids_for_errors))?;
@@ -348,10 +349,9 @@ impl Vault {
         let mut msg = vec![
             if diff > 0 {
                 if let Some(dir) = gpg_keys_dir {
-                    // TODO: take output as paramter, don't hardcode stdout!
-                    self.import_keys(ctx, dir, &missing, &mut io::stdout())
+                    self.import_keys(ctx, dir, &missing, output)
                         .context("Could not auto-import all required keys")?;
-                    return self.keys_by_ids(ctx, ids, type_of_ids_for_errors, None);
+                    return self.keys_by_ids(ctx, ids, type_of_ids_for_errors, None, output);
                 }
 
                 let mut msg = format!(
@@ -411,6 +411,7 @@ impl Vault {
         &self,
         ctx: &mut gpgme::Context,
         gpg_keys_dir: Option<&Path>,
+        output: &mut io::Write,
     ) -> Result<Vec<gpgme::Key>, Error> {
         let recipients_fprs = self.recipients_list()?;
         if recipients_fprs.is_empty() {
@@ -419,7 +420,7 @@ impl Vault {
                 self.recipients.display()
             ));
         }
-        self.keys_by_ids(ctx, &recipients_fprs, "recipient", gpg_keys_dir)
+        self.keys_by_ids(ctx, &recipients_fprs, "recipient", gpg_keys_dir, output)
     }
 
     fn vault_path_for_display(&self) -> String {

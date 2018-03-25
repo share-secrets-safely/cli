@@ -59,6 +59,7 @@ impl Vault {
                 self.gpg_keys_dir_for_auto_import(partition)
                     .as_ref()
                     .map(PathBuf::as_path),
+                output,
             ).context("Aborted edit operation as you cannot encrypt resources.")?;
         }
         run_editor(editor.as_os_str(), &tempfile_path)?;
@@ -124,9 +125,14 @@ impl Vault {
         Ok(())
     }
 
-    pub fn encrypt_buffer(&self, input: &[u8], gpg_keys_dir: Option<&Path>) -> Result<Vec<u8>, Error> {
+    pub fn encrypt_buffer(
+        &self,
+        input: &[u8],
+        gpg_keys_dir: Option<&Path>,
+        output: &mut io::Write,
+    ) -> Result<Vec<u8>, Error> {
         let mut ctx = new_context()?;
-        let keys = self.recipient_keys(&mut ctx, gpg_keys_dir)?;
+        let keys = self.recipient_keys(&mut ctx, gpg_keys_dir, output)?;
 
         let encrypted_bytes = encrypt_buffer(
             &mut ctx,
@@ -188,7 +194,11 @@ impl Vault {
                             none,
                             Some((
                                 partition.secrets_path(),
-                                partition.recipient_keys(&mut ctx, gpg_keys_dir.as_ref().map(PathBuf::as_path))?,
+                                partition.recipient_keys(
+                                    &mut ctx,
+                                    gpg_keys_dir.as_ref().map(PathBuf::as_path),
+                                    output,
+                                )?,
                             )),
                         );
                         let some = none;

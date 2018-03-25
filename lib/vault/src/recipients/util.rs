@@ -213,7 +213,7 @@ impl Vault {
         has_multiple_partitions: bool,
         output: &mut Write,
     ) -> Result<(), Error> {
-        let keys = self.recipient_keys(ctx, gpg_keys_dir)?;
+        let keys = self.recipient_keys(ctx, gpg_keys_dir, output)?;
 
         let mut obuf = Vec::new();
 

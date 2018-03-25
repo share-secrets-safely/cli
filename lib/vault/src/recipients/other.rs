@@ -22,7 +22,7 @@ impl Vault {
         Ok(())
     }
 
-    pub fn print_recipients(&self, output: &mut Write) -> Result<(), Error> {
+    pub fn print_recipients(&self, output: &mut Write, error: &mut Write) -> Result<(), Error> {
         let mut ctx = new_context()?;
         if self.partitions.is_empty() {
             let keys_dir_for_auto_import = if self.auto_import.clone().unwrap_or(false) {
@@ -30,7 +30,7 @@ impl Vault {
             } else {
                 None
             };
-            for key in self.recipient_keys(&mut ctx, keys_dir_for_auto_import.as_ref().map(PathBuf::as_path))? {
+            for key in self.recipient_keys(&mut ctx, keys_dir_for_auto_import.as_ref().map(PathBuf::as_path), error)? {
                 writeln!(output, "{}", FingerprintUserId(&key)).ok();
             }
         } else {
@@ -41,6 +41,7 @@ impl Vault {
                     self.gpg_keys_dir_for_auto_import(partition)
                         .as_ref()
                         .map(PathBuf::as_path),
+                    error,
                 )? {
                     writeln!(output, "{}", FingerprintUserId(&key)).ok();
                 }
