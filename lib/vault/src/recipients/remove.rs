@@ -88,7 +88,7 @@ impl Vault {
                 written_file.display()
             ).ok();
 
-            partition.reencrypt(&mut ctx, &self.trust_model, output)?;
+            partition.reencrypt(&mut ctx, &self.find_trust_model(partition), output)?;
         }
         Ok(())
     }

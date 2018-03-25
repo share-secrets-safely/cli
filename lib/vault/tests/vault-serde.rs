@@ -7,14 +7,14 @@ use sheesy_vault::TrustModel;
 #[test]
 fn vault_trust_model_serde() {
     let mut v = Vault::default();
-    v.trust_model = TrustModel::Always;
+    v.trust_model = Some(TrustModel::GpgWebOfTrust);
     let res = serde_yaml::to_string(&v).unwrap();
 
     assert_eq!(
         res,
         r#"---
 name: ~
-trust_model: always
+trust_model: "gpg-web-of-trust"
 secrets: "."
 gpg_keys: ~
 recipients: ".gpg-id""#
@@ -24,6 +24,7 @@ recipients: ".gpg-id""#
         res
     );
 }
+
 #[test]
 fn default_vault_ser() {
     let v = Vault::default();
@@ -31,6 +32,7 @@ fn default_vault_ser() {
         serde_yaml::to_string(&v).unwrap(),
         r#"---
 name: ~
+trust_model: ~
 secrets: "."
 gpg_keys: ~
 recipients: ".gpg-id""#

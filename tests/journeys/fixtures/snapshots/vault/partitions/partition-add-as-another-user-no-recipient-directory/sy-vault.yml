@@ -1,10 +1,12 @@
 ---
 name: ~
+trust_model: "gpg-web-of-trust"
 secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: mine
+trust_model: ~
 secrets: "private-partition"
 gpg_keys: ~
 recipients: "private-partition/recipients"

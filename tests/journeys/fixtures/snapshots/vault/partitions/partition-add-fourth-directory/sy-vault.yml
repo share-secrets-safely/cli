@@ -1,25 +1,30 @@
 ---
 name: ~
+trust_model: "gpg-web-of-trust"
 secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
 ---
 name: first
+trust_model: ~
 secrets: first
 gpg_keys: ~
 recipients: first/recipients
 ---
 name: "second-partition"
+trust_model: ~
 secrets: "./subdir/second"
 gpg_keys: ~
 recipients: "./subdir/second/recipients"
 ---
 name: third
+trust_model: ~
 secrets: subdir/third
 gpg_keys: ~
 recipients: subdir/third/recipients
 ---
 name: "second-partition"
+trust_model: ~
 secrets: "/tmp/some-empty-dir"
 gpg_keys: ~
 recipients: "/tmp/some-empty-dir/recipients"

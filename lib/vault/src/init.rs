@@ -39,7 +39,7 @@ impl Vault {
         recipients_file: &Path,
         vault_path: &Path,
         name: Option<String>,
-        trust_model: TrustModel,
+        trust_model: Option<TrustModel>,
         output: &mut Write,
     ) -> Result<Self, Error> {
         let vault = Vault {

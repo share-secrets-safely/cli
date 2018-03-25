@@ -1,5 +1,6 @@
 ---
 name: ~
+trust_model: "gpg-web-of-trust"
 secrets: sec
 gpg_keys: ".gpg-keys"
 recipients: "sec/.gpg-id"

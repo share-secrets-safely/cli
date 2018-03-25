@@ -4,6 +4,7 @@ use base::Vault;
 use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
 use spec::SigningMode;
 use std::iter::once;
+use TrustModel;
 
 impl Vault {
     pub fn add_recipients(
@@ -83,9 +84,18 @@ impl Vault {
                 writeln!(output, "Added recipient {}", KeyDisplay(&key)).ok();
             }
             partition.write_recipients_list(&mut recipients)?;
-            partition.reencrypt(&mut gpg_ctx, &self.trust_model, output)?;
+            partition.reencrypt(&mut gpg_ctx, &self.find_trust_model(partition), output)?;
         }
         Ok(())
+    }
+
+    pub fn find_trust_model(&self, partition: &Vault) -> TrustModel {
+        partition
+            .trust_model
+            .as_ref()
+            .or_else(|| self.trust_model.as_ref())
+            .map(|v| v.to_owned())
+            .unwrap_or_else(TrustModel::default)
     }
 
     pub fn partitions_by_name_or_path(&self, partitions: &[String]) -> Result<Vec<&Vault>, Error> {

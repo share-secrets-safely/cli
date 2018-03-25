@@ -1,5 +1,6 @@
 ---
 name: "vault-name"
+trust_model: "gpg-web-of-trust"
 secrets: "."
 gpg_keys: ".gpg-keys"
 recipients: "./.gpg-id"

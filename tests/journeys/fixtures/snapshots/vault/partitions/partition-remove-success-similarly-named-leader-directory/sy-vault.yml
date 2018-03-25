@@ -1,5 +1,6 @@
 ---
 name: same
+trust_model: ~
 secrets: one
 gpg_keys: ".gpg-keys"
 recipients: bar

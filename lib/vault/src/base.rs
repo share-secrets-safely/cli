@@ -35,24 +35,15 @@ impl Default for VaultKind {
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Hash, Ord, PartialOrd)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "kebab-case")]
 pub enum TrustModel {
-    WebOfTrustDefault,
+    GpgWebOfTrust,
     Always,
 }
 
 impl Default for TrustModel {
     fn default() -> Self {
-        TrustModel::WebOfTrustDefault
-    }
-}
-
-impl TrustModel {
-    pub fn skip_if(&self) -> bool {
-        match *self {
-            TrustModel::WebOfTrustDefault => true,
-            _ => false,
-        }
+        TrustModel::GpgWebOfTrust
     }
 }
 
@@ -61,7 +52,7 @@ impl FromStr for TrustModel {
 
     fn from_str(s: &str) -> Result<Self, <Self as FromStr>::Err> {
         Ok(match s {
-            "web-of-trust" => TrustModel::WebOfTrustDefault,
+            "web-of-trust" => TrustModel::GpgWebOfTrust,
             "always" => TrustModel::Always,
             _ => return Err(format!("Unknown trust model: '{}'", s)),
         })
@@ -81,8 +72,8 @@ pub struct Vault {
     pub resolved_at: PathBuf,
     #[serde(skip)]
     pub vault_path: Option<PathBuf>,
-    #[serde(default, skip_serializing_if = "TrustModel::skip_if")]
-    pub trust_model: TrustModel,
+    #[serde(default)]
+    pub trust_model: Option<TrustModel>,
     #[serde(default = "secrets_default")]
     pub secrets: PathBuf,
     pub gpg_keys: Option<PathBuf>,

@@ -123,7 +123,12 @@ impl Vault {
         let mut ctx = new_context()?;
         let keys = self.recipient_keys(&mut ctx)?;
 
-        let encrypted_bytes = encrypt_buffer(&mut ctx, input, &keys, &self.trust_model)?;
+        let encrypted_bytes = encrypt_buffer(
+            &mut ctx,
+            input,
+            &keys,
+            &self.trust_model.clone().unwrap_or_else(TrustModel::default),
+        )?;
         Ok(encrypted_bytes)
     }
 
@@ -192,7 +197,7 @@ impl Vault {
                     ))?;
                     buf
                 };
-                let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys, &self.trust_model)?;
+                let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys, &self.find_trust_model(partition))?;
                 spec.open_output_in(secrets_dir, mode, dst_mode, output)?
                     .write_all(&encrypted_bytes)
                     .context(format!(

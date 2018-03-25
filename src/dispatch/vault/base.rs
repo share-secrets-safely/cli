@@ -20,7 +20,7 @@ pub enum Command {
     },
     Init {
         name: Option<String>,
-        trust_model: TrustModel,
+        trust_model: Option<TrustModel>,
         gpg_key_ids: Vec<String>,
         gpg_keys_dir: PathBuf,
         secrets: PathBuf,

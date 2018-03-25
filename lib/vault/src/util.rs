@@ -230,7 +230,7 @@ pub fn flags_for_model(model: &TrustModel) -> gpgme::EncryptFlags {
         gpgme::EncryptFlags::ALWAYS_TRUST,
         match *model {
             TrustModel::Always => true,
-            TrustModel::WebOfTrustDefault => false,
+            TrustModel::GpgWebOfTrust => false,
         },
     );
     flags

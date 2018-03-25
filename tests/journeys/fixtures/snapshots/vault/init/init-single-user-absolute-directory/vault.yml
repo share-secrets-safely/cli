@@ -1,5 +1,6 @@
 ---
 name: "custom-name"
+trust_model: "gpg-web-of-trust"
 secrets: "."
 gpg_keys: keys
 recipients: "./recipients"
