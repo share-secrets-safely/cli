@@ -89,20 +89,23 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 3.4
+### Roadmap to 4.0
 
-#### More powerful substitution
+#### Switch to Liquid templating engine
 
 When looking at helm it becomes evident how much more filters would be needed to effectively
 adjust yaml files.
-This can be done either by adding all sorts of default filters, or add another substitution
-engine which sports most of them by default.
 
-* **ideas for handlebars filters**
-  - base64
-  - truncate
+Handlebars was a nice try, yet it only shows that filters are what makes a language powerful.
+Fortunately it's still time to change, so let's swap handlebars with [liquid][liquid].
 
-### Roadmap to 4.0
+Also add the following filters
+
+ * [ ] base64
+
+[liquid]: https://shopify.github.io/liquid/
+
+### Roadmap to 4.1
 
 #### Sub-Commands as standalone programs
 
