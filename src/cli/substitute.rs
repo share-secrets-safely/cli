@@ -8,7 +8,8 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
         .about("Substitutes templates using structured data. \
                  The idea is to build a tree of data that is used to substitute in various templates, using multiple inputs and outputs.\
                  That way, secrets (like credentials) can be extracted from the vault just once and used wherever needed without them touching disk.\
-                 Handlebars is used as templating engine, and it's possible to refer to and inherit from other templates by their file-stem.")
+                 Liquid is used as template engine, and it's possible to refer to and inherit from other templates by their file-stem. \
+                 Read more on their website at https://shopify.github.io/liquid .")
         .arg(
             Arg::with_name("separator")
                 .required(false)

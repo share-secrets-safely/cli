@@ -5,7 +5,7 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
     App::new("extract")
         .alias("fetch")
         .about(
-            "Extract scalar or complex values from any JSON or YAML file.
+            "Extract scalar or complex values from any JSON or YAML file. \
              Multi-document YAML files are supported.",
         )
         .arg(

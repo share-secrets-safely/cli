@@ -6,7 +6,7 @@ use atty;
 use json;
 use yaml_rust;
 use failure::{err_msg, Error, ResultExt};
-use handlebars::{no_escape, Handlebars};
+use liquid;
 
 use std::ffi::OsStr;
 use std::io::{self, stdin};
@@ -51,13 +51,13 @@ pub fn substitute(
 
     validate(input_data, specs)?;
     let dataset = substitute_in_data(dataset, replacements);
+    let dataset = into_liquid_object(dataset)?;
 
     let mut seen_file_outputs = BTreeSet::new();
     let mut seen_writes_to_stdout = 0;
-    let mut hbs = Handlebars::new();
-    hbs.set_strict_mode(true);
-    hbs.register_escape_fn(no_escape);
+    let liquid = liquid::ParserBuilder::with_liquid().build();
     let mut buf = Vec::<u8>::new();
+    let mut ibuf = String::new();
 
     for spec in specs {
         let append = match spec.dst {
@@ -73,8 +73,12 @@ pub fn substitute(
         };
 
         let mut istream = spec.src.open_as_input()?;
-        hbs.register_template_source(spec.src.short_name(), &mut istream)
-            .with_context(|_| format!("Failed to register handlebars template at '{}'", spec.src.name()))?;
+        ibuf.clear();
+        istream.read_to_string(&mut ibuf)?;
+
+        let tpl = liquid.parse(&ibuf).map_err(|err| {
+            format_err!("{}", err).context(format!("Failed to parse liquid template at '{}'", spec.src.name()))
+        })?;
 
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
@@ -84,8 +88,13 @@ pub fn substitute(
         {
             let ostream_for_template: &mut io::Write = if try_deserialize { &mut buf } else { &mut ostream };
 
-            hbs.render_to_write(spec.src.short_name(), &dataset, ostream_for_template)
-                .with_context(|_| format!("Could instantiate template or writing to '{}' failed", spec.dst.name()))?;
+            let rendered = tpl.render(&dataset).map_err(|err| {
+                format_err!("{}", err).context(format!(
+                    "Failed to instantiate template from template at '{}'",
+                    spec.src.short_name()
+                ))
+            })?;
+            ostream_for_template.write_all(rendered.as_bytes())?;
         }
 
         if try_deserialize {
@@ -107,6 +116,14 @@ pub fn substitute(
         }
     }
     Ok(())
+}
+
+fn into_liquid_object(src: json::Value) -> Result<liquid::Object, Error> {
+    let dst = json::from_value(src)?;
+    match dst {
+        liquid::Value::Object(obj) => Ok(obj),
+        _ => Err(err_msg("Data model root must be an object")),
+    }
 }
 
 fn substitute_in_data(mut d: json::Value, r: &[(String, String)]) -> json::Value {

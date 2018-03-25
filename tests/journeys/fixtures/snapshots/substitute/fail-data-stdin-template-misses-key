@@ -1,4 +1,5 @@
-<Q>: What is the answer to everything?
-<A>: error: Could instantiate template or writing to 'stream' failed
+error: Failed to instantiate template from template at 'the-answer'
 Caused by: 
- 1: Error rendering "the-answer" line 2, col 6: Value not found in strict mode.
+ 1: liquid: Invalid index
+  with:
+    index=the-answer
