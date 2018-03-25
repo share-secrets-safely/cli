@@ -103,12 +103,7 @@ it optional to more advanced teams.
 
  * [x] Configure web-of-trust options on per-partition basis and use that when encrypting.
  * [x] Option to auto-import keys when encrypting resources, which is enabled by default.
- * [ ] Don't fail when listing recipients whose keys are not in the keychain.
- * [ ] Assure that the error messages provided when we can't find a partition are
-    better and specific to the use case.
- * [ ] Tree mode for lists of
-   * [ ] recipients
-   * [ ] resources
+ * [x] Don't fail when listing recipients whose keys are not in the keychain.
  
 [keybase]: https://keybase.io
 
@@ -125,7 +120,6 @@ engine which sports most of them by default.
   - base64
   - truncate
 
-
 ### Roadmap to 4.0
 
 #### Sub-Commands as standalone programs
@@ -140,7 +134,7 @@ This can be useful to make `pass` standins more approachable, and also build cus
 stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
-
+ 
 ### Roadmap to 4.1
 
 #### Add the `pass` subcommand
@@ -152,7 +146,14 @@ stand-in for pass.
 
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
+ 
+#### Some usability improvements
 
+ * [ ] Assure that the error messages provided when we can't find a partition are
+    better and specific to the use case.
+ * [ ] Tree mode for lists of
+   * [ ] recipients
+   * [ ] resources
 
 ### Roadmap to 5.0
 #### Web of Trust for everyone
