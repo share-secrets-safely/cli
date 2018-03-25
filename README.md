@@ -89,24 +89,6 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 3.3
-
-#### Improved UX and basic Web of Trust controls
-
-Having spend some time reading up on the issue, and having realized that there is a reason
-the 'Web of Trust' model as implemented by GPG/PGP are not particularly wide-spread for a reason,
-for adoption, there should be a way to turn it off and delegate trust checking to external sources
-(_like [keybase.io][keybase]_).
-
-Also given the way the vault is typically used, we should disable it by default, and make enabling
-it optional to more advanced teams.
-
- * [x] Configure web-of-trust options on per-partition basis and use that when encrypting.
- * [x] Option to auto-import keys when encrypting resources, which is enabled by default.
- * [x] Don't fail when listing recipients whose keys are not in the keychain.
- 
-[keybase]: https://keybase.io
-
 ### Roadmap to 3.4
 
 #### More powerful substitution

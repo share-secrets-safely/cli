@@ -1,11 +1,26 @@
 ### V3.3: Value extraction and basic trust controls
 
+#### Improved UX and basic Web of Trust controls
+
+Having spend some time reading up on the issue, and having realized that there is a reason
+the 'Web of Trust' model as implemented by GPG/PGP are not particularly wide-spread for a reason,
+for adoption, there should be a way to turn it off and delegate trust checking to external sources
+(_like [keybase.io][keybase]_).
+
+Also given the way the vault is typically used, we should disable it by default, and make enabling
+it optional to more advanced teams.
+
+ * [x] Configure web-of-trust options on per-partition basis and use that when encrypting.
+ * [x] Option to auto-import keys when encrypting resources, which is enabled by default.
+ * [x] Don't fail when listing recipients whose keys are not in the keychain.
+ 
+[keybase]: https://keybase.io
+
 #### The `extract` subcommand
 
 The `extract` capability makes it feasible to store secrets in structured files
 like YAML or JSON, as it allows to extract pieces of data in various ways.
 Think basic `jq` but with native support for YAML files.
-
 
 ## V3.2: Master-Merger
 
