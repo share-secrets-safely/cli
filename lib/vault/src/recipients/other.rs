@@ -6,6 +6,7 @@ use util::new_context;
 use util::extract_at_least_one_secret_key;
 use util::export_key;
 use std::iter::once;
+use std::path::PathBuf;
 
 impl Vault {
     pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
@@ -24,13 +25,23 @@ impl Vault {
     pub fn print_recipients(&self, output: &mut Write) -> Result<(), Error> {
         let mut ctx = new_context()?;
         if self.partitions.is_empty() {
-            for key in self.recipient_keys(&mut ctx, None)? {
+            let keys_dir_for_auto_import = if self.auto_import.clone().unwrap_or(false) {
+                self.gpg_keys_dir().ok()
+            } else {
+                None
+            };
+            for key in self.recipient_keys(&mut ctx, keys_dir_for_auto_import.as_ref().map(PathBuf::as_path))? {
                 writeln!(output, "{}", FingerprintUserId(&key)).ok();
             }
         } else {
             for partition in once(self).chain(self.partitions.iter()) {
                 writeln!(output, "{}", partition.url())?;
-                for key in partition.recipient_keys(&mut ctx, None)? {
+                for key in partition.recipient_keys(
+                    &mut ctx,
+                    self.gpg_keys_dir_for_auto_import(partition)
+                        .as_ref()
+                        .map(PathBuf::as_path),
+                )? {
                     writeln!(output, "{}", FingerprintUserId(&key)).ok();
                 }
             }

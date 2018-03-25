@@ -201,6 +201,13 @@ EDITOR
             }
           )
         )
+        
+        (when "listing recipients whose keys are not in our keychain"
+          it "works as it imports them on the fly" && {
+            WITH_SNAPSHOT="$snapshot/vault-listing-with-missing-key" \
+            expect_run $SUCCESSFULLY "$exe" vault recipient list
+          }
+        )
       )
     )
   )

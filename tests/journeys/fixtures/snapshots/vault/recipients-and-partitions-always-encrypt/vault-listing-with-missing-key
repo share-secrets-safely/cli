@@ -1,0 +1,9 @@
+syv://p1
+D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (Tester (for testing only) <tester@example.com>)
+syv://second@p2
+Imported recipient key at path 'etc/keys/7435ACDC03D55429C41637C4DB9831D842C18D28'
+7435ACDC03D55429C41637C4DB9831D842C18D28 (user b <b@example.com>)
+D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (Tester (for testing only) <tester@example.com>)
+syv://third@p3
+7435ACDC03D55429C41637C4DB9831D842C18D28 (user b <b@example.com>)
+D6339718E9B58FCE3C66C78AAA5B7BF150F48332 (Tester (for testing only) <tester@example.com>)
