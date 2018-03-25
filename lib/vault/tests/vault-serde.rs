@@ -14,6 +14,7 @@ fn vault_trust_model_serde() {
         res,
         r#"---
 name: ~
+auto_import: true
 trust_model: "gpg-web-of-trust"
 secrets: "."
 gpg_keys: ~
@@ -32,6 +33,7 @@ fn default_vault_ser() {
         serde_yaml::to_string(&v).unwrap(),
         r#"---
 name: ~
+auto_import: true
 trust_model: ~
 secrets: "."
 gpg_keys: ~

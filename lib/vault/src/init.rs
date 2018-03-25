@@ -40,6 +40,7 @@ impl Vault {
         vault_path: &Path,
         name: Option<String>,
         trust_model: Option<TrustModel>,
+        auto_import: Option<bool>,
         output: &mut Write,
     ) -> Result<Self, Error> {
         let vault = Vault {
@@ -47,6 +48,7 @@ impl Vault {
             recipients: recipients_file.to_owned(),
             name,
             secrets: secrets.to_owned(),
+            auto_import,
             trust_model,
             ..Default::default()
         }.set_resolved_at(vault_path)?;

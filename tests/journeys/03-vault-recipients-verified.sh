@@ -18,7 +18,7 @@ snapshot="$fixture/snapshots/vault/recipients/verified"
   (with "a vault initialized for a single recipient and an existing secret and custom secrets dir"
     { import_user "$fixture/tester.sec.asc"
       mkdir secrets
-      "$exe" vault init --trust-model=web-of-trust --secrets-dir ./secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
+      "$exe" vault init --trust-model=web-of-trust --secrets-dir ./secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients --no-auto-import
       echo -n secret | "$exe" vault add :secret
     }  &>/dev/null
 

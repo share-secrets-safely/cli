@@ -80,6 +80,14 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                 ),
         )
         .arg(
+            Arg::with_name("no-auto-import")
+                .long("no-auto-import")
+                .required(false)
+                .takes_value(false)
+                .help( "If set, missing keys will not automatically be imported to your keychain. \
+                        This may make attempts to encrypt resources fail." ),
+        )
+        .arg(
             Arg::with_name("trust-model")
                 .long("trust-model")
                 .required(false)

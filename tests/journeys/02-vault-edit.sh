@@ -18,7 +18,7 @@ snapshot="$fixture/snapshots/vault/edit"
   (with "a vault initialized for a single recipient"
     {
       import_user "$fixture/tester.sec.asc"
-      "$exe" vault init --trust-model=web-of-trust
+      "$exe" vault init --trust-model=web-of-trust --no-auto-import
     } &> /dev/null
 
     (when "adding new resource from stdin"

@@ -73,6 +73,8 @@ pub struct Vault {
     #[serde(skip)]
     pub vault_path: Option<PathBuf>,
     #[serde(default)]
+    pub auto_import: Option<bool>,
+    #[serde(default)]
     pub trust_model: Option<TrustModel>,
     #[serde(default = "secrets_default")]
     pub secrets: PathBuf,
@@ -88,6 +90,7 @@ impl Default for Vault {
             index: 0,
             partitions: Default::default(),
             trust_model: Default::default(),
+            auto_import: Some(true),
             vault_path: None,
             name: None,
             secrets: secrets_default(),
@@ -117,7 +120,8 @@ impl Vault {
                             secrets: PathBuf::from("."),
                             gpg_keys: None,
                             recipients: recipients_default(),
-                            trust_model: Default::default(),
+                            auto_import: Some(false),
+                            trust_model: Some(TrustModel::GpgWebOfTrust),
                         };
                         vault = vault.set_resolved_at(&recipients_path
                             .parent()

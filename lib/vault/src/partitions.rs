@@ -114,6 +114,7 @@ impl Vault {
             gpg_keys: None,
             recipients: recipients_file,
             trust_model: None,
+            auto_import: None,
         };
 
         let partition = new_partition.clone();

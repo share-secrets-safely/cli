@@ -116,10 +116,8 @@ title "'vault partitions & recipients -- always encrypt"
           expect_snapshot "$snapshot/vault-with-multiple-partitions-after-recipient-add" etc
         }
 
-        (when "impersonating the newly added user and explicitly imported keys (TODO: UX issue)"
-          { as_user "$fixture/a.sec.asc"
-            import_user "$fixture/tester.sec.asc" 
-          } &>/dev/null
+        (when "impersonating the newly added user and auto-imported keys"
+          as_user "$fixture/a.sec.asc" &>/dev/null
 
           (when "adding a new resource in partition p2"
             it "succeeds" && {

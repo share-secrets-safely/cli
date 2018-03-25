@@ -148,6 +148,7 @@ pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     let mut recipients_file: PathBuf = required_os_arg(args, "recipients-file-path")?;
     let secrets: PathBuf = required_os_arg(args, "secrets-dir")?;
     let trust_model = args.value_of("trust-model").map(|v| v.parse().expect("clap to work"));
+    let auto_import = Some(!args.is_present("no-auto-import"));
 
     if args.is_present("first-partition") && secrets == Path::new(".") {
         bail!("If --first-partition is present, --secrets-dir must not be set to '.' or left unset");
@@ -159,6 +160,7 @@ pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
         command: Command::Init {
             name: args.value_of("name").map(ToOwned::to_owned),
             recipients_file,
+            auto_import,
             trust_model,
             secrets,
             gpg_keys_dir: required_os_arg(args, "gpg-keys-dir")?,

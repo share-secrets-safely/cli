@@ -110,7 +110,7 @@ title "'vault partitions & recipients"
                   expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p1-fail-directory" etc
                 }
               )
-              (with "explicitly imported keys (TODO: UX issue)"
+              (with "explicitly imported keys as auto-import is off"
                 { import_user "$fixture/tester.sec.asc"
                   gpg --sign-key --yes --batch tester@example.com
                 } &>/dev/null

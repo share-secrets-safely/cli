@@ -18,7 +18,7 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
   title "vault recipients add unverified - multi-recipient-key"
   (with "a key file containing multiple recipients"
     { import_user "$fixture/tester.sec.asc"
-      "$exe" vault init --trust-model=web-of-trust --gpg-keys-dir ./keys
+      "$exe" vault init --trust-model=web-of-trust --gpg-keys-dir ./keys --no-auto-import
       cat "$fixture/b.pub.asc" "$fixture/c.pub.asc" > ./keys/7435ACDC03D55429C41637C4DB9831D842C18D28
     } >/dev/null
 
