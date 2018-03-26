@@ -99,9 +99,11 @@ adjust yaml files.
 Handlebars was a nice try, yet it only shows that filters are what makes a language powerful.
 Fortunately it's still time to change, so let's swap handlebars with [liquid][liquid].
 
-Also add the following filters
-
- * [ ] base64
+ * [x] add liquid
+ * [ ] add handlebars
+ * [ ] differentiate both in docs
+ * [ ] optional data
+ * [ ] ask demand for docs for liquid
 
 [liquid]: https://shopify.github.io/liquid/
 
