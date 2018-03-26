@@ -100,7 +100,8 @@ Handlebars was a nice try, yet it only shows that filters are what makes a langu
 Fortunately it's still time to change, so let's swap handlebars with [liquid][liquid].
 
  * [x] add liquid
- * [ ] add handlebars
+ * [x] add handlebars
+ * [ ] add base64 filter to _liquid_
  * [ ] differentiate both in docs
  * [ ] optional data
  * [ ] ask demand for docs for liquid
@@ -121,7 +122,7 @@ This can be useful to make `pass` standins more approachable, and also build cus
 stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
- 
+
 ### Roadmap to 4.2
 
 #### Add the `pass` subcommand
@@ -133,7 +134,7 @@ stand-in for pass.
 
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
- 
+
 #### Some usability improvements
 
  * [ ] Assure that the error messages provided when we can't find a partition are

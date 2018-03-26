@@ -30,7 +30,7 @@ impl FromStr for Engine {
 
 pub enum EngineChoice {
     Handlebars(handlebars::Handlebars, json::Value),
-    Liquid(liquid::Parser, liquid::Value),
+    Liquid(liquid::Parser, liquid::Object),
 }
 
 pub fn validate(data: &StreamOrPath, specs: &[Spec]) -> Result<(), Error> {

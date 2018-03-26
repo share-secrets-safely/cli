@@ -18,6 +18,7 @@ pub use self::spec::*;
 pub use self::util::Engine;
 use self::util::{de_json_or_yaml, validate, EngineChoice};
 use std::collections::BTreeSet;
+use handlebars::no_escape;
 
 pub fn substitute(
     engine: Engine,
@@ -54,11 +55,21 @@ pub fn substitute(
 
     validate(input_data, specs)?;
     let dataset = substitute_in_data(dataset, replacements);
-    let dataset = into_liquid_object(dataset)?;
+    let mut engine = match engine {
+        Engine::Liquid => EngineChoice::Liquid(
+            liquid::ParserBuilder::with_liquid().build(),
+            into_liquid_object(dataset)?,
+        ),
+        Engine::Handlebars => {
+            let mut hbs = Handlebars::new();
+            hbs.set_strict_mode(true);
+            hbs.register_escape_fn(no_escape);
+            EngineChoice::Handlebars(hbs, dataset)
+        }
+    };
 
     let mut seen_file_outputs = BTreeSet::new();
     let mut seen_writes_to_stdout = 0;
-    let liquid = liquid::ParserBuilder::with_liquid().build();
     let mut buf = Vec::<u8>::new();
     let mut ibuf = String::new();
 
@@ -79,10 +90,6 @@ pub fn substitute(
         ibuf.clear();
         istream.read_to_string(&mut ibuf)?;
 
-        let tpl = liquid.parse(&ibuf).map_err(|err| {
-            format_err!("{}", err).context(format!("Failed to parse liquid template at '{}'", spec.src.name()))
-        })?;
-
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
             ostream.write_all(separator.as_bytes())?;
@@ -91,13 +98,31 @@ pub fn substitute(
         {
             let ostream_for_template: &mut io::Write = if try_deserialize { &mut buf } else { &mut ostream };
 
-            let rendered = tpl.render(&dataset).map_err(|err| {
-                format_err!("{}", err).context(format!(
-                    "Failed to render template from template at '{}'",
-                    spec.src.short_name()
-                ))
-            })?;
-            ostream_for_template.write_all(rendered.as_bytes())?;
+            match engine {
+                EngineChoice::Liquid(ref liquid, ref dataset) => {
+                    let tpl = liquid.parse(&ibuf).map_err(|err| {
+                        format_err!("{}", err)
+                            .context(format!("Failed to parse liquid template at '{}'", spec.src.name()))
+                    })?;
+
+                    let rendered = tpl.render(dataset).map_err(|err| {
+                        format_err!("{}", err).context(format!(
+                            "Failed to render template from template at '{}'",
+                            spec.src.short_name()
+                        ))
+                    })?;
+                    ostream_for_template.write_all(rendered.as_bytes())?;
+                }
+                EngineChoice::Handlebars(ref mut hbs, ref dataset) => {
+                    hbs.register_template_source(spec.src.short_name(), &mut istream)
+                        .with_context(|_| format!("Failed to register handlebars template at '{}'", spec.src.name()))?;
+
+                    hbs.render_to_write(spec.src.short_name(), &dataset, ostream_for_template)
+                        .with_context(|_| {
+                            format!("Could instantiate template or writing to '{}' failed", spec.dst.name())
+                        })?;
+                }
+            }
         }
 
         if try_deserialize {
