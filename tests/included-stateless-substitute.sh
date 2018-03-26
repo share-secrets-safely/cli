@@ -166,8 +166,16 @@ title "'substitute' subcommand"
     )
   )
 )
+title "'substitute' (liquid) custom filters"
+(when "using a base64 filter"
+  it "succeeds and produces the expected output" && {
+    echo "{}" | \
+    WITH_SNAPSHOT="$snapshot/liquid/filter-base64" \
+    expect_run $SUCCESSFULLY "$exe" substitute <(echo '{{"hello" | base64}}')
+  }
+)
 
-title "'substitute' complex example"
+title "'substitute' (liquid) complex example"
 (when "feeding a complex example"
   it "succeeds and produces the correct output" && {
     WITH_SNAPSHOT="$snapshot/template-from-complex-template" \
