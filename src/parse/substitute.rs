@@ -1,6 +1,6 @@
 use failure::Error;
 use clap::ArgMatches;
-use tools::substitute::{Spec, StreamOrPath};
+use tools::substitute::{Engine, Spec, StreamOrPath};
 use itertools::Itertools;
 
 use super::util::required_os_arg;
@@ -11,6 +11,7 @@ pub struct Context {
     pub validate: bool,
     pub replacements: Vec<(String, String)>,
     pub separator: OsString,
+    pub engine: Engine,
     pub data: StreamOrPath,
     pub specs: Vec<Spec>,
 }
@@ -26,6 +27,7 @@ pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
             replace_cmds.into_iter().tuples().collect()
         },
         separator: required_os_arg(args, "separator")?,
+        engine: args.value_of("engine").expect("clap to work").parse()?,
         validate: args.is_present("validate"),
         data: args.value_of_os("data").map_or(StreamOrPath::Stream, Into::into),
         specs: match args.values_of("spec") {

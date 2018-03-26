@@ -90,6 +90,7 @@ fn main() {
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
             substitute(
+                context.engine,
                 &context.data,
                 &context.specs,
                 &context.separator,

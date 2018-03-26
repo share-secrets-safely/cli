@@ -22,3 +22,4 @@ yaml-rust = "0.4.0"
 glob = "0.2.11"
 treediff = {version = "3.0.0", features = ["with-yaml-rust", "with-serde-json"]}
 liquid = "0.14.2"
+handlebars = "0.32.0"

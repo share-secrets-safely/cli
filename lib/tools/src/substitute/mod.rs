@@ -7,6 +7,7 @@ use json;
 use yaml_rust;
 use failure::{err_msg, Error, ResultExt};
 use liquid;
+use handlebars::Handlebars;
 
 use std::ffi::OsStr;
 use std::io::{self, stdin};
@@ -14,10 +15,12 @@ use std::fs::File;
 use std::os::unix::ffi::OsStrExt;
 
 pub use self::spec::*;
-use self::util::{de_json_or_yaml, validate};
+pub use self::util::Engine;
+use self::util::{de_json_or_yaml, validate, EngineChoice};
 use std::collections::BTreeSet;
 
 pub fn substitute(
+    engine: Engine,
     input_data: &StreamOrPath,
     specs: &[Spec],
     separator: &OsStr,

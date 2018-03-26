@@ -11,6 +11,23 @@ pub fn cli<'a, 'b>() -> App<'a, 'b> {
                  Liquid is used as template engine, and it's possible to refer to and inherit from other templates by their file-stem. \
                  Read more on their website at https://shopify.github.io/liquid .")
         .arg(
+            Arg::with_name("engine")
+                .required(false)
+                .multiple(false)
+                .takes_value(true)
+                .long("engine")
+                .value_name("name")
+                .short("e")
+                .default_value("liquid")
+                .possible_values(&["handlebars", "liquid"])
+                .help("The choice of engine used for the substitution. Valid values are 'handlebars' and \
+                       'liquid'. \
+                       'liquid', the default, is coming with batteries included and very good at handling
+                       one template at a time.
+                       'handlebars' supports referencing other templates using partials, which \
+                       is useful for sharing of common functionality.")
+        )
+        .arg(
             Arg::with_name("separator")
                 .required(false)
                 .multiple(false)

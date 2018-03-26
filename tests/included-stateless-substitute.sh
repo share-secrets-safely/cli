@@ -13,7 +13,7 @@ title "'substitute' with find & replace"
         WITH_SNAPSHOT="$snapshot/fail-data-stdin-json-data-validated-stdout" \
         expect_run $WITH_FAILURE "$exe" substitute --validate "$template/data.json.hbs"
       }
-      
+
       (with "replacements to escape the offending character"
         it "succeeds thanks to replacements" && {
           echo "$INPUT" | \
@@ -173,6 +173,32 @@ title "'substitute' complex example"
     WITH_SNAPSHOT="$snapshot/template-from-complex-template" \
     expect_run $SUCCESSFULLY "$exe" substitute "$template/complex.tpl" < "$template/data-for-complex.tpl.yml"
   }
+)
+
+title "'substitute' (handlebars) with templates referencing other templates"
+(with "data from stdin"
+  (with "indication for rendering partial 0"
+    (with "multiple partials and a template"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/handlebars/data-stdin-partial-0-output-stdout" \
+        expect_run $SUCCESSFULLY "$exe" substitute --engine=handlebars "$template/partials/base0.hbs:/dev/null" "$template/partials/base1.hbs:/dev/null" "$template/partials/template.hbs" <<YAML
+title: example 0
+parent: base0
+YAML
+      }
+    )
+  )
+  (with "indication for rendering partial 1"
+    (with "multiple partials and a template"
+      it "succeeds" && {
+        WITH_SNAPSHOT="$snapshot/handlebars/data-stdin-partial-1-output-stdout" \
+        expect_run $SUCCESSFULLY "$exe" substitute --engine=handlebars "$template/partials/base1.hbs:/dev/null" "$template/partials/template.hbs" <<YAML
+title: other example
+parent: base1
+YAML
+      }
+    )
+  )
 )
 
 title "'substitute' subcommand error cases"

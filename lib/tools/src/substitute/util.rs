@@ -1,11 +1,37 @@
 use failure::{Error, Fail, ResultExt};
 use json;
 use yaml;
+use liquid;
+use handlebars;
 
 use std::io::Read;
 
 pub use super::spec::*;
 use std::io::Cursor;
+use std::str::FromStr;
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum Engine {
+    Handlebars,
+    Liquid,
+}
+
+impl FromStr for Engine {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, <Self as FromStr>::Err> {
+        Ok(match s {
+            "liquid" => Engine::Liquid,
+            "handlebars" => Engine::Handlebars,
+            _ => bail!("Engine named '{}' is unknown", s),
+        })
+    }
+}
+
+pub enum EngineChoice {
+    Handlebars(handlebars::Handlebars, json::Value),
+    Liquid(liquid::Parser, liquid::Value),
+}
 
 pub fn validate(data: &StreamOrPath, specs: &[Spec]) -> Result<(), Error> {
     if specs.is_empty() {
