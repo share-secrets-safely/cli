@@ -10,6 +10,19 @@ pub use super::spec::*;
 use std::io::Cursor;
 use std::str::FromStr;
 
+pub mod liquid_filters {
+    use liquid::Value;
+    use liquid::interpreter::{FilterError, FilterResult};
+    use base64;
+
+    pub fn base64(input: &Value, _args: &[Value]) -> FilterResult {
+        match *input {
+            Value::Scalar(ref s) => Ok(Value::scalar(base64::encode(s.to_str().as_ref()))),
+            _ => Err(FilterError::InvalidType("String expected".to_owned())),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum Engine {
     Handlebars,

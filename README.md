@@ -103,8 +103,6 @@ Fortunately it's still time to change, so let's swap handlebars with [liquid][li
  * [x] add handlebars
  * [ ] add base64 filter to _liquid_
  * [ ] differentiate both in docs
- * [ ] optional data
- * [ ] ask demand for docs for liquid
 
 [liquid]: https://shopify.github.io/liquid/
 

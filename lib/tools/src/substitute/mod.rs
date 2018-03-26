@@ -16,7 +16,7 @@ use std::os::unix::ffi::OsStrExt;
 
 pub use self::spec::*;
 pub use self::util::Engine;
-use self::util::{de_json_or_yaml, validate, EngineChoice};
+use self::util::{de_json_or_yaml, liquid_filters, validate, EngineChoice};
 use std::collections::BTreeSet;
 use handlebars::no_escape;
 
@@ -57,7 +57,9 @@ pub fn substitute(
     let dataset = substitute_in_data(dataset, replacements);
     let mut engine = match engine {
         Engine::Liquid => EngineChoice::Liquid(
-            liquid::ParserBuilder::with_liquid().build(),
+            liquid::ParserBuilder::with_liquid()
+                .filter("base64", liquid_filters::base64 as liquid::interpreter::FnFilterValue)
+                .build(),
             into_liquid_object(dataset)?,
         ),
         Engine::Handlebars => {

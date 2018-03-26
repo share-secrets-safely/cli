@@ -1,6 +1,7 @@
 extern crate atty;
 #[macro_use]
 extern crate failure;
+extern crate base64;
 extern crate glob;
 extern crate handlebars;
 extern crate liquid;

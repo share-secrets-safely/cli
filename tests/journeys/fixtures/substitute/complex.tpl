@@ -91,7 +91,7 @@ is turned into a comment.
 {% endfor %}
 
 {% for item in array limit:2 %}
-  {{ item }} 
+  {{ item }}
 {%- endfor -%}
 
 {% for i in (3..5) %}
@@ -234,12 +234,4 @@ there
 
 {% assign my_array = "ants, bugs, bees, bugs, ants" | split: ", " %}
 {{ my_array | uniq | join: ", " }}
-
-
-
-
-
-
-
-
-
+{{ "some text as base64" | base64 }}
