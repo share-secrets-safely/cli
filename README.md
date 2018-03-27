@@ -106,8 +106,6 @@ Fortunately it's still time to change, so let's swap handlebars with [liquid][li
 
 [liquid]: https://shopify.github.io/liquid/
 
-### Roadmap to 4.1
-
 #### Sub-Commands as standalone programs
 
 Even though the main binary should by `sy` as before, the code should be structured to
@@ -121,7 +119,18 @@ stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
 
-### Roadmap to 4.2
+### Non-Functional: Move to Organization
+
+In order to get the project where it is supposed to be, it can't be in my
+user's space. We will have multiple repositories and hopefully some more contributors.
+
+The new organization should have the following repositories:
+
+ * [ ] **CLI** - the 'sheesy' command-line interface
+ * [ ] **getting-started** - a repository with all you need to start using a
+   _sheesy_ vault in teams.
+
+### Roadmap to 4.1
 
 #### Add the `pass` subcommand
 
@@ -141,6 +150,14 @@ well as its behaviour.
    * [ ] recipients
    * [ ] resources
 
+### Roadmap to 4.2
+
+#### Bootstrap-library for common usage scenarios
+
+Ideally it's easy to get started not only when cloning the `getting-started` repository,
+but to make it all yours with templates to get something deployed with secrets
+to _kubernetes_ for example.
+
 ### Roadmap to 5.0
 #### Web of Trust for everyone
 
@@ -152,7 +169,6 @@ only for trusted keys.
        and make available everyone they signed for.
  * [ ] suggest to import keys or do it for the user
  * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
-
 
 ## Development Practices
 
