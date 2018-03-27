@@ -5,8 +5,8 @@ version = "3.3.0"
 
 description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults."
 license = "LGPL-2.1"
-repository = "https://github.com/Byron/share-secrets-safely"
-homepage = "https://github.com/Byron/share-secrets-safely"
+repository = "https://github.com/share-secrets-safely/cli"
+homepage = "https://github.com/share-secrets-safely/cli"
 documentation = "https://share-secrets-safely.github.io/cli"
 keywords = ["gnupg", "pgp", "crypto"]
 readme = "README.md"

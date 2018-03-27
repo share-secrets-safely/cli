@@ -5,8 +5,8 @@ version = "3.3.0"
 
 description = "Vault functionality used by 'share-secrets-safely' CLI. Use it to interact with GPG based vaults."
 license = "LGPL-2.1"
-repository = "https://github.com/Byron/share-secrets-safely"
-homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/vault"
+repository = "https://github.com/share-secrets-safely/cli"
+homepage = "https://github.com/share-secrets-safely/cli/tree/master/lib/vault"
 documentation = "https://docs.rs/sheesy-vault"
 
 [badges]

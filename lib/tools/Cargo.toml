@@ -5,8 +5,8 @@ version = "3.3.0"
 
 description = "Tooling to make using shared secrets effortless."
 license = "MIT"
-repository = "https://github.com/Byron/share-secrets-safely"
-homepage = "https://github.com/Byron/share-secrets-safely/tree/master/lib/tools"
+repository = "https://github.com/share-secrets-safely/cli"
+homepage = "https://github.com/share-secrets-safely/cli/tree/master/lib/tools"
 documentation = "https://docs.rs/sheesy-tools"
 
 [badges]

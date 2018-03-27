@@ -45,7 +45,7 @@ pushd "$sandbox_tempdir" >/dev/null
 ```
 
 ```bash,use=sandboxed,exec
-curl --fail -Lso sy.tar.gz https://github.com/Byron/share-secrets-safely/releases/download/3.2.0/sy-cli-Linux-x86_64.tar.gz
+curl --fail -Lso sy.tar.gz https://github.com/share-secrets-safely/cli/releases/download/3.2.0/sy-cli-Linux-x86_64.tar.gz
 tar xzf sy.tar.gz
 # verify 'sy' was built by one of the maintainers
 gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc) 2>/dev/null
@@ -81,7 +81,7 @@ If you don't have `cargo` yet, you can install it via [instructions on rustup.rs
 Please note that for building on OSX, you are required to locally install [certain dependencies][dep-osx],
 which is also the case on [linux systems][dep-debian].
 
-[dep-osx]: https://github.com/Byron/share-secrets-safely/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L30
-[dep-debian]: https://github.com/Byron/share-secrets-safely/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L22
-[releases]: https://github.com/Byron/share-secrets-safely/releases
+[dep-osx]: https://github.com/share-secrets-safely/cli/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L30
+[dep-debian]: https://github.com/share-secrets-safely/cli/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L22
+[releases]: https://github.com/share-secrets-safely/cli/releases
 [rustup]: http://rustup.rs

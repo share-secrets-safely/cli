@@ -119,16 +119,18 @@ stand-in capability).
 
  * [ ] move vault-cli into own library and use it from `hub` cli.
 
-### Non-Functional: Move to Organization
+#### Non-Functional: Move to Organization
 
 In order to get the project where it is supposed to be, it can't be in my
 user's space. We will have multiple repositories and hopefully some more contributors.
 
 The new organization should have the following repositories:
 
- * [ ] **CLI** - the 'sheesy' command-line interface
- * [ ] **getting-started** - a repository with all you need to start using a
-   _sheesy_ vault in teams.
+ * [x] **CLI** - the 'sheesy' command-line interface
+ * [ ] **Update travis secrets** - needs to reencrypt (new) token thanks to new name
+ * [ ] **make patch release** - fixes all URLs on crates.io and for brew
+ * [ ] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
+   * It should be standalone and pull binaries as it needs them.
 
 ### Roadmap to 4.1
 
