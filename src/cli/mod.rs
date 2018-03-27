@@ -29,7 +29,7 @@ where
             .setting(AppSettings::DeriveDisplayOrder)
             .setting(AppSettings::SubcommandRequired)
             .name(CLI::name())
-            .after_help("Read more on https://byron.github.io/share-secrets-safely")
+            .after_help("Read more on https://share-secrets-safely.github.io/cli")
             .version(include_str!("../../VERSION"))
             .subcommand(vault::cli())
             .subcommand(substitute::cli())

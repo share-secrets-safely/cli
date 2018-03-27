@@ -62,7 +62,7 @@ one, with the possibility for later contexts to override earlier ones.
 With this capability, it's also possible to substitute secrets into files, for example
 like this: `sy sub base.json sub/ours.yaml <(sy vault show secret.yaml) < deployment.yml | kubectl apply -f -`.
 
-Read more [in the documentation](https://byron.github.io/share-secrets-safely/tools/substitute.html).
+Read more [in the documentation](https://share-secrets-safely.github.io/cli/tools/substitute.html).
 
 ## V3.0: Support for Partitions
 
@@ -91,9 +91,9 @@ the capabilities so far!
 
 We also [sign our binaries][signatures] from here on, and make them available [via *homebrew*][install].
 
-[signatures]: https://byron.github.io/share-secrets-safely/installation.html#via-a-hrefhttpsgithubcombyronshare-secrets-safelyreleasesreleasesa
-[install]: https://byron.github.io/share-secrets-safely/installation.html#via-homebrew-osx-and-linux
-[book]: https://byron.github.io/share-secrets-safely
+[signatures]: https://share-secrets-safely.github.io/cli/installation.html#via-a-hrefhttpsgithubcombyronshare-secrets-safelyreleasesreleasesa
+[install]: https://share-secrets-safely.github.io/cli/installation.html#via-homebrew-osx-and-linux
+[book]: https://share-secrets-safely.github.io/cli
 
 ### Improvements
 

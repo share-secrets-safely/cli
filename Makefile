@@ -57,7 +57,7 @@ watch-docs: build-docs-image $(MUSL_EXE)
 $(CAST):
 	rm -f $@
 	asciinema rec \
-		--title 'Getting Started with Sheesy (https://byron.github.io/share-secrets-safely)' \
+		--title 'Getting Started with Sheesy (https://share-secrets-safely.github.io/cli)' \
 		--idle-time-limit 1 \
 		-c '$(DOCKER_DOCS_ARGS_NO_CMD) sh -c "termbook play doc 1.1. 2>/dev/null"' \
 		$@

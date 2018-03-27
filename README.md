@@ -20,14 +20,14 @@ helping users to work with the `gpg` toolchain and workaround peculiarities.
 
 Please read the [installation notes here][installation].
 
-[installation]: https://byron.github.io/share-secrets-safely/installation.html
+[installation]: https://share-secrets-safely.github.io/cli/installation.html
 
 ## Getting Started
 
 The first steps showing on how to use the vault with a complete example and detailed
 explanations can be found [in the book][first-steps].
 
-[first-steps]: https://byron.github.io/share-secrets-safely/vault/first-steps.html
+[first-steps]: https://share-secrets-safely.github.io/cli/vault/first-steps.html
 
 ## Project Goals
 
@@ -65,7 +65,7 @@ explanations can be found [in the book][first-steps].
 You will find various and probably biased and opinionated comparisons [in our book][compare].
 However, it's a fun read, and please feel free to make PRs for corrections.
 
-[compare]: https://byron.github.io/share-secrets-safely/compare.html
+[compare]: https://share-secrets-safely.github.io/cli/compare.html
 
 ## Caveats
 
