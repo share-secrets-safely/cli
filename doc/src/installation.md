@@ -4,7 +4,7 @@
 This is by far the easiest way to get the binary. Just execute the following code:
 
 ```bash
-brew tap byron/share-secrets-safely
+brew tap share-secrets-safely/cli
 brew install sheesy
 ```
 
@@ -48,7 +48,7 @@ pushd "$sandbox_tempdir" >/dev/null
 curl --fail -Lso sy.tar.gz https://github.com/share-secrets-safely/cli/releases/download/3.2.0/sy-cli-Linux-x86_64.tar.gz
 tar xzf sy.tar.gz
 # verify 'sy' was built by one of the maintainers
-gpg --import <(curl -s https://raw.githubusercontent.com/Byron/share-secrets-safely/master/signing-keys.asc) 2>/dev/null
+gpg --import <(curl -s https://raw.githubusercontent.com/share-secrets-safely/cli/master/signing-keys.asc) 2>/dev/null
 gpg --sign-key --yes --batch 296B26A2B943AFFA &>/dev/null
 gpg --verify ./sy.gpg sy
 # This will print out that the file was created by one of the maintainers. If you chose to

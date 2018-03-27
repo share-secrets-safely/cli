@@ -13,7 +13,7 @@ readme = "README.md"
 exclude = ["HomebrewFormula", "tests/**", "pkg/**", "lib/**", "etc/**", "doc/**", "bin/**"]
 
 [badges]
-travis-ci = { repository = "Byron/share-secrets-safely" }
+travis-ci = { repository = "share-secrets-safely/cli" }
 
 [[bin]]
 name = "sy"

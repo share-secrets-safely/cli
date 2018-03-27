@@ -57,11 +57,8 @@ deploy:
     local-dir: doc/book
     github-token: "$GITHUB_TOKEN"
     on:
-      repo: Byron/share-secrets-safely
+      repo: share-secrets-safely/cli
       branch: master
       tags: true
       condition: $TRAVIS_OS_NAME != "osx"
       
-env:
-  global:
-    secure: lsyZVCwegdhKqBxuC/wlWcy9Z1a6u3j+1l6KB9Ayi7xEoV0uLoCnLe3hy4nu6cyS3QLzyzbxjL0eZbH1c+NxiO43rnj3U1anaXNba6+SYHcRV+BUZo/869b/4l0vajT+9NkU61Qw/+8wcplrF4MxeNtIub5GpFSlMNdxJDlnjKBNs6BPYtVje/JMp6U5PCq/qtubsQMoQBRuM/OOdLglPWwRqMYi2KMzytxypQRbHYyT5rri/DydsWT8dM90fUb3PLe/uTZmimZsVF+E3y22Rrasdm83/BE5pMVn65C6spU4GL3RA6qWcTLK95e2ifq+RQ4xj3kDeoyyD8xYrMf5/XuyTJqyZld2xyTQCub9vEw4FpgFeWN0fVdch1YDN7BIAyaCDCO2Mi+dprZmd1sNlyrLe29XK1SylTJqI+dL0Z+wOUIxUSj09Vj7UGSQ/XO3gEFiqHrrTNP5g4DslbUo33Gv1Vq1T8/2G+kd/bK/rmrdAAaOjWRGz3/rQIIUBMLSdBGp/9g5PIDT4SjSWov4hTxsT5fTi+nBHV6narjDi2n2uy8jhz133U7f8xeti8Hg1LjePRRZ8ZJ33khO30/YrYeOOvFqUR3/6S1SllsFpaloykZcYT7UgA5hlQsGxSffPm5BI3hj77SFk1JZ1CH5b/AnM2qRTwnMbPMKfrrXGxg=

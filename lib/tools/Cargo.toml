@@ -10,7 +10,7 @@ homepage = "https://github.com/share-secrets-safely/cli/tree/master/lib/tools"
 documentation = "https://docs.rs/sheesy-tools"
 
 [badges]
-travis-ci = { repository = "Byron/share-secrets-safely" }
+travis-ci = { repository = "share-secrets-safely/cli" }
 
 [dependencies]
 failure = "0.1.1"
