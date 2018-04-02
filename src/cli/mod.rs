@@ -1,10 +1,15 @@
 use clap::App;
 use clap::AppSettings;
 
+#[cfg(feature = "rest")]
 mod completions;
+#[cfg(feature = "vault")]
 pub mod vault;
+#[cfg(feature = "rest")]
 mod substitute;
+#[cfg(feature = "rest")]
 mod merge;
+#[cfg(feature = "rest")]
 mod extract;
 mod util;
 
@@ -15,6 +20,7 @@ where
     pub app: App<'a, 'b>,
 }
 
+#[cfg(all(feature = "rest", feature = "vault"))]
 impl<'a, 'b> CLI<'a, 'b>
 where
     'a: 'b,

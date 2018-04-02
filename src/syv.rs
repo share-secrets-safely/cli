@@ -1,15 +1,8 @@
-extern crate atty;
 #[macro_use]
 extern crate clap;
-extern crate conv;
 #[macro_use]
 extern crate failure;
-extern crate gpgme;
-#[macro_use]
-extern crate lazy_static;
-extern crate glob;
-extern crate itertools;
-extern crate sheesy_tools as tools;
+#[cfg(feature = "vault")]
 extern crate sheesy_vault as vault;
 
 use clap::ArgMatches;

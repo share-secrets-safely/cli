@@ -1,15 +1,23 @@
-extern crate atty;
 #[macro_use]
 extern crate clap;
-extern crate conv;
 #[macro_use]
 extern crate failure;
-extern crate gpgme;
+#[cfg(feature = "rest")]
 #[macro_use]
 extern crate lazy_static;
+#[cfg(feature = "rest")]
+extern crate atty;
+#[cfg(feature = "vault")]
+extern crate conv;
+#[cfg(feature = "rest")]
 extern crate glob;
+#[cfg(feature = "vault")]
+extern crate gpgme;
+#[cfg(feature = "rest")]
 extern crate itertools;
+#[cfg(feature = "rest")]
 extern crate sheesy_tools as tools;
+#[cfg(feature = "vault")]
 extern crate sheesy_vault as vault;
 
 mod cli;
@@ -17,8 +25,8 @@ mod parse;
 mod dispatch;
 
 use clap::ArgMatches;
-use tools::substitute::substitute;
-use tools::merge::reduce;
+#[cfg(feature = "rest")]
+use tools::{merge::reduce, substitute::substitute};
 use std::io::stdout;
 use cli::CLI;
 

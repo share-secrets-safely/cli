@@ -1,27 +1,26 @@
 use failure::Error;
-use vault::{print_causes, error::{first_cause_of_type, DecryptionError}};
 use std::io::{stderr, stdout, Write};
 use std::process;
 use clap::ArgMatches;
-use cli::CLI;
 
-pub fn amend_error_info<T>(r: Result<T, Error>) -> Result<T, Error> {
-    r.map_err(|e| {
-        let ctx = match first_cause_of_type::<DecryptionError>(&e) {
-            Some(_err) => Some(format!(
-                "Export your public key using '{} vault recipient init', then \
-                 ask one of the existing recipients to import your public key \
-                 using '{} vault recipients add <your-userid>.'",
-                CLI::name(),
-                CLI::name()
-            )),
-            None => None,
-        };
-        (e, ctx)
-    }).map_err(|(e, msg)| match msg {
-        Some(msg) => e.context(msg).into(),
-        None => e,
-    })
+pub fn print_causes<E, W>(e: E, mut w: W)
+where
+    E: Into<Error>,
+    W: Write,
+{
+    let e = e.into();
+    let causes = e.causes().collect::<Vec<_>>();
+    let num_causes = causes.len();
+    for (index, cause) in causes.iter().enumerate() {
+        if index == 0 {
+            writeln!(w, "{}", cause).ok();
+            if num_causes > 1 {
+                writeln!(w, "Caused by: ").ok();
+            }
+        } else {
+            writeln!(w, " {}: {}", num_causes - index, cause).ok();
+        }
+    }
 }
 
 pub fn ok_or_exit<T, E>(r: Result<T, E>) -> T

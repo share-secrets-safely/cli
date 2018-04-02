@@ -15,32 +15,43 @@ exclude = ["HomebrewFormula", "tests/**", "pkg/**", "lib/**", "etc/**", "doc/**"
 [badges]
 travis-ci = { repository = "share-secrets-safely/cli" }
 
+[features]
+default = []
+vault = ["sheesy-vault", "conv", "gpgme"]
+rest = ["sheesy-tools", "glob", "conv", "itertools", "lazy_static", "atty"]
+
 [[bin]]
 name = "sy"
 path = "src/sy.rs"
+required-features = ["vault", "rest"]
 doctest = false
+doc = false
 
-[[bin]]
-name = "syv"
-path = "src/syv.rs"
-doctest = false
+# [[bin]]
+# name = "syv"
+# path = "src/syv.rs"
+# required-features = ["vault"]
+# doctest = false
+# doc = false
 
 [dependencies]
 clap = "~2.31"
 failure = "~0.1.1"
-conv = "0.3.3"
-lazy_static = "1.0.0"
-gpgme = { version = "0.7.0" }
-atty = "0.2.8"
-glob = "0.2.11"
-itertools = "0.7.7"
+lazy_static = {version = "1.0.0", optional = true}
+atty = {version = "0.2.8", optional = true}
+glob = {version = "0.2.11", optional = true}
+conv = {version = "0.3.3", optional = true}
+gpgme = {version = "0.7.2", optional = true}
+itertools = {version = "0.7.8", optional = true}
 
 [dependencies.sheesy-tools]
 path = "lib/tools"
 version = "3.3.0"
+optional = true
 
 [dependencies.sheesy-vault]
 path = "lib/vault"
 version = "3.3.0"
+optional = true
 
 [workspace]

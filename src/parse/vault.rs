@@ -5,13 +5,35 @@ use clap::ArgMatches;
 use std::path::{Path, PathBuf};
 use std::convert::Into;
 
+use vault::error::{first_cause_of_type, DecryptionError};
 use vault::{CreateMode, SigningMode};
 use dispatch::vault::{Command, Context};
 
 use super::util::{optional_args, required_arg, required_os_arg};
-use util::{amend_error_info, ok_or_exit, usage_and_exit};
+use util::{ok_or_exit, usage_and_exit};
 use std::io::{stderr, stdout};
 use dispatch;
+
+pub fn amend_error_info<T>(r: Result<T, Error>) -> Result<T, Error> {
+    use cli::CLI;
+
+    r.map_err(|e| {
+        let ctx = match first_cause_of_type::<DecryptionError>(&e) {
+            Some(_err) => Some(format!(
+                "Export your public key using '{} vault recipient init', then \
+                 ask one of the existing recipients to import your public key \
+                 using '{} vault recipients add <your-userid>.'",
+                CLI::name(),
+                CLI::name()
+            )),
+            None => None,
+        };
+        (e, ctx)
+    }).map_err(|(e, msg)| match msg {
+        Some(msg) => e.context(msg).into(),
+        None => e,
+    })
+}
 
 pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
