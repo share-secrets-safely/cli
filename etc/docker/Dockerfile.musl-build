@@ -1,4 +1,4 @@
-FROM clux/muslrust:stable-2018-01-01
+FROM clux/muslrust:stable
 
 RUN apt-get update
 RUN apt-get install -y autoconf=2.69-9
