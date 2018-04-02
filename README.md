@@ -117,7 +117,15 @@ This can be useful to make `pass` standins more approachable, and also build cus
 `sy` binaries with just a sub-set of the functionality (for example, without `pass`
 stand-in capability).
 
- * [ ] move vault-cli into own library and use it from `hub` cli.
+ * [ ] binary for sheesy-
+   * [x] hub
+   * [x] vault
+   * [ ] substitute
+   * [ ] process
+   * [ ] extract
+ * [ ] build all binaries in release mode on 
+   * [x] host
+   * [ ] linux musl
 
 #### Non-Functional: Move to Organization
 
@@ -127,8 +135,8 @@ user's space. We will have multiple repositories and hopefully some more contrib
 The new organization should have the following repositories:
 
  * [x] **CLI** - the 'sheesy' command-line interface
- * [ ] **Update travis secrets** - needs to reencrypt (new) token thanks to new name
- * [ ] **make patch release** - fixes all URLs on crates.io and for brew
+ * [x] **Update travis secrets** - needs to reencrypt (new) token thanks to new name
+ * [ ] **make new release** - fixes all URLs on crates.io and for brew
  * [ ] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
    * It should be standalone and pull binaries as it needs them.
 
