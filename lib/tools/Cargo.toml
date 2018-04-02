@@ -12,6 +12,9 @@ documentation = "https://docs.rs/sheesy-tools"
 [badges]
 travis-ci = { repository = "share-secrets-safely/cli" }
 
+[lib]
+doctest = false
+
 [dependencies]
 failure = "0.1.1"
 atty = "0.2.8"
