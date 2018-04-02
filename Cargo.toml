@@ -17,7 +17,7 @@ travis-ci = { repository = "share-secrets-safely/cli" }
 
 [features]
 default = []
-vault = ["sheesy-vault", "conv", "gpgme"]
+vault = ["sheesy-vault", "conv", "gpgme", "lazy_static"]
 rest = ["sheesy-tools", "glob", "conv", "itertools", "lazy_static", "atty"]
 
 [[bin]]
@@ -27,12 +27,12 @@ required-features = ["vault", "rest"]
 doctest = false
 doc = false
 
-# [[bin]]
-# name = "syv"
-# path = "src/syv.rs"
-# required-features = ["vault"]
-# doctest = false
-# doc = false
+[[bin]]
+name = "syv"
+path = "src/syv.rs"
+required-features = ["vault"]
+doctest = false
+doc = false
 
 [dependencies]
 clap = "~2.31"

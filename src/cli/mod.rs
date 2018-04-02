@@ -1,5 +1,4 @@
 use clap::App;
-use clap::AppSettings;
 
 #[cfg(feature = "rest")]
 mod completions;
@@ -20,7 +19,7 @@ where
     pub app: App<'a, 'b>,
 }
 
-#[cfg(all(feature = "rest", feature = "vault"))]
+#[cfg(feature = "vault")]
 impl<'a, 'b> CLI<'a, 'b>
 where
     'a: 'b,
@@ -28,8 +27,15 @@ where
     pub fn name() -> &'static str {
         "sy"
     }
+}
 
+#[cfg(all(feature = "rest", feature = "vault"))]
+impl<'a, 'b> CLI<'a, 'b>
+where
+    'a: 'b,
+{
     pub fn new() -> Self {
+        use clap::AppSettings;
         let app: App = app_from_crate!()
             .setting(AppSettings::VersionlessSubcommands)
             .setting(AppSettings::DeriveDisplayOrder)

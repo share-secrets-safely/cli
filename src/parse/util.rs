@@ -3,6 +3,7 @@ use failure::Error;
 use std::ffi::OsStr;
 use std::str::FromStr;
 
+#[cfg(feature = "rest")]
 pub fn optional_args_with_value<F, T>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(T, usize)>
 where
     F: Fn(&str) -> T,

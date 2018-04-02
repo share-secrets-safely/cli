@@ -2,7 +2,7 @@
 extern crate clap;
 #[macro_use]
 extern crate failure;
-#[cfg(feature = "rest")]
+#[cfg(feature = "vault")]
 #[macro_use]
 extern crate lazy_static;
 #[cfg(feature = "rest")]

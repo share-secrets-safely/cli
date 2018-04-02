@@ -68,10 +68,10 @@ asciinema-upload: build-docs-image $(MUSL_EXE) $(CAST)
 	asciinema upload $(CAST)
 
 $(EXE): always
-	cargo build
+	cargo build --bin=sy --all-features
 
 $(RELEASE_EXE): always
-	cargo build --release
+	cargo build --release --bin=sy --all-features
 
 $(MUSL_EXE): build-linux-musl
 
@@ -116,10 +116,10 @@ build-musl-image:
 	docker build -t $(MY_MUSL_IMAGE) - < etc/docker/Dockerfile.musl-build
 
 build-linux-musl: build-musl-image
-	$(MUSL_DOCKER_ARGS) cargo build --target=x86_64-unknown-linux-musl
+	$(MUSL_DOCKER_ARGS) cargo build --bin=sy --all-features --target=x86_64-unknown-linux-musl
 
 release-linux-musl: build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm $(MY_MUSL_IMAGE) cargo build --target=x86_64-unknown-linux-musl --release
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm $(MY_MUSL_IMAGE) cargo build --bin=sy --all-features --target=x86_64-unknown-linux-musl --release
 
 interactive-linux-musl: build-musl-image
 	$(DOCKER_ARGS) -it $(MY_MUSL_IMAGE)
