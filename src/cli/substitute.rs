@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 use clap::AppSettings;
 
-pub fn cli<'a, 'b>() -> App<'a, 'b> {
+pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("substitute")
         .setting(AppSettings::AllowLeadingHyphen)
         .alias("sub")

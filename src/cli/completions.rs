@@ -5,7 +5,7 @@ lazy_static! {
     static ref SHELL: Result<String, env::VarError> = env::var("SHELL");
 }
 
-pub fn cli<'a, 'b>() -> App<'a, 'b> {
+pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("completions")
         .about("generate completions for supported shell")
         .arg({

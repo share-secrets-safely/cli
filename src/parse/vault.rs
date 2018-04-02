@@ -9,6 +9,9 @@ use vault::{CreateMode, SigningMode};
 use dispatch::vault::{Command, Context};
 
 use super::util::{optional_args, required_arg, required_os_arg};
+use util::{amend_error_info, ok_or_exit, usage_and_exit};
+use std::io::{stderr, stdout};
+use dispatch;
 
 pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
@@ -168,4 +171,32 @@ pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
         },
         ..ctx
     })
+}
+
+pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+    let mut context = ok_or_exit(context_from(args));
+    context = match args.subcommand() {
+        ("partitions", Some(args)) => match args.subcommand() {
+            ("add", Some(args)) => partitions_add(context, args)?,
+            ("remove", Some(args)) => partitions_remove(context, args)?,
+            _ => usage_and_exit(&args),
+        },
+        ("recipients", Some(args)) => match args.subcommand() {
+            ("add", Some(args)) => recipients_add(context, args)?,
+            ("remove", Some(args)) => recipients_remove(context, args)?,
+            ("init", Some(args)) => recipients_init(context, args)?,
+            ("list", Some(args)) => recipients_list(context, args)?,
+            _ => recipients_list(context, args)?,
+        },
+        ("init", Some(args)) => init_from(context, args)?,
+        ("add", Some(args)) => resource_add(context, args)?,
+        ("remove", Some(args)) => vault_resource_remove(context, args)?,
+        ("show", Some(args)) => resource_show(context, args)?,
+        ("edit", Some(args)) => resource_edit(context, args)?,
+        ("list", Some(args)) => resource_list(context, args)?,
+        _ => context,
+    };
+    let sout = stdout();
+    let mut lock = sout.lock();
+    amend_error_info(dispatch::vault::do_it(context, &mut lock, &mut stderr()))
 }

@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 use cli::util::output_formats;
 
-pub fn cli<'a, 'b>() -> App<'a, 'b> {
+pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("extract")
         .alias("fetch")
         .about(

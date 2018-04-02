@@ -17,7 +17,13 @@ travis-ci = { repository = "share-secrets-safely/cli" }
 
 [[bin]]
 name = "sy"
-path = "src/main.rs"
+path = "src/sy.rs"
+doctest = false
+
+[[bin]]
+name = "syv"
+path = "src/syv.rs"
+doctest = false
 
 [dependencies]
 clap = "~2.31"

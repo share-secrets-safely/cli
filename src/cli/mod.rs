@@ -2,7 +2,7 @@ use clap::App;
 use clap::AppSettings;
 
 mod completions;
-mod vault;
+pub mod vault;
 mod substitute;
 mod merge;
 mod extract;
@@ -31,11 +31,11 @@ where
             .name(CLI::name())
             .after_help("Read more on https://share-secrets-safely.github.io/cli")
             .version(include_str!("../../VERSION"))
-            .subcommand(vault::cli())
-            .subcommand(substitute::cli())
-            .subcommand(merge::cli())
-            .subcommand(extract::cli())
-            .subcommand(completions::cli());
+            .subcommand(vault::new())
+            .subcommand(substitute::new())
+            .subcommand(merge::new())
+            .subcommand(extract::new())
+            .subcommand(completions::new());
 
         Self { app }
     }

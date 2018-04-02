@@ -22,7 +22,7 @@ lazy_static! {
     );
 }
 
-pub fn cli<'a, 'b>() -> App<'a, 'b> {
+pub fn new<'a, 'b>() -> App<'a, 'b> {
     let gpg_key_id = Arg::with_name("gpg-key-id")
         .multiple(true)
         .required(false)

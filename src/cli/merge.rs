@@ -2,7 +2,7 @@ use clap::{App, Arg};
 use glob;
 use cli::util::output_formats;
 
-pub fn cli<'a, 'b>() -> App<'a, 'b> {
+pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("process")
         .alias("show")
         .alias("merge")
