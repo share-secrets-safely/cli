@@ -2,22 +2,14 @@
 extern crate clap;
 #[macro_use]
 extern crate failure;
-#[cfg(feature = "vault")]
 #[macro_use]
 extern crate lazy_static;
-#[cfg(feature = "rest")]
 extern crate atty;
-#[cfg(feature = "vault")]
 extern crate conv;
-#[cfg(feature = "rest")]
 extern crate glob;
-#[cfg(feature = "vault")]
 extern crate gpgme;
-#[cfg(feature = "rest")]
 extern crate itertools;
-#[cfg(feature = "rest")]
 extern crate sheesy_tools as tools;
-#[cfg(feature = "vault")]
 extern crate sheesy_vault as vault;
 
 mod cli;
@@ -48,13 +40,7 @@ fn main() {
             let mut lock = sout.lock();
             reduce(cmds, None, &mut lock).map(|_| ())
         }
-        ("process", Some(args)) => {
-            let cmds = ok_or_exit(parse::merge::context_from(args));
-
-            let sout = stdout();
-            let mut lock = sout.lock();
-            reduce(cmds, None, &mut lock).map(|_| ())
-        }
+        ("process", Some(args)) => parse::merge::execute(args),
         ("substitute", Some(args)) => {
             let context = ok_or_exit(parse::substitute::context_from(args));
             substitute(

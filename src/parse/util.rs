@@ -1,9 +1,12 @@
 use clap::ArgMatches;
+#[cfg(any(feature = "vault", feature = "rest"))]
 use failure::Error;
+#[cfg(any(feature = "vault", feature = "rest"))]
 use std::ffi::OsStr;
+#[cfg(any(feature = "vault", feature = "rest"))]
 use std::str::FromStr;
 
-#[cfg(feature = "rest")]
+#[cfg(any(feature = "process", feature = "rest"))]
 pub fn optional_args_with_value<F, T>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(T, usize)>
 where
     F: Fn(&str) -> T,
@@ -19,6 +22,7 @@ where
     }
 }
 
+#[cfg(any(feature = "vault", feature = "rest"))]
 pub fn required_os_arg<'a, T>(args: &'a ArgMatches, name: &'static str) -> Result<T, Error>
 where
     T: From<&'a OsStr>,
@@ -29,6 +33,7 @@ where
     }
 }
 
+#[cfg(any(feature = "vault", feature = "rest"))]
 pub fn optional_args<'a, T>(args: &'a ArgMatches, name: &'static str) -> Vec<T>
 where
     T: From<&'a str>,
@@ -38,6 +43,7 @@ where
         .unwrap_or_else(Vec::new)
 }
 
+#[cfg(any(feature = "vault", feature = "rest"))]
 pub fn required_arg<T>(args: &ArgMatches, name: &'static str) -> Result<T, Error>
 where
     T: FromStr,

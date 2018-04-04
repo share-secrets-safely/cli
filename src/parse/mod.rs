@@ -5,7 +5,7 @@ pub mod vault;
 pub mod completions;
 #[cfg(feature = "rest")]
 pub mod substitute;
-#[cfg(feature = "rest")]
+#[cfg(feature = "process")]
 pub mod merge;
 #[cfg(feature = "rest")]
 pub mod extract;

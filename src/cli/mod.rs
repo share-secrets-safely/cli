@@ -1,3 +1,4 @@
+#[cfg(any(feature = "vault", feature = "rest"))]
 use clap::App;
 
 #[cfg(feature = "rest")]
@@ -6,12 +7,13 @@ mod completions;
 pub mod vault;
 #[cfg(feature = "rest")]
 mod substitute;
-#[cfg(feature = "rest")]
-mod merge;
+#[cfg(feature = "process")]
+pub mod merge;
 #[cfg(feature = "rest")]
 mod extract;
 mod util;
 
+#[cfg(any(feature = "vault", feature = "rest"))]
 pub struct CLI<'a, 'b>
 where
     'a: 'b,

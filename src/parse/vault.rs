@@ -10,9 +10,9 @@ use vault::{CreateMode, SigningMode};
 use dispatch::vault::{Command, Context};
 
 use super::util::{optional_args, required_arg, required_os_arg};
-use util::{ok_or_exit, usage_and_exit};
 use std::io::{stderr, stdout};
 use dispatch;
+use std::process;
 
 pub fn amend_error_info<T>(r: Result<T, Error>) -> Result<T, Error> {
     use cli::CLI;
@@ -195,8 +195,13 @@ pub fn init_from(ctx: Context, args: &ArgMatches) -> Result<Context, Error> {
     })
 }
 
+fn usage_and_exit(args: &ArgMatches) -> ! {
+    println!("{}", args.usage());
+    process::exit(1)
+}
+
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
-    let mut context = ok_or_exit(context_from(args));
+    let mut context = context_from(args)?;
     context = match args.subcommand() {
         ("partitions", Some(args)) => match args.subcommand() {
             ("add", Some(args)) => partitions_add(context, args)?,

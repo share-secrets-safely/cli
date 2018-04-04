@@ -18,6 +18,7 @@ travis-ci = { repository = "share-secrets-safely/cli" }
 [features]
 default = []
 vault = ["sheesy-vault", "conv", "gpgme", "lazy_static"]
+process = ["sheesy-tools", "atty", "glob"]
 rest = ["sheesy-tools", "glob", "conv", "itertools", "lazy_static", "atty"]
 
 [[bin]]
@@ -31,6 +32,13 @@ doc = false
 name = "syv"
 path = "src/syv.rs"
 required-features = ["vault"]
+doctest = false
+doc = false
+
+[[bin]]
+name = "syp"
+path = "src/syp.rs"
+required-features = ["process"]
 doctest = false
 doc = false
 

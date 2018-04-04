@@ -70,10 +70,12 @@ asciinema-upload: build-docs-image $(MUSL_EXE) $(CAST)
 $(EXE): always
 	cargo build --bin=sy --all-features
 	cargo build --bin=syv --features=vault
+	cargo build --bin=syp --features=process
 
 $(RELEASE_EXE): always
 	cargo build --release --bin=sy --all-features
 	cargo build --release --bin=syv --features=vault
+	cargo build --release --bin=syp --features=process
 
 $(MUSL_EXE): build-linux-musl
 

@@ -1,7 +1,6 @@
 use failure::Error;
 use std::io::{stderr, stdout, Write};
 use std::process;
-use clap::ArgMatches;
 
 pub fn print_causes<E, W>(e: E, mut w: W)
 where
@@ -36,9 +35,4 @@ where
             process::exit(1);
         }
     }
-}
-
-pub fn usage_and_exit(args: &ArgMatches) -> ! {
-    println!("{}", args.usage());
-    process::exit(1)
 }
