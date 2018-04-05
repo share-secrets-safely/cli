@@ -120,10 +120,14 @@ stand-in capability).
  * [ ] binary for sheesy-
    * [x] hub
    * [x] vault
+   * [x] process
+   * [ ] substitute
+   * [ ] extract
+ * [ ] Documentation for
    * [ ] substitute
    * [ ] process
    * [ ] extract
- * [ ] build all binaries in release mode on 
+ * [ ] build all binaries in release mode on
    * [x] host
    * [ ] linux musl
 
