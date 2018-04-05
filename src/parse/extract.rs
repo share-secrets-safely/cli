@@ -5,6 +5,16 @@ use tools::merge::{Command, OutputMode};
 use parse::util::optional_args_with_value;
 
 use std::path::PathBuf;
+use std::io::stdout;
+use tools::merge::reduce;
+
+pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+    let cmds = context_from(args)?;
+
+    let sout = stdout();
+    let mut lock = sout.lock();
+    reduce(cmds, None, &mut lock).map(|_| ())
+}
 
 pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
     Ok({

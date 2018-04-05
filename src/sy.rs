@@ -18,8 +18,7 @@ mod dispatch;
 
 use clap::ArgMatches;
 #[cfg(feature = "rest")]
-use tools::{merge::reduce, substitute::substitute};
-use std::io::stdout;
+use tools::{substitute::substitute};
 use cli::CLI;
 
 mod util;
@@ -34,11 +33,7 @@ fn main() {
     let res = match matches.subcommand() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
         ("extract", Some(args)) => {
-            let cmds = ok_or_exit(parse::extract::context_from(args));
-
-            let sout = stdout();
-            let mut lock = sout.lock();
-            reduce(cmds, None, &mut lock).map(|_| ())
+            parse::extract::execute(args)
         }
         ("process", Some(args)) => parse::merge::execute(args),
         ("substitute", Some(args)) => {
