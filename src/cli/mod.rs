@@ -9,7 +9,7 @@ pub mod vault;
 pub mod substitute;
 #[cfg(feature = "process")]
 pub mod merge;
-#[cfg(feature = "process")]
+#[cfg(feature = "extract")]
 pub mod extract;
 mod util;
 

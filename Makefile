@@ -71,14 +71,14 @@ $(EXE): always
 	cargo build --bin=sy --all-features
 	cargo build --bin=syv --features=vault
 	cargo build --bin=syp --features=process
-	cargo build --bin=sye --features=process
+	cargo build --bin=sye --features=extract
 	cargo build --bin=sys --features=substitute
 
 $(RELEASE_EXE): always
 	cargo build --release --bin=sy --all-features
 	cargo build --release --bin=syv --features=vault
 	cargo build --release --bin=syp --features=process
-	cargo build --release --bin=sye --features=process
+	cargo build --release --bin=sye --features=extract
 	cargo build --release --bin=sys --features=substitute
 
 $(MUSL_EXE): build-linux-musl

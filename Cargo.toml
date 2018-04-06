@@ -20,6 +20,7 @@ default = []
 completions = []
 vault = ["sheesy-vault", "conv", "gpgme", "lazy_static"]
 process = ["sheesy-tools/process", "atty", "glob"]
+extract = ["sheesy-tools/process", "atty", "glob"]
 substitute = ["sheesy-tools/substitute", "itertools"]
 
 [[bin]]
@@ -46,7 +47,7 @@ doc = false
 [[bin]]
 name = "sye"
 path = "src/sye.rs"
-required-features = ["process"]
+required-features = ["extract"]
 doctest = false
 doc = false
 

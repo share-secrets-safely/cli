@@ -6,7 +6,7 @@ use std::ffi::OsStr;
 #[cfg(feature = "vault")]
 use std::str::FromStr;
 
-#[cfg(feature = "process")]
+#[cfg(any(feature = "process", feature = "extract"))]
 pub fn optional_args_with_value<F, T>(args: &ArgMatches, name: &'static str, into: F) -> Vec<(T, usize)>
 where
     F: Fn(&str) -> T,
@@ -33,7 +33,7 @@ where
     }
 }
 
-#[cfg(any(feature = "vault", feature = "process"))]
+#[cfg(feature = "vault")]
 pub fn optional_args<'a, T>(args: &'a ArgMatches, name: &'static str) -> Vec<T>
 where
     T: From<&'a str>,
