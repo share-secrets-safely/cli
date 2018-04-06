@@ -5,6 +5,7 @@ use itertools::Itertools;
 
 use super::util::required_os_arg;
 use std::ffi::OsString;
+use tools::substitute::substitute;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Context {
@@ -35,4 +36,16 @@ pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
             None => Vec::new(),
         },
     })
+}
+
+pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+    let context = context_from(args)?;
+    substitute(
+        context.engine,
+        &context.data,
+        &context.specs,
+        &context.separator,
+        context.validate,
+        &context.replacements,
+    )
 }

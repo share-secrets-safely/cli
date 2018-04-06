@@ -17,8 +17,6 @@ mod parse;
 mod dispatch;
 
 use clap::ArgMatches;
-#[cfg(feature = "rest")]
-use tools::{substitute::substitute};
 use cli::CLI;
 
 mod util;
@@ -32,21 +30,9 @@ fn main() {
 
     let res = match matches.subcommand() {
         ("completions", Some(args)) => parse::completions::generate(appc, args),
-        ("extract", Some(args)) => {
-            parse::extract::execute(args)
-        }
+        ("extract", Some(args)) => parse::extract::execute(args),
         ("process", Some(args)) => parse::merge::execute(args),
-        ("substitute", Some(args)) => {
-            let context = ok_or_exit(parse::substitute::context_from(args));
-            substitute(
-                context.engine,
-                &context.data,
-                &context.specs,
-                &context.separator,
-                context.validate,
-                &context.replacements,
-            )
-        }
+        ("substitute", Some(args)) => parse::substitute::execute(args),
         ("vault", Some(args)) => parse::vault::execute(args),
         _ => panic!("Expected clap to prevent this"),
     };

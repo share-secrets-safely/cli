@@ -121,8 +121,11 @@ stand-in capability).
    * [x] hub
    * [x] vault
    * [x] process
-   * [ ] substitute
-   * [ ] extract
+   * [x] substitute
+   * [x] extract
+ * [ ] optimize makefile to reduce unnecessary builds
+   * consider testing testing the specialized binaries to reduce build times.
+     This is particularly important for `sy vault`
  * [ ] Documentation for
    * [ ] substitute
    * [ ] process

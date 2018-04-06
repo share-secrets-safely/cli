@@ -1,11 +1,11 @@
 mod util;
 #[cfg(feature = "vault")]
 pub mod vault;
-#[cfg(feature = "rest")]
+#[cfg(feature = "completions")]
 pub mod completions;
-#[cfg(feature = "rest")]
+#[cfg(feature = "substitute")]
 pub mod substitute;
 #[cfg(feature = "process")]
 pub mod merge;
-#[cfg(feature = "rest")]
+#[cfg(feature = "process")]
 pub mod extract;

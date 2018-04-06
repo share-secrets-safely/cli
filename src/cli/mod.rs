@@ -1,19 +1,19 @@
-#[cfg(any(feature = "vault", feature = "rest"))]
+#[cfg(any(feature = "vault", feature = "completions"))]
 use clap::App;
 
-#[cfg(feature = "rest")]
+#[cfg(feature = "completions")]
 mod completions;
 #[cfg(feature = "vault")]
 pub mod vault;
-#[cfg(feature = "rest")]
-mod substitute;
+#[cfg(feature = "substitute")]
+pub mod substitute;
 #[cfg(feature = "process")]
 pub mod merge;
-#[cfg(feature = "rest")]
-mod extract;
+#[cfg(feature = "process")]
+pub mod extract;
 mod util;
 
-#[cfg(any(feature = "vault", feature = "rest"))]
+#[cfg(any(feature = "vault", feature = "completions"))]
 pub struct CLI<'a, 'b>
 where
     'a: 'b,
@@ -31,7 +31,7 @@ where
     }
 }
 
-#[cfg(all(feature = "rest", feature = "vault"))]
+#[cfg(all(feature = "completions", feature = "vault"))]
 impl<'a, 'b> CLI<'a, 'b>
 where
     'a: 'b,

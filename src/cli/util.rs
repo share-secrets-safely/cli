@@ -1,4 +1,4 @@
-#[cfg(any(feature = "process", feature = "rest"))]
+#[cfg(feature = "process")]
 pub fn output_formats() -> &'static [&'static str] {
     &["json", "yaml"]
 }
