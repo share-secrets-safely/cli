@@ -19,8 +19,8 @@ snapshot="$fixture/snapshots/vault/always-encrypt"
   (with "a vault initialized for a single recipient and an existing secret and custom secrets dir and default trust model"
     { import_user "$fixture/tester.sec.asc"
       mkdir secrets
-      "$exe" vault init --secrets-dir ./secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
-      echo -n secret | "$exe" vault add :secret
+      "$exe" init --secrets-dir ./secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
+      echo -n secret | "$exe" add :secret
     }  &>/dev/null
     
     precondition "the vault configuration is what we expect" && {
@@ -30,7 +30,7 @@ snapshot="$fixture/snapshots/vault/always-encrypt"
     (when "listing the vault content"
       it "looks as expected" && {
         WITH_SNAPSHOT="$snapshot/list-with-relative-secrets-dir" \
-        expect_run $SUCCESSFULLY "$exe" vault
+        expect_run $SUCCESSFULLY "$exe"
       }
     )
 
@@ -39,18 +39,18 @@ snapshot="$fixture/snapshots/vault/always-encrypt"
         (when "trying to decrypt"
           it "fails" && {
             WITH_SNAPSHOT="$snapshot/show-failure-as-unknown-user" \
-            expect_run $WITH_FAILURE "$exe" vault show secret
+            expect_run $WITH_FAILURE "$exe" show secret
           }
         )
         (when "trying to encrypt a new file without a signed tester@example.com key"
           it "succeeds" && {
             echo other-secret | \
             WITH_SNAPSHOT="$snapshot/add-success-as-unknown-user" \
-            expect_run $SUCCESSFULLY "$exe" vault add :new-secret
+            expect_run $SUCCESSFULLY "$exe" add :new-secret
           }
           it "cannot be decrypted by yourself" && {
             WITH_SNAPSHOT="$snapshot/show-fail-for-new-secret-as-unknown-user" \
-            expect_run $WITH_FAILURE "$exe" vault show new-secret
+            expect_run $WITH_FAILURE "$exe" show new-secret
           }
           rm secrets/new-secret.gpg
         )
@@ -66,17 +66,17 @@ title "'vault partitions & recipients -- always encrypt"
     import_user "$fixture/tester.sec.asc"
 
     (with "a vault ready for partitions and a resource"
-      { "$exe" vault init --secrets-dir p1 \
+      { "$exe" init --secrets-dir p1 \
                           --gpg-keys-dir etc/keys \
                           --recipients-file etc/p1
-        echo 1 | "$exe" vault add :one
+        echo 1 | "$exe" add :one
       } &>/dev/bull
 
       (with "a two more partitions"
-        { "$exe" vault partition add --recipients-file etc/p2 --name second p2
-          "$exe" vault partition add --recipients-file etc/p3 --name third p3
-          echo 2 | "$exe" vault add :p2/two
-          echo 3 | "$exe" vault add :p3/three
+        { "$exe" partition add --recipients-file etc/p2 --name second p2
+          "$exe" partition add --recipients-file etc/p3 --name third p3
+          echo 2 | "$exe" add :p2/two
+          echo 3 | "$exe" add :p3/three
         } &>/dev/null
 
         precondition "the vault structure is what we expect" && {
@@ -92,7 +92,7 @@ title "'vault partitions & recipients -- always encrypt"
           (when "adding the other user as recipient choosing the partition explicitly"
             it "succeeds, even though it's the same outcome as when the partition was not chosen" && {
               WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-recipient-init" \
-              expect_run $SUCCESSFULLY "$exe" vault --select p2 recipients init
+              expect_run $SUCCESSFULLY "$exe" --select p2 recipients init
             }
 
             it "adds the public key to the gpg-keys directory" && {
@@ -104,7 +104,7 @@ title "'vault partitions & recipients -- always encrypt"
         (when "adding the new (trusted) user to both partitions by path and by name respectively"
           it "succeeds" && {
             WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-recipient-add-to-multiple" \
-            expect_run $SUCCESSFULLY "$exe" vault recipients add B488BD82 --to p2 --partition third
+            expect_run $SUCCESSFULLY "$exe" recipients add B488BD82 --to p2 --partition third
           }
         )
         
@@ -119,28 +119,28 @@ title "'vault partitions & recipients -- always encrypt"
             it "succeeds" && {
               echo "hi from new one" | \
               WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-add-resource-to-p2" \
-              expect_run $SUCCESSFULLY "$exe" vault add :p2/added-by-new-user
+              expect_run $SUCCESSFULLY "$exe" add :p2/added-by-new-user
             }
           )
           (when "adding a new resource in partition p3"
             it "succeeds" && {
               echo "hi from new one too" | \
               WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-add-resource-to-p3" \
-              expect_run $SUCCESSFULLY "$exe" vault add :p3/added-by-new-user
+              expect_run $SUCCESSFULLY "$exe" add :p3/added-by-new-user
             }
           )
           (when "adding a resource in partition p1 (which is not encrypted for this user)"
             it "succeeds" && {
               echo "another new resource" | \
               WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-add-resource-to-p1" \
-              expect_run $SUCCESSFULLY "$exe" vault add :p1/added-by-new-user
+              expect_run $SUCCESSFULLY "$exe" add :p1/added-by-new-user
             }
           )
 
           (when "removing from a single partitition (p3)"
             it "succeeds" && {
               WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-with-import" \
-              expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --from p3
+              expect_run $SUCCESSFULLY "$exe" recipient remove a@example.com --from p3
             }
             it "writes the configuration correctly, but does not delete its key from the gpg-keys-dir as it's still used in another partition" && {
               expect_snapshot "$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p3-directory" etc
@@ -164,7 +164,7 @@ EDITOR
             export EDITOR="$editor"
             it "succeeds" && {
               WITH_SNAPSHOT="$snapshot/resource-add-from-stdin-with-editor" \
-              expect_run $SUCCESSFULLY "$exe" vault add :p2/with-editor
+              expect_run $SUCCESSFULLY "$exe" add :p2/with-editor
             }
           )
         )
@@ -176,13 +176,13 @@ EDITOR
           (when "adding a new user to a partition we are not a member of"
             it "fails" && {
               WITH_SNAPSHOT="$snapshot/fail-recipient-add-without-prior-import-of-all-users-wrong-partition" \
-              expect_run $WITH_FAILURE "$exe" vault recipients add --verified b@example.com --to p3
+              expect_run $WITH_FAILURE "$exe" recipients add --verified b@example.com --to p3
             }
           )
           (when "adding a new user to a partition we are a member of"
             it "succeeds" && {
               WITH_SNAPSHOT="$snapshot/recipient-add-without-prior-import-of-all-users-right-partition" \
-              expect_run $SUCCESSFULLY "$exe" vault recipients add --verified b@example.com --to p2
+              expect_run $SUCCESSFULLY "$exe" recipients add --verified b@example.com --to p2
             }
           )
         )
@@ -193,7 +193,7 @@ EDITOR
           (when "removing from the last remaining assigned partitition (p2)"
             it "succeeds" && {
               WITH_SNAPSHOT="$snapshot/vault-with-multiple-partitions-new-recipient-removes-themselves-from-p2-with-import" \
-              expect_run $SUCCESSFULLY "$exe" vault recipient remove a@example.com --partition second
+              expect_run $SUCCESSFULLY "$exe" recipient remove a@example.com --partition second
             }
 
             it "writes the configuration correctly, and removes its key" && {
@@ -205,7 +205,7 @@ EDITOR
         (when "listing recipients whose keys are not in our keychain"
           it "works as it imports them on the fly" && {
             WITH_SNAPSHOT="$snapshot/vault-listing-with-missing-key" \
-            expect_run $SUCCESSFULLY "$exe" vault recipient list
+            expect_run $SUCCESSFULLY "$exe" recipient list
           }
         )
       )
@@ -216,6 +216,6 @@ EDITOR
 (with "an invalid trust-model"
   it "fails" && {
     WITH_SNAPSHOT="$snapshot/fail-invalid-trust-model" \
-    expect_run $WITH_FAILURE "$exe" vault init --trust-model=something-new
+    expect_run $WITH_FAILURE "$exe" init --trust-model=something-new
   }
 )

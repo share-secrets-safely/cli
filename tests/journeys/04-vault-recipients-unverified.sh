@@ -18,14 +18,14 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
   title "vault recipients add unverified - multi-recipient-key"
   (with "a key file containing multiple recipients"
     { import_user "$fixture/tester.sec.asc"
-      "$exe" vault init --trust-model=web-of-trust --gpg-keys-dir ./keys --no-auto-import
+      "$exe" init --trust-model=web-of-trust --gpg-keys-dir ./keys --no-auto-import
       cat "$fixture/b.pub.asc" "$fixture/c.pub.asc" > ./keys/7435ACDC03D55429C41637C4DB9831D842C18D28
     } >/dev/null
 
     (when "adding only one recipient from that file"
       it "fails as only one of the keys was specified" && {
         WITH_SNAPSHOT="$snapshot/vault-recipients-add-unverified-failure-with-multi-recipient-keyfile" \
-        expect_run $WITH_FAILURE "$exe" vault recipients add 42C18D28
+        expect_run $WITH_FAILURE "$exe" recipients add 42C18D28
       }
 
       it "does not alter the vault at all" && {
@@ -40,14 +40,14 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
   (with "a vault initialized for a single recipient and an existing secret"
     { import_user "$fixture/tester.sec.asc"
       mkdir secrets
-      "$exe" vault init --secrets-dir secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
-      echo -n secret | "$exe" vault add :secret
+      "$exe" init --secrets-dir secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
+      echo -n secret | "$exe" add :secret
     } &>/dev/null
 
     (with "some invalid fingerprints and a few valid ones"
       it "won't make any change" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-unverified-invalid-fingerprint" \
-        expect_run $WITH_FAILURE "$exe" vault recipient add something-that-is-not-a-fingerprint \
+        expect_run $WITH_FAILURE "$exe" recipient add something-that-is-not-a-fingerprint \
             also-invalid \
             abc \
             abc1f7d1 \
@@ -67,7 +67,7 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
     (when "adding an unknown recipient with a valid fingerprint"
       it "fails" && {
         WITH_SNAPSHOT="$snapshot/vault-recipient-add-valid-fingerprint-key-not-present-in-keys-dir" \
-        expect_run $WITH_FAILURE "$exe" vault recipient add abcabc12
+        expect_run $WITH_FAILURE "$exe" recipient add abcabc12
       }
 
       it "does not alter any files" && {
@@ -80,13 +80,13 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
         precondition "b@example.com did not have the prime members signature yet" && {
           expect_run_sh $WITH_FAILURE "gpg --list-packets $fixture/b.pub.asc | grep -q 'issuer key ID AA5B7BF150F48332'"
         }
-        "$exe" vault recipient init
+        "$exe" recipient init
       ) > /dev/null
 
       (when "adding them as recipient via fingerprint"
         it "succeeds" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
-          expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
+          expect_run $SUCCESSFULLY "$exe" recipient add DB9831D842C18D28
         }
 
         it "signs the new recipient with prime members key and exports the key" && {
@@ -105,7 +105,7 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
       (when "re-adding the new recipient via fingerprint"
         it "succeeds as it finds a signing key non-ambiguously" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-with-fingerprint" \
-          expect_run $SUCCESSFULLY "$exe" vault recipient add DB9831D842C18D28
+          expect_run $SUCCESSFULLY "$exe" recipient add DB9831D842C18D28
         }
 
         it "signs the new recipient with prime members key and exports the key" && {
@@ -120,13 +120,13 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
 
     (with "two usable signing keys"
       ( as_user "$fixture/a.sec.asc"
-        "$exe" vault recipient init a@example.com
+        "$exe" recipient init a@example.com
       ) >/dev/null
 
       (when "adding the new recipient"
         it "succeeds as there still is only one secret key which is also in recipients" && {
           WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint" \
-          expect_run $SUCCESSFULLY "$exe" vault recipient add EF17047AB488BD82
+          expect_run $SUCCESSFULLY "$exe" recipient add EF17047AB488BD82
         }
       )
 
@@ -134,19 +134,19 @@ snapshot="$fixture/snapshots/vault/recipients/unverified"
         (when "not specifying the signing key"
           it "fails the signing key can not be determined unambiguously" && {
             WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint-ambiguously" \
-            expect_run $WITH_FAILURE "$exe" vault recipient add EF17047AB488BD82
+            expect_run $WITH_FAILURE "$exe" recipient add EF17047AB488BD82
           }
         )
         (when "specifying an invalid signing key"
           it "succeeds" && {
             WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint-invalid-signing-key" \
-            expect_run $WITH_FAILURE "$exe" vault recipient add --signing-key foo@example.com EF17047AB488BD82
+            expect_run $WITH_FAILURE "$exe" recipient add --signing-key foo@example.com EF17047AB488BD82
           }
         )
         (when "specifying the correct signing key"
           it "succeeds" && {
             WITH_SNAPSHOT="$snapshot/vault-recipient-add-untrusted-user-a-with-fingerprint-valid-signing-key" \
-            expect_run $SUCCESSFULLY "$exe" vault recipient add --signing-key tester@example.com EF17047AB488BD82
+            expect_run $SUCCESSFULLY "$exe" recipient add --signing-key tester@example.com EF17047AB488BD82
           }
         )
       )

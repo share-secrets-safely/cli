@@ -3,6 +3,6 @@ error: 'something-new' isn't a valid value for '--trust-model <model>'
 
 
 USAGE:
-    sy vault --config-file <path> init --gpg-keys-dir <directory> --recipients-file <path> --secrets-dir <path> --trust-model <model>
+    syv --config-file <path> init --gpg-keys-dir <directory> --recipients-file <path> --secrets-dir <path> --trust-model <model>
 
 For more information try --help

@@ -123,16 +123,16 @@ stand-in capability).
    * [x] process
    * [x] substitute
    * [x] extract
- * [ ] optimize makefile to reduce unnecessary builds
+ * [x] optimize makefile to reduce unnecessary builds
    * consider testing the specialized binaries to reduce build times.
      This is particularly important for `sy vault`
  * [ ] Documentation for
    * [ ] substitute
    * [ ] process
    * [ ] extract
- * [ ] build all binaries in release mode on
+ * [x] build all binaries in release mode on
    * [x] host
-   * [ ] linux musl
+   * [x] linux musl
 
 #### Non-Functional: Move to Organization
 

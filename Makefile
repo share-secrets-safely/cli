@@ -4,6 +4,7 @@ DOCS_IMAGE=sheesy_docs:latest
 RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
 RELEASE_EXE=target/release/sy
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/sy
+SYV_MUSL_EXE=target/x86_64-unknown-linux-musl/debug/syv
 MUSL_IMAGE=clux/muslrust:stable
 MY_MUSL_IMAGE=sheesy_musl:stable
 MY_LINUX_RUN_IMAGE=alpine_with_gpg2:stable
@@ -80,6 +81,8 @@ all-release-host-binaries: always
 	cargo build --release --bin=sys --features=substitute
 	
 $(MUSL_EXE): build-linux-musl
+	
+$(SYV_MUSL_EXE): build-linux-musl-syv
 
 $(RELEASE_MUSL_EXE): release-linux-musl
 
@@ -110,7 +113,7 @@ update-homebrew:
 tag-release: bin/tag-release.sh release.md VERSION
 	bin/tag-release.sh $$(cat VERSION) release.md
 
-stateful-journey-tests: $(MUSL_EXE) build-linux-run-image
+stateful-journey-tests: $(SYV_MUSL_EXE) build-linux-run-image
 	tests/stateful-journey-test.sh $< $(MY_LINUX_RUN_IMAGE)
 
 stateless-journey-tests: $(EXE)
@@ -131,6 +134,9 @@ build-musl-image:
 build-linux-musl: build-musl-image
 	$(MUSL_DOCKER_ARGS) cargo build --bin=sy --all-features --target=x86_64-unknown-linux-musl
 
+build-linux-musl-syv: build-musl-image
+	$(MUSL_DOCKER_ARGS) cargo build --bin=syv --features=vault --target=x86_64-unknown-linux-musl
+	
 release-linux-musl: build-musl-image
 	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" --rm $(MY_MUSL_IMAGE) cargo build --bin=sy --all-features --target=x86_64-unknown-linux-musl --release
 

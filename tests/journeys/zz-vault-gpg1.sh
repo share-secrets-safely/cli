@@ -18,19 +18,19 @@ snapshot="$fixture/snapshots/vault/init-with-gpg1"
   (with "a vault initialized for a single recipient and an existing secret"
     { import_user "$fixture/tester.sec.asc"
       mkdir secrets
-      "$exe" vault init --secrets-dir secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
-      echo -n secret | "$exe" vault add :secret
+      "$exe" init --secrets-dir secrets --gpg-keys-dir ./etc/keys --recipients-file ./etc/recipients
+      echo -n secret | "$exe" add :secret
     } &>/dev/null
 
     (with "an untrusted user requesting membership"
       (as_user "$fixture/b.sec.asc"
-        "$exe" vault recipient init
+        "$exe" recipient init
       ) > /dev/null
 
       (when "adding them as recipient via fingerprint"
         it "fails with an error message indicating the GPG version doesn't support signing" && {
           WITH_SNAPSHOT="$snapshot/gpg1-vault-recipient-add-untrusted-user-with-fingerprint" \
-          expect_run $WITH_FAILURE "$exe" vault recipient add DB9831D842C18D28
+          expect_run $WITH_FAILURE "$exe" recipient add DB9831D842C18D28
         }
 
         it "does not alter the meta-data structure" && {

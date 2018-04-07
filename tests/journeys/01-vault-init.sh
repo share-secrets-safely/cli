@@ -19,7 +19,7 @@ title "'vault init'"
 (with "no available gpg key and no key"
     it "fails as it cannot identify the user" && \
       WITH_SNAPSHOT="$snapshot/init-failure-no-secret-key" \
-      expect_run $WITH_FAILURE "$exe" vault init
+      expect_run $WITH_FAILURE "$exe" init
 )
 
 (sandboxed
@@ -29,7 +29,7 @@ title "'vault init'"
     gpg --import "$fixture/tester.sec.asc" &>/dev/null
     it "succeeds as the key is not ambiguous" && {
       WITH_SNAPSHOT="$snapshot/successful-init" \
-      expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --no-auto-import
+      expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --no-auto-import
     }
     it "creates a valid vault configuration file, \
         exports the public portion of the key to the correct spot and \
@@ -41,21 +41,21 @@ title "'vault init'"
   (with "an existing vault configuration file"
     it "fails as it cannot possibly overwrite anything" && {
       WITH_SNAPSHOT="$snapshot/init-will-not-overwrite-vault-config" \
-      expect_run $WITH_FAILURE "$exe" vault init
+      expect_run $WITH_FAILURE "$exe" init
     }
   )
 
   (with "an existing gpg-keys directory"
     it "fails as it cannot possibly overwrite anything" && {
       WITH_SNAPSHOT="$snapshot/init-will-not-write-into-existing-nonempty-directory" \
-      expect_run $WITH_FAILURE "$exe" vault -c a-different-file.yml init
+      expect_run $WITH_FAILURE "$exe" -c a-different-file.yml init
     }
   )
 
   (with "an existing recipients file"
     it "fails as it cannot possibly overwrite anything" && {
       WITH_SNAPSHOT="$snapshot/init-will-overwrite-recipients-file" \
-      expect_run $WITH_FAILURE "$exe" vault -c a-different-file-too.yml init -k some-nonexisting-directory
+      expect_run $WITH_FAILURE "$exe" -c a-different-file-too.yml init -k some-nonexisting-directory
     }
   )
 )
@@ -73,7 +73,7 @@ title "'vault init'"
         it "succeeds" && {
           echo hi | \
           WITH_SNAPSHOT="$snapshot/add-without-vault-description" \
-          expect_run $SUCCESSFULLY "$exe" vault add :resource
+          expect_run $SUCCESSFULLY "$exe" add :resource
         }
 
         it "creates the encrypted resource file" && {
@@ -92,7 +92,7 @@ title "'vault init'"
           it "succeeds" && {
             echo hi | \
             WITH_SNAPSHOT="$snapshot/add-without-vault-description" \
-            expect_run $SUCCESSFULLY "$exe" vault --config-file "$DIR/non-existing.yml" add :resource
+            expect_run $SUCCESSFULLY "$exe" --config-file "$DIR/non-existing.yml" add :resource
           }
 
           it "creates the encrypted resource file" && {
@@ -114,7 +114,7 @@ title "'vault init'"
       (with "no explicit recipients file"
         in-space one
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --secrets-dir secrets --no-auto-import
+          expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --secrets-dir secrets --no-auto-import
         }
 
         it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
@@ -125,7 +125,7 @@ title "'vault init'"
       (with "an explicit recipients file name"
         in-space two
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --secrets-dir ./secrets --recipients-file recipients --no-auto-import
+          expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --secrets-dir ./secrets --recipients-file recipients --no-auto-import
         }
 
         it "creates the recipients file within the secrets dir to be more suitable for partitions" && {
@@ -136,7 +136,7 @@ title "'vault init'"
       (with "an explicit recipients path"
         in-space three
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --secrets-dir ./secrets --recipients-file ./recipients --no-auto-import
+          expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --secrets-dir ./secrets --recipients-file ./recipients --no-auto-import
         }
 
         it "creates the recipients file at that path" && {
@@ -150,7 +150,7 @@ title "'vault init'"
         in-space four
         it "fails as it is missing the secrets dir override" && {
           WITH_SNAPSHOT="$snapshot/init-first-partition-no-secrets-dir" \
-          expect_run $WITH_FAILURE "$exe" vault init --first-partition
+          expect_run $WITH_FAILURE "$exe" init --first-partition
         }
       )
 
@@ -158,14 +158,14 @@ title "'vault init'"
         in-space five
         it "fails as it should not be the current dir" && {
           WITH_SNAPSHOT="$snapshot/init-first-partition-invalid-secrets-dir-dot" \
-          expect_run $WITH_FAILURE "$exe" vault init --first-partition --secrets-dir .
+          expect_run $WITH_FAILURE "$exe" init --first-partition --secrets-dir .
         }
       )
 
       (with "a valid secrets dir"
         in-space seven
         it "succeeds" && {
-          expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --first-partition --secrets-dir sec --no-auto-import
+          expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --first-partition --secrets-dir sec --no-auto-import
         }
 
         it "creates the correct vault structure" && {
@@ -187,7 +187,7 @@ title "'vault init'"
     (with "a specified --secrets-dir location and relative directories for keys and recipients"
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/init-with-at-argument" \
-        expect_run $SUCCESSFULLY "$exe" vault \
+        expect_run $SUCCESSFULLY "$exe" \
           -c $vault_dir/vault.yml \
           init --trust-model=web-of-trust --name customized --secrets-dir secrets -k ./etc/keys -r ./etc/recipients --no-auto-import
       }
@@ -200,7 +200,7 @@ title "'vault init'"
     (when "adding a secret"
       mkdir -p $vault_dir/secrets
       it "succeeds" && {
-        echo hi | expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml add :secret
+        echo hi | expect_run $SUCCESSFULLY "$exe" -c $vault_dir/vault.yml add :secret
       }
 
       it "puts the file to the right spot" && {
@@ -209,7 +209,7 @@ title "'vault init'"
 
       it "lists the content as expected" && {
         WITH_SNAPSHOT="$snapshot/list-changed-secrets-location" \
-        expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml list
+        expect_run $SUCCESSFULLY "$exe" -c $vault_dir/vault.yml list
       }
     )
 
@@ -217,7 +217,7 @@ title "'vault init'"
       it "succeeds" && {
         echo with-sub-dirs | \
         WITH_SNAPSHOT="$snapshot/add-with-subdirectory" \
-        expect_run $SUCCESSFULLY "$exe" vault -c $vault_dir/vault.yml add :partition/subdir/secret
+        expect_run $SUCCESSFULLY "$exe" -c $vault_dir/vault.yml add :partition/subdir/secret
       }
 
       it "creates the encrypted secret file in the correct location" && {
@@ -237,7 +237,7 @@ title "'vault init'"
 
   (with "a an absolute vault directory (and a custom name)"
     it "succeeds" && {
-      expect_run $SUCCESSFULLY "$exe" vault --config-file "$vault_dir/vault.yml" \
+      expect_run $SUCCESSFULLY "$exe" --config-file "$vault_dir/vault.yml" \
         init --trust-model=web-of-trust -n custom-name --gpg-keys-dir keys --recipients-file recipients --no-auto-import
     }
     it "creates the correct folder structure" && {
@@ -255,7 +255,7 @@ EDITOR
       it "succeeds" && {
         WITH_SNAPSHOT="$snapshot/edit-with-absolute-vault-directory" \
         EDITOR="$editor" \
-        expect_run $SUCCESSFULLY "$exe" vault -c "$vault_dir/vault.yml" \
+        expect_run $SUCCESSFULLY "$exe" -c "$vault_dir/vault.yml" \
           edit new-resource
       }
       it "creates an the newly edited encrypted file" && {
@@ -268,13 +268,13 @@ EDITOR
         it "does not add resources which walk to the parent directory" && {
           WITH_SNAPSHOT="$snapshot/resource-add-relative-dir-failure" \
           expect_run $WITH_FAILURE "$exe" \
-            vault -c vault.yml add ../content
+            -c vault.yml add ../content
         }
 
         it "does add resource which walk to the parent directory if destination is specified" && {
           WITH_SNAPSHOT="$snapshot/resource-add-relative-dir-success" \
           expect_run $SUCCESSFULLY "$exe" \
-            vault -c vault.yml add ../content:content
+            -c vault.yml add ../content:content
         }
 
         it "creates an the encrypted file" && {
@@ -292,12 +292,12 @@ EDITOR
   (with "a gpg key signed by others"
     it "fails as it can't decide which gpg key to export" && {
       WITH_SNAPSHOT="$snapshot/init-with-multiple-viable-keys" \
-      expect_run $WITH_FAILURE "$exe" vault init
+      expect_run $WITH_FAILURE "$exe" init
     }
     (with "a selected gpg key and a vault name"
       it "succeeds as it just follow instructions" && {
         WITH_SNAPSHOT="$snapshot/init-with-key-specified-explicitly" \
-        expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --name vault-name --gpg-key-id c@example.com --no-auto-import
+        expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --name vault-name --gpg-key-id c@example.com --no-auto-import
       }
 
       it "creates a valid vault configuration file, \
@@ -308,7 +308,7 @@ EDITOR
 
       it "uses the vault name when showing its contents" && {
         WITH_SNAPSHOT="$snapshot/list-with-name" \
-        expect_run $SUCCESSFULLY "$exe" vault list
+        expect_run $SUCCESSFULLY "$exe" list
       }
     )
   )
@@ -322,7 +322,7 @@ EDITOR
   (with "multiple selected gpg keys"
     it "succeeds as it just follow instructions" && {
       WITH_SNAPSHOT="$snapshot/init-with-multiple-specified-keys" \
-      expect_run $SUCCESSFULLY "$exe" vault init --trust-model=web-of-trust --gpg-key-id c@example.com --gpg-key-id tester@example.com --no-auto-import
+      expect_run $SUCCESSFULLY "$exe" init --trust-model=web-of-trust --gpg-key-id c@example.com --gpg-key-id tester@example.com --no-auto-import
     }
 
     it "creates the expected folder structure" && {

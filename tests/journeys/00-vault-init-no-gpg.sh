@@ -19,7 +19,7 @@ title "'vault init' - without GPG"
 (with "no GPG installation"
     it "fails and provides helpful notes" && {
       WITH_SNAPSHOT="$snapshot/init-no-gpg" \
-      expect_run $WITH_FAILURE "$exe" vault init
+      expect_run $WITH_FAILURE "$exe" init
     }
 )
 
@@ -30,7 +30,7 @@ title "'vault init' - without GPG"
     (when "adding a new secret"
       it "fails and provides helpful notes" && {
         WITH_SNAPSHOT="$snapshot/add-empty-recipients" \
-        expect_run $WITH_FAILURE "$exe" vault add some:secret
+        expect_run $WITH_FAILURE "$exe" add some:secret
       }
     )
   )
@@ -40,7 +40,7 @@ title "'vault init' - without GPG"
     (when "adding a new secret"
       it "fails and provides helpful notes" && {
         WITH_SNAPSHOT="$snapshot/add-no-gpg" \
-        expect_run $WITH_FAILURE "$exe" vault add some:secret
+        expect_run $WITH_FAILURE "$exe" add some:secret
       }
     )
   )
@@ -50,7 +50,7 @@ title "'vault init' - without GPG"
     (when "showing the secret"
       it "fails and provides helpful notes" && {
         WITH_SNAPSHOT="$snapshot/show-no-gpg" \
-        expect_run $WITH_FAILURE "$exe" vault show secret
+        expect_run $WITH_FAILURE "$exe" show secret
       }
     )
   )
