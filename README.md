@@ -89,65 +89,12 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 4.0
+### Roadmap to 4.1
+ 
+#### Git-based installation
 
-#### Switch to Liquid templating engine
-
-When looking at helm it becomes evident how much more filters would be needed to effectively
-adjust yaml files.
-
-Handlebars was a nice try, yet it only shows that filters are what makes a language powerful.
-Fortunately it's still time to change, so let's swap handlebars with [liquid][liquid].
-
- * [x] add liquid
- * [x] add handlebars
- * [x] add base64 filter to _liquid_
- * [ ] differentiate both in docs
-
-[liquid]: https://shopify.github.io/liquid/
-
-#### Sub-Commands as standalone programs
-
-Even though the main binary should by `sy` as before, the code should be structured to
-provide `cli` versions of the respective subcommand, e.g. `vault-cli`.
-That way, people can also use special-purpose sub-programs directly without having
-a binary that contains all the other cruft.
-
-This can be useful to make `pass` standins more approachable, and also build custom
-`sy` binaries with just a sub-set of the functionality (for example, without `pass`
-stand-in capability).
-
- * [x] binary for sheesy-
-   * [x] hub
-   * [x] vault
-   * [x] process
-   * [x] substitute
-   * [x] extract
- * [x] optimize makefile to reduce unnecessary builds
-   * consider testing the specialized binaries to reduce build times.
-     This is particularly important for `sy vault`
- * [ ] Documentation for
-   * [ ] substitute
-   * [ ] process
-   * [ ] extract
- * [x] build all binaries in release mode on
-   * [x] host
-   * [x] linux musl
-
-#### Non-Functional: Move to Organization
-
-In order to get the project where it is supposed to be, it can't be in my
-user's space. We will have multiple repositories and hopefully some more contributors.
-
-The new organization should have the following repositories:
-
- * [x] **CLI** - the 'sheesy' command-line interface
- * [x] **Update travis secrets** - needs to reencrypt (new) token thanks to new name
- * [ ] **make new release** - fixes all URLs on crates.io and for brew
  * [ ] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
    * It should be standalone and pull binaries as it needs them.
-
-### Roadmap to 4.1
 
 #### Add the `pass` subcommand
 
@@ -158,6 +105,13 @@ stand-in for pass.
 
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
+
+#### More documentation
+ * [ ] Documentation for
+   * [ ] substitute
+   * [ ] process
+   * [ ] extract
+   * [ ] pass
 
 #### Some usability improvements
 

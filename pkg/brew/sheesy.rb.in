@@ -15,5 +15,9 @@ class Sheesy < Formula
 
   def install
     bin.install "sy"
+    bin.install "sye"
+    bin.install "syv"
+    bin.install "syp"
+    bin.install "sys"
   end
 end
