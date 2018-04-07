@@ -117,14 +117,14 @@ This can be useful to make `pass` standins more approachable, and also build cus
 `sy` binaries with just a sub-set of the functionality (for example, without `pass`
 stand-in capability).
 
- * [ ] binary for sheesy-
+ * [x] binary for sheesy-
    * [x] hub
    * [x] vault
    * [x] process
    * [x] substitute
    * [x] extract
  * [ ] optimize makefile to reduce unnecessary builds
-   * consider testing testing the specialized binaries to reduce build times.
+   * consider testing the specialized binaries to reduce build times.
      This is particularly important for `sy vault`
  * [ ] Documentation for
    * [ ] substitute

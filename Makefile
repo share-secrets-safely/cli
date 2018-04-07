@@ -1,8 +1,8 @@
 SHELL=/bin/bash
 EXE=target/debug/sy
 DOCS_IMAGE=sheesy_docs:latest
-RELEASE_EXE=target/release/sy
 RELEASE_MUSL_EXE=target/x86_64-unknown-linux-musl/release/sy
+RELEASE_EXE=target/release/sy
 MUSL_EXE=target/x86_64-unknown-linux-musl/debug/sy
 MUSL_IMAGE=clux/muslrust:stable
 MY_MUSL_IMAGE=sheesy_musl:stable
@@ -15,6 +15,8 @@ LINUX_DEPLOYABLE=sy-cli-Linux-x86_64.tar.gz
 DOCKER_DOCS_ARGS_NO_CMD=$(DOCKER_ARGS) -e EXE_PATH=$(MUSL_EXE) -w /volume $(DOCS_IMAGE)
 DOCKER_DOCS_ARGS=$(DOCKER_DOCS_ARGS_NO_CMD) termbook build ./doc
 CAST=getting-started.cast
+MUSL_RELEASE_ARGS=--release --target=x86_64-unknown-linux-musl
+ROOT=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
 help:
 	$(info Available Targets)
@@ -69,33 +71,36 @@ asciinema-upload: build-docs-image $(MUSL_EXE) $(CAST)
 
 $(EXE): always
 	cargo build --bin=sy --all-features
-	cargo build --bin=syv --features=vault
-	cargo build --bin=syp --features=process
-	cargo build --bin=sye --features=extract
-	cargo build --bin=sys --features=substitute
 
-$(RELEASE_EXE): always
+all-release-host-binaries: always
 	cargo build --release --bin=sy --all-features
 	cargo build --release --bin=syv --features=vault
 	cargo build --release --bin=syp --features=process
 	cargo build --release --bin=sye --features=extract
 	cargo build --release --bin=sys --features=substitute
-
+	
 $(MUSL_EXE): build-linux-musl
 
 $(RELEASE_MUSL_EXE): release-linux-musl
 
-$(LINUX_DEPLOYABLE): $(RELEASE_MUSL_EXE)
-	$(MUSL_DOCKER_ARGS) strip --strip-all $<
-	gpg --yes --output $<.gpg --detach-sig $<
-	tar czf $@ -C $(dir $<) $(notdir $<) $(notdir $<).gpg
-
+$(LINUX_DEPLOYABLE): build-musl-image
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" \
+					--rm $(MY_MUSL_IMAGE) \
+					/bin/bash -c \
+					'cargo build --bin=sy --all-features $(MUSL_RELEASE_ARGS) && \
+					cargo build --bin=syv --features=vault $(MUSL_RELEASE_ARGS) && \
+					cargo build --bin=syp --features=process $(MUSL_RELEASE_ARGS) && \
+					cargo build --bin=sye --features=extract $(MUSL_RELEASE_ARGS) && \
+					cargo build --bin=sys --features=substitute $(MUSL_RELEASE_ARGS) && \
+					(cd "$(dir $(RELEASE_MUSL_EXE))" && \
+					 strip --strip-all `../../../bin/find-executables.sh .`)'
+	bin/package.sh "$(dir $(RELEASE_MUSL_EXE))" "$@"
+					
 deployable-linux: $(LINUX_DEPLOYABLE)
 
-$(HOST_DEPLOYABLE): $(RELEASE_EXE)
-	strip $<
-	gpg --yes --output $<.gpg --detach-sig $<
-	tar czf $@ -C $(dir $<) $(notdir $<) $(notdir $<).gpg
+$(HOST_DEPLOYABLE): all-release-host-binaries
+	(cd "$(dir $(RELEASE_EXE))" && strip `$(ROOT)/bin/find-executables.sh .`)
+	bin/package.sh "$(dir $(RELEASE_EXE))" "$@"
 
 deployable-host: $(HOST_DEPLOYABLE)
 
