@@ -31,7 +31,7 @@ However, it allows you to use _partials_, which are good to model something like
 
 For example, in an invocation like this you can declare headers and footers without rendering them, and then output multiple pages that use it.
 
-```bash,use=sy,exec
+```bash,
 sy substitute -d ./data.json ./header.tpl:/dev/null ./footer.tpl:/dev/null page-1.tpl:page1.html page-2.tpl:page2.html
 ```
 
@@ -39,7 +39,7 @@ sy substitute -d ./data.json ./header.tpl:/dev/null ./footer.tpl:/dev/null page-
 
 The perceived disadvantage of having close to zero available filters would have to be compensated using a processing program which takes the data, and adds all the variations that you would need in your templates:
 
-```bash,use=sy,exec
+```bash
 data-processor < data.json | sy substitute template.tpl
 ```
 
@@ -52,7 +52,7 @@ You have probably seen this coming from a mile away, but this is a great opportu
 `sy merge` allows to merge multiple files together to become one, and even some additional processing to it.
 That way you can use the combined data as model during template substitution.
 
-```bash,use=sy,exec
+```bash
 sy merge ./etc/ext/team.yml ./etc/project.yml —at=environment -e | sy substitute template.tpl
 ```
 
