@@ -88,9 +88,6 @@ pub fn substitute(
             }
         };
 
-        let mut istream = spec.src.open_as_input()?;
-        ibuf.clear();
-        istream.read_to_string(&mut ibuf)?;
 
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
@@ -98,10 +95,13 @@ pub fn substitute(
         }
 
         {
+            let mut istream = spec.src.open_as_input()?;
             let ostream_for_template: &mut io::Write = if try_deserialize { &mut buf } else { &mut ostream };
 
             match engine {
                 EngineChoice::Liquid(ref liquid, ref dataset) => {
+                    ibuf.clear();
+                    istream.read_to_string(&mut ibuf)?;
                     let tpl = liquid.parse(&ibuf).map_err(|err| {
                         format_err!("{}", err)
                             .context(format!("Failed to parse liquid template at '{}'", spec.src.name()))
