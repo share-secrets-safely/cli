@@ -93,7 +93,7 @@ to settle from 5.0.
  
 #### Git-based installation
 
- * [ ] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
+ * [x] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
    * It should be standalone and pull binaries as it needs them.
 
 #### Add the `pass` subcommand

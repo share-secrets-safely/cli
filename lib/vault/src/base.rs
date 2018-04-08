@@ -264,6 +264,7 @@ impl Vault {
     }
 
     pub fn print_resources(&self, w: &mut Write) -> Result<(), Error> {
+        let has_multiple_partitions = !self.partitions.is_empty();
         for partition in once(self).chain(self.partitions.iter()) {
             writeln!(w, "{}", partition.url())?;
             let dir = partition.secrets_path();
@@ -272,7 +273,11 @@ impl Vault {
             }
             let _change_cwd = ResetCWD::new(&dir)?;
             for entry in glob(GPG_GLOB).expect("valid pattern").filter_map(Result::ok) {
-                writeln!(w, "{}", strip_ext(&entry).display())?;
+                if has_multiple_partitions {
+                    writeln!(w, "{}", dir.join(strip_ext(&entry)).display())?;
+                } else {
+                    writeln!(w, "{}", strip_ext(&entry).display())?;
+                }
             }
         }
         Ok(())
