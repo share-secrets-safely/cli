@@ -8,7 +8,7 @@ adjust yaml files.
 Handlebars was a nice try, yet it only shows that filters are what makes a language powerful.
 Fortunately it's still time to change, so let's swap handlebars with [liquid][liquid].
 
- * [x] add liquid
+ * [x] add liquid 
  * [x] add handlebars
  * [x] add base64 filter to _liquid_
 
@@ -31,12 +31,6 @@ stand-in capability).
    * [x] process
    * [x] substitute
    * [x] extract
- * [x] optimize makefile to reduce unnecessary builds
-   * consider testing the specialized binaries to reduce build times.
-     This is particularly important for `sy vault`
- * [x] build all binaries in release mode on
-   * [x] host
-   * [x] linux musl
 
 #### Non-Functional: Move to Organization
 
@@ -46,7 +40,6 @@ user's space. We will have multiple repositories and hopefully some more contrib
 The new organization should have the following repositories:
 
  * [x] **CLI** - the 'sheesy' command-line interface
- * [x] **Update travis secrets** - needs to reencrypt (new) token thanks to new name
  
 ### V3.3: Value extraction and basic trust controls
 

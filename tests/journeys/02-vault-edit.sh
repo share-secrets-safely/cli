@@ -15,6 +15,41 @@ fixture="$root/fixtures"
 snapshot="$fixture/snapshots/vault/edit"
 (sandboxed
   title "'vault add'"
+  (with "a vault initialized for a single recipient and a custom secrets directory"
+    {
+      import_user "$fixture/tester.sec.asc"
+      "$exe" init --trust-model=web-of-trust --no-auto-import --secrets-dir secrets
+    } &> /dev/null
+  )
+  
+  (when "editing an yet-to-be-created resource"
+    editor="$PWD/my-add-editor.sh"
+    (
+      cat <<'EDITOR' > "$editor"
+#!/bin/bash -e
+file_to_edit=${1:?}
+echo "vault add from editor" > $file_to_edit
+EDITOR
+      chmod +x "$editor"
+    )
+    
+    it "succeeds" && {
+      EDITOR=$editor \
+      WITH_SNAPSHOT="$snapshot/edit-new-resource-with-changed-secrets-dir" \
+      expect_run $SUCCESSFULLY "$exe" edit new-resource
+    }
+    it "creates the resource within the secrets dir" && {
+      expect_exists secrets/new-resource.gpg
+    }
+    
+    it "has creates a file with the correct contents" && {
+      WITH_SNAPSHOT="$snapshot/show-new-resource-with-changed-secrets-dir" \
+      expect_run $SUCCESSFULLY "$exe" show new-resource
+    }
+  )
+)
+(sandboxed
+  title "'vault add'"
   (with "a vault initialized for a single recipient"
     {
       import_user "$fixture/tester.sec.asc"
@@ -138,7 +173,7 @@ EDITOR
         expect_run $WITH_FAILURE test -f "$(cat /tmp/filepath-with-decrypted-content)"
       }
     )
-    (when "editing an unknown resource"
+    (when "editing an unknown resource with --no-create set"
       it "fails" && {
         WITH_SNAPSHOT="$snapshot/unknown-resource-edit" \
         expect_run $WITH_FAILURE "$exe" edit --no-create some-unknown-resource

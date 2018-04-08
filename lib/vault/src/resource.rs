@@ -48,12 +48,15 @@ impl Vault {
             self.decrypt(path, &mut decrypted_writer)
                 .context(format!("Failed to decrypt file at '{}'.", path.display()))
                 .or_else(|err| match (mode, err.first_cause_of::<io::Error>()) {
-                    (&CreateMode::Create, Some(_)) => gpg_output_filename(path).map(|p| self.absolute_path(&p)),
+                    (&CreateMode::Create, Some(_)) => gpg_output_filename(path).and_then(|p| {
+                        self.partition_by_owned_path(p.clone())
+                            .map(|(partition, path)| partition.secrets_path().join(&path))
+                    }),
                     _ => Err(err.into()),
                 })?
         };
         if try_encrypt {
-            let (partition, _) = self.partition_by_owned_path(tempfile_path.clone())?;
+            let (partition, _) = self.partition_by_owned_path(decrypted_file_path.clone())?;
             self.encrypt_buffer(
                 b"",
                 self.gpg_keys_dir_for_auto_import(partition)
