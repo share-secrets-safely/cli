@@ -6,7 +6,7 @@ use yaml_rust;
 use yaml_rust::YamlEmitter;
 use treediff::{diff, tools};
 use super::types::NeverDrop;
-use merge::types::State;
+use process::types::State;
 
 pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R, state: &State) -> Result<json::Value, Error> {
     let mut buf = String::new();

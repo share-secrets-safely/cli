@@ -2,7 +2,7 @@ use atty;
 use glob;
 use failure::Error;
 use clap::ArgMatches;
-use tools::merge::{reduce, Command, MergeMode, OutputMode};
+use tools::process::{reduce, Command, MergeMode, OutputMode};
 use parse::util::optional_args_with_value;
 
 use std::path::PathBuf;

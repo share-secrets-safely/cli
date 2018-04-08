@@ -89,7 +89,7 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 4.1
+### Roadmap to 5.0
  
 #### Git-based installation
 
@@ -121,7 +121,7 @@ well as its behaviour.
    * [ ] recipients
    * [ ] resources
 
-### Roadmap to 4.2
+### Roadmap to 5.1
 
 #### Bootstrap-library for common usage scenarios
 
@@ -129,7 +129,7 @@ Ideally it's easy to get started not only when cloning the `getting-started` rep
 but to make it all yours with templates to get something deployed with secrets
 to _kubernetes_ for example.
 
-### Roadmap to 5.0
+### Roadmap to 6.0
 #### Web of Trust for everyone
 
 The web-of-trust is powerful if used correctly, and helps to assure you are encrypting

@@ -23,4 +23,4 @@ extern crate yaml_rust;
 #[cfg(feature = "substitute")]
 pub mod substitute;
 #[cfg(feature = "process")]
-pub mod merge;
+pub mod process;
