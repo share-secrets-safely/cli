@@ -1,4 +1,6 @@
-
+```bash,prepare=in-fixtures,hide
+cd doc/src/tools/fixtures/substitute
+```
 ```bash,use=sy-in-path,exec
 sy substitute --help
 ```
@@ -31,16 +33,35 @@ However, it allows you to use _partials_, which are good to model something like
 
 For example, in an invocation like this you can declare headers and footers without rendering them, and then output multiple pages that use it.
 
-```bash,
-sy substitute -d ./data.json ./header.tpl:/dev/null ./footer.tpl:/dev/null page-1.tpl:page1.html page-2.tpl:page2.html
+_Here is the content of the files used_:
+
+```bash,use=in-fixtures,exec
+cat ./data.json
 ```
 
-**TODO** actual executable example showing the partial, and to documentation
+```bash,use=in-fixtures,exec
+cat ./base0.hbs
+```
+
+```bash,use=in-fixtures,exec
+cat ./template.hbs
+```
+
+When using these in substitution, this is the output:
+```bash,use=in-fixtures,use=sy-in-path,exec
+sy substitute --engine=handlebars -d ./data.json ./base0.hbs:/dev/null ./template.hbs
+```
 
 The perceived disadvantage of having close to zero available filters would have to be compensated using a processing program which takes the data, and adds all the variations that you would need in your templates:
 
-```bash
-data-processor < data.json | sy substitute template.tpl
+```bash,use=in-fixtures,use=sy-in-path,exec
+./data-processor < ./data.json | sy substitute ./template.tpl
+```
+
+The `data-processor` in the example just adds transformed values for all fields it sees:
+
+```bash,use=in-fixtures,use=sy-in-path,exec
+./data-processor < ./data.json
 ```
 
 [hbs]: http://handlebarsjs.com
@@ -52,8 +73,9 @@ You have probably seen this coming from a mile away, but this is a great opportu
 `sy merge` allows to merge multiple files together to become one, and even some additional processing to it.
 That way you can use the combined data as model during template substitution.
 
-```bash
-sy merge ./etc/ext/team.yml ./etc/project.yml —at=environment -e | sy substitute template.tpl
+# TODO figure out why stdin is required here, and improve the '--at' ordering
+```bash,use=in-fixtures,use=sy-in-path,exec
+cat ./team.yml | sy merge --at=team --at=project ./project.yml --at=env --environment 
 ```
 
 ### Tips and Tricks (WIP)
