@@ -1,14 +1,6 @@
 #!/bin/bash
 
-title "sy itself"
-
 snapshot="$fixture/snapshots/vault/stateless"
-(when "asking for the version"
-  it "works (and does not print unnecessary newlines)" && {
-    WITH_SNAPSHOT="$snapshot/version-info" \
-    expect_run $SUCCESSFULLY "$exe" --version
-  }
-)
 
 title "'vault' subcommand"
 (with "a minimal vault configuration file"
