@@ -21,7 +21,7 @@ fn main() {
     let cli = cli::vault::new()
         .version(crate_version!())
         .author(crate_authors!())
-        .name(crate_name!());
+        .name("syv");
     let matches: ArgMatches = cli.get_matches();
     ok_or_exit(parse::vault::execute(&matches))
 }

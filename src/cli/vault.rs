@@ -347,6 +347,8 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         .subcommand(remove_partition);
 
     App::new("vault")
+        .version(crate_version!())
+        .author(crate_authors!())
         .setting(AppSettings::VersionlessSubcommands)
         .setting(AppSettings::DeriveDisplayOrder)
         .about("Various commands to store and retrieve secrets and control who has access.")

@@ -1,8 +1,16 @@
 #!/bin/bash
 
-title "'vault' subcommand"
-snapshot="$fixture/snapshots/vault/stateless"
+title "sy itself"
 
+snapshot="$fixture/snapshots/vault/stateless"
+(when "asking for the version"
+  it "works (and does not print unnecessary newlines)" && {
+    WITH_SNAPSHOT="$snapshot/version-info" \
+    expect_run $SUCCESSFULLY "$exe" --version
+  }
+)
+
+title "'vault' subcommand"
 (with "a minimal vault configuration file"
   it "succeeds even if there is no further argument" && \
       echo 'secrets: .' | expect_run $SUCCESSFULLY "$exe" vault -c -
@@ -12,7 +20,8 @@ title "'vault init' subcommand"
 
 (with "an invalid vault path"
   it "fails" && \
-      WITH_SNAPSHOT="$snapshot/invalid-vault-path" expect_run $WITH_FAILURE "$exe" vault -c / init
+      WITH_SNAPSHOT="$snapshot/invalid-vault-path" \
+      expect_run $WITH_FAILURE "$exe" vault -c / init
 )
 
 title "'completions' subcommand"

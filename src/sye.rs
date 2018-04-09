@@ -18,7 +18,7 @@ fn main() {
     let cli = cli::extract::new()
         .version(crate_version!())
         .author(crate_authors!())
-        .name(crate_name!());
+        .name("sye");
     let matches: ArgMatches = cli.get_matches();
     ok_or_exit(parse::extract::execute(&matches))
 }

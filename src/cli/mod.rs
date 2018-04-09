@@ -44,7 +44,6 @@ where
             .setting(AppSettings::SubcommandRequired)
             .name(CLI::name())
             .after_help("Read more on https://share-secrets-safely.github.io/cli")
-            .version(include_str!("../../VERSION"))
             .subcommand(vault::new())
             .subcommand(substitute::new())
             .subcommand(merge::new())
