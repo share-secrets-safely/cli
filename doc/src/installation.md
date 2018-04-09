@@ -4,7 +4,7 @@
 This is by far the easiest way to get the binary. Just execute the following code:
 
 ```bash
-brew tap share-secrets-safely/cli
+brew tap share-secrets-safely/cli https://github.com/share-secrets-safely/cli
 brew install sheesy
 ```
 
