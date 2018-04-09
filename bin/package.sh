@@ -6,7 +6,9 @@ directory="${1:?First argument must be the directory containing executables}"
 output=${2:?Second argument is the package file to create}
 
 root="$(cd "${0%/*}" && pwd)"
-exeFiles=( `$root/find-executables.sh "$directory"` )
+
+# shellcheck disable=2207
+exeFiles=( $("$root/find-executables.sh" "$directory") )
 
 (
   cd "$directory"
