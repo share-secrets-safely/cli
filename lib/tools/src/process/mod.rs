@@ -9,6 +9,7 @@ use std::io::{self, stdin};
 use std::fs::File;
 use std::env::vars;
 use treediff::{diff, tools};
+use std::io::Cursor;
 
 mod util;
 
@@ -71,8 +72,10 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
                 state.insert_next_at = prev_insert_next_at;
             }
             MergeStdin => {
-                let value_to_merge = util::de_json_or_yaml_document_support(stdin(), &state)?;
-                state = merge(value_to_merge, state)?;
+                if let Some(input) = probe_and_read_from_stdin()? {
+                    let value_to_merge = util::de_json_or_yaml_document_support(input, &state)?;
+                    state = merge(value_to_merge, state)?;
+                }
             }
             MergeEnvironment(pattern) => {
                 let mut map = vars().filter(|&(ref var, _)| pattern.matches(var)).fold(
@@ -109,6 +112,18 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
     }
 
     Ok(state)
+}
+
+fn probe_and_read_from_stdin() -> Result<Option<Cursor<Vec<u8>>>, Error> {
+    use std::io::Read;
+
+    let s = stdin();
+    let mut stdin = s.lock();
+    let mut buf = Vec::new();
+    stdin
+        .read_to_end(&mut buf)
+        .context("Failed to read everything from standard input")?;
+    Ok(if buf.is_empty() { None } else { Some(Cursor::new(buf)) })
 }
 
 fn show_buffer<W>(output_mode: Option<&OutputMode>, value: &[json::Value], mut ostream: W) -> Result<(), Error>

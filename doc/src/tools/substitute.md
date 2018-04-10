@@ -75,7 +75,7 @@ That way you can use the combined data as model during template substitution.
 
 # TODO figure out why stdin is required here, and improve the '--at' ordering
 ```bash,use=in-fixtures,use=sy-in-path,exec
-cat ./team.yml | sy merge --at=team --at=project ./project.yml --at=env --environment 
+sy merge --at=team ./team.yml --at=project ./project.yml --at=env --environment 
 ```
 
 ### Tips and Tricks (WIP)

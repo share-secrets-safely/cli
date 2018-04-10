@@ -218,6 +218,19 @@ title "'merge' --at and stdin"
     )
   )
 )
+
+title "'merge' - no stdin and no tty"
+(with "no data from stdin (as happens if there is no tty attached, and no stdin)"
+  (with "data from a file"
+    it "succeeds" && {
+      echo -n | \
+      WITH_SNAPSHOT="$snapshot/empty-stdin-input-from-file-to-stdout" \
+      expect_run $SUCCESSFULLY "$exe" merge --at=from-file <(echo '{}')
+    }
+  )
+)
+
+title "'merge' - everything else"
 (with "--at at various locations"
   it "succeeds and consumes the --at flags for each merge" && {
     cat "$template/good-answer.yml" | \

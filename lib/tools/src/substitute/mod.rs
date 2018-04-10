@@ -88,7 +88,6 @@ pub fn substitute(
             }
         };
 
-
         let mut ostream = spec.dst.open_as_output(append)?;
         if seen_writes_to_stdout > 1 || append {
             ostream.write_all(separator.as_bytes())?;
