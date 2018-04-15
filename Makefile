@@ -108,7 +108,11 @@ $(HOST_DEPLOYABLE): all-release-host-binaries
 deployable-host: $(HOST_DEPLOYABLE)
 
 update-homebrew:
-	@set -ex; ./bin/update-homebrew-formula.sh $$(git tag | tail -1) ./pkg/brew/sheesy.rb.in ./pkg/brew/sheesy.rb
+	git clone https://github.com/share-secrets-safely/homebrew-cli
+	set -ex; ./bin/update-homebrew-formula.sh $$(git tag | tail -1) ./etc/brew/sheesy.rb.in ./homebrew-cli/sheesy.rb
+	cd homebrew-cli && git commit -am "update formula" && git push origin master
+	rm -Rf homebrew-cli/
+
 
 tag-release: bin/tag-release.sh release.md VERSION
 	bin/tag-release.sh $$(cat VERSION) release.md
