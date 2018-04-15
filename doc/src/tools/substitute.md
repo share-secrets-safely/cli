@@ -5,6 +5,95 @@ cd doc/src/tools/fixtures/substitute
 sy substitute --help
 ```
 
+### Control your output
+
+`template-specs` are the bread and butter of this substitution engine. They allow to not
+only specify the input templates, like `./some-file.tpl`, but also set the output location.
+
+By default, this is standard ouptut, but can easily be `some-file.yml`, as in `./some-file.tpl:out/some-file.yml`.
+
+You can have _any amount of template specs_, which allows them to use the same, possibly
+expensive, data-model.
+
+#### Separating YAML Documents
+
+At first sight, it might not be so useful to output multiple templates to standard output.
+Some formats are built just for that usecase, provided you separate the documents correctly.
+
+If there are multiple YAML files for instance, you can separate them like this:
+
+```bash,use=in-fixtures,use=sy-in-path,exec=0
+echo 'value: 42' \
+| sy substitute --separator=$'---\n' <(echo 'first: {{value}}') <(echo 'second: {{value}}')
+```
+
+Also note the explicit newline in the separator, which might call for special syntax
+depending on which shell you use.
+
+#### Validating YAML or JSON Documents
+
+In the example above, how great would it be to protect ourselves from accidentially creating
+invalid YAML or JSON documents?
+
+Fortunately, `sheesy` has got you covered with the `--validate` flag.
+
+```bash,use=in-fixtures,use=sy-in-path,exec=1
+echo 'value: 42' \
+| sy substitute --validate <(echo '{"first":"{{value}}}') 
+```
+
+#### Protecting against 'special' values
+
+When generating structured data files, like YAML or JSON, even with a valid template you
+are very vulnerable to the values contained in the data-model. Some passwords for instance
+may contain characters which break your output. Even though `--validate` can tell you right away,
+how can you make this work without pre-processing your data?
+
+`--replace` to the rescure. The following example fails to validate as the password was
+now changed to contain a special character in the JSON context:
+
+```bash,use=in-fixtures,use=sy-in-path,exec=1
+echo 'password: xyz"abc' \
+| sy substitute --validate <(echo '{"pw":"{{password}}"}') 
+```
+
+Here is how it looks like without validation:
+```bash,use=in-fixtures,use=sy-in-path,exec=0
+echo 'password: xyz"abc' \
+| sy substitute <(echo '{"pw":"{{password}}"}') 
+```
+
+You can fix it by replacing all violating characters with the respective escaped version:
+
+```bash,use=in-fixtures,use=sy-in-path,exec=0
+echo 'password: xyz"abc' \
+| sy substitute --replace='":\"' --validate <(echo '{"pw":"{{password}}"}') 
+```
+
+### How to use multi-file data in your templates
+
+You have probably seen this coming from a mile away, but this is a great opportunity for a shameless plug to advertise `sy merge`.
+
+`sy merge` allows to merge multiple files together to become one, and even some additional processing to it.
+That way you can use the combined data as model during template substitution.
+
+```bash,use=in-fixtures,use=sy-in-path,exec
+sy merge --at=team ./team.yml --at=project ./project.yml --at=env --environment \
+| sy substitute ./kubernetes-manifest.yaml.tpl
+```
+
+### Templates from STDIN ? Sure thing...
+
+By default, we read the _data model_ from stdin and expect all templates to be provided
+by `template-spec`. However, sometimes doing exactly the opposite might be what you need.
+
+In this case, just use the `-d` flag to feed the _data model_, which automatically turns
+standard input into expecting the template.
+
+```bash,use=in-fixtures,use=sy-in-path,exec
+echo '{{greeting | capitalize}} {{name}}' | sy substitute -d <(echo '{"greeting":"hello", "name":"Hans"}')
+```
+
 ### Meet the engines
 
 The substitution can be performed by various engines, each with their distinct advantages and disadvantages.
@@ -65,19 +154,3 @@ The `data-processor` in the example just adds transformed values for all fields 
 ```
 
 [hbs]: http://handlebarsjs.com
-
-### How to use multi-file data in your templates
-
-You have probably seen this coming from a mile away, but this is a great opportunity for a shameless plug to advertise `sy merge`.
-
-`sy merge` allows to merge multiple files together to become one, and even some additional processing to it.
-That way you can use the combined data as model during template substitution.
-
-# TODO figure out why stdin is required here, and improve the '--at' ordering
-```bash,use=in-fixtures,use=sy-in-path,exec
-sy merge --at=team ./team.yml --at=project ./project.yml --at=env --environment 
-```
-
-### Tips and Tricks (WIP)
-
- * When data is provided via the `-d` flag, everything from stdin is interpreted as template.

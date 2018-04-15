@@ -106,9 +106,11 @@ stand-in for pass.
 Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
 
+  * [ ] init
+
 #### More documentation
  * [ ] Documentation for
-   * [ ] substitute
+   * [x] substitute
    * [ ] process
    * [ ] extract
    * [ ] pass
