@@ -37,6 +37,7 @@ help:
 	$(info deployable-host        | Archive usable on your host)
 	$(info deployment             | All archives, for host and linux system)
 	$(info update-homebrew        | Update homebrew after both deployables have been generated)
+	$(info update-getting-started | Update the getting-started repository to the latest version)
 	$(info - Docker ------------------------------------------------------------------------------------------------------)
 	$(info build-linux-musl       | Build the binary via a docker based musl container)
 	$(info build-musl-image       | Build our musl build image)
@@ -113,6 +114,10 @@ update-homebrew:
 	cd homebrew-cli && git commit -am "update formula" && git push origin master
 	rm -Rf homebrew-cli/
 
+update-getting-started:
+	git clone https://github.com/share-secrets-safely/getting-started
+	cd getting-started && echo "VERSION=$$(cat ../VERSION)" > .version && git commit -am "update version" && git push origin master
+	rm -Rf getting-started
 
 tag-release: bin/tag-release.sh release.md VERSION
 	bin/tag-release.sh $$(cat VERSION) release.md
