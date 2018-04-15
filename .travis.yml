@@ -38,7 +38,6 @@ before_cache:
 
 script:
   - cargo doc
-  - cargo test --all
   - |
     set -e
     if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
@@ -48,6 +47,7 @@ script:
           make docs
         fi
     else
+        cargo test --all
         make stateless-journey-tests
     fi
 
