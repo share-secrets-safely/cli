@@ -89,21 +89,6 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
-### Roadmap to 4.0.1
-
-This release contains some minor fixes and improvements, as well as a lot more documentation.
-
-#### More documentation
- * [x] Documentation for
-   * [x] substitute
-   * [x] process
-   * [x] extract
-   
-#### Git-based installation
-
- * [x] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
-   * It should be standalone and pull binaries as it needs them.
-
 ### Roadmap to 5.0
  
 #### Add the `pass` subcommand
@@ -122,7 +107,13 @@ And last but not least, there should be some sort of documentation, highlighting
 and differences.
 
  * [ ] documentation
+ 
+#### More documentation
 
+ * [ ] Documentation for
+   * [ ] vault init
+   * [ ] ...
+ 
 #### Some usability improvements
 
  * [ ] Assure that the error messages provided when we can't find a partition are

@@ -3,7 +3,7 @@ while avoiding them to touch disk.
 
 This can be achieved by putting the following capabilities together:
 
-1. **context creation**
+1. **Context Creation**
    * A context is just a bunch of properties in a structure.
    * Used to instantiate and customize templates.
    * Parts of it may be secret.
@@ -30,3 +30,6 @@ merge \
     etc/template/k8s-$stage-infrastructure.yml \
 | kubectl --kubeconfig <(show-secret $stage/kube.config) apply -f -
 ```
+
+**Read on to learn more about the individual tools to _merge_, _substitute_ and
+_extract_**.

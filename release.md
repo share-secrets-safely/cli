@@ -1,3 +1,23 @@
+### V4.0.1: Fixes and improvements
+
+This release contains some minor fixes and improvements, as well as a lot more documentation.
+
+#### More documentation
+
+ * [x] Documentation for
+   * [x] [substitute][substitute]
+   * [x] [process][process]
+   * [x] [extract][extract]
+   
+[substitute]: https://share-secrets-safely.github.io/cli/tools/substitute.html
+[process]: https://share-secrets-safely.github.io/cli/tools/process.html
+[extract]: https://share-secrets-safely.github.io/cli/tools/extract.html
+   
+#### Git-based installation
+
+ * [x] **getting-started** - a repository with all you need to start using a _sheesy_ vault in teams.
+   * See https://github.com/share-secrets-safely/getting-started
+   
 ### V4.0: Liquid as substitution-engine and a program per sub-command
 
 #### Switch to Liquid templating engine
