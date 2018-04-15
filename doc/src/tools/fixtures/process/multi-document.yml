@@ -1,0 +1,8 @@
+---
+pre-production:
+  replicas: 1
+  max-memory: 64M
+---
+production:
+  replicas: 3
+  max-memory: 1024M

@@ -1,0 +1,8 @@
+pre-production:
+  replicas: 1
+  max-cpu: 200mi
+  max-memory: 64M
+production:
+  replicas: 3
+  max-cpu: 2000mi
+  max-memory: 1024M

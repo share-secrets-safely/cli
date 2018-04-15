@@ -107,13 +107,17 @@ Even though its output won't be matched, its input will be matched perfectly, as
 well as its behaviour.
 
   * [ ] init
+   
+And last but not least, there should be some sort of documentation, highlighting similarities
+and differences.
+
+ * [ ] documentation
 
 #### More documentation
  * [ ] Documentation for
    * [x] substitute
-   * [ ] process
+   * [x] process
    * [ ] extract
-   * [ ] pass
 
 #### Some usability improvements
 

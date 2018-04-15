@@ -5,6 +5,8 @@ cd doc/src/tools/fixtures/substitute
 sy substitute --help
 ```
 
+You can also use this alias: **sub**.
+ 
 ### Control your output
 
 `template-specs` are the bread and butter of this substitution engine. They allow to not
@@ -78,8 +80,8 @@ You have probably seen this coming from a mile away, but this is a great opportu
 That way you can use the combined data as model during template substitution.
 
 ```bash,use=in-fixtures,use=sy-in-path,exec
-sy merge --at=team ./team.yml --at=project ./project.yml --at=env --environment \
-| sy substitute ./kubernetes-manifest.yaml.tpl
+sy merge --at=team team.yml --at=project project.yml --at=env --environment \
+| sy substitute kubernetes-manifest.yaml.tpl
 ```
 
 ### Templates from STDIN ? Sure thing...
@@ -125,32 +127,32 @@ For example, in an invocation like this you can declare headers and footers with
 _Here is the content of the files used_:
 
 ```bash,use=in-fixtures,exec
-cat ./data.json
+cat data.json
 ```
 
 ```bash,use=in-fixtures,exec
-cat ./base0.hbs
+cat base0.hbs
 ```
 
 ```bash,use=in-fixtures,exec
-cat ./template.hbs
+cat template.hbs
 ```
 
 When using these in substitution, this is the output:
 ```bash,use=in-fixtures,use=sy-in-path,exec
-sy substitute --engine=handlebars -d ./data.json ./base0.hbs:/dev/null ./template.hbs
+sy substitute --engine=handlebars -d data.json base0.hbs:/dev/null template.hbs
 ```
 
 The perceived disadvantage of having close to zero available filters would have to be compensated using a processing program which takes the data, and adds all the variations that you would need in your templates:
 
 ```bash,use=in-fixtures,use=sy-in-path,exec
-./data-processor < ./data.json | sy substitute ./template.tpl
+./data-processor < data.json | sy substitute template.tpl
 ```
 
 The `data-processor` in the example just adds transformed values for all fields it sees:
 
 ```bash,use=in-fixtures,use=sy-in-path,exec
-./data-processor < ./data.json
+./data-processor < data.json
 ```
 
 [hbs]: http://handlebarsjs.com
