@@ -1,1 +1,1 @@
-error: Invalid value for '--environment <filter>...': Pattern syntax error near position 1: invalid range pattern
+error: Invalid value for '--environment=<filter>...': Pattern syntax error near position 1: invalid range pattern

@@ -1,4 +1,4 @@
-use clap::{App, Arg};
+use clap::{App, Arg, ArgSettings};
 use glob;
 use cli::util::output_formats;
 
@@ -13,6 +13,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("select")
+                .set(ArgSettings::RequireEquals)
                 .alias("from")
                 .long("select")
                 .short("s")
@@ -28,6 +29,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("at")
+                .set(ArgSettings::RequireEquals)
                 .alias("to")
                 .long("at")
                 .short("a")
@@ -43,6 +45,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("environment")
+                .set(ArgSettings::RequireEquals)
                 .long("environment")
                 .short("e")
                 .takes_value(true)
@@ -77,6 +80,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("output")
+                .set(ArgSettings::RequireEquals)
                 .short("o")
                 .long("output")
                 .takes_value(true)

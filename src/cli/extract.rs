@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use cli::util::output_formats;
+use clap::ArgSettings;
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("extract")
@@ -10,6 +11,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("output")
+                .set(ArgSettings::RequireEquals)
                 .short("o")
                 .long("output")
                 .takes_value(true)
@@ -25,6 +27,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("file")
+                .set(ArgSettings::RequireEquals)
                 .value_name("file")
                 .long("file")
                 .short("f")

@@ -1,8 +1,8 @@
-error: 'foobar' isn't a valid value for '--output <mode>'
+error: 'foobar' isn't a valid value for '--output=<mode>'
 	[possible values: json, yaml]
 
 
 USAGE:
-    sy process --environment <filter>... --output <mode>
+    sy process --environment=<filter>... --output=<mode>
 
 For more information try --help

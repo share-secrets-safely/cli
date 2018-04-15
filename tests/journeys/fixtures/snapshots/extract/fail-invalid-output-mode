@@ -1,8 +1,8 @@
-error: 'foobar' isn't a valid value for '--output <mode>'
+error: 'foobar' isn't a valid value for '--output=<mode>'
 	[possible values: json, yaml]
 
 
 USAGE:
-    sy extract <pointer>... --output <mode>
+    sy extract <pointer>... --output=<mode>
 
 For more information try --help

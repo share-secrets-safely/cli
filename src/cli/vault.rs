@@ -1,6 +1,7 @@
 use clap::{App, Arg};
 use clap::AppSettings;
 use std::env;
+use clap::ArgSettings;
 
 fn mk_help(kind: &str, prefix: &str) -> String {
     format!(
@@ -209,6 +210,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         .alias("insert")
         .arg(
             Arg::with_name("partition")
+                .set(ArgSettings::RequireEquals)
                 .long("partition")
                 .alias("to")
                 .short("p")
@@ -265,6 +267,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("partition")
+                .set(ArgSettings::RequireEquals)
                 .long("partition")
                 .alias("from")
                 .short("f")

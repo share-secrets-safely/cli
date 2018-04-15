@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use clap::AppSettings;
+use clap::ArgSettings;
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("substitute")
@@ -12,6 +13,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
                  Read more on their website at https://shopify.github.io/liquid .")
         .arg(
             Arg::with_name("engine")
+                .set(ArgSettings::RequireEquals)
                 .required(false)
                 .multiple(false)
                 .takes_value(true)
@@ -29,6 +31,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("separator")
+                .set(ArgSettings::RequireEquals)
                 .required(false)
                 .multiple(false)
                 .takes_value(true)
@@ -43,6 +46,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("replace")
+                .set(ArgSettings::RequireEquals)
                 .long("replace")
                 .takes_value(true)
                 .value_name("find-this:replace-with-that")
@@ -64,6 +68,7 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
         )
         .arg(
             Arg::with_name("data")
+                .set(ArgSettings::RequireEquals)
                 .required(false)
                 .multiple(false)
                 .takes_value(true)
