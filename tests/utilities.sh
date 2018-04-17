@@ -53,7 +53,7 @@ function fail () {
 }
 
 function sandbox () {
-  sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
+  sandbox_tempdir="$(mktemp -t sandbox.XXXXXX -d)"
   # shellcheck disable=2064
   trap "popd >/dev/null" EXIT
   pushd "$sandbox_tempdir" >/dev/null \
