@@ -40,7 +40,7 @@ explanations can be found [in the book][first-steps].
    * Thanks to *GPG* each user is identified separately through their public key
  * **automation and scripting is easy**
    * storing structured secrets is as easy as making them available in shell scripts
-   * common operations like substituting secrets into a file are are natively supported
+   * common operations like substituting secrets into a file are natively supported
    * proper program exit codes make error handling easy
  * **user management**
    * support small and large teams, as well as multiple teams, with ease
@@ -93,7 +93,7 @@ to settle from 5.0.
  
 #### Add the `pass` subcommand
 
-`sy` aims to be as usable as possible, and breaks compatiblity were needed to
+`sy` aims to be as usable as possible, and breaks compatibility were needed to
 achieve that. However, to allow people to leverage its improved portability
 thanks to it being self-contained, it should be possible to let it act as a
 stand-in for pass.
