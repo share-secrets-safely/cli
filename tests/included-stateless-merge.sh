@@ -228,6 +228,12 @@ title "'merge' - no stdin and no tty"
       expect_run $SUCCESSFULLY "$exe" merge --at=from-file <(echo '{}')
     }
   )
+  (with "data from key-value pairs"
+    it "succeeds" && {
+      WITH_SNAPSHOT="$snapshot/empty-stdin-input-from-key-value-pairs-to-stdout" \
+      expect_run $SUCCESSFULLY "$exe" process a=42 b=true c=foo
+    }
+  )
 )
 
 title "'merge' - everything else"
