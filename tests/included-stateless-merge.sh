@@ -236,6 +236,23 @@ title "'merge' - no stdin and no tty"
   )
 )
 
+title "'merge' - --no-stdin"
+(with "the --no-stdin flag set"
+  (with "some value from stdin"
+    it "succeeds" && {
+      echo 'b: should-not-be-shown' | \
+      WITH_SNAPSHOT="$snapshot/no-stdin-ignores-input-from-stdin" \
+      expect_run $SUCCESSFULLY "$exe" process --no-stdin a=42
+    }
+  )
+  (with "stdin explicitly specified"
+    it "fails" && {
+      WITH_SNAPSHOT="$snapshot/fail-no-stdin-with-explicit-stdin" \
+      expect_run $WITH_FAILURE "$exe" process --no-stdin -
+    }
+  )
+)
+
 title "'merge' - everything else"
 (with "--at at various locations"
   it "succeeds and consumes the --at flags for each merge" && {
