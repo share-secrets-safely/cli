@@ -1,0 +1,1 @@
+error: Cannot specify standard input explicitly with '-' and prohibit reading stdin with --no-stdin.

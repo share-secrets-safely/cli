@@ -28,6 +28,14 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
                 )
         )
         .arg(
+            Arg::with_name("no-stdin")
+                .long("no-stdin")
+                .required(false)
+                .help("If set, we will not try to read structured data from standard input. This may be required \
+                       in some situations where we are blockingly reading from a standard input which is attached \
+                       to a pseudo-terminal.")
+        )
+        .arg(
             Arg::with_name("at")
                 .set(ArgSettings::RequireEquals)
                 .alias("to")
