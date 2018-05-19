@@ -1,3 +1,8 @@
+### V4.0.2: Fixes and improvements
+
+* add the '--no-stdin' flag to `sy process`. It allows to prevent it from blocking on reading from
+  stdin in certain situations. Previously, one would have to provide some stdin like `echo '{}' | sy process ...`.
+
 ### V4.0.1: Fixes and improvements
 
 This release contains some minor fixes and improvements, as well as a lot more documentation.
