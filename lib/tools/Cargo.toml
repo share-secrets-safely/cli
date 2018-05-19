@@ -1,7 +1,7 @@
 [package]
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "sheesy-tools"
-version = "4.0.1"
+version = "4.0.2"
 
 description = "Tooling to make using shared secrets effortless."
 license = "MIT"
