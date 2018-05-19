@@ -78,6 +78,7 @@ glob = {version = "0.2.11", optional = true}
 conv = {version = "0.3.3", optional = true}
 gpgme = {version = "0.7.2", optional = true}
 itertools = {version = "0.7.8", optional = true}
+human-panic = "0.4.0"
 
 [dependencies.sheesy-tools]
 path = "lib/tools"

@@ -5,6 +5,8 @@ extern crate failure;
 extern crate atty;
 extern crate glob;
 extern crate sheesy_tools as tools;
+#[macro_use]
+extern crate human_panic;
 
 use clap::ArgMatches;
 
@@ -15,6 +17,7 @@ mod parse;
 use util::ok_or_exit;
 
 fn main() {
+    setup_panic!();
     let cli = cli::merge::new()
         .version(crate_version!())
         .author(crate_authors!())

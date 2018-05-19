@@ -11,6 +11,8 @@ extern crate gpgme;
 extern crate itertools;
 extern crate sheesy_tools as tools;
 extern crate sheesy_vault as vault;
+#[macro_use]
+extern crate human_panic;
 
 mod cli;
 mod parse;
@@ -24,6 +26,8 @@ mod util;
 use util::*;
 
 fn main() {
+    setup_panic!();
+
     let cli = CLI::new();
     let appc = cli.app.clone();
     let matches: ArgMatches = cli.app.get_matches();

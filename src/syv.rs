@@ -7,6 +7,8 @@ extern crate lazy_static;
 extern crate conv;
 extern crate gpgme;
 extern crate sheesy_vault as vault;
+#[macro_use]
+extern crate human_panic;
 
 use clap::ArgMatches;
 
@@ -18,6 +20,7 @@ mod parse;
 use util::ok_or_exit;
 
 fn main() {
+    setup_panic!();
     let cli = cli::vault::new()
         .version(crate_version!())
         .author(crate_authors!())
