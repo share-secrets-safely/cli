@@ -4,8 +4,6 @@ extern crate clap;
 extern crate failure;
 extern crate itertools;
 extern crate sheesy_tools as tools;
-#[macro_use]
-extern crate human_panic;
 
 use clap::ArgMatches;
 
@@ -16,7 +14,6 @@ mod parse;
 use util::ok_or_exit;
 
 fn main() {
-    setup_panic!();
     let cli = cli::substitute::new()
         .version(crate_version!())
         .author(crate_authors!())
