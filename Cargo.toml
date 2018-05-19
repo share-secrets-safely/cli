@@ -12,6 +12,17 @@ keywords = ["gnupg", "pgp", "crypto"]
 readme = "README.md"
 exclude = ["HomebrewFormula", "tests/**", "pkg/**", "lib/**", "etc/**", "doc/**", "bin/**"]
 
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'unwind'
+incremental = false
+overflow-checks = true
+
 [badges]
 travis-ci = { repository = "share-secrets-safely/cli" }
 
