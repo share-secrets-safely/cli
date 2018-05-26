@@ -47,6 +47,14 @@ function shortcoming () {
   _note shortcoming "${RED}" "$*"
 }
 
+function step () {
+  _note step "${WHITE}" "$*"
+}
+
+function stepn () {
+  step "$*" $'\n'
+}
+
 function fail () {
   echo 1>&2 "${RED} $*"
   exit 1
