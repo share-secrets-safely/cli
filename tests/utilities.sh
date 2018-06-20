@@ -7,6 +7,18 @@ RED="$(tput setaf 1 2>/dev/null || echo -n '')"
 OFFSET=( )
 STEP="  "
 
+function with_program () {
+  local program="${1:?}"
+  hash "$program" &>/dev/null || {
+    function expect_run () {
+      echo 1>&2 "${WHITE} - skipped (missing program)"
+    }
+    function expect_run_sh () {
+      echo 1>&2 "${WHITE} - skipped (missing program)"
+    }
+  }
+}
+
 function title () {
   echo "$WHITE-----------------------------------------------------"
   echo "${GREEN}$*"
