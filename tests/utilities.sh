@@ -32,6 +32,14 @@ function _context () {
   OFFSET+=("$STEP")
 }
 
+function step () {
+  _note step "${WHITE}" "$*"
+}
+
+function stepn () {
+  step "$*" $'\n'
+}
+
 function with () {
   _context with "$*"
 }
