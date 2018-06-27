@@ -1,21 +1,4 @@
-wget: unrecognized option: show-progress
-BusyBox v1.27.2 (2017-12-12 10:41:50 GMT) multi-call binary.
-
-Usage: wget [-c|--continue] [--spider] [-q|--quiet] [-O|--output-document FILE]
-	[--header 'header: value'] [-Y|--proxy on/off] [-P DIR]
-	[-S|--server-response] [-U|--user-agent AGENT] [-T SEC] URL...
-
-Retrieve files via HTTP or FTP
-
-	--spider	Only check URL existence: $? is 0 if exists
-	-c		Continue retrieval of aborted transfer
-	-q		Quiet
-	-P DIR		Save to DIR (default .)
-	-S    		Show server response
-	-T SEC		Network read timeout is SEC seconds
-	-O FILE		Save to FILE ('-' for stdout)
-	-U STR		Use STR for User-Agent header
-	-Y on/off	Use proxy
+Downloading https://github.com/share-secrets-safely/cli/releases/download/4.0.2/sy-cli-Linux-x86_64.tar.gz...
 {
   "a": 42
 }
