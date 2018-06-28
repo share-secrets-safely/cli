@@ -17,7 +17,13 @@ This will install `gpg` as well, which is required for the [`sheesy vault`][syva
 Thanks to the [`getting-started`][getting-started] repository, obtaining the release binaries on demand becomes a breeze.
 This is particularly useful for quick fetchin `sheesy` for use within containers.
 
-```bash,exec
+```bash,prepare=sandboxed,hide
+set -eu
+sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
+pushd "$sandbox_tempdir" >/dev/null
+```
+
+```bash,use=sandboxed,exec=1
 git clone https://github.com/share-secrets-safely/getting-started
 ./getting-started/sy
 ```
@@ -52,11 +58,6 @@ function trust_key () {
 }
 
 trust_key "$fpr"
-```
-
-```bash,prepare=sandboxed,hide
-sandbox_tempdir="$(mktemp -t sandbox.XXXX -d)"
-pushd "$sandbox_tempdir" >/dev/null
 ```
 
 ```bash,use=sandboxed,exec
