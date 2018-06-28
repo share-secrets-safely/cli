@@ -135,26 +135,6 @@ and differences.
    * [ ] recipients
    * [ ] resources
 
-### Roadmap to 5.1
-
-#### Bootstrap-library for common usage scenarios
-
-Ideally it's easy to get started not only when cloning the `getting-started` repository,
-but to make it all yours with templates to get something deployed with secrets
-to _kubernetes_ for example.
-
-### Roadmap to 6.0
-#### Web of Trust for everyone
-
-The web-of-trust is powerful if used correctly, and helps to assure you are encrypting
-only for trusted keys.
-
- * [ ] Suggestion engine to learn how to encrypt for everyone in partition(s) with the
-       least amount of work. It will suggest 'ownertrust' to well-connected people
-       and make available everyone they signed for.
- * [ ] suggest to import keys or do it for the user
- * [ ] suggest to trust recipients or ((locally) sign) to make encryption possible
-
 ## Development Practices
 
  * **test-first development**
