@@ -89,7 +89,26 @@ evident.
 The *vault library* and its types will change much more often, but we would expect it
 to settle from 5.0.
 
+### Roadmap to 4.1
+
+This should make the first release which can be publicised, as it should include all the
+material people might need to get started using _sheesy_ comfortably.
+
+ * [ ] Documentation for
+   * [ ] vault init
+   * [ ] ...
+ 
 ### Roadmap to 5.0
+
+The GPGME dependency is also the major flaw for usability, as it eventually goes down to
+the quirks of GPG itself.
+[SEQUOIA](https://gitlab.com/sequoia-pgp/sequoia) is a pure-Rust implementation of the
+PGP protocol, which would greatly help making *sheesy* even more usable.
+
+  * [ ] Use SEQUOIA instead of GPGME
+  * [ ] Provide a windows binary
+
+### Roadmap to 6.0
  
 #### Add the `pass` subcommand
 
@@ -107,12 +126,6 @@ And last but not least, there should be some sort of documentation, highlighting
 and differences.
 
  * [ ] documentation
- 
-#### More documentation
-
- * [ ] Documentation for
-   * [ ] vault init
-   * [ ] ...
  
 #### Some usability improvements
 
