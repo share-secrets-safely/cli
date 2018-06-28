@@ -12,6 +12,21 @@ This will install `gpg` as well, which is required for the [`sheesy vault`][syva
 
 [syvault]: vault/about.html
 
+### Via Git Clone
+
+Thanks to the [`getting-started`][getting-started] repository, obtaining the release binaries on demand becomes a breeze.
+This is particularly useful for quick fetchin `sheesy` for use within containers.
+
+```bash,exec
+git clone https://github.com/share-secrets-safely/getting-started
+./getting-started/sy
+```
+
+The binaries are download when `./sy` is first executed, and you will find them in `./bin/$(uname -s)/*`
+for further use.
+
+[getting-started]: https://github.com/share-secrets-safely/getting-started
+
 ### Via [Releases][releases]
 
 Please note that in order to use `sy`, you will need a working [installation of `gpg`][gpg].
