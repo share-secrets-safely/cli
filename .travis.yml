@@ -59,7 +59,6 @@ deploy:
     on:
       repo: share-secrets-safely/cli
       branch: master
-      tags: true
       condition: $TRAVIS_OS_NAME != "osx"
       
 env:
