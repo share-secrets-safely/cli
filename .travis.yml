@@ -43,9 +43,7 @@ script:
     if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
         make lint-scripts
         make stateful-journey-tests
-        if [[ -n "$TRAVIS_TAG" ]]; then
-          make docs
-        fi
+        make docs
     else
         cargo test --all
         make stateless-journey-tests
