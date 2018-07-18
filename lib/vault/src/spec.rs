@@ -1,16 +1,16 @@
 use conv::TryFrom;
 use std::fmt;
+use std::fs::create_dir_all;
 use std::fs::{File, OpenOptions};
 use std::io::{self, stdin, Read, Write};
-use std::fs::create_dir_all;
 
 use atty;
-use mktemp::Temp;
 use failure::{Error, ResultExt};
-use std::path::{Path, PathBuf};
-use std::path::Component;
+use mktemp::Temp;
 use std::env;
 use std::ffi::OsString;
+use std::path::Component;
+use std::path::{Path, PathBuf};
 use util::run_editor;
 
 lazy_static! {

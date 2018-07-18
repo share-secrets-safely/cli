@@ -23,7 +23,7 @@ fn it_cannot_have_just_a_separator() {
     let invalid = ":";
     assert_eq!(
         VaultSpec::try_from(invalid),
-        Err(VaultSpecError(format!("'{}' does not contain a destination.", invalid),))
+        Err(VaultSpecError(format!("'{}' does not contain a destination.", invalid)))
     )
 }
 

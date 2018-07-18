@@ -1,22 +1,22 @@
-use std::io::{self, Write};
-use std::path::{Path, PathBuf};
 use std::fs::{remove_file, File};
+use std::io::{self, Write};
 use std::mem;
+use std::path::{Path, PathBuf};
 
-use mktemp::Temp;
-use itertools::join;
-use gpgme;
 use base::Vault;
-use failure::{Error, ResultExt};
 use error::FailExt;
+use error::{DecryptionError, EncryptionError};
+use failure::{Error, ResultExt};
+use gpgme;
+use itertools::join;
+use mktemp::Temp;
 use spec::{gpg_output_filename, SpecSourceType, VaultSpec};
 use spec::{CreateMode, Destination, WriteMode};
-use error::{DecryptionError, EncryptionError};
-use util::{new_context, strip_ext, write_at};
-use util::run_editor;
 use std::iter::once;
-use TrustModel;
 use util::flags_for_model;
+use util::run_editor;
+use util::{new_context, strip_ext, write_at};
+use TrustModel;
 
 fn encrypt_buffer(
     ctx: &mut gpgme::Context,
@@ -68,12 +68,10 @@ impl Vault {
         run_editor(editor.as_os_str(), &tempfile_path)?;
         let mut zero = Vec::new();
         self.encrypt(
-            &[
-                VaultSpec {
-                    src: SpecSourceType::Path(tempfile_path.clone()),
-                    dst: decrypted_file_path,
-                },
-            ],
+            &[VaultSpec {
+                src: SpecSourceType::Path(tempfile_path.clone()),
+                dst: decrypted_file_path,
+            }],
             WriteMode::AllowOverwrite,
             Destination::Unchanged,
             &mut zero,

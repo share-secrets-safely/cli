@@ -1,20 +1,20 @@
-use failure::{err_msg, Error, Fail, ResultExt};
-use std::fs::File;
-use std::io::{Read, Write};
-use util::ResetCWD;
 use base::{Vault, GPG_GLOB};
-use std::path::{Path, PathBuf};
+use error::EncryptionError;
+use failure::{err_msg, Error, Fail, ResultExt};
 use glob::glob;
-use util::{fingerprint_of, UserIdFingerprint};
 use gpgme::{self, Key};
 use itertools::Itertools;
 use mktemp::Temp;
-use error::EncryptionError;
-use util::write_at;
-use util::strip_ext;
 use print_causes;
-use TrustModel;
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::{Path, PathBuf};
 use util::flags_for_model;
+use util::strip_ext;
+use util::write_at;
+use util::ResetCWD;
+use util::{fingerprint_of, UserIdFingerprint};
+use TrustModel;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
@@ -71,7 +71,7 @@ impl Vault {
                     })
                     .or_else(|err| {
                         gpg_ctx
-                            .find_key(fpr)
+                            .get_key(fpr)
                             .map(|_key| vec![fpr.to_owned()])
                             .map_err(|_gpg_err| {
                                 err.context(format!(
@@ -134,7 +134,7 @@ impl Vault {
             }
         };
         let signing_key_fpr = match signing_key_id {
-            Some(id) => Some(ctx.find_key(id)
+            Some(id) => Some(ctx.get_key(id)
                 .map_err(Into::into)
                 .and_then(|k| fingerprint_of(&k))
                 .context(format!(

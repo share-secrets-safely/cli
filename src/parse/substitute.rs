@@ -1,7 +1,7 @@
-use failure::Error;
 use clap::ArgMatches;
-use tools::substitute::{Engine, Spec, StreamOrPath};
+use failure::Error;
 use itertools::Itertools;
+use tools::substitute::{Engine, Spec, StreamOrPath};
 
 use super::util::required_os_arg;
 use std::ffi::OsString;

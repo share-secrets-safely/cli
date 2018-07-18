@@ -1,11 +1,11 @@
 use atty;
-use failure::Error;
 use clap::ArgMatches;
-use tools::process::{Command, OutputMode};
+use failure::Error;
 use parse::util::optional_args_with_value;
+use tools::process::{Command, OutputMode};
 
-use std::path::PathBuf;
 use std::io::stdout;
+use std::path::PathBuf;
 use tools::process::reduce;
 
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {

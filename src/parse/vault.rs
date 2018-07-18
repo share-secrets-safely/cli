@@ -1,17 +1,17 @@
+use clap::ArgMatches;
 use conv::TryInto;
 use failure::Error;
-use clap::ArgMatches;
 
-use std::path::{Path, PathBuf};
 use std::convert::Into;
+use std::path::{Path, PathBuf};
 
+use dispatch::vault::{Command, Context};
 use vault::error::{first_cause_of_type, DecryptionError};
 use vault::{CreateMode, SigningMode};
-use dispatch::vault::{Command, Context};
 
 use super::util::{optional_args, required_arg, required_os_arg};
-use std::io::{stderr, stdout};
 use dispatch;
+use std::io::{stderr, stdout};
 use std::process;
 
 pub fn amend_error_info<T>(r: Result<T, Error>) -> Result<T, Error> {

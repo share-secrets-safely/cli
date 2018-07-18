@@ -1,12 +1,12 @@
+use base::Vault;
 use failure::Error;
 use std::io::Write;
-use base::Vault;
-use util::{FingerprintUserId, UserIdFingerprint};
-use util::new_context;
-use util::extract_at_least_one_secret_key;
-use util::export_key;
 use std::iter::once;
 use std::path::PathBuf;
+use util::export_key;
+use util::extract_at_least_one_secret_key;
+use util::new_context;
+use util::{FingerprintUserId, UserIdFingerprint};
 
 impl Vault {
     pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {

@@ -4,10 +4,10 @@ use json;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use std::borrow::Cow;
-use treediff::tools::MutableFilter;
-use std::fmt;
 use glob;
+use std::borrow::Cow;
+use std::fmt;
+use treediff::tools::MutableFilter;
 
 #[derive(Default)]
 pub struct State {

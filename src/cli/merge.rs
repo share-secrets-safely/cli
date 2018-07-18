@@ -1,6 +1,6 @@
 use clap::{App, Arg, ArgSettings};
-use glob;
 use cli::util::output_formats;
+use glob;
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("process")

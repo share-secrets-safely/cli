@@ -1,12 +1,12 @@
-use failure::{Error, ResultExt};
 use atty;
+use failure::{Error, ResultExt};
 
-use std::path::PathBuf;
-use std::fmt;
 use std::ffi::OsStr;
-use std::io::{self, stdin, stdout};
-use std::fs::{File, OpenOptions};
+use std::fmt;
 use std::fs::create_dir_all;
+use std::fs::{File, OpenOptions};
+use std::io::{self, stdin, stdout};
+use std::path::PathBuf;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum StreamOrPath {
@@ -111,8 +111,8 @@ impl Spec {
 
 impl fmt::Display for Spec {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::StreamOrPath::*;
         use self::fmt::Write;
+        use self::StreamOrPath::*;
         match (&self.src, &self.dst) {
             (&Stream, &Stream) => f.write_char(Spec::sep()),
             (&Path(ref p), &Stream) => p.display().fmt(f),

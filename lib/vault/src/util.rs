@@ -1,13 +1,13 @@
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-use std::env::{current_dir, set_current_dir};
-use std::fs::{self, OpenOptions};
-use std::fmt;
-use itertools::{join, Itertools};
 use failure::{self, err_msg, Error, ResultExt};
 use gpgme;
+use itertools::{join, Itertools};
+use std::env::{current_dir, set_current_dir};
 use std::ffi::OsStr;
+use std::fmt;
+use std::fs::{self, OpenOptions};
 use std::process::Command;
 use std::process::Stdio;
 use TrustModel;

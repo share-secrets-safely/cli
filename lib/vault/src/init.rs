@@ -1,13 +1,13 @@
 use std::path::Path;
 
-use failure::{Error, ResultExt};
-use std::fs::create_dir_all;
 use base::Vault;
-use util::new_context;
-use util::extract_at_least_one_secret_key;
+use failure::{Error, ResultExt};
 use spec::WriteMode;
+use std::fs::create_dir_all;
 use std::io::Write;
 use util::export_key_with_progress;
+use util::extract_at_least_one_secret_key;
+use util::new_context;
 use TrustModel;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]

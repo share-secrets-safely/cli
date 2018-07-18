@@ -1,8 +1,8 @@
 extern crate serde_yaml;
 extern crate sheesy_vault;
 
-use sheesy_vault::Vault;
 use sheesy_vault::TrustModel;
+use sheesy_vault::Vault;
 
 #[test]
 fn vault_trust_model_serde() {

@@ -20,7 +20,7 @@ extern crate treediff;
 #[cfg(any(feature = "substitute", feature = "process"))]
 extern crate yaml_rust;
 
-#[cfg(feature = "substitute")]
-pub mod substitute;
 #[cfg(feature = "process")]
 pub mod process;
+#[cfg(feature = "substitute")]
+pub mod substitute;

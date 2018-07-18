@@ -1,12 +1,12 @@
 use failure::{Error, ResultExt};
-use std::io::Write;
-use Vault;
-use util::{new_context, UserIdFingerprint};
 use itertools::Itertools;
 use std::fs::remove_file;
-use util::fingerprints_of_keys;
+use std::io::Write;
 use std::iter::once;
 use std::path::PathBuf;
+use util::fingerprints_of_keys;
+use util::{new_context, UserIdFingerprint};
+use Vault;
 
 impl Vault {
     pub fn remove_recipients(

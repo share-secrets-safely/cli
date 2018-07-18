@@ -17,15 +17,15 @@ extern crate serde_derive;
 extern crate serde_yaml;
 extern crate yaml_rust;
 
-pub mod error;
-mod util;
 mod base;
-mod recipients;
-mod spec;
+pub mod error;
 mod init;
-mod resource;
 mod partitions;
+mod recipients;
+mod resource;
+mod spec;
+mod util;
 
-pub use spec::*;
 pub use base::{TrustModel, Vault, VaultExt};
+pub use spec::*;
 pub use util::print_causes;

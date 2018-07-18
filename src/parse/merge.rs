@@ -1,12 +1,12 @@
 use atty;
-use glob;
-use failure::Error;
 use clap::ArgMatches;
-use tools::process::{reduce, Command, MergeMode, OutputMode};
+use failure::Error;
+use glob;
 use parse::util::optional_args_with_value;
+use tools::process::{reduce, Command, MergeMode, OutputMode};
 
-use std::path::PathBuf;
 use std::io::stdout;
+use std::path::PathBuf;
 
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     let cmds = context_from(args)?;

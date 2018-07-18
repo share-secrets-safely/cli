@@ -1,15 +1,15 @@
 use failure::{Error, ResultExt};
 use json;
-use yaml;
 use serde::Serialize;
+use yaml;
 
 mod types;
 pub use self::types::*;
-use std::io::{self, stdin};
-use std::fs::File;
 use std::env::vars;
-use treediff::{diff, tools};
+use std::fs::File;
 use std::io::Cursor;
+use std::io::{self, stdin};
+use treediff::{diff, tools};
 
 mod util;
 

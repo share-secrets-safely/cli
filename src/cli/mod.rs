@@ -3,15 +3,15 @@ use clap::App;
 
 #[cfg(feature = "completions")]
 mod completions;
-#[cfg(feature = "vault")]
-pub mod vault;
-#[cfg(feature = "substitute")]
-pub mod substitute;
-#[cfg(feature = "process")]
-pub mod merge;
 #[cfg(feature = "extract")]
 pub mod extract;
+#[cfg(feature = "process")]
+pub mod merge;
+#[cfg(feature = "substitute")]
+pub mod substitute;
 mod util;
+#[cfg(feature = "vault")]
+pub mod vault;
 
 #[cfg(any(feature = "vault", feature = "completions"))]
 pub struct CLI<'a, 'b>

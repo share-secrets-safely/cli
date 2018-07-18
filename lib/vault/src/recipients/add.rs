@@ -1,11 +1,11 @@
-use failure::{err_msg, Error, ResultExt};
-use std::io::Write;
 use base::Vault;
-use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
+use failure::{err_msg, Error, ResultExt};
 use spec::SigningMode;
+use std::io::Write;
 use std::iter::once;
-use TrustModel;
 use std::path::PathBuf;
+use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
+use TrustModel;
 
 impl Vault {
     pub fn add_recipients(
@@ -34,7 +34,7 @@ impl Vault {
                     })?;
                 gpg_ctx.add_signer(&signing_key)?;
                 for key_fpr_to_sign in imported_gpg_keys_ids {
-                    let key_to_sign = gpg_ctx.find_key(&key_fpr_to_sign)?;
+                    let key_to_sign = gpg_ctx.get_key(&key_fpr_to_sign)?;
                     gpg_ctx.sign_key(&key_to_sign, None::<&[u8]>, None).with_context(|_| {
                         format_err!(
                             "Could not sign key of recipient {} with signing key {}",

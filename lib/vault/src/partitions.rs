@@ -1,11 +1,11 @@
 use base::{Vault, VaultKind};
 use failure::{err_msg, Error, ResultExt};
-use std::io::Write;
-use std::path::Path;
-use spec::WriteMode;
-use std::iter::once;
-use util::{export_key_with_progress, extract_at_least_one_secret_key, fingerprint_of, new_context};
 use init::assure_empty_directory_exists;
+use spec::WriteMode;
+use std::io::Write;
+use std::iter::once;
+use std::path::Path;
+use util::{export_key_with_progress, extract_at_least_one_secret_key, fingerprint_of, new_context};
 
 impl Vault {
     pub fn all_in_order(&self) -> Vec<&Vault> {

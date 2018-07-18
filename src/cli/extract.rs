@@ -1,6 +1,6 @@
+use clap::ArgSettings;
 use clap::{App, Arg};
 use cli::util::output_formats;
-use clap::ArgSettings;
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("extract")

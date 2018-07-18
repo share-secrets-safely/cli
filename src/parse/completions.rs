@@ -1,9 +1,9 @@
-use failure::{err_msg, Error, ResultExt};
 use clap::App;
 use clap::ArgMatches;
-use std::io::stdout;
-use cli::CLI;
 use clap::Shell;
+use cli::CLI;
+use failure::{err_msg, Error, ResultExt};
+use std::io::stdout;
 use std::path::Path;
 use std::str::FromStr;
 

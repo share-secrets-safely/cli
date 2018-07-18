@@ -1,8 +1,8 @@
 use failure::{Error, Fail, ResultExt};
-use json;
-use yaml;
-use liquid;
 use handlebars;
+use json;
+use liquid;
+use yaml;
 
 use std::io::Read;
 
@@ -11,9 +11,9 @@ use std::io::Cursor;
 use std::str::FromStr;
 
 pub mod liquid_filters {
-    use liquid::Value;
-    use liquid::interpreter::{FilterError, FilterResult};
     use base64;
+    use liquid::interpreter::{FilterError, FilterResult};
+    use liquid::Value;
 
     pub fn base64(input: &Value, _args: &[Value]) -> FilterResult {
         match *input {

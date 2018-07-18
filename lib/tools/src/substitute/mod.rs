@@ -3,22 +3,22 @@ mod spec;
 mod util;
 
 use atty;
-use json;
-use yaml_rust;
 use failure::{err_msg, Error, ResultExt};
-use liquid;
 use handlebars::Handlebars;
+use json;
+use liquid;
+use yaml_rust;
 
 use std::ffi::OsStr;
-use std::io::{self, stdin};
 use std::fs::File;
+use std::io::{self, stdin};
 use std::os::unix::ffi::OsStrExt;
 
 pub use self::spec::*;
 pub use self::util::Engine;
 use self::util::{de_json_or_yaml, liquid_filters, validate, EngineChoice};
-use std::collections::BTreeSet;
 use handlebars::no_escape;
+use std::collections::BTreeSet;
 
 pub fn substitute(
     engine: Engine,

@@ -1,7 +1,7 @@
-use clap::{App, Arg};
 use clap::AppSettings;
-use std::env;
 use clap::ArgSettings;
+use clap::{App, Arg};
+use std::env;
 
 fn mk_help(kind: &str, prefix: &str) -> String {
     format!(

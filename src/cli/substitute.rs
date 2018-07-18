@@ -1,6 +1,6 @@
-use clap::{App, Arg};
 use clap::AppSettings;
 use clap::ArgSettings;
+use clap::{App, Arg};
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("substitute")

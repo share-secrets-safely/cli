@@ -1,18 +1,18 @@
-use std::path::{Path, PathBuf};
-use std::fs::File;
-use std::io::{stdin, BufRead, BufReader, Read, Write};
-use serde_yaml;
-use util::{strip_ext, write_at, FingerprintUserId, ResetCWD};
 use error::{IOMode, VaultError};
 use failure::{err_msg, Error, ResultExt};
 use glob::glob;
-use spec::WriteMode;
 use gpgme;
+use serde_yaml;
+use spec::WriteMode;
 use std::collections::HashSet;
-use std::iter::once;
 use std::fs::create_dir_all;
-use std::str::FromStr;
+use std::fs::File;
 use std::io;
+use std::io::{stdin, BufRead, BufReader, Read, Write};
+use std::iter::once;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use util::{strip_ext, write_at, FingerprintUserId, ResetCWD};
 
 pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {
@@ -336,7 +336,7 @@ impl Vault {
     ) -> Result<Vec<gpgme::Key>, Error> {
         ctx.find_keys(ids)
             .context(format!("Could not iterate keys for given {}s", type_of_ids_for_errors))?;
-        let (keys, missing): (Vec<gpgme::Key>, Vec<String>) = ids.iter().map(|id| (ctx.find_key(id), id)).fold(
+        let (keys, missing): (Vec<gpgme::Key>, Vec<String>) = ids.iter().map(|id| (ctx.get_key(id), id)).fold(
             (Vec::new(), Vec::new()),
             |(mut keys, mut missing), (r, id)| {
                 match r {
@@ -351,60 +351,58 @@ impl Vault {
             return Ok(keys);
         }
         let diff: isize = ids.len() as isize - keys.len() as isize;
-        let mut msg = vec![
-            if diff > 0 {
-                if let Some(dir) = gpg_keys_dir {
-                    self.import_keys(ctx, dir, &missing, output)
-                        .context("Could not auto-import all required keys")?;
-                    return self.keys_by_ids(ctx, ids, type_of_ids_for_errors, None, output);
-                }
+        let mut msg = vec![if diff > 0 {
+            if let Some(dir) = gpg_keys_dir {
+                self.import_keys(ctx, dir, &missing, output)
+                    .context("Could not auto-import all required keys")?;
+                return self.keys_by_ids(ctx, ids, type_of_ids_for_errors, None, output);
+            }
 
-                let mut msg = format!(
-                    "Didn't find the key for {} {}(s) in the gpg database.{}",
-                    diff,
-                    type_of_ids_for_errors,
-                    match self.gpg_keys.as_ref() {
-                        Some(dir) => format!(
-                            " This might mean it wasn't imported yet from the '{}' directory.",
-                            self.absolute_path(dir).display()
-                        ),
-                        None => String::new(),
-                    }
-                );
-                msg.push_str(&format!(
-                    "\nThe following {}(s) could not be found in the gpg key database:",
-                    type_of_ids_for_errors
-                ));
-                for fpr in missing {
-                    msg.push_str("\n");
-                    let key_path_info = match self.gpg_keys.as_ref() {
-                        Some(dir) => {
-                            let key_path = self.absolute_path(dir).join(&fpr);
-                            format!(
-                                "{}'{}'",
-                                if key_path.is_file() {
-                                    "Import key-file using 'gpg --import "
-                                } else {
-                                    "Key-file does not exist at "
-                                },
-                                key_path.display()
-                            )
-                        }
-                        None => "No GPG keys directory".into(),
-                    };
-                    msg.push_str(&format!("{} ({})", &fpr, key_path_info));
+            let mut msg = format!(
+                "Didn't find the key for {} {}(s) in the gpg database.{}",
+                diff,
+                type_of_ids_for_errors,
+                match self.gpg_keys.as_ref() {
+                    Some(dir) => format!(
+                        " This might mean it wasn't imported yet from the '{}' directory.",
+                        self.absolute_path(dir).display()
+                    ),
+                    None => String::new(),
                 }
-                msg
-            } else {
-                format!(
-                    "Found {} additional keys to encrypt for, which may indicate an unusual \
-                     {}s specification in the recipients file at '{}'",
-                    diff,
-                    type_of_ids_for_errors,
-                    self.recipients_path().display()
-                )
-            },
-        ];
+            );
+            msg.push_str(&format!(
+                "\nThe following {}(s) could not be found in the gpg key database:",
+                type_of_ids_for_errors
+            ));
+            for fpr in missing {
+                msg.push_str("\n");
+                let key_path_info = match self.gpg_keys.as_ref() {
+                    Some(dir) => {
+                        let key_path = self.absolute_path(dir).join(&fpr);
+                        format!(
+                            "{}'{}'",
+                            if key_path.is_file() {
+                                "Import key-file using 'gpg --import "
+                            } else {
+                                "Key-file does not exist at "
+                            },
+                            key_path.display()
+                        )
+                    }
+                    None => "No GPG keys directory".into(),
+                };
+                msg.push_str(&format!("{} ({})", &fpr, key_path_info));
+            }
+            msg
+        } else {
+            format!(
+                "Found {} additional keys to encrypt for, which may indicate an unusual \
+                 {}s specification in the recipients file at '{}'",
+                diff,
+                type_of_ids_for_errors,
+                self.recipients_path().display()
+            )
+        }];
         if !keys.is_empty() {
             msg.push(format!("All {}s found in gpg database:", type_of_ids_for_errors));
             msg.extend(keys.iter().map(|k| format!("{}", FingerprintUserId(k))));
