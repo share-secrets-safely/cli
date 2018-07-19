@@ -95,21 +95,12 @@ impl fmt::Display for NeverDrop {
 }
 
 impl MutableFilter for NeverDrop {
-    fn resolve_removal<'a, K: fmt::Display, V: Clone>(
-        &mut self,
-        _keys: &[K],
-        removed: &'a V,
-        _self: &mut V,
-    ) -> Option<Cow<'a, V>> {
-        Some(Cow::Borrowed(removed))
-    }
-
     fn resolve_conflict<'a, K: fmt::Display, V: Clone>(
         &mut self,
         keys: &[K],
         old: &'a V,
         new: &'a V,
-        _self: &mut V,
+        _self_of_whole_value: &mut V,
     ) -> Option<Cow<'a, V>> {
         match self.mode {
             MergeMode::NoOverwrite => {
@@ -119,5 +110,14 @@ impl MutableFilter for NeverDrop {
             }
             MergeMode::Overwrite => Some(Cow::Borrowed(new)),
         }
+    }
+
+    fn resolve_removal<'a, K: fmt::Display, V: Clone>(
+        &mut self,
+        _keys: &[K],
+        removed: &'a V,
+        _self_of_whole_value: &mut V,
+    ) -> Option<Cow<'a, V>> {
+        Some(Cow::Borrowed(removed))
     }
 }

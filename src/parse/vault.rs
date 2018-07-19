@@ -225,5 +225,5 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     };
     let sout = stdout();
     let mut lock = sout.lock();
-    amend_error_info(dispatch::vault::do_it(context, &mut lock, &mut stderr()))
+    amend_error_info(dispatch::vault::do_it(&context, &mut lock, &mut stderr()))
 }

@@ -32,6 +32,7 @@ pub fn assure_empty_directory_exists(dir: &Path) -> Result<DirectoryInfo, Error>
 }
 
 impl Vault {
+    #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
     pub fn init(
         secrets: &Path,
         gpg_key_ids: &[String],

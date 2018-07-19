@@ -449,11 +449,7 @@ impl Vault {
     }
 
     pub fn gpg_keys_dir_for_auto_import(&self, partition: &Vault) -> Option<PathBuf> {
-        let auto_import = partition
-            .auto_import
-            .clone()
-            .or(self.auto_import.clone())
-            .unwrap_or(false);
+        let auto_import = partition.auto_import.or(self.auto_import).unwrap_or(false);
         if auto_import {
             self.find_gpg_keys_dir().ok()
         } else {

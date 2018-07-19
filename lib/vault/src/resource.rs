@@ -36,7 +36,7 @@ impl Vault {
         &self,
         path: &Path,
         editor: &Path,
-        mode: &CreateMode,
+        mode: CreateMode,
         try_encrypt: bool,
         output: &mut Write,
     ) -> Result<(), Error> {
@@ -48,7 +48,7 @@ impl Vault {
             self.decrypt(path, &mut decrypted_writer)
                 .context(format!("Failed to decrypt file at '{}'.", path.display()))
                 .or_else(|err| match (mode, err.first_cause_of::<io::Error>()) {
-                    (&CreateMode::Create, Some(_)) => gpg_output_filename(path).and_then(|p| {
+                    (CreateMode::Create, Some(_)) => gpg_output_filename(path).and_then(|p| {
                         self.partition_by_owned_path(p.clone())
                             .map(|(partition, path)| partition.secrets_path().join(&path))
                     }),

@@ -25,7 +25,7 @@ impl Vault {
     pub fn print_recipients(&self, output: &mut Write, error: &mut Write) -> Result<(), Error> {
         let mut ctx = new_context()?;
         if self.partitions.is_empty() {
-            let keys_dir_for_auto_import = if self.auto_import.clone().unwrap_or(false) {
+            let keys_dir_for_auto_import = if self.auto_import.unwrap_or(false) {
                 self.gpg_keys_dir().ok()
             } else {
                 None
