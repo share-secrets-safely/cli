@@ -19,8 +19,8 @@ LINUX_FILE=sy-cli-Linux-x86_64.tar.gz
 }
 
 SHA_SUM=$(
-  which sha256sum 2>/dev/null \
-  || which gsha256sum 2>/dev/null \
+  command -v sha256sum 2>/dev/null \
+  || command -v gsha256sum 2>/dev/null \
   || { echo 1>&2 "sha256 program not found"; false; } \
 )
 
