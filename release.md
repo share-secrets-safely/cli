@@ -1,3 +1,7 @@
+### V4.0.3: Dependency Update
+
+* upgrade all dependencies to the latest version
+
 ### V4.0.2: Fixes and improvements
 
 * add the '--no-stdin' flag to `sy process`. It allows to prevent it from blocking on reading from
