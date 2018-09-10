@@ -65,4 +65,6 @@ Those are namely
 
 [wot]: https://www.gnupg.org/gph/en/manual/x547.html
 [gpgme]: https://github.com/johnschug/rust-gpgme
+[pass]: https://www.passwordstore.org
+
    
