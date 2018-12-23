@@ -113,7 +113,7 @@ pub fn export_key(
     let fingerprint = fingerprint_of(key)?;
     let key_path = gpg_keys_dir.join(&fingerprint);
     ctx.set_armor(true);
-    ctx.export_keys([key].iter().map(|k| *k), gpgme::ExportMode::empty(), &mut *buf)
+    ctx.export_keys([key].iter().cloned(), gpgme::ExportMode::empty(), &mut *buf)
         .with_context(|_| err_msg("Failed to export at least one public key with signatures."))?;
     write_at(&key_path)
         .and_then(|mut f| f.write_all(buf))
@@ -167,7 +167,7 @@ pub struct ResetCWD {
     cwd: Result<PathBuf, io::Error>,
 }
 impl ResetCWD {
-    pub fn new(next_cwd: &Path) -> Result<Self, Error> {
+    pub fn from_path(next_cwd: &Path) -> Result<Self, Error> {
         let prev_cwd = current_dir();
         set_current_dir(next_cwd).with_context(|_| {
             format!(

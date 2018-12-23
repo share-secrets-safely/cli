@@ -278,7 +278,7 @@ impl Vault {
             if !dir.is_dir() {
                 continue;
             }
-            let _change_cwd = ResetCWD::new(&dir)?;
+            let _change_cwd = ResetCWD::from_path(&dir)?;
             for entry in glob(GPG_GLOB).expect("valid pattern").filter_map(Result::ok) {
                 if has_multiple_partitions {
                     writeln!(w, "{}", dir.join(strip_ext(&entry)).display())?;

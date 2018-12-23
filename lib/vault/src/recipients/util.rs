@@ -182,7 +182,7 @@ impl Vault {
         let fpr_path = if fpr.len() == 40 {
             gpg_keys_dir.join(fpr)
         } else {
-            let _cwd = ResetCWD::new(gpg_keys_dir)?;
+            let _cwd = ResetCWD::from_path(gpg_keys_dir)?;
             let glob_pattern = format!("*{}", fpr);
             let matching_paths: Vec<_> = glob(&glob_pattern)
                 .expect("valid pattern")
@@ -234,7 +234,7 @@ impl Vault {
             }
         };
         let files_to_reencrypt: Vec<_> = {
-            let _change_cwd = ResetCWD::new(&secrets_dir)?;
+            let _change_cwd = ResetCWD::from_path(&secrets_dir)?;
             glob(GPG_GLOB).expect("valid pattern").filter_map(Result::ok).collect()
         };
         for encrypted_file_path in files_to_reencrypt {
