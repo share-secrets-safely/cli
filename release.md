@@ -1,3 +1,7 @@
+### V4.0.4: Dependency Update
+
+* upgrade all dependencies to the latest version
+
 ### V4.0.3: Dependency Update
 
 * upgrade all dependencies to the latest version
