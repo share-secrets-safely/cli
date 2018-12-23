@@ -1,8 +1,0 @@
-error: 'something-new' isn't a valid value for '--trust-model <model>'
-	[possible values: always, web-of-trust]
-
-
-USAGE:
-    syv --config-file <path> init --gpg-keys-dir <directory> --recipients-file <path> --secrets-dir <path> --trust-model <model>
-
-For more information try --help

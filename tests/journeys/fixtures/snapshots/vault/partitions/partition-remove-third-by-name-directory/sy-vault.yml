@@ -1,7 +1,7 @@
 ---
 name: ~
 auto_import: false
-trust_model: "gpg-web-of-trust"
+trust_model: gpg-web-of-trust
 secrets: secrets
 gpg_keys: etc/keys
 recipients: etc/recipients
@@ -13,7 +13,7 @@ secrets: first
 gpg_keys: ~
 recipients: first/recipients
 ---
-name: "second-partition"
+name: second-partition
 auto_import: ~
 trust_model: ~
 secrets: "./subdir/second"

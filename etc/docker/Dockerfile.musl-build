@@ -11,5 +11,3 @@ RUN cd /gettext-${GETTEXT_VERSION} && ./configure --disable-openmp --without-ema
 RUN cd /gettext-${GETTEXT_VERSION} make -j2 > /dev/null && make install > /dev/null 
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
-
-

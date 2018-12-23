@@ -1,7 +1,7 @@
 ---
 name: ~
 auto_import: false
-trust_model: "gpg-web-of-trust"
+trust_model: gpg-web-of-trust
 secrets: sec
 gpg_keys: ".gpg-keys"
-recipients: "sec/.gpg-id"
+recipients: sec/.gpg-id

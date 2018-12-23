@@ -211,7 +211,7 @@ where
     W: Write,
 {
     let e = e.into();
-    let causes = e.causes().collect::<Vec<_>>();
+    let causes = e.iter_chain().collect::<Vec<_>>();
     let num_causes = causes.len();
     for (index, cause) in causes.iter().enumerate() {
         if index == 0 {

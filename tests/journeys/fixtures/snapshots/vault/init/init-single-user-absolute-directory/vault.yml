@@ -1,7 +1,7 @@
 ---
-name: "custom-name"
+name: custom-name
 auto_import: false
-trust_model: "gpg-web-of-trust"
+trust_model: gpg-web-of-trust
 secrets: "."
 gpg_keys: keys
 recipients: "./recipients"
