@@ -1,5 +1,5 @@
 error: Failed to render template from template at 'the-answer'
 Caused by: 
- 1: liquid: Invalid index
+ 1: liquid: Unknown variable
   with:
-    index=the-answer
+    variable=the-answer

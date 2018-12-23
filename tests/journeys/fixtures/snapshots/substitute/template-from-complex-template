@@ -33,7 +33,9 @@ Introduction
 
 
 
-tomatotomatoWow, John G. Chalmers-Smith, you have a long name!Anything you put between  tags
+tomatotomato
+
+Anything you put between  tags
 is turned into a comment.
 
 
@@ -88,6 +90,10 @@ is turned into a comment.
 
   
     
+  
+    5
+  
+
 
 
   1
@@ -96,6 +102,8 @@ is turned into a comment.
 
   4
 
+  5
+
 
 
 
@@ -104,6 +112,8 @@ is turned into a comment.
   2
 
   3
+
+  4
 
 
 
@@ -205,7 +215,7 @@ March 25, 2018
 
 
 
-2.857143
+2.857142857142857
 parker moore
 Have you read &#39;James &amp; the Giant Peach&#39;?
 1 &lt; 2 &amp; 3

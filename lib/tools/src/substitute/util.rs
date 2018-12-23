@@ -12,13 +12,14 @@ use std::str::FromStr;
 
 pub mod liquid_filters {
     use base64;
-    use liquid::interpreter::{FilterError, FilterResult};
-    use liquid::Value;
+    use liquid::interpreter::FilterResult;
+    use liquid::value::Value;
+    use liquid_error;
 
     pub fn base64(input: &Value, _args: &[Value]) -> FilterResult {
         match *input {
             Value::Scalar(ref s) => Ok(Value::scalar(base64::encode(s.to_str().as_ref()))),
-            _ => Err(FilterError::InvalidType("String expected".to_owned())),
+            _ => Err(liquid_error::Error::with_msg("String expected")),
         }
     }
 }
@@ -43,7 +44,7 @@ impl FromStr for Engine {
 
 pub enum EngineChoice {
     Handlebars(handlebars::Handlebars, json::Value),
-    Liquid(liquid::Parser, liquid::Object),
+    Liquid(liquid::Parser, liquid::value::Object),
 }
 
 pub fn validate(data: &StreamOrPath, specs: &[Spec]) -> Result<(), Error> {

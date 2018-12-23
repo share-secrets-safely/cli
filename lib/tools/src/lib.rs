@@ -15,6 +15,8 @@ extern crate glob;
 extern crate handlebars;
 #[cfg(feature = "substitute")]
 extern crate liquid;
+#[cfg(feature = "substitute")]
+extern crate liquid_error;
 #[cfg(feature = "process")]
 extern crate serde;
 #[cfg(feature = "process")]

@@ -2,7 +2,6 @@ extern crate atty;
 extern crate conv;
 #[macro_use]
 extern crate failure;
-#[macro_use]
 extern crate failure_derive;
 extern crate glob;
 extern crate gpgme;

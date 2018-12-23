@@ -34,13 +34,6 @@
 {%- assign my_variable = "tomato" -%}
 {{ my_variable }}
 
-{%- assign username = "John G. Chalmers-Smith" -%}
-{%- if username != "" and username.size > 10 -%}
-  Wow, {{ username }}, you have a long name!
-{%- else -%}
-  Hello there!
-{%- endif -%}
-
 Anything you put between {% comment %} and {% endcomment %} tags
 is turned into a comment.
 

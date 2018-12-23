@@ -149,10 +149,10 @@ pub fn substitute(
     Ok(())
 }
 
-fn into_liquid_object(src: json::Value) -> Result<liquid::Object, Error> {
+fn into_liquid_object(src: json::Value) -> Result<liquid::value::Object, Error> {
     let dst = json::from_value(src)?;
     match dst {
-        liquid::Value::Object(obj) => Ok(obj),
+        liquid::value::Value::Object(obj) => Ok(obj),
         _ => Err(err_msg("Data model root must be an object")),
     }
 }

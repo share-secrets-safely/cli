@@ -3,6 +3,6 @@ Caused by:
  6: rust-yaml deserialization failed
  5: while scanning a quoted scalar, found unexpected end of stream at line 1 column 2
  4: JSON deserialization failed
- 3: control character (\u0000-\u001F) found while parsing a string at line 1 column 5
+ 3: control character (\u0000-\u001F) found while parsing a string at line 2 column 0
  2: YAML deserialization failed
  1: while scanning a quoted scalar, found unexpected end of stream at line 1 column 2
