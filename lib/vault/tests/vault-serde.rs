@@ -15,7 +15,7 @@ fn vault_trust_model_serde() {
         r#"---
 name: ~
 auto_import: true
-trust_model: "gpg-web-of-trust"
+trust_model: gpg-web-of-trust
 secrets: "."
 gpg_keys: ~
 recipients: ".gpg-id""#
