@@ -30,17 +30,19 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
     Ok({
         let mut has_seen_merge_stdin = false;
         let mut cmds = match (args.values_of_os("path"), args.indices_of("path")) {
-            (Some(v), Some(i)) => v.map(|v| {
-                if v == "-" {
-                    has_seen_merge_stdin = true;
-                    Command::MergeStdin
-                } else {
-                    match v.to_str().map(|v| (v, v.find('='))) {
-                        Some((v, Some(idx))) => Command::MergeValue(v[..idx].to_owned(), v[idx + 1..].to_owned()),
-                        _ => Command::MergePath(PathBuf::from(v)),
+            (Some(v), Some(i)) => v
+                .map(|v| {
+                    if v == "-" {
+                        has_seen_merge_stdin = true;
+                        Command::MergeStdin
+                    } else {
+                        match v.to_str().map(|v| (v, v.find('='))) {
+                            Some((v, Some(idx))) => Command::MergeValue(v[..idx].to_owned(), v[idx + 1..].to_owned()),
+                            _ => Command::MergePath(PathBuf::from(v)),
+                        }
                     }
-                }
-            }).zip(i)
+                })
+                .zip(i)
                 .collect(),
             (None, None) => Vec::new(),
             _ => unreachable!("expecting clap to work"),
@@ -73,7 +75,8 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
             bail!("Cannot specify standard input explicitly with '-' and prohibit reading stdin with --no-stdin.")
         }
         if atty::isnt(atty::Stream::Stdin) && !has_seen_merge_stdin && may_read_stdin {
-            let at_position = cmds.iter()
+            let at_position = cmds
+                .iter()
                 .position(|cmd| match *cmd {
                     Command::MergePath(_) | Command::MergeValue(_, _) | Command::MergeEnvironment(_) => true,
                     _ => false,

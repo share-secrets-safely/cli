@@ -47,7 +47,8 @@ impl Vault {
                         "Signed recipients key {} with signing key {}",
                         UserIdFingerprint(&key_to_sign),
                         UserIdFingerprint(&signing_key)
-                    ).ok();
+                    )
+                    .ok();
                 }
             }
             let keys = {
@@ -77,7 +78,8 @@ impl Vault {
                         "Exported public key for user {} to '{}'",
                         KeyDisplay(key),
                         file_path.display()
-                    ).ok();
+                    )
+                    .ok();
                 }
             }
 

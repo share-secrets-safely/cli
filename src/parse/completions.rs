@@ -8,7 +8,8 @@ use std::path::Path;
 use std::str::FromStr;
 
 pub fn generate(mut app: App, args: &ArgMatches) -> Result<(), Error> {
-    let shell = args.value_of("shell")
+    let shell = args
+        .value_of("shell")
         .ok_or_else(|| err_msg("expected 'shell' argument"))
         .map(|s| {
             Path::new(s)

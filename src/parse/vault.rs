@@ -29,7 +29,8 @@ pub fn amend_error_info<T>(r: Result<T, Error>) -> Result<T, Error> {
             None => None,
         };
         (e, ctx)
-    }).map_err(|(e, msg)| match msg {
+    })
+    .map_err(|(e, msg)| match msg {
         Some(msg) => e.context(msg).into(),
         None => e,
     })
@@ -63,7 +64,8 @@ pub fn recipients_remove(ctx: Context, args: &ArgMatches) -> Result<Context, Err
     Ok(Context {
         command: Command::RecipientsRemove {
             partitions: optional_args(args, "partition"),
-            gpg_key_ids: args.values_of("gpg-key-id")
+            gpg_key_ids: args
+                .values_of("gpg-key-id")
                 .expect("Clap to assure this is a required arg")
                 .map(Into::into)
                 .collect(),
@@ -104,7 +106,8 @@ pub fn recipients_add(ctx: Context, args: &ArgMatches) -> Result<Context, Error>
             },
             partitions: optional_args(args, "partition"),
             signing_key_id: args.value_of("signing-key").map(ToOwned::to_owned),
-            gpg_key_ids: args.values_of("gpg-key-id")
+            gpg_key_ids: args
+                .values_of("gpg-key-id")
                 .expect("Clap to assure this is a required arg")
                 .map(Into::into)
                 .collect(),

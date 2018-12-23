@@ -62,7 +62,8 @@ pub fn validate(data: &StreamOrPath, specs: &[Spec]) -> Result<(), Error> {
         .filter_map(|s| {
             use self::StreamOrPath::*;
             match (&s.src, &s.dst) {
-                (&Path(ref src), &Path(ref dst)) => src.canonicalize()
+                (&Path(ref src), &Path(ref dst)) => src
+                    .canonicalize()
                     .and_then(|src| dst.canonicalize().map(|dst| (src, dst)))
                     .ok()
                     .and_then(|(src, dst)| if src == dst { Some(s) } else { None }),

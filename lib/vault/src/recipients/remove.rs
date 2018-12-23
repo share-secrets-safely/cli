@@ -36,18 +36,18 @@ impl Vault {
                 let keys_and_fprs = fingerprints_of_keys(&keys_for_ids)?;
                 let recipient_keys_and_fprs = fingerprints_of_keys(&recipients_keys)?;
 
-                let (keys_and_fprs_to_remove, missing) = keys_and_fprs.into_iter().fold(
-                    (Vec::new(), Vec::new()),
-                    |(mut keys, mut missing), (k, fpr)| {
-                        let found = recipient_keys_and_fprs.iter().any(|&(_, ref rkfpr)| *rkfpr == fpr);
-                        if found {
-                            keys.push((k, fpr));
-                        } else {
-                            missing.push(k);
-                        };
-                        (keys, missing)
-                    },
-                );
+                let (keys_and_fprs_to_remove, missing) =
+                    keys_and_fprs
+                        .into_iter()
+                        .fold((Vec::new(), Vec::new()), |(mut keys, mut missing), (k, fpr)| {
+                            let found = recipient_keys_and_fprs.iter().any(|&(_, ref rkfpr)| *rkfpr == fpr);
+                            if found {
+                                keys.push((k, fpr));
+                            } else {
+                                missing.push(k);
+                            };
+                            (keys, missing)
+                        });
 
                 if !missing.is_empty() {
                     return Err(format_err!(
@@ -87,7 +87,8 @@ impl Vault {
                             "Fingerprint key file at '{}' was not existing anymore",
                             fingerprint_path.display()
                         )
-                    }.ok();
+                    }
+                    .ok();
                 }
             }
 
@@ -96,7 +97,8 @@ impl Vault {
                 output,
                 "Wrote changed recipients to file at '{}'",
                 written_file.display()
-            ).ok();
+            )
+            .ok();
 
             partition.reencrypt(
                 &mut ctx,

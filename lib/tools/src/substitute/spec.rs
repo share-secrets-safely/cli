@@ -46,23 +46,27 @@ impl StreamOrPath {
                     create_dir_all(dir)
                         .context(format!("Could not create directory leading towards '{}'", p.display(),))?;
                 }
-                Box::new(OpenOptions::new()
-                    .create(true)
-                    .write(true)
-                    .append(append)
-                    .open(p)
-                    .context(format!("Could not open '{}' for writing", p.display()))?)
+                Box::new(
+                    OpenOptions::new()
+                        .create(true)
+                        .write(true)
+                        .append(append)
+                        .open(p)
+                        .context(format!("Could not open '{}' for writing", p.display()))?,
+                )
             }
         })
     }
 
     pub fn open_as_input(&self) -> Result<Box<io::Read>, Error> {
         Ok(match *self {
-            StreamOrPath::Stream => if atty::is(atty::Stream::Stdin) {
-                bail!("Cannot read from standard input while a terminal is connected")
-            } else {
-                Box::new(stdin())
-            },
+            StreamOrPath::Stream => {
+                if atty::is(atty::Stream::Stdin) {
+                    bail!("Cannot read from standard input while a terminal is connected")
+                } else {
+                    Box::new(stdin())
+                }
+            }
             StreamOrPath::Path(ref p) => {
                 Box::new(File::open(p).context(format!("Could not open '{}' for reading", p.display()))?)
             }
@@ -117,7 +121,8 @@ impl fmt::Display for Spec {
             (&Stream, &Stream) => f.write_char(Spec::sep()),
             (&Path(ref p), &Stream) => p.display().fmt(f),
             (&Stream, &Path(ref p)) => f.write_char(Spec::sep()).and(p.display().fmt(f)),
-            (&Path(ref p1), &Path(ref p2)) => p1.display()
+            (&Path(ref p1), &Path(ref p2)) => p1
+                .display()
                 .fmt(f)
                 .and(f.write_char(Spec::sep()))
                 .and(p2.display().fmt(f)),

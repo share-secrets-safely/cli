@@ -63,7 +63,8 @@ impl ::std::error::Error for VaultSpecError {
 }
 
 pub fn gpg_output_filename(path: &Path) -> Result<PathBuf, Error> {
-    let file_name = path.file_name()
+    let file_name = path
+        .file_name()
         .ok_or_else(|| format_err!("'{}' does not have a filename", path.display()))?;
     Ok(path.parent().expect("path with filename to have a root").join(format!(
         "{}.gpg",

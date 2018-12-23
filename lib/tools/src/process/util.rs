@@ -16,35 +16,42 @@ pub fn de_json_or_yaml_document_support<R: io::Read>(mut reader: R, state: &Stat
 
     Ok(match json::from_str(&buf) {
         Ok(v) => v,
-        Err(json_err) => yaml::from_str(&buf).map_err(|yaml_err| (yaml_err, json_err)).or_else(
-            |(yaml_err, json_err)| {
-                yaml_rust::YamlLoader::load_from_str(&buf)
-                    .map_err(|rust_yaml_err| {
-                        yaml_err
-                            .context("YAML deserialization failed")
-                            .context(json_err)
-                            .context("JSON deserialization failed")
-                            .context(rust_yaml_err)
-                            .context("rust-yaml deserialization failed")
-                            .context("Could not deserialize data, tried JSON and YAML. The data might be malformed")
-                    })
-                    .and_then(|v| match v.len() {
-                        0 => Err(err_msg("Deserialized a YAML without a single value").context("fatal")),
-                        1 => Err(err_msg("We expect single-document yaml files to be read by serde").context("fatal")),
-                        _ => {
-                            let mut m =
-                                tools::Merger::with_filter(v[0].clone(), NeverDrop::with_mode(&state.merge_mode));
-                            for docs in v.as_slice().windows(2) {
-                                diff(&docs[0], &docs[1], &mut m);
+        Err(json_err) => {
+            yaml::from_str(&buf)
+                .map_err(|yaml_err| (yaml_err, json_err))
+                .or_else(|(yaml_err, json_err)| {
+                    yaml_rust::YamlLoader::load_from_str(&buf)
+                        .map_err(|rust_yaml_err| {
+                            yaml_err
+                                .context("YAML deserialization failed")
+                                .context(json_err)
+                                .context("JSON deserialization failed")
+                                .context(rust_yaml_err)
+                                .context("rust-yaml deserialization failed")
+                                .context("Could not deserialize data, tried JSON and YAML. The data might be malformed")
+                        })
+                        .and_then(|v| match v.len() {
+                            0 => Err(err_msg("Deserialized a YAML without a single value").context("fatal")),
+                            1 => {
+                                Err(err_msg("We expect single-document yaml files to be read by serde")
+                                    .context("fatal"))
                             }
-                            if !m.filter().clashed_keys.is_empty() {
-                                return Err(format_err!("{}", m.filter()).context("The merge failed due to conflicts"));
+                            _ => {
+                                let mut m =
+                                    tools::Merger::with_filter(v[0].clone(), NeverDrop::with_mode(&state.merge_mode));
+                                for docs in v.as_slice().windows(2) {
+                                    diff(&docs[0], &docs[1], &mut m);
+                                }
+                                if !m.filter().clashed_keys.is_empty() {
+                                    return Err(
+                                        format_err!("{}", m.filter()).context("The merge failed due to conflicts")
+                                    );
+                                }
+                                Ok(yaml_rust_to_json(&m.into_inner()))
                             }
-                            Ok(yaml_rust_to_json(&m.into_inner()))
-                        }
-                    })
-            },
-        )?,
+                        })
+                })?
+        }
     })
 }
 

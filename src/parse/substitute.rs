@@ -20,7 +20,8 @@ pub struct Context {
 pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
     Ok(Context {
         replacements: {
-            let replace_cmds = args.values_of("replace")
+            let replace_cmds = args
+                .values_of("replace")
                 .map_or_else(Vec::new, |v| v.map(|s| s.to_owned()).collect());
             if replace_cmds.len() % 2 != 0 {
                 bail!("Please provide --replace-value arguments in pairs of two. First the value to find, second the one to replace it with");

@@ -58,7 +58,8 @@ impl Vault {
                                 e.context(format!(
                                     "Could not import key to gpg key database from content of file at '{}'",
                                     fpr_path.display()
-                                )).into()
+                                ))
+                                .into()
                             })
                             .map(|imports| {
                                 imports
@@ -77,7 +78,8 @@ impl Vault {
                                 err.context(format!(
                                     "Could not find fingerprint '{}', tried local file as well as gpg keychain.",
                                     fpr
-                                )).into()
+                                ))
+                                .into()
                             })
                     })
             })
@@ -119,7 +121,8 @@ impl Vault {
     }
 
     pub fn find_signing_key(&self, ctx: &mut gpgme::Context, signing_key_id: Option<&str>) -> Result<Key, Error> {
-        let recipients_fprs = self.recipients_list()
+        let recipients_fprs = self
+            .recipients_list()
             .context("A recipients list is needed assure the signing key is in the recipients list.")?;
         if recipients_fprs.is_empty() {
             return Err(err_msg(
@@ -134,24 +137,29 @@ impl Vault {
             }
         };
         let signing_key_fpr = match signing_key_id {
-            Some(id) => Some(ctx.get_key(id)
-                .map_err(Into::into)
-                .and_then(|k| fingerprint_of(&k))
-                .context(format!(
-                    "The given signing key named '{}' could not be found in the keychain.",
-                    id
-                ))?),
+            Some(id) => Some(
+                ctx.get_key(id)
+                    .map_err(Into::into)
+                    .and_then(|k| fingerprint_of(&k))
+                    .context(format!(
+                        "The given signing key named '{}' could not be found in the keychain.",
+                        id
+                    ))?,
+            ),
             None => None,
         };
         let only_matching_signing_key = |(k, fpr)| match signing_key_fpr.as_ref() {
-            Some(sk_fpr) => if &fpr == sk_fpr {
-                Some((k, fpr))
-            } else {
-                None
-            },
+            Some(sk_fpr) => {
+                if &fpr == sk_fpr {
+                    Some((k, fpr))
+                } else {
+                    None
+                }
+            }
             None => Some((k, fpr)),
         };
-        let mut signing_keys: Vec<_> = ctx.find_secret_keys(None::<String>)?
+        let mut signing_keys: Vec<_> = ctx
+            .find_secret_keys(None::<String>)?
             .filter_map(Result::ok)
             .filter_map(|k| fingerprint_of(&k).map(|fpr| (k, fpr)).ok())
             .filter_map(only_matching_signing_key)
@@ -279,7 +287,8 @@ impl Vault {
                 output,
                 "Re-encrypted '{}' for new recipient(s)",
                 strip_ext(&qualified(&encrypted_file_path)).display()
-            ).ok();
+            )
+            .ok();
         }
         Ok(())
     }

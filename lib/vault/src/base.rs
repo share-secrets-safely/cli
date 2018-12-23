@@ -124,10 +124,12 @@ impl Vault {
                             auto_import: Some(false),
                             trust_model: Some(TrustModel::GpgWebOfTrust),
                         };
-                        vault = vault.set_resolved_at(&recipients_path
-                            .parent()
-                            .expect("parent dir for recipient path which was joined before")
-                            .join("sy-vault.yml"))?;
+                        vault = vault.set_resolved_at(
+                            &recipients_path
+                                .parent()
+                                .expect("parent dir for recipient path which was joined before")
+                                .join("sy-vault.yml"),
+                        )?;
                         return Ok(vec![vault]);
                     }
                 }
@@ -160,9 +162,11 @@ impl Vault {
     }
 
     pub fn set_resolved_at(mut self, vault_file: &Path) -> Result<Self, Error> {
-        self.resolved_at = normalize(vault_file
-            .parent()
-            .ok_or_else(|| format_err!("The vault file path '{}' is invalid.", vault_file.display()))?);
+        self.resolved_at = normalize(
+            vault_file
+                .parent()
+                .ok_or_else(|| format_err!("The vault file path '{}' is invalid.", vault_file.display()))?,
+        );
         self.vault_path = Some(vault_file.to_owned());
         Ok(self)
     }
@@ -172,7 +176,8 @@ impl Vault {
             return Ok(());
         }
         {
-            let all_secrets_paths: Vec<_> = self.partitions
+            let all_secrets_paths: Vec<_> = self
+                .partitions
                 .iter()
                 .map(|v| v.secrets_path())
                 .chain(once(self.secrets_path()))
@@ -186,7 +191,8 @@ impl Vault {
             for (sp, dp) in iproduct!(
                 all_secrets_paths.iter().enumerate(),
                 all_secrets_paths.iter().enumerate()
-            ).filter_map(|((si, s), (di, d))| if si == di { None } else { Some((s, d)) })
+            )
+            .filter_map(|((si, s), (di, d))| if si == di { None } else { Some((s, d)) })
             {
                 if sp.starts_with(&dp) {
                     bail!(
@@ -199,7 +205,8 @@ impl Vault {
         }
         {
             let mut seen: HashSet<_> = Default::default();
-            for path in self.partitions
+            for path in self
+                .partitions
                 .iter()
                 .map(|v| v.recipients_path())
                 .chain(once(self.recipients_path()))
@@ -513,7 +520,8 @@ fn split_documents<R: Read>(mut r: R) -> Result<Vec<String>, Error> {
     r.read_to_string(&mut buf)?;
 
     let docs = YamlLoader::load_from_str(&buf).context("YAML deserialization failed")?;
-    Ok(docs.iter()
+    Ok(docs
+        .iter()
         .map(|d| {
             let mut out_str = String::new();
             {

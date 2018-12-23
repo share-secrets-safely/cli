@@ -99,7 +99,8 @@ pub fn export_key_with_progress(
         "Exported public key for user {} to '{}'",
         KeyDisplay(key),
         key_path.display()
-    ).ok();
+    )
+    .ok();
     Ok((fingerprint, key_path))
 }
 

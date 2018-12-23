@@ -20,14 +20,16 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
     Ok({
         let mut has_seen_merge_stdin = false;
         let mut cmds = match (args.values_of_os("file"), args.indices_of("file")) {
-            (Some(v), Some(i)) => v.map(|v| {
-                if v == "-" {
-                    has_seen_merge_stdin = true;
-                    Command::MergeStdin
-                } else {
-                    Command::MergePath(PathBuf::from(v))
-                }
-            }).zip(i)
+            (Some(v), Some(i)) => v
+                .map(|v| {
+                    if v == "-" {
+                        has_seen_merge_stdin = true;
+                        Command::MergeStdin
+                    } else {
+                        Command::MergePath(PathBuf::from(v))
+                    }
+                })
+                .zip(i)
                 .collect(),
             (None, None) => Vec::new(),
             _ => unreachable!("expecting clap to work"),
@@ -44,7 +46,8 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
         }
 
         if atty::isnt(atty::Stream::Stdin) && !has_seen_merge_stdin {
-            let at_position = cmds.iter()
+            let at_position = cmds
+                .iter()
                 .position(|cmd| match *cmd {
                     Command::MergePath(_) | Command::SelectToBuffer(_) => true,
                     _ => false,

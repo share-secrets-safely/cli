@@ -21,7 +21,8 @@ impl Vault {
                 .map(|p| p.as_path())
                 .ok_or_else(|| err_msg("Expected vault to know its configuration file"))?,
             WriteMode::AllowOverwrite,
-        ).map_err(Into::into)
+        )
+        .map_err(Into::into)
     }
 
     pub fn partition_index<'a, I>(selector: &str, partitions: I, leader_index: Option<usize>) -> Result<usize, Error>
@@ -96,14 +97,16 @@ impl Vault {
                 )
             })?),
         };
-        let max_index = self.partitions
+        let max_index = self
+            .partitions
             .iter()
             .map(|v| v.index)
             .chain(once(self.index))
             .max()
             .expect("at least one item");
         let new_partition = Vault {
-            name: name.map(ToOwned::to_owned)
+            name: name
+                .map(ToOwned::to_owned)
                 .or_else(|| path.file_name().map(|f| f.to_string_lossy().into_owned())),
             kind: VaultKind::Partition,
             index: max_index + 1,
@@ -148,7 +151,8 @@ impl Vault {
                 "Added unnamed partition with resources at '{}'",
                 partition_secrets_dir.display()
             ),
-        }.ok();
+        }
+        .ok();
 
         Ok(())
     }

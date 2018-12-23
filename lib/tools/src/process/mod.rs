@@ -14,7 +14,8 @@ use treediff::{diff, tools};
 mod util;
 
 fn validate(cmds: &[Command]) -> Result<(), Error> {
-    let num_merge_stdin_cmds = cmds.iter()
+    let num_merge_stdin_cmds = cmds
+        .iter()
         .filter(|c| if let Command::MergeStdin = **c { true } else { false })
         .count();
     if num_merge_stdin_cmds > 1 {
@@ -136,11 +137,13 @@ where
     });
 
     let output_mode = match output_mode {
-        None => if has_complex_value {
-            Some(&OutputMode::Json)
-        } else {
-            None
-        },
+        None => {
+            if has_complex_value {
+                Some(&OutputMode::Json)
+            } else {
+                None
+            }
+        }
         Some(mode) => Some(mode),
     };
 

@@ -63,7 +63,8 @@ impl Vault {
                     .as_ref()
                     .map(PathBuf::as_path),
                 output,
-            ).context("Aborted edit operation as you cannot encrypt resources.")?;
+            )
+            .context("Aborted edit operation as you cannot encrypt resources.")?;
         }
         run_editor(editor.as_os_str(), &tempfile_path)?;
         let mut zero = Vec::new();
@@ -75,7 +76,8 @@ impl Vault {
             WriteMode::AllowOverwrite,
             Destination::Unchanged,
             &mut zero,
-        ).context("Failed to re-encrypt edited content.")?;
+        )
+        .context("Failed to re-encrypt edited content.")?;
         writeln!(output, "Edited '{}'.", path.display()).ok();
         Ok(())
     }
@@ -97,7 +99,8 @@ impl Vault {
         ctx.decrypt(&mut input, &mut output)
             .map_err(|e: gpgme::Error| DecryptionError::caused_by(e, "Failed to decrypt data."))?;
 
-        w.write_all(&output).context("Could not write out all decrypted data.")?;
+        w.write_all(&output)
+            .context("Could not write out all decrypted data.")?;
         Ok(path_for_decryption)
     }
 
@@ -234,7 +237,8 @@ impl Vault {
                 encrypted_destinations.iter().map(|p| format!("'{}'", p.display())),
                 ", "
             )
-        ).ok();
+        )
+        .ok();
         Ok(())
     }
 }

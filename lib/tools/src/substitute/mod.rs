@@ -32,13 +32,15 @@ pub fn substitute(
     let mut own_specs = Vec::new();
 
     let (dataset, specs) = match *input_data {
-        Stream => if atty::is(atty::Stream::Stdin) {
-            bail!("Stdin is a TTY. Cannot substitute a template without any data.")
-        } else {
-            let stdin = stdin();
-            let locked_stdin = stdin.lock();
-            (de_json_or_yaml(locked_stdin)?, specs)
-        },
+        Stream => {
+            if atty::is(atty::Stream::Stdin) {
+                bail!("Stdin is a TTY. Cannot substitute a template without any data.")
+            } else {
+                let stdin = stdin();
+                let locked_stdin = stdin.lock();
+                (de_json_or_yaml(locked_stdin)?, specs)
+            }
+        }
         Path(ref p) => (
             de_json_or_yaml(File::open(&p).context(format!("Could not open input data file at '{}'", p.display()))?)?,
             if specs.is_empty() {
@@ -166,7 +168,8 @@ fn substitute_in_data(mut d: json::Value, r: &[(String, String)]) -> json::Value
         while let Some(v) = stack.pop() {
             match *v {
                 String(ref mut s) => {
-                    *s = r.iter()
+                    *s = r
+                        .iter()
                         .fold(s.to_owned(), |s, &(ref f, ref t)| s.replace(f.as_str(), t))
                 }
                 Array(ref mut v) => stack.extend(v.iter_mut()),

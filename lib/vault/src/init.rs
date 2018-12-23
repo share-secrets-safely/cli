@@ -18,7 +18,8 @@ pub enum DirectoryInfo {
 
 pub fn assure_empty_directory_exists(dir: &Path) -> Result<DirectoryInfo, Error> {
     Ok(if dir.is_dir() {
-        let num_entries = dir.read_dir()
+        let num_entries = dir
+            .read_dir()
             .with_context(|_| format!("Failed to open directory '{}' to see if it is empty", dir.display()))?
             .count();
         if num_entries > 0 {
@@ -52,7 +53,8 @@ impl Vault {
             auto_import,
             trust_model,
             ..Default::default()
-        }.set_resolved_at(vault_path)?;
+        }
+        .set_resolved_at(vault_path)?;
 
         let mut gpg_ctx = new_context()?;
         let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
