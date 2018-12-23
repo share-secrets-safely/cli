@@ -88,7 +88,7 @@ $(SYV_MUSL_EXE): build-linux-musl-syv
 $(RELEASE_MUSL_EXE): release-linux-musl
 
 $(LINUX_DEPLOYABLE): build-musl-image
-	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo -v "$$PWD:/volume" \
+	docker run -v $$PWD/.docker-cargo-cache:/root/.cargo/registry -v "$$PWD:/volume" \
 					--rm $(MY_MUSL_IMAGE) \
 					/bin/bash -c \
 					'cargo build --bin=sy --all-features $(MUSL_RELEASE_ARGS) && \
