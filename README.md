@@ -175,7 +175,7 @@ red builds just yet.
   * run `make deployment`.
   * copy all text from the `release.md` file and copy it into the release text on github.
   * drag & drop all _tar.gz_  into the release and publish it.
-  * in `installation.md`, update the URL to use the latest published version
+  * in `doc/src/installation.md`, update the URL to use the latest published version
   * run `make update-homebrew` - it will push for you
   * run `make update-getting-started` - it will push for you
 
