@@ -10,6 +10,28 @@ pub use super::spec::*;
 use std::io::Cursor;
 use std::str::FromStr;
 
+pub mod liquid_filters {
+    use liquid::compiler::Filter;
+    use liquid::derive::*;
+    use liquid::error::Result;
+    use liquid::interpreter::Context;
+    use liquid::value::Value;
+
+    #[derive(Clone, ParseFilter, FilterReflection)]
+    #[filter(name = "base64", description = "convert a string to base64", parsed(Base64Filter))]
+    pub struct Base64;
+
+    #[derive(Debug, Default, Display_filter)]
+    #[name = "base64"]
+    struct Base64Filter;
+
+    impl Filter for Base64Filter {
+        fn evaluate(&self, input: &Value, _context: &Context) -> Result<Value> {
+            Ok(Value::scalar(base64::encode(input.to_str().as_bytes())))
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum Engine {
     Handlebars,

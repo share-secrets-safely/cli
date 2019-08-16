@@ -14,7 +14,7 @@ travis-ci = { repository = "share-secrets-safely/cli" }
 
 [features]
 default = ["substitute", "process"]
-substitute = ["base64", "atty", "handlebars", "liquid", "yaml-rust"]
+substitute = ["base64", "atty", "handlebars", "liquid", "liquid-error", "yaml-rust"]
 process = ["yaml-rust", "glob", "treediff", "serde"]
 
 [lib]
@@ -32,4 +32,4 @@ treediff = {version = "3.0.0", features = ["with-yaml-rust", "with-serde-json"],
 liquid = {version = "0.19", optional = true}
 handlebars = {version = "2.0", optional = true}
 base64 = {version = "0.10.0", optional = true}
-liquid-error = "0.19.0"
+liquid-error = {version = "0.19.0", optional = true}
