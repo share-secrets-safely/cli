@@ -13,7 +13,7 @@ impl Vault {
         &self,
         gpg_key_ids: &[String],
         partitions: &[String],
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<(), Error> {
         let mut ctx = new_context()?;
         let partitions = self.partitions_by_name_or_path(partitions)?;

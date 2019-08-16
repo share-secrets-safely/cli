@@ -11,7 +11,7 @@ fn vault_from(ctx: &Context) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_selector)
 }
 
-fn inner_do_it(ctx: &Context, output: &mut Write, error: &mut Write) -> Result<(), Error> {
+fn inner_do_it(ctx: &Context, output: &mut dyn Write, error: &mut dyn Write) -> Result<(), Error> {
     use dispatch::vault::Command::*;
     match ctx.command {
         PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
@@ -87,7 +87,7 @@ fn inner_do_it(ctx: &Context, output: &mut Write, error: &mut Write) -> Result<(
 
 /// A universal handler which delegates all functionality based on the provided Context
 /// The latter is usually provided by the user interface.
-pub fn do_it(ctx: &Context, output: &mut Write, error: &mut Write) -> Result<(), Error> {
+pub fn do_it(ctx: &Context, output: &mut dyn Write, error: &mut dyn Write) -> Result<(), Error> {
     inner_do_it(&ctx, output, error).map_err(|failure| {
         let gpg_error_code = match first_cause_of_type::<gpgme::Error>(&failure) {
             Some(gpg_err) => Some(gpg_err.code()),

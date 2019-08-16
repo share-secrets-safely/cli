@@ -9,7 +9,7 @@ use util::new_context;
 use util::{FingerprintUserId, UserIdFingerprint};
 
 impl Vault {
-    pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut Write) -> Result<(), Error> {
+    pub fn init_recipients(&self, gpg_key_ids: &[String], output: &mut dyn Write) -> Result<(), Error> {
         let gpg_keys_dir = self.find_gpg_keys_dir()?;
         let mut gpg_ctx = new_context()?;
         let keys = extract_at_least_one_secret_key(&mut gpg_ctx, gpg_key_ids)?;
@@ -22,7 +22,7 @@ impl Vault {
         Ok(())
     }
 
-    pub fn print_recipients(&self, output: &mut Write, error: &mut Write) -> Result<(), Error> {
+    pub fn print_recipients(&self, output: &mut dyn Write, error: &mut dyn Write) -> Result<(), Error> {
         let mut ctx = new_context()?;
         if self.partitions.is_empty() {
             let keys_dir_for_auto_import = if self.auto_import.unwrap_or(false) {

@@ -38,7 +38,7 @@ impl Vault {
         editor: &Path,
         mode: CreateMode,
         try_encrypt: bool,
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<(), Error> {
         let file = Temp::new_file().context("Could not create temporary file to decrypt to.")?;
         let tempfile_path = file.to_path_buf();
@@ -82,7 +82,7 @@ impl Vault {
         Ok(())
     }
 
-    pub fn decrypt(&self, path: &Path, w: &mut Write) -> Result<PathBuf, Error> {
+    pub fn decrypt(&self, path: &Path, w: &mut dyn Write) -> Result<PathBuf, Error> {
         let mut ctx = new_context()?;
         let (partition, path) = self.partition_by_owned_path(path.to_owned())?;
         let resolved_absolute_path = partition.secrets_path().join(path);
@@ -104,7 +104,7 @@ impl Vault {
         Ok(path_for_decryption)
     }
 
-    pub fn remove(&self, specs: &[PathBuf], output: &mut Write) -> Result<(), Error> {
+    pub fn remove(&self, specs: &[PathBuf], output: &mut dyn Write) -> Result<(), Error> {
         for path_to_remove in specs {
             let (partition, path_to_remove) = self.partition_by_owned_path(path_to_remove.to_owned())?;
             let path = {
@@ -116,7 +116,7 @@ impl Vault {
                 if gpg_path.exists() {
                     gpg_path
                 } else {
-                    let mut new_path = strip_ext(&gpg_path);
+                    let new_path = strip_ext(&gpg_path);
                     if !new_path.exists() {
                         return Err(format_err!("No file present at '{}'", gpg_path.display()));
                     }
@@ -133,7 +133,7 @@ impl Vault {
         &self,
         input: &[u8],
         gpg_keys_dir: Option<&Path>,
-        output: &mut io::Write,
+        output: &mut dyn io::Write,
     ) -> Result<Vec<u8>, Error> {
         let mut ctx = new_context()?;
         let keys = self.recipient_keys(&mut ctx, gpg_keys_dir, output)?;
@@ -181,7 +181,7 @@ impl Vault {
         specs: &[VaultSpec],
         mode: WriteMode,
         dst_mode: Destination,
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<(), Error> {
         let mut ctx = new_context()?;
         let mut lut: Vec<Option<(PathBuf, Vec<gpgme::Key>)>> = vec![None; 1 + self.partitions.len()];
@@ -220,7 +220,7 @@ impl Vault {
                     ))?;
                     buf
                 };
-                let mut encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys, &self.find_trust_model(partition))?;
+                let encrypted_bytes = encrypt_buffer(&mut ctx, &input, keys, &self.find_trust_model(partition))?;
                 spec.open_output_in(secrets_dir, mode, dst_mode, output)?
                     .write_all(&encrypted_bytes)
                     .context(format!(

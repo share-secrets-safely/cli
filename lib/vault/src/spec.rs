@@ -107,7 +107,7 @@ impl VaultSpec {
         root: &Path,
         mode: WriteMode,
         dst_mode: Destination,
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<File, Error> {
         let output_file = self.output_in(root, dst_mode)?;
         if let Some(d) = output_file.parent() {
@@ -136,7 +136,7 @@ impl VaultSpec {
             })?)
     }
 
-    pub fn open_input(&self) -> Result<Box<Read>, Error> {
+    pub fn open_input(&self) -> Result<Box<dyn Read>, Error> {
         Ok(match self.src {
             SpecSourceType::Path(ref p) => {
                 Box::new(File::open(p).with_context(|_| format!("Could not open input file at '{}'", p.display()))?)

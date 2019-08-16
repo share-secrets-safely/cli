@@ -43,7 +43,7 @@ impl Vault {
         name: Option<String>,
         trust_model: Option<TrustModel>,
         auto_import: Option<bool>,
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<Self, Error> {
         let vault = Vault {
             gpg_keys: Some(gpg_keys_dir.to_owned()),

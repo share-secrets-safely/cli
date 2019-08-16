@@ -105,7 +105,7 @@ impl Default for Vault {
 impl Vault {
     pub fn from_file(path: &Path) -> Result<Vec<Vault>, Error> {
         let path_is_stdin = path == Path::new("-");
-        let reader: Box<Read> = if path_is_stdin {
+        let reader: Box<dyn Read> = if path_is_stdin {
             Box::new(stdin())
         } else {
             if !path.exists() {
@@ -270,7 +270,7 @@ impl Vault {
         )
     }
 
-    pub fn print_resources(&self, w: &mut Write) -> Result<(), Error> {
+    pub fn print_resources(&self, w: &mut dyn Write) -> Result<(), Error> {
         let has_multiple_partitions = !self.partitions.is_empty();
         for partition in once(self).chain(self.partitions.iter()) {
             writeln!(w, "{}", partition.url())?;
@@ -339,7 +339,7 @@ impl Vault {
         ids: &[String],
         type_of_ids_for_errors: &str,
         gpg_keys_dir: Option<&Path>,
-        output: &mut io::Write,
+        output: &mut dyn io::Write,
     ) -> Result<Vec<gpgme::Key>, Error> {
         ctx.find_keys(ids)
             .context(format!("Could not iterate keys for given {}s", type_of_ids_for_errors))?;
@@ -421,7 +421,7 @@ impl Vault {
         &self,
         ctx: &mut gpgme::Context,
         gpg_keys_dir: Option<&Path>,
-        output: &mut io::Write,
+        output: &mut dyn io::Write,
     ) -> Result<Vec<gpgme::Key>, Error> {
         let recipients_fprs = self.recipients_list()?;
         if recipients_fprs.is_empty() {

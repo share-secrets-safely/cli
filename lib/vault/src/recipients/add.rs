@@ -14,7 +14,7 @@ impl Vault {
         sign: SigningMode,
         signing_key_id: Option<&str>,
         partitions: &[String],
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<(), Error> {
         let mut gpg_ctx = new_context()?;
         let partitions: Vec<&Vault> = self.partitions_by_name_or_path(partitions)?;

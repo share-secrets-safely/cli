@@ -91,7 +91,7 @@ pub fn export_key_with_progress(
     gpg_keys_dir: &Path,
     key: &gpgme::Key,
     buf: &mut Vec<u8>,
-    output: &mut Write,
+    output: &mut dyn Write,
 ) -> Result<(String, PathBuf), Error> {
     let (fingerprint, key_path) = export_key(ctx, gpg_keys_dir, key, buf)?;
     writeln!(

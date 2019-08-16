@@ -63,7 +63,7 @@ impl Vault {
         })
     }
 
-    pub fn remove_partition(&mut self, selector: &str, output: &mut Write) -> Result<(), Error> {
+    pub fn remove_partition(&mut self, selector: &str, output: &mut dyn Write) -> Result<(), Error> {
         let index = Vault::partition_index(selector, &self.partitions, Some(self.index))?;
 
         self.partitions.retain(|v| v.index != index);
@@ -79,7 +79,7 @@ impl Vault {
         name: Option<&str>,
         gpg_key_ids: &[String],
         recipients_file: Option<&Path>,
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<(), Error> {
         let secrets_dir = self.secrets.parent().ok_or_else(|| {
             format_err!(

@@ -24,7 +24,7 @@ fn valid_fingerprint(id: &str) -> Result<&str, Error> {
         ));
     }
     let has_only_fingerprint_chars = id.chars().all(|c| match c {
-        'a'...'f' | 'A'...'F' | '0'...'9' => true,
+        'a'..='f' | 'A'..='F' | '0'..='9' => true,
         _ => false,
     });
 
@@ -44,7 +44,7 @@ impl Vault {
         gpg_ctx: &mut gpgme::Context,
         gpg_keys_dir: &Path,
         gpg_key_ids: &[String],
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<Vec<String>, Error> {
         let imported_gpg_keys_fprs = gpg_key_ids
             .iter()
@@ -219,7 +219,7 @@ impl Vault {
         model: &TrustModel,
         gpg_keys_dir: Option<&Path>,
         has_multiple_partitions: bool,
-        output: &mut Write,
+        output: &mut dyn Write,
     ) -> Result<(), Error> {
         let keys = self.recipient_keys(ctx, gpg_keys_dir, output)?;
 
