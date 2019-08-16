@@ -2,6 +2,7 @@
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "sheesy-cli"
 version = "4.0.4"
+default-run = "sy"
 
 description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults."
 license = "LGPL-2.1"
@@ -33,6 +34,7 @@ vault = ["sheesy-vault", "conv", "gpgme", "lazy_static"]
 process = ["sheesy-tools/process", "atty", "glob"]
 extract = ["sheesy-tools/process", "atty", "glob"]
 substitute = ["sheesy-tools/substitute", "itertools"]
+
 
 [[bin]]
 name = "sy"
@@ -74,7 +76,7 @@ clap = "2.31"
 failure = "0.1.1"
 lazy_static = {version = "1.0.0", optional = true}
 atty = {version = "0.2.8", optional = true}
-glob = {version = "0.2.11", optional = true}
+glob = {version = "0.3", optional = true}
 conv = {version = "0.3.3", optional = true}
 gpgme = {version = "0.8.0", optional = true}
 itertools = {version = "0.8.0", optional = true}
