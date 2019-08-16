@@ -19,6 +19,7 @@ pub use self::util::Engine;
 use self::util::{de_json_or_yaml, validate, EngineChoice};
 use handlebars::no_escape;
 use std::collections::BTreeSet;
+use substitute::util::liquid_filters;
 
 pub fn substitute(
     engine: Engine,
@@ -59,7 +60,9 @@ pub fn substitute(
     let dataset = substitute_in_data(dataset, replacements);
     let mut engine = match engine {
         Engine::Liquid => EngineChoice::Liquid(
-            liquid::ParserBuilder::with_liquid().build()?,
+            liquid::ParserBuilder::with_liquid()
+                .filter(liquid_filters::Base64)
+                .build()?,
             into_liquid_object(dataset)?,
         ),
         Engine::Handlebars => {
