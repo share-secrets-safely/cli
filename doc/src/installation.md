@@ -79,7 +79,7 @@ mv ./sy /usr/local/bin
 
 Now the `sy` executable is available in your `PATH`.
 
-```bash,exec
+```bash,use=sy-in-path,exec
 sy --help
 ```
 
