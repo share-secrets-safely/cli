@@ -97,7 +97,7 @@ pub fn substitute(
 
         {
             let mut istream = spec.src.open_as_input()?;
-            let ostream_for_template: &mut io::Write = if try_deserialize { &mut buf } else { &mut ostream };
+            let ostream_for_template: &mut dyn io::Write = if try_deserialize { &mut buf } else { &mut ostream };
 
             match engine {
                 EngineChoice::Liquid(ref liquid, ref dataset) => {

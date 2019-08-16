@@ -38,7 +38,7 @@ impl StreamOrPath {
         }
     }
 
-    pub fn open_as_output(&self, append: bool) -> Result<Box<io::Write>, Error> {
+    pub fn open_as_output(&self, append: bool) -> Result<Box<dyn io::Write>, Error> {
         Ok(match *self {
             StreamOrPath::Stream => Box::new(stdout()),
             StreamOrPath::Path(ref p) => {
@@ -58,7 +58,7 @@ impl StreamOrPath {
         })
     }
 
-    pub fn open_as_input(&self) -> Result<Box<io::Read>, Error> {
+    pub fn open_as_input(&self) -> Result<Box<dyn io::Read>, Error> {
         Ok(match *self {
             StreamOrPath::Stream => {
                 if atty::is(atty::Stream::Stdin) {

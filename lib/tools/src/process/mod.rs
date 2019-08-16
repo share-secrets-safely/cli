@@ -33,7 +33,11 @@ fn to_json(s: String, state: &State) -> json::Value {
         .unwrap_or_else(|_| json::Value::from(reader.into_inner()))
 }
 
-pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut io::Write) -> Result<State, Error> {
+pub fn reduce(
+    cmds: Vec<Command>,
+    initial_state: Option<State>,
+    mut output: &mut dyn io::Write,
+) -> Result<State, Error> {
     validate(&cmds)?;
 
     use self::Command::*;
@@ -79,7 +83,7 @@ pub fn reduce(cmds: Vec<Command>, initial_state: Option<State>, mut output: &mut
                 }
             }
             MergeEnvironment(pattern) => {
-                let mut map = vars().filter(|&(ref var, _)| pattern.matches(var)).fold(
+                let map = vars().filter(|&(ref var, _)| pattern.matches(var)).fold(
                     json::Map::new(),
                     |mut m, (var, value)| {
                         m.insert(var, to_json(value, &state));
