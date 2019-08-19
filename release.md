@@ -1,3 +1,8 @@
+### V4.0.6: Dependency Update
+
+* Assure writes to a single unique output file will overwrite its complete content during substitution.
+    * Previously, if you would write less than the original file size, parts of the previous content may still be present.
+
 ### V4.0.5: Dependency Update
 
 * upgrade all dependencies to the latest version

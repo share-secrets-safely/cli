@@ -49,6 +49,7 @@ impl StreamOrPath {
                 Box::new(
                     OpenOptions::new()
                         .create(true)
+                        .truncate(!append)
                         .write(true)
                         .append(append)
                         .open(p)

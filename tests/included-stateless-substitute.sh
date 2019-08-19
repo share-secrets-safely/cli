@@ -93,7 +93,7 @@ title "'substitute' subcommand"
 
 (with "stdin for data"
   (with "input as yaml"
-    (with "multiple template from a file to the same output file"
+    (with "multiple (2) template from a file to the same output file"
       (sandbox
         (with "the default document separator"
           it "succeeds" && {
@@ -106,7 +106,7 @@ title "'substitute' subcommand"
             expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-output" output
           }
         )
-        (when "writing to the same output file again"
+        (when "writing to the same output file again (1)"
           it "succeeds" && {
             echo "the-answer: 42" | \
             WITH_SNAPSHOT="$snapshot/data-stdin-yaml-multi-template-to-same-file-again" \
@@ -126,6 +126,31 @@ title "'substitute' subcommand"
           }
           it "produces the expected output" && {
             expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-explicit-separator-output" output
+          }
+        )
+      )
+    )
+    (with "multiple (3) template from a file to the same output file"
+      (sandbox
+        (with "the default document separator"
+          it "succeeds" && {
+            echo "the-answer: 42" | \
+            WITH_SNAPSHOT="$snapshot/data-stdin-yaml-multi-template-to-same-file-more" \
+            expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs:output" "$template/the-answer.hbs:output" "$template/the-answer.hbs:output"
+          }
+
+          it "produces the expected output, which is a single document separated by the document separator" && {
+            expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-more-output" output
+          }
+        )
+        (when "writing to the same output file again (2)"
+          it "succeeds" && {
+            echo "the-answer: 42" | \
+            WITH_SNAPSHOT="$snapshot/data-stdin-yaml-multi-template-to-same-file-again-more" \
+            expect_run $SUCCESSFULLY "$exe" substitute "$template/the-answer.hbs:output" "$template/the-answer.hbs:output"
+          }
+          it "overwrites the previous output file entirely" && {
+            expect_snapshot "$snapshot/data-stdin-yaml-multi-template-to-same-file-again-more-output" output
           }
         )
       )
