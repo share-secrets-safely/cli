@@ -1,3 +1,8 @@
+### V4.0.7: --partial <file> support for template engines
+
+You can now pass partial templates for use in liquid and handlebars directly using the
+'--partials=templatepath...' flag in the 'substitute' subcommand.
+
 ### V4.0.6: Dependency Update
 
 * Assure writes to a single unique output file will overwrite its complete content during substitution.
