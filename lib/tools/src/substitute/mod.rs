@@ -20,7 +20,7 @@ use std::{
     fs::File,
     io::{self, stdin},
     os::unix::ffi::OsStrExt,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 use substitute::util::liquid_filters;
 
@@ -69,14 +69,9 @@ pub fn substitute(
                 if !partials.is_empty() {
                     let mut source = liquid::partials::InMemorySource::default();
                     for partial_path in partials {
-                        let partial = fs::read_to_string(partial_path)
-                            .with_context(|_| format_err!("Could not read partial at '{}'", partial_path.display()))?;
                         source.add(
-                            partial_path
-                                .file_stem()
-                                .and_then(|s| s.to_str())
-                                .expect("decodable partial name"),
-                            partial,
+                            partial_name_from_path(partial_path),
+                            partial_buf_from_path(partial_path)?,
                         );
                     }
                     builder = builder.partials(liquid::Partials::new(source));
@@ -88,6 +83,13 @@ pub fn substitute(
         Engine::Handlebars => {
             let mut hbs = Handlebars::new();
             hbs.set_strict_mode(true);
+            for partial_path in partials {
+                hbs.register_template_string(
+                    partial_name_from_path(partial_path),
+                    &mut partial_buf_from_path(partial_path)?,
+                )
+                .with_context(|_| "Failed to register handlebars template string")?;
+            }
             hbs.register_escape_fn(no_escape);
             EngineChoice::Handlebars(hbs, dataset)
         }
@@ -168,6 +170,18 @@ pub fn substitute(
         }
     }
     Ok(())
+}
+
+fn partial_name_from_path(partial_path: &Path) -> &str {
+    partial_path
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .expect("decodable partial name")
+}
+
+fn partial_buf_from_path(partial_path: &Path) -> Result<String, Error> {
+    Ok(fs::read_to_string(partial_path)
+        .with_context(|_| format_err!("Could not read partial at '{}'", partial_path.display()))?)
 }
 
 fn into_liquid_object(src: json::Value) -> Result<liquid::value::Object, Error> {
