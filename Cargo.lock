@@ -707,7 +707,7 @@ dependencies = [
 
 [[package]]
 name = "sheesy-cli"
-version = "4.0.6"
+version = "4.0.7"
 dependencies = [
  "atty 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -717,13 +717,13 @@ dependencies = [
  "gpgme 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sheesy-tools 4.0.6",
- "sheesy-vault 4.0.6",
+ "sheesy-tools 4.0.7",
+ "sheesy-vault 4.0.7",
 ]
 
 [[package]]
 name = "sheesy-tools"
-version = "4.0.6"
+version = "4.0.7"
 dependencies = [
  "atty 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -741,7 +741,7 @@ dependencies = [
 
 [[package]]
 name = "sheesy-vault"
-version = "4.0.6"
+version = "4.0.7"
 dependencies = [
  "atty 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "conv 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
