@@ -4,7 +4,7 @@ use itertools::Itertools;
 use tools::substitute::{Engine, Spec, StreamOrPath};
 
 use super::util::required_os_arg;
-use std::ffi::OsString;
+use std::{ffi::OsString, path::PathBuf};
 use tools::substitute::substitute;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -14,6 +14,7 @@ pub struct Context {
     pub separator: OsString,
     pub engine: Engine,
     pub data: StreamOrPath,
+    pub partials: Vec<PathBuf>,
     pub specs: Vec<Spec>,
 }
 
@@ -32,10 +33,12 @@ pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
         engine: args.value_of("engine").expect("clap to work").parse()?,
         validate: args.is_present("validate"),
         data: args.value_of_os("data").map_or(StreamOrPath::Stream, Into::into),
-        specs: match args.values_of("spec") {
-            Some(v) => v.map(Spec::from).collect(),
-            None => Vec::new(),
-        },
+        partials: args
+            .values_of_os("partials")
+            .map_or_else(Vec::new, |v| v.map(PathBuf::from).collect()),
+        specs: args
+            .values_of("spec")
+            .map_or_else(Vec::new, |v| v.map(Spec::from).collect()),
     })
 }
 
@@ -48,5 +51,6 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         &context.separator,
         context.validate,
         &context.replacements,
+        &context.partials,
     )
 }

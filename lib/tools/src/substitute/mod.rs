@@ -9,16 +9,19 @@ use json;
 use liquid;
 use yaml_rust;
 
-use std::ffi::OsStr;
-use std::fs::File;
-use std::io::{self, stdin};
-use std::os::unix::ffi::OsStrExt;
-
 pub use self::spec::*;
 pub use self::util::Engine;
 use self::util::{de_json_or_yaml, validate, EngineChoice};
 use handlebars::no_escape;
-use std::collections::BTreeSet;
+use std::{
+    collections::BTreeSet,
+    ffi::OsStr,
+    fs,
+    fs::File,
+    io::{self, stdin},
+    os::unix::ffi::OsStrExt,
+    path::PathBuf,
+};
 use substitute::util::liquid_filters;
 
 pub fn substitute(
@@ -28,6 +31,7 @@ pub fn substitute(
     separator: &OsStr,
     try_deserialize: bool,
     replacements: &[(String, String)],
+    partials: &[PathBuf],
 ) -> Result<(), Error> {
     use self::StreamOrPath::*;
     let mut own_specs = Vec::new();
@@ -60,9 +64,25 @@ pub fn substitute(
     let dataset = substitute_in_data(dataset, replacements);
     let mut engine = match engine {
         Engine::Liquid => EngineChoice::Liquid(
-            liquid::ParserBuilder::with_liquid()
-                .filter(liquid_filters::Base64)
-                .build()?,
+            {
+                let mut builder = liquid::ParserBuilder::with_liquid().filter(liquid_filters::Base64);
+                if !partials.is_empty() {
+                    let mut source = liquid::partials::InMemorySource::default();
+                    for partial_path in partials {
+                        let partial = fs::read_to_string(partial_path)
+                            .with_context(|_| format_err!("Could not read partial at '{}'", partial_path.display()))?;
+                        source.add(
+                            partial_path
+                                .file_stem()
+                                .and_then(|s| s.to_str())
+                                .expect("decodable partial name"),
+                            partial,
+                        );
+                    }
+                    builder = builder.partials(liquid::Partials::new(source));
+                }
+                builder.build()?
+            },
             into_liquid_object(dataset)?,
         ),
         Engine::Handlebars => {

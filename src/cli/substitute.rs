@@ -79,6 +79,17 @@ pub fn new<'a, 'b>() -> App<'a, 'b> {
                        If set, everything from standard input is interpreted as template."),
         )
         .arg(
+            Arg::with_name("partials")
+                .set(ArgSettings::RequireEquals)
+                .required(false)
+                .multiple(true)
+                .takes_value(true)
+                .long("partial")
+                .value_name("template")
+                .help("A file to be read as partial template, whose name will be the its file stem. \
+                       It can then be included from another template, and thus act as a function call."),
+        )
+        .arg(
             Arg::with_name("spec")
                 .required(false)
                 .multiple(true)

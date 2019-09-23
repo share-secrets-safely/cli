@@ -3,6 +3,19 @@
 template="$fixture/substitute"
 snapshot="$fixture/snapshots/substitute"
 
+title "'substitute' (liquid) with partials/includes"
+(with "stdin for data"
+  (with "a simple model used in the partial"
+    (with "a partial is loaded multiple times"
+      PARTIAL="$template/partials/included.liquid"
+        it "succeeds (ignoring and silently overwriting the partial)" && {
+          echo "global: from-global" | \
+          WITH_SNAPSHOT="$snapshot/data-stdin-json-data-partial-input-success" \
+          expect_run $SUCCESSFULLY "$exe" substitute --partial="$PARTIAL" --partial="$PARTIAL" "$template/with-partial.liquid"
+        }
+    )
+  )
+)
 title "'substitute' with find & replace"
 (with "stdin for data"
   (with "input as yaml containing a character that needs escaping in JSON"

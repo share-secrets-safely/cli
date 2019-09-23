@@ -1,0 +1,4 @@
+from source: from-global
+
+included: from global: from-global
+as argument: argument from caller
