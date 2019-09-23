@@ -19,13 +19,12 @@ LINUX_FILE=sy-cli-Linux-x86_64.tar.gz
 }
 
 SHA_SUM=$(
-  command -v sha256sum 2>/dev/null \
-  || command -v gsha256sum 2>/dev/null \
+  command -v shasum 2>/dev/null \
   || { echo 1>&2 "sha256 program not found"; false; } \
 )
 
-OSX_SHA256="$($SHA_SUM $OSX_FILE | awk '{print $1}')"
-LINUX_SHA256="$($SHA_SUM $LINUX_FILE | awk '{print $1}')"
+OSX_SHA256="$($SHA_SUM -a 256 $OSX_FILE | awk '{print $1}')"
+LINUX_SHA256="$($SHA_SUM -a 256 $LINUX_FILE | awk '{print $1}')"
 TEMPLATE_NOTE="---> DO NOT EDIT <--- (this file was generated from $TEMPLATE_FILE"
 export VERSION OSX_SHA256 LINUX_SHA256 TEMPLATE_NOTE
 
