@@ -22,15 +22,15 @@ process = ["yaml-rust", "glob", "treediff", "serde"]
 doctest = false
 
 [dependencies]
-failure = "0.1.1"
-atty = {version = "0.2.8", optional = true}
-serde_json = "1.0.11"
-serde_yaml = "0.8.8"
-serde = {version = "1.0", optional = true}
-yaml-rust = {version = "0.4.0", optional = true}
+failure = "0.1.7"
+atty = {version = "0.2.14", optional = true}
+serde_json = "1.0.51"
+serde_yaml = "0.8.11"
+serde = {version = "1.0.106", optional = true}
+yaml-rust = {version = "0.4.3", optional = true}
 glob = {version = "0.3", optional = true}
-treediff = {version = "3.0.0", features = ["with-yaml-rust", "with-serde-json"], optional = true}
+treediff = {version = "4.0.0", features = ["with-yaml-rust", "with-serde-json"], optional = true}
 liquid = {version = "0.19", optional = true}
 handlebars = {version = "2.0", optional = true}
-base64 = {version = "0.10.0", optional = true}
+base64 = {version = "0.12.0", optional = true}
 liquid-error = {version = "0.19.0", optional = true}
