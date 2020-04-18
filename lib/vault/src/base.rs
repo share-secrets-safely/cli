@@ -1,9 +1,10 @@
-use error::{IOMode, VaultError};
+use crate::error::{IOMode, VaultError};
+use crate::spec::WriteMode;
+use crate::util::{strip_ext, write_at, FingerprintUserId, ResetCWD};
 use failure::{err_msg, Error, ResultExt};
 use glob::glob;
 use gpgme;
 use serde_yaml;
-use spec::WriteMode;
 use std::collections::HashSet;
 use std::fs::create_dir_all;
 use std::fs::File;
@@ -12,7 +13,6 @@ use std::io::{stdin, BufRead, BufReader, Read, Write};
 use std::iter::once;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use util::{strip_ext, write_at, FingerprintUserId, ResetCWD};
 
 pub const GPG_GLOB: &str = "**/*.gpg";
 pub fn recipients_default() -> PathBuf {

@@ -1,12 +1,12 @@
+use crate::util::fingerprints_of_keys;
+use crate::util::{new_context, UserIdFingerprint};
+use crate::Vault;
 use failure::{Error, ResultExt};
 use itertools::Itertools;
 use std::fs::remove_file;
 use std::io::Write;
 use std::iter::once;
 use std::path::PathBuf;
-use util::fingerprints_of_keys;
-use util::{new_context, UserIdFingerprint};
-use Vault;
 
 impl Vault {
     pub fn remove_recipients(

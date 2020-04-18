@@ -3,20 +3,20 @@ use std::io::{self, Write};
 use std::mem;
 use std::path::{Path, PathBuf};
 
-use base::Vault;
-use error::FailExt;
-use error::{DecryptionError, EncryptionError};
+use crate::base::Vault;
+use crate::error::FailExt;
+use crate::error::{DecryptionError, EncryptionError};
+use crate::spec::{gpg_output_filename, SpecSourceType, VaultSpec};
+use crate::spec::{CreateMode, Destination, WriteMode};
+use crate::util::flags_for_model;
+use crate::util::run_editor;
+use crate::util::{new_context, strip_ext, write_at};
+use crate::TrustModel;
 use failure::{Error, ResultExt};
 use gpgme;
 use itertools::join;
 use mktemp::Temp;
-use spec::{gpg_output_filename, SpecSourceType, VaultSpec};
-use spec::{CreateMode, Destination, WriteMode};
 use std::iter::once;
-use util::flags_for_model;
-use util::run_editor;
-use util::{new_context, strip_ext, write_at};
-use TrustModel;
 
 fn encrypt_buffer(
     ctx: &mut gpgme::Context,

@@ -1,3 +1,5 @@
+use crate::util::write_at;
+use crate::util::FingerprintUserId;
 use failure;
 use failure::Fail;
 use gpgme;
@@ -7,8 +9,6 @@ use std::fmt;
 use std::fs::File;
 use std::io;
 use std::path::{Path, PathBuf};
-use util::write_at;
-use util::FingerprintUserId;
 
 #[derive(Debug, Fail)]
 #[fail(display = "The content was not encrypted for you.")]

@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
+use crate::TrustModel;
 use failure::{self, err_msg, Error, ResultExt};
 use gpgme;
 use itertools::{join, Itertools};
@@ -10,7 +11,6 @@ use std::fmt;
 use std::fs::{self, OpenOptions};
 use std::process::Command;
 use std::process::Stdio;
-use TrustModel;
 
 pub fn strip_ext(p: &Path) -> PathBuf {
     let mut p = p.to_owned();

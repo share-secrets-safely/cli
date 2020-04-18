@@ -12,6 +12,7 @@ use yaml_rust;
 pub use self::spec::*;
 pub use self::util::Engine;
 use self::util::{de_json_or_yaml, validate, EngineChoice};
+use crate::substitute::util::liquid_filters;
 use handlebars::no_escape;
 use std::{
     collections::BTreeSet,
@@ -22,7 +23,6 @@ use std::{
     os::unix::ffi::OsStrExt,
     path::{Path, PathBuf},
 };
-use substitute::util::liquid_filters;
 
 pub fn substitute(
     engine: Engine,

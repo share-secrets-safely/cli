@@ -1,11 +1,11 @@
-use base::Vault;
+use crate::base::Vault;
+use crate::spec::SigningMode;
+use crate::util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
+use crate::TrustModel;
 use failure::{err_msg, Error, ResultExt};
-use spec::SigningMode;
 use std::io::Write;
 use std::iter::once;
 use std::path::PathBuf;
-use util::{export_key, fingerprint_of, new_context, KeyDisplay, KeylistDisplay, UserIdFingerprint};
-use TrustModel;
 
 impl Vault {
     pub fn add_recipients(

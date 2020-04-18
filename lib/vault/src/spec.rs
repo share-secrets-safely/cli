@@ -4,6 +4,7 @@ use std::fs::create_dir_all;
 use std::fs::{File, OpenOptions};
 use std::io::{self, stdin, Read, Write};
 
+use crate::util::run_editor;
 use atty;
 use failure::{Error, ResultExt};
 use mktemp::Temp;
@@ -11,7 +12,6 @@ use std::env;
 use std::ffi::OsString;
 use std::path::Component;
 use std::path::{Path, PathBuf};
-use util::run_editor;
 
 lazy_static! {
     static ref EDITOR: PathBuf = PathBuf::from(env::var_os("EDITOR").unwrap_or_else(|| OsString::from("vim")));

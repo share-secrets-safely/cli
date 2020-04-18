@@ -1,7 +1,7 @@
 use super::types::NeverDrop;
+use crate::process::types::State;
 use failure::{err_msg, Error, Fail, ResultExt};
 use json;
-use process::types::State;
 use std::io;
 use treediff::{diff, tools};
 use yaml;

@@ -2,6 +2,7 @@
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "sheesy-tools"
 version = "4.0.7"
+edition = "2018"
 
 description = "Tooling to make using shared secrets effortless."
 license = "MIT"

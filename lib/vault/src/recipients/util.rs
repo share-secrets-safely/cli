@@ -1,20 +1,20 @@
-use base::{Vault, GPG_GLOB};
-use error::EncryptionError;
+use crate::base::{Vault, GPG_GLOB};
+use crate::error::EncryptionError;
+use crate::print_causes;
+use crate::util::flags_for_model;
+use crate::util::strip_ext;
+use crate::util::write_at;
+use crate::util::ResetCWD;
+use crate::util::{fingerprint_of, UserIdFingerprint};
+use crate::TrustModel;
 use failure::{err_msg, Error, Fail, ResultExt};
 use glob::glob;
 use gpgme::{self, Key};
 use itertools::Itertools;
 use mktemp::Temp;
-use print_causes;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use util::flags_for_model;
-use util::strip_ext;
-use util::write_at;
-use util::ResetCWD;
-use util::{fingerprint_of, UserIdFingerprint};
-use TrustModel;
 
 fn valid_fingerprint(id: &str) -> Result<&str, Error> {
     if id.len() < 8 || id.len() > 40 {
