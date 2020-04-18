@@ -1,18 +1,18 @@
-use dispatch::vault::Context;
+use crate::dispatch::vault::Context;
+use crate::vault::error::first_cause_of_type;
+use crate::vault::Destination;
+use crate::vault::WriteMode;
+use crate::vault::{Vault, VaultExt};
 use failure::Error;
 use gpgme;
 use std::io::Write;
-use vault::error::first_cause_of_type;
-use vault::Destination;
-use vault::WriteMode;
-use vault::{Vault, VaultExt};
 
 fn vault_from(ctx: &Context) -> Result<Vault, Error> {
     Vault::from_file(&ctx.vault_path)?.select(&ctx.vault_selector)
 }
 
 fn inner_do_it(ctx: &Context, output: &mut dyn Write, error: &mut dyn Write) -> Result<(), Error> {
-    use dispatch::vault::Command::*;
+    use crate::dispatch::vault::Command::*;
     match ctx.command {
         PartitionsRemove { ref selector } => vault_from(&ctx)?.remove_partition(selector, output),
         PartitionsAdd {

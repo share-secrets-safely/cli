@@ -1,5 +1,5 @@
+use crate::cli::util::output_formats;
 use clap::{App, Arg, ArgSettings};
-use cli::util::output_formats;
 use glob;
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {

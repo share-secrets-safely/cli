@@ -1,6 +1,6 @@
+use crate::cli::util::output_formats;
 use clap::ArgSettings;
 use clap::{App, Arg};
-use cli::util::output_formats;
 
 pub fn new<'a, 'b>() -> App<'a, 'b> {
     App::new("extract")

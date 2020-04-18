@@ -2,6 +2,7 @@
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 name = "sheesy-cli"
 version = "4.0.7"
+edition = "2018"
 
 description = "The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults."
 license = "LGPL-2.1"

@@ -1,7 +1,7 @@
+use crate::parse::util::optional_args_with_value;
 use atty;
 use clap::ArgMatches;
 use failure::Error;
-use parse::util::optional_args_with_value;
 use tools::process::{Command, OutputMode};
 
 use std::io::stdout;

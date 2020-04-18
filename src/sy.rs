@@ -16,8 +16,8 @@ mod cli;
 mod dispatch;
 mod parse;
 
+use crate::cli::CLI;
 use clap::ArgMatches;
-use cli::CLI;
 
 mod util;
 

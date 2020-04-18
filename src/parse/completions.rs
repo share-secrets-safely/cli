@@ -1,7 +1,7 @@
+use crate::cli::CLI;
 use clap::App;
 use clap::ArgMatches;
 use clap::Shell;
-use cli::CLI;
 use failure::{err_msg, Error, ResultExt};
 use std::io::stdout;
 use std::path::Path;

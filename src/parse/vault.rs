@@ -5,17 +5,17 @@ use failure::Error;
 use std::convert::Into;
 use std::path::{Path, PathBuf};
 
-use dispatch::vault::{Command, Context};
+use crate::dispatch::vault::{Command, Context};
 use vault::error::{first_cause_of_type, DecryptionError};
 use vault::{CreateMode, SigningMode};
 
 use super::util::{optional_args, required_arg, required_os_arg};
-use dispatch;
+use crate::dispatch;
 use std::io::{stderr, stdout};
 use std::process;
 
 pub fn amend_error_info<T>(r: Result<T, Error>) -> Result<T, Error> {
-    use cli::CLI;
+    use crate::cli::CLI;
 
     r.map_err(|e| {
         let ctx = match first_cause_of_type::<DecryptionError>(&e) {
