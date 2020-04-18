@@ -50,8 +50,8 @@ impl FromStr for Engine {
     }
 }
 
-pub enum EngineChoice {
-    Handlebars(handlebars::Handlebars, json::Value),
+pub enum EngineChoice<'a> {
+    Handlebars(handlebars::Handlebars<'a>, json::Value),
     Liquid(liquid::Parser, liquid::value::Object),
 }
 
