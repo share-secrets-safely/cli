@@ -278,7 +278,7 @@ title "'substitute' subcommand error cases"
 (with "data from stdin and template from stdin"
   it "fails" && {
     WITH_SNAPSHOT="$snapshot/fail-data-stdin-template-stdin" \
-    expect_run $WITH_FAILURE "$exe" substitute :output
+    expect_run $WITH_FAILURE "$exe" substitute --no-stdin :output
   }
 )
 (with "no data specification and no spec"
