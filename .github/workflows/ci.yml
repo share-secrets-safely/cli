@@ -70,7 +70,7 @@ jobs:
         make docs
 
   rustfmt-and-clippy:
-    name: rustfmt
+    name: rustfmt-and-clippy
     runs-on: ubuntu-18.04
     steps:
     - name: Checkout repository
