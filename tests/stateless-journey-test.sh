@@ -14,9 +14,6 @@ SUCCESSFULLY=0
 
 fixture="$root/journeys/fixtures"
 
-# shellcheck source=./tests/included-stateless-extract.sh
-source "$root/included-stateless-extract.sh"
-
 # shellcheck source=./tests/included-stateless-vault.sh
 source "$root/included-stateless-vault.sh"
 
@@ -25,4 +22,7 @@ source "$root/included-stateless-merge.sh"
 
 # shellcheck source=./tests/included-stateless-substitute.sh
 source "$root/included-stateless-substitute.sh"
+
+# shellcheck source=./tests/included-stateless-extract.sh
+source "$root/included-stateless-extract.sh"
 
