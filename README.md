@@ -1,4 +1,5 @@
 [![https://crates.io](https://img.shields.io/crates/v/sheesy-cli.svg)](https://crates.io/crates/sheesy-cli)
+[![ci](https://github.com/share-secrets-safely/cli/workflows/ci/badge.svg)](https://github.com/share-secrets-safely/cli/actions?query=workflow%3Aci)
 
 **sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing
 shared secrets in teams and build pipelines.
