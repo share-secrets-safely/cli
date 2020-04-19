@@ -64,9 +64,12 @@ jobs:
 
     - name: Run stateful journey tests (Ubuntu)
       if: matrix.os == 'ubuntu-18.04'
+      run: make stateful-journey-tests
+
+    - name: Build documentation
+      if: matrix.os == 'ubuntu-18.04'
       run: |
         make lint-scripts
-        make stateful-journey-tests
         make docs
     - name: Upload documentation to github pages
       if: matrix.os == 'ubuntu-18.04'
