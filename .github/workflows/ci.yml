@@ -37,7 +37,7 @@ jobs:
     - name: Install packages (Ubuntu)
       if: matrix.os == 'ubuntu-18.04'
       run: |
-        bin/install-dependencies-debian.sh
+        sudo bin/install-dependencies-debian.sh
 
     - name: Install packages (macOS)
       if: matrix.os == 'macos-latest'
