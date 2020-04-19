@@ -285,7 +285,7 @@ title "'substitute' subcommand error cases"
 (with "no data specification and no spec"
   it "fails" && {
     WITH_SNAPSHOT="$snapshot/fail-no-data-and-no-specs" \
-    expect_run $WITH_FAILURE "$exe" substitute
+    expect_run $WITH_FAILURE "$exe" substitute --no-stdin
   }
 )
 (with "data from stdin specification and no spec"
