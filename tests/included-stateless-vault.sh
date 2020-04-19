@@ -18,7 +18,9 @@ title "'vault init' subcommand"
 
 title "'completions' subcommand"
 
-(with "a supported $SHELL"
+(with "a supported shell"
+    SHELL="$(command -v bash)"
+    export SHELL
     it "generates a script executable by $SHELL" && \
       expect_run $SUCCESSFULLY "$exe" completions | $SHELL
 )
