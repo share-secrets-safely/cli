@@ -420,7 +420,7 @@ title "'merge' subcommand errors"
   (with "no given file"
     it "fails" && {
       WITH_SNAPSHOT="$snapshot/fail-no-data-from-stdin-and-no-file-specified" \
-      expect_run $WITH_FAILURE "$exe" merge
+      expect_run $WITH_FAILURE "$exe" merge --no-stdin
     }
   )
 )

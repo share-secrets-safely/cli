@@ -60,9 +60,7 @@ jobs:
       run: ${{ env.CARGO }} build --verbose --all ${{ env.TARGET_FLAGS }}
 
     - name: Run stateless Journey Tests
-      run: |
-        echo "Let's see if this prevents stdin injection…";
-        make stateless-journey-tests;
+      run: make stateless-journey-tests
 
     - name: Run stateful journey tests (Ubuntu)
       if: matrix.os == 'ubuntu-18.04'
