@@ -55,7 +55,7 @@ pub enum EngineChoice<'a> {
     Liquid(liquid::Parser, liquid::value::Object),
 }
 
-pub fn validate(data: &StreamOrPath, specs: &[Spec]) -> Result<(), Error> {
+pub fn validate(data: StreamOrPath, specs: &[Spec]) -> Result<(), Error> {
     if specs.is_empty() {
         bail!("No spec provided, neither from standard input, nor from file")
     }

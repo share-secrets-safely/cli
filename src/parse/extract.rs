@@ -1,12 +1,12 @@
 use crate::parse::util::optional_args_with_value;
+use crate::tools::process::{Command, OutputMode};
 use atty;
 use clap::ArgMatches;
 use failure::Error;
-use tools::process::{Command, OutputMode};
 
+use crate::tools::process::reduce;
 use std::io::stdout;
 use std::path::PathBuf;
-use tools::process::reduce;
 
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     let cmds = context_from(args)?;

@@ -12,14 +12,14 @@ extern crate itertools;
 extern crate sheesy_tools as tools;
 extern crate sheesy_vault as vault;
 
-mod cli;
-mod dispatch;
-mod parse;
+pub mod cli;
+pub mod dispatch;
+pub mod parse;
 
 use crate::cli::CLI;
 use clap::ArgMatches;
 
-mod util;
+pub mod util;
 
 use util::*;
 

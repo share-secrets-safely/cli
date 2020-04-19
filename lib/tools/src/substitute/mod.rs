@@ -26,7 +26,7 @@ use std::{
 
 pub fn substitute(
     engine: Engine,
-    input_data: &StreamOrPath,
+    input_data: Option<StreamOrPath>,
     specs: &[Spec],
     separator: &OsStr,
     try_deserialize: bool,
@@ -36,7 +36,9 @@ pub fn substitute(
     use self::StreamOrPath::*;
     let mut own_specs = Vec::new();
 
-    let (dataset, specs) = match *input_data {
+    let input_data =
+        input_data.ok_or_else(|| format_err!("Stdin is a TTY. Cannot substitute a template without any data."))?;
+    let (dataset, specs) = match input_data {
         Stream => {
             if atty::is(atty::Stream::Stdin) {
                 bail!("Stdin is a TTY. Cannot substitute a template without any data.")

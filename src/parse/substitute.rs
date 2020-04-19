@@ -13,12 +13,13 @@ pub struct Context {
     pub replacements: Vec<(String, String)>,
     pub separator: OsString,
     pub engine: Engine,
-    pub data: StreamOrPath,
+    pub data: Option<StreamOrPath>,
     pub partials: Vec<PathBuf>,
     pub specs: Vec<Spec>,
 }
 
 pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
+    let may_read_stdin = !args.is_present("no-stdin");
     Ok(Context {
         replacements: {
             let replace_cmds = args
@@ -32,7 +33,13 @@ pub fn context_from(args: &ArgMatches) -> Result<Context, Error> {
         separator: required_os_arg(args, "separator")?,
         engine: args.value_of("engine").expect("clap to work").parse()?,
         validate: args.is_present("validate"),
-        data: args.value_of_os("data").map_or(StreamOrPath::Stream, Into::into),
+        data: args.value_of_os("data").map(Into::into).or_else(|| {
+            if may_read_stdin {
+                Some(StreamOrPath::Stream)
+            } else {
+                None
+            }
+        }),
         partials: args
             .values_of_os("partials")
             .map_or_else(Vec::new, |v| v.map(PathBuf::from).collect()),
@@ -46,7 +53,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     let context = context_from(args)?;
     substitute(
         context.engine,
-        &context.data,
+        context.data,
         &context.specs,
         &context.separator,
         context.validate,

@@ -10,10 +10,10 @@ extern crate sheesy_vault as vault;
 
 use clap::ArgMatches;
 
-mod cli;
-mod dispatch;
-mod parse;
-mod util;
+pub mod cli;
+pub mod dispatch;
+pub mod parse;
+pub mod util;
 
 use util::ok_or_exit;
 

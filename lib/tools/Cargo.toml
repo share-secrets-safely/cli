@@ -10,9 +10,6 @@ repository = "https://github.com/share-secrets-safely/cli"
 homepage = "https://github.com/share-secrets-safely/cli/tree/master/lib/tools"
 documentation = "https://docs.rs/sheesy-tools"
 
-[badges]
-travis-ci = { repository = "share-secrets-safely/cli" }
-
 [features]
 default = ["substitute", "process"]
 substitute = ["base64", "atty", "handlebars", "liquid", "liquid-error", "yaml-rust"]

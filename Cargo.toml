@@ -24,9 +24,6 @@ panic = 'unwind'
 incremental = false
 overflow-checks = true
 
-[badges]
-travis-ci = { repository = "share-secrets-safely/cli" }
-
 [features]
 default = []
 completions = []

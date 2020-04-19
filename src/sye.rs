@@ -8,9 +8,9 @@ extern crate sheesy_tools as tools;
 
 use clap::ArgMatches;
 
-mod cli;
-mod parse;
-mod util;
+pub mod cli;
+pub mod parse;
+pub mod util;
 
 use util::ok_or_exit;
 

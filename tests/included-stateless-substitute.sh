@@ -277,6 +277,7 @@ title "'substitute' subcommand error cases"
 )
 (with "data from stdin and template from stdin"
   it "fails" && {
+    echo -n | \
     WITH_SNAPSHOT="$snapshot/fail-data-stdin-template-stdin" \
     expect_run $WITH_FAILURE "$exe" substitute --no-stdin :output
   }
