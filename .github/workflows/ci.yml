@@ -76,6 +76,8 @@ jobs:
       uses: crazy-max/ghaction-github-pages@v1.4.0
       with:
         build_dir: doc/book
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   rustfmt-and-clippy:
     name: rustfmt-and-clippy
