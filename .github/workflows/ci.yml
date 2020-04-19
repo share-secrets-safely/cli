@@ -69,7 +69,7 @@ jobs:
         make stateful-journey-tests
         make docs
 
-  rustfmt:
+  rustfmt-and-clippy:
     name: rustfmt
     runs-on: ubuntu-18.04
     steps:
