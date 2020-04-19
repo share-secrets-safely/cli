@@ -68,6 +68,11 @@ jobs:
         make lint-scripts
         make stateful-journey-tests
         make docs
+    - name: Upload documentation to github pages
+      if: matrix.os == 'ubuntu-18.04'
+      uses: crazy-max/ghaction-github-pages@v1.4.0
+      with:
+        build_dir: doc/book
 
   rustfmt-and-clippy:
     name: rustfmt-and-clippy
