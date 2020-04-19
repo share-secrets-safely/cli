@@ -1,7 +1,4 @@
 [![https://crates.io](https://img.shields.io/crates/v/sheesy-cli.svg)](https://crates.io/crates/sheesy-cli)
-[![Build Status](https://travis-ci.org/share-secrets-safely/cli.svg?branch=master)](https://travis-ci.org/share-secrets-safely/cli)
-[![dependency
-status](https://deps.rs/repo/github/share-secrets-safely/cli/status.svg)](https://deps.rs/repo/github/share-secrets-safely/cli)
 
 **sh**are-s**e**cr**e**ts-**s**afel**y** (_sheesy_) is a solution for managing
 shared secrets in teams and build pipelines.
