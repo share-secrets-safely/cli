@@ -393,14 +393,6 @@ title "'merge' subcommand errors"
     expect_run $WITH_FAILURE "$exe" merge - -
   }
 )
-(with "no data from stdin"
-  (with "no given file"
-    it "fails" && {
-      WITH_SNAPSHOT="$snapshot/fail-no-data-from-stdin-and-no-file-specified" \
-      expect_run $WITH_FAILURE "$exe" merge
-    }
-  )
-)
 (with "data invalid data from stdin"
   (with "yaml format"
     it "fails" && {
@@ -423,4 +415,12 @@ title "'merge' subcommand errors"
     WITH_SNAPSHOT="$snapshot/fail-invalid-dotted-pointer" \
     expect_run $WITH_FAILURE "$exe" show --from a.b.c
   }
+)
+(with "no data from stdin"
+  (with "no given file"
+    it "fails" && {
+      WITH_SNAPSHOT="$snapshot/fail-no-data-from-stdin-and-no-file-specified" \
+      expect_run $WITH_FAILURE "$exe" merge
+    }
+  )
 )
