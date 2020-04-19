@@ -45,7 +45,11 @@ pub fn context_from(args: &ArgMatches) -> Result<Vec<Command>, Error> {
             cmds.insert(0, Command::SetOutputMode(output_mode));
         }
 
-        if atty::isnt(atty::Stream::Stdin) && !has_seen_merge_stdin {
+        let may_read_stdin = !args.is_present("no-stdin");
+        if !may_read_stdin && has_seen_merge_stdin {
+            bail!("Cannot specify standard input explicitly with '-' and prohibit reading stdin with --no-stdin.")
+        }
+        if atty::isnt(atty::Stream::Stdin) && !has_seen_merge_stdin && may_read_stdin {
             let at_position = cmds
                 .iter()
                 .position(|cmd| match *cmd {

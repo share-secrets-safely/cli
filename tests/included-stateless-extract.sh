@@ -112,7 +112,7 @@ title "'extract' - extracting values by pointer"
 (with "no value to read"
   it "fails" && {
     WITH_SNAPSHOT="$snapshot/fail-no-input" \
-    expect_run $WITH_FAILURE "$exe" extract foo/bar
+    expect_run $WITH_FAILURE "$exe" extract --no-stdin foo/bar
   }
 )
 (with "a file to read that does not exist"
