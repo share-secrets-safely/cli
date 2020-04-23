@@ -61,7 +61,7 @@ complexity while entirely removing the 'Web of Trust'. The latter seemed to have
 I find problematic.
 
 It should be valued that they [actively increase test-coverage][gopass-tests], but it also means that they don't
-do test-driven development, which nurishes my doubt in the quality of the software.
+do test-driven development, which nourishes my doubt in the quality of the software.
 
 [gopass]: https://github.com/justwatchcom/gopass
 [gopass-wot]: https://github.com/justwatchcom/gopass/issues/305
