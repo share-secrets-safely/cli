@@ -67,7 +67,7 @@ jobs:
       run: make stateful-journey-tests
 
     - name: Build documentation
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-18.04' && github.ref == 'refs/heads/master'
       run: |
         make lint-scripts
         make docs
