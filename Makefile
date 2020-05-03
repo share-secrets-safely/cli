@@ -110,7 +110,7 @@ deployable-host: $(HOST_DEPLOYABLE)
 
 update-homebrew:
 	git clone https://github.com/share-secrets-safely/homebrew-cli
-	set -ex; ./bin/update-homebrew-formula.sh $$(git tag | tail -1) ./etc/brew/sheesy.rb.in ./homebrew-cli/sheesy.rb
+	set -ex; ./bin/update-homebrew-formula.sh $$(cat ../VERSION) ./etc/brew/sheesy.rb.in ./homebrew-cli/sheesy.rb
 	cd homebrew-cli && git commit -am "update formula" && git push origin master
 	rm -Rf homebrew-cli/
 
