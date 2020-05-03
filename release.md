@@ -1,4 +1,4 @@
-### V4.0.9: Update brew package description
+### V4.0.9: Update brew package description; update dependencies
 
 * it's necessary to depend on `gpgme` instead of just `gnupg` for the tool to work on MacOS by default
 
