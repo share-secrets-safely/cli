@@ -1,3 +1,7 @@
+### V4.0.9: Update brew package description
+
+* it's necessary to depend on `gpgme` instead of just `gnupg` for the tool to work on MacOS by default
+
 ### V4.0.7: --partial <file> support for template engines
 
 You can now pass partial templates for use in liquid and handlebars directly using the
