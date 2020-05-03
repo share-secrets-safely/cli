@@ -3,7 +3,7 @@ class Sheesy < Formula
   version '${VERSION}'
   desc "share secrets within teams to avoid plain-text secrets from day one"
   homepage "https://github.com/share-secrets-safely/cli"
-  depends_on "gnupg"
+  depends_on "gpgme"
 
   if OS.mac?
       url "https://github.com/share-secrets-safely/cli/releases/download/#{version}/sy-cli-Darwin-x86_64.tar.gz"
