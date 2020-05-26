@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Installation - </title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <base href="">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html">Introduction</a></li><li class="affix"><a href="compare.html">Comparisons</a></li><li class="affix"><a href="installation.html" class="active">Installation</a></li><li><a href="vault/first-steps.html"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="installation.html#via-homebrew-osx-and-linux" id="via-homebrew-osx-and-linux"><h3>Via HomeBrew (OSX and Linux)</h3></a>
+<p>This is by far the easiest way to get the binary. Just execute the following code:</p>
+<pre><code class="language-bash">brew tap share-secrets-safely/cli
+brew install sheesy
+</code></pre>
+<p>This will install <code>gpg</code> as well, which is required for the <a href="vault/about.html"><code>sheesy vault</code></a> to work.</p>
+<a class="header" href="installation.html#via-git-clone" id="via-git-clone"><h3>Via Git Clone</h3></a>
+<p>Thanks to the <a href="https://github.com/share-secrets-safely/getting-started"><code>getting-started</code></a> repository, obtaining the release binaries on demand becomes a breeze.
+This is particularly useful for quick fetchin <code>sheesy</code> for use within containers.</p>
+<pre><code class="language-bash use=sandboxed exec=1">git clone https://github.com/share-secrets-safely/getting-started
+./getting-started/sy
+</code></pre>
+<pre><code class="language-output">Cloning into 'getting-started'...
+Downloading https://github.com/share-secrets-safely/cli/releases/download/4.0.10/sy-cli-Linux-x86_64.tar.gz...
+error: 'sy' requires a subcommand, but one was not provided
+
+USAGE:
+    sy &lt;SUBCOMMAND&gt;
+
+For more information try --help
+</code></pre>
+<p>The binaries are download when <code>./sy</code> is first executed, and you will find them in <code>./bin/$(uname -s)/*</code>
+for further use.</p>
+<a class="header" href="installation.html#via-a-hrefhttpsgithubcomshare-secrets-safelyclireleasesreleasesa" id="via-a-hrefhttpsgithubcomshare-secrets-safelyclireleasesreleasesa"><h3>Via <a href="https://github.com/share-secrets-safely/cli/releases">Releases</a></h3></a>
+<p>Please note that in order to use <code>sy</code>, you will need a working <a href="https://www.gnupg.org/download/index.html#binary">installation of <code>gpg</code></a>.</p>
+<p>Navigate to the <a href="https://github.com/share-secrets-safely/cli/releases">releases page</a> and download a release binary suitable
+for your system. A full example <em>for linux</em> looks like this:</p>
+<pre><code class="language-bash use=sandboxed exec">curl --fail -Lso sy.tar.gz https://github.com/share-secrets-safely/cli/releases/download/4.0.5/sy-cli-Linux-x86_64.tar.gz
+curl --fail -Lso sy.tar.gz.gpg https://github.com/share-secrets-safely/cli/releases/download/4.0.5/sy-cli-Linux-x86_64.tar.gz.gpg
+# verify 'sy' was built by one of the maintainers
+gpg --import &lt;(curl -s https://raw.githubusercontent.com/share-secrets-safely/cli/master/signing-keys.asc) 2&gt;/dev/null
+gpg --sign-key --yes --batch 763629FEC8788FC35128B5F6EE029D1E5EB40300 &amp;&gt;/dev/null
+gpg --verify ./sy.tar.gz.gpg sy.tar.gz
+# now that we know it's the real thing, let's use it.
+tar xzf sy.tar.gz
+# This will print out that the file was created by one of the maintainers. If you chose to
+# trust the respective key after verifying it belongs to the maintainers, gpg will tell you
+# it is verified.
+
+# Finally put the executable into your PATH
+mv ./sy /usr/local/bin
+</code></pre>
+<pre><code class="language-output">gpg: Signature made Fri Aug 16 09:58:02 2019 UTC
+gpg:                using RSA key 763629FEC8788FC35128B5F6EE029D1E5EB40300
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   1  signed:   1  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: depth: 1  valid:   1  signed:   0  trust: 1-, 0q, 0n, 0m, 0f, 0u
+gpg: Good signature from &quot;Sebastian Thiel (Yubikey USB-C) &lt;sthiel@thoughtworks.com&gt;&quot; [full]
+</code></pre>
+<p>Now the <code>sy</code> executable is available in your <code>PATH</code>.</p>
+<pre><code class="language-bash use=sy-in-path exec">sy --help
+</code></pre>
+<pre><code class="language-output">sy 4.0.10
+Sebastian Thiel &lt;byronimo@gmail.com&gt;
+The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults.
+
+USAGE:
+    sy &lt;SUBCOMMAND&gt;
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    vault          Various commands to store and retrieve secrets and control who has access.
+    substitute     Substitutes templates using structured data. The idea is to build a tree of data that is used to
+                   substitute in various templates, using multiple inputs and outputs.That way, secrets (like
+                   credentials) can be extracted from the vault just once and used wherever needed without them
+                   touching disk.Liquid is used as template engine, and it's possible to refer to and inherit from
+                   other templates by their file-stem. Read more on their website at
+                   https://shopify.github.io/liquid .
+    process        Merge JSON or YAML files from standard input from specified files. Multi-document YAML files are
+                   supported. Merging a single file is explicitly valid and can be used to check for syntax errors.
+    extract        Extract scalar or complex values from any JSON or YAML file. Multi-document YAML files are
+                   supported.
+    completions    generate completions for supported shell
+    help           Prints this message or the help of the given subcommand(s)
+
+Read more on https://share-secrets-safely.github.io/cli
+</code></pre>
+<a class="header" href="installation.html#via-a-hrefhttprustuprscargoa" id="via-a-hrefhttprustuprscargoa"><h3>Via <a href="http://rustup.rs">Cargo</a></h3></a>
+<p>If you already have <code>cargo</code> available, installation is as easy as the following:</p>
+<pre><code class="language-bash">cargo install sheesy-cli
+</code></pre>
+<p>This installation should be preferred as it makes updating the binary much easier.
+If you don't have <code>cargo</code> yet, you can install it via <a href="http://rustup.rs">instructions on rustup.rs</a>.</p>
+<p>Please note that for building on OSX, you are required to locally install <a href="https://github.com/share-secrets-safely/cli/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L30">certain dependencies</a>,
+which is also the case on <a href="https://github.com/share-secrets-safely/cli/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L22">linux systems</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="compare.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="vault/first-steps.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="compare.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="vault/first-steps.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

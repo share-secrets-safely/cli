@@ -1,0 +1,7 @@
+#!/bin/bash
+cat <<EOF
+{
+  "title" : "Main Heading",
+  "title_lowercase" : "main heading",
+}
+EOF

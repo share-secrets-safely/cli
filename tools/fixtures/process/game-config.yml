@@ -1,0 +1,5 @@
+player:
+  lives: 3
+enemies:
+  type: aliens
+  cheat: true

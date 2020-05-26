@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Comparisons - </title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <base href="">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html">Introduction</a></li><li class="affix"><a href="compare.html" class="active">Comparisons</a></li><li class="affix"><a href="installation.html">Installation</a></li><li><a href="vault/first-steps.html"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>You might ask yourself why you would chose <code>sheesy</code> over other tools. The comparisons
+that follow should be helpful in deciding what's best for you.</p>
+<a class="header" href="compare.html#pass" id="pass"><h3>Pass</h3></a>
+<p>The <a href="https://www.passwordstore.org/">standard unix pass</a> is a shell script, which requires the presence of various standard unix tools, <a href="https://git.zx2c4.com/password-store/tree/README">among which</a> are
+<code>tree</code> and <code>getopt</code>. The latter are actually not necessarily present, and if they are they may not produce exactly the same
+results. On <em>OSX</em> for example, the <code>gpg</code> file suffix is shown instead of hidden, and <code>pass</code> goes in an endless loop if
+<code>getopt</code> is broken, which it is by default when <code>brew reinstall gnu-getopt</code> was not invoked.</p>
+<p><code>sheesy</code> has only one dependency: <code>gpg</code>, and even there it does not depend on the executable, but rather the <code>gpg-agent</code>.
+It does not invoke the <code>gpg</code> command, and thus will not be confused by a change in the way <code>gpg</code> interprets its arguments
+between minor version increments.</p>
+<p>Besides, as <code>pass</code> just invokes <code>gpg</code>, it suffers from the horrible and hard-to-grok error messages that it produces.
+Using <code>pass</code> and <code>gpg</code> requires to overcome a significant learning barrier, and you are required to know and understand
+the 'Web of Trust' and all the error messages that come with not having one big enough to encrypt for the desired
+recipients.</p>
+<p><code>sheesy</code> is built with <em>great user experience</em> as first class requirement, and even though you will always see the underlying
+<code>gpg</code> error, it will explain what it means and provide you with hints to solve the issue. When encryption fails, it will
+list exactly for which recipient you cannot encrypt, and why.</p>
+<p><code>pass</code> even has a <a href="https://git.zx2c4.com/password-store/tree/">few tests</a>, but it's unclear when and where these run. <code>sheesy</code> is developed in a test-driven
+fashion, and has user-centric tests that model real-world interaction. This is the reason why those interactions are designed
+to be understandable, consistent and easy to remember.</p>
+<a class="header" href="compare.html#gopass" id="gopass"><h3>Gopass</h3></a>
+<p><a href="https://github.com/justwatchcom/gopass"><code>gopass</code></a> is '<em>the slightly more awesome standard unix password manager for teams</em>' as claimed on the projects
+github page. As I have never used it beyond trying it locally, this paragraph might be lacking details. However, a first
+impression is worth something, and here we go.</p>
+<p>As it is a <code>go</code> program, it comes without any dependencies except for the <code>gpg</code> executable. It calls it directly, and thus
+would be vulnerable to changes to the way <code>gpg</code> parses its arguments.</p>
+<p>It's feature-ladden and seems overwhelming at first, it is clearly not centered
+around user experience. Otherwise the user-journey would be much more streamlined and easier to comprehend. Many advanced
+features I certainly don't get to enjoy that way.</p>
+<p>Somewhat a sybling of the issue above seems to be that it is hell-bent on being a personal password store.
+Thus it will store meta-data in your home directory and really wants a root-store which is placed in your
+home by default. So-called 'mounts' are really just a way to let it know about other <code>pass</code> compatible vaults,
+and I believe that makes it a buzz-word. Nonetheless, this made it hard for me to get started with it, and I still
+feel highly uncomfortable to use it thanks to it opinionatedness.</p>
+<p>Last but not least, and an issue that I find makes the case for not using <code>gopass</code> is that it actually
+<a href="https://github.com/justwatchcom/gopass/issues/305">abandons the <code>Web of Trust</code></a> in favor of simplicity to the user. Even though I understand
+why one would do that, I think the <code>Web of Trust</code> is an awesome idea, with terrible user experience, which
+just begs you to make it usable for the masses thanks to better tooling.</p>
+<p>Additionally <code>gopass</code> just aims to be a <em>slightly more awesome</em> than <code>pass</code>, which shows as it is basically
+pass written in <code>go</code> with more features.</p>
+<p>Even though it certainly is better than <code>pass</code>, I wouldn't want to use it in its place because it adds so much
+complexity while entirely removing the 'Web of Trust'. The latter seemed to have happened rather sneakily, which
+I find problematic.</p>
+<p>It should be valued that they <a href="https://github.com/justwatchcom/gopass/search?q=Increase+test+coverage&amp;type=Commits&amp;utf8=%E2%9C%93">actively increase test-coverage</a>, but it also means that they don't
+do test-driven development, which nourishes my doubt in the quality of the software.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="installation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="installation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

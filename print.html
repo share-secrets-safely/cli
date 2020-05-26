@@ -1,0 +1,1502 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <base href="">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html">Introduction</a></li><li class="affix"><a href="compare.html">Comparisons</a></li><li class="affix"><a href="installation.html">Installation</a></li><li><a href="vault/first-steps.html"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="print.html#share-secrets-safely" id="share-secrets-safely"><h1>Share Secrets Safely</h1></a>
+<p>...and here is how!</p>
+<p><code>share secrets safely</code>, or <code>sheesy</code> in short, is a command-line tool which makes
+using cryptography powered by <a href="https://www.gnupg.org/"><code>gpg</code></a> easy.</p>
+<p>It's there for you and your team to help you avoid putting plain-text secrets into
+your repository from day one.</p>
+<p>However, there is more to it and this guide will give you an overview of the
+difficulties associated with <em>shared secrets</em>, and how to overcome them.</p>
+<a class="header" href="print.html#about-shared-secrets" id="about-shared-secrets"><h2>About shared secrets!</h2></a>
+<p><code>secrets</code>, that's knowledge whose possession yields a value. It can be credentials
+providing access to databases, which in turn may contain confidential data or all
+your customers payment information.
+Or it can be a token giving full access to a big companys AWS account with unlimited
+credit.</p>
+<p>The first line of defense is to never, ever store <code>secrets</code> in plain text! This cannot
+be stressed enough. Never do it, ever, and instead read the <a href="vault/first-steps.html">'First Steps'</a>
+to learn how to avoid it from day one.</p>
+<a class="header" href="print.html#rotation-rotation-rotation" id="rotation-rotation-rotation"><h2>Rotation, Rotation, Rotation!</h2></a>
+<p>An interesting property of <em>shared</em> secrets is that once they have been read, they
+must be considered leaked. By using <code>sheesy</code> you try to assure no unauthorized party
+gets to easily read them, but authorized parties still read them eventually, adding
+the risk of leakage each time.</p>
+<p>After adding <code>sheesy</code> into your workflow, it <em>must</em> be your next goal to make it easy
+(e.g. automatically) to rotate these secrets. This invalidates any leak and acts like a
+reset. The shorter the secrets remain valid, the better when it comes to risk of leakage.</p>
+<p><em>If you think further, the safest secrets are the ones that never stay valid for an extended
+period of time, and which are tied to a specific entity.</em></p>
+<a class="header" href="print.html#the-tools" id="the-tools"><h2>The Tools</h2></a>
+<p>Fortunately all the tooling exists to avoid plain-text secrets and make sharing them
+a little safer.
+<code>sheesy</code> does nothing more than bringing them together in a single binary.</p>
+<p>Those are namely</p>
+<ul>
+<li><strong>gpg-cryptography</strong>
+<ul>
+<li>This provides user-identification with public keys as well as proven cryptography</li>
+<li>The <a href="https://www.gnupg.org/gph/en/manual/x547.html"><em>Web of Trust</em></a> helps to conveniently assure public keys actually belong
+to the individual, assuring nobody <em>sneaks in</em>.</li>
+</ul>
+</li>
+<li><strong><em>sheesy</em> command-line tool</strong>
+<ul>
+<li>A binary communicating with the <code>gpg</code> cryptography engine via <a href="https://github.com/johnschug/rust-gpgme"><code>gpgme</code></a>.</li>
+<li>It provides a great user experience making using <code>gpg</code> easy even without prior
+knowledge.</li>
+<li>It provides capabilities to make it easy to use <code>sheesy vaults</code> from your
+build pipeline.</li>
+</ul>
+</li>
+<li><strong>pass - the standard unix password manager</strong>
+<ul>
+<li><a href="https://www.passwordstore.org">pass</a> is a shell-script which drives the <code>gpg</code> program to make it easier
+to use in teams. <code>sheesy</code> vaults are fully compatible to <code>pass</code> vaults.</li>
+</ul>
+</li>
+</ul>
+<p>You might ask yourself why you would chose <code>sheesy</code> over other tools. The comparisons
+that follow should be helpful in deciding what's best for you.</p>
+<a class="header" href="print.html#pass" id="pass"><h3>Pass</h3></a>
+<p>The <a href="https://www.passwordstore.org/">standard unix pass</a> is a shell script, which requires the presence of various standard unix tools, <a href="https://git.zx2c4.com/password-store/tree/README">among which</a> are
+<code>tree</code> and <code>getopt</code>. The latter are actually not necessarily present, and if they are they may not produce exactly the same
+results. On <em>OSX</em> for example, the <code>gpg</code> file suffix is shown instead of hidden, and <code>pass</code> goes in an endless loop if
+<code>getopt</code> is broken, which it is by default when <code>brew reinstall gnu-getopt</code> was not invoked.</p>
+<p><code>sheesy</code> has only one dependency: <code>gpg</code>, and even there it does not depend on the executable, but rather the <code>gpg-agent</code>.
+It does not invoke the <code>gpg</code> command, and thus will not be confused by a change in the way <code>gpg</code> interprets its arguments
+between minor version increments.</p>
+<p>Besides, as <code>pass</code> just invokes <code>gpg</code>, it suffers from the horrible and hard-to-grok error messages that it produces.
+Using <code>pass</code> and <code>gpg</code> requires to overcome a significant learning barrier, and you are required to know and understand
+the 'Web of Trust' and all the error messages that come with not having one big enough to encrypt for the desired
+recipients.</p>
+<p><code>sheesy</code> is built with <em>great user experience</em> as first class requirement, and even though you will always see the underlying
+<code>gpg</code> error, it will explain what it means and provide you with hints to solve the issue. When encryption fails, it will
+list exactly for which recipient you cannot encrypt, and why.</p>
+<p><code>pass</code> even has a <a href="https://git.zx2c4.com/password-store/tree/">few tests</a>, but it's unclear when and where these run. <code>sheesy</code> is developed in a test-driven
+fashion, and has user-centric tests that model real-world interaction. This is the reason why those interactions are designed
+to be understandable, consistent and easy to remember.</p>
+<a class="header" href="print.html#gopass" id="gopass"><h3>Gopass</h3></a>
+<p><a href="https://github.com/justwatchcom/gopass"><code>gopass</code></a> is '<em>the slightly more awesome standard unix password manager for teams</em>' as claimed on the projects
+github page. As I have never used it beyond trying it locally, this paragraph might be lacking details. However, a first
+impression is worth something, and here we go.</p>
+<p>As it is a <code>go</code> program, it comes without any dependencies except for the <code>gpg</code> executable. It calls it directly, and thus
+would be vulnerable to changes to the way <code>gpg</code> parses its arguments.</p>
+<p>It's feature-ladden and seems overwhelming at first, it is clearly not centered
+around user experience. Otherwise the user-journey would be much more streamlined and easier to comprehend. Many advanced
+features I certainly don't get to enjoy that way.</p>
+<p>Somewhat a sybling of the issue above seems to be that it is hell-bent on being a personal password store.
+Thus it will store meta-data in your home directory and really wants a root-store which is placed in your
+home by default. So-called 'mounts' are really just a way to let it know about other <code>pass</code> compatible vaults,
+and I believe that makes it a buzz-word. Nonetheless, this made it hard for me to get started with it, and I still
+feel highly uncomfortable to use it thanks to it opinionatedness.</p>
+<p>Last but not least, and an issue that I find makes the case for not using <code>gopass</code> is that it actually
+<a href="https://github.com/justwatchcom/gopass/issues/305">abandons the <code>Web of Trust</code></a> in favor of simplicity to the user. Even though I understand
+why one would do that, I think the <code>Web of Trust</code> is an awesome idea, with terrible user experience, which
+just begs you to make it usable for the masses thanks to better tooling.</p>
+<p>Additionally <code>gopass</code> just aims to be a <em>slightly more awesome</em> than <code>pass</code>, which shows as it is basically
+pass written in <code>go</code> with more features.</p>
+<p>Even though it certainly is better than <code>pass</code>, I wouldn't want to use it in its place because it adds so much
+complexity while entirely removing the 'Web of Trust'. The latter seemed to have happened rather sneakily, which
+I find problematic.</p>
+<p>It should be valued that they <a href="https://github.com/justwatchcom/gopass/search?q=Increase+test+coverage&amp;type=Commits&amp;utf8=%E2%9C%93">actively increase test-coverage</a>, but it also means that they don't
+do test-driven development, which nourishes my doubt in the quality of the software.</p>
+<a class="header" href="print.html#via-homebrew-osx-and-linux" id="via-homebrew-osx-and-linux"><h3>Via HomeBrew (OSX and Linux)</h3></a>
+<p>This is by far the easiest way to get the binary. Just execute the following code:</p>
+<pre><code class="language-bash">brew tap share-secrets-safely/cli
+brew install sheesy
+</code></pre>
+<p>This will install <code>gpg</code> as well, which is required for the <a href="vault/about.html"><code>sheesy vault</code></a> to work.</p>
+<a class="header" href="print.html#via-git-clone" id="via-git-clone"><h3>Via Git Clone</h3></a>
+<p>Thanks to the <a href="https://github.com/share-secrets-safely/getting-started"><code>getting-started</code></a> repository, obtaining the release binaries on demand becomes a breeze.
+This is particularly useful for quick fetchin <code>sheesy</code> for use within containers.</p>
+<pre><code class="language-bash use=sandboxed exec=1">git clone https://github.com/share-secrets-safely/getting-started
+./getting-started/sy
+</code></pre>
+<pre><code class="language-output">Cloning into 'getting-started'...
+Downloading https://github.com/share-secrets-safely/cli/releases/download/4.0.10/sy-cli-Linux-x86_64.tar.gz...
+error: 'sy' requires a subcommand, but one was not provided
+
+USAGE:
+    sy &lt;SUBCOMMAND&gt;
+
+For more information try --help
+</code></pre>
+<p>The binaries are download when <code>./sy</code> is first executed, and you will find them in <code>./bin/$(uname -s)/*</code>
+for further use.</p>
+<a class="header" href="print.html#via-a-hrefhttpsgithubcomshare-secrets-safelyclireleasesreleasesa" id="via-a-hrefhttpsgithubcomshare-secrets-safelyclireleasesreleasesa"><h3>Via <a href="https://github.com/share-secrets-safely/cli/releases">Releases</a></h3></a>
+<p>Please note that in order to use <code>sy</code>, you will need a working <a href="https://www.gnupg.org/download/index.html#binary">installation of <code>gpg</code></a>.</p>
+<p>Navigate to the <a href="https://github.com/share-secrets-safely/cli/releases">releases page</a> and download a release binary suitable
+for your system. A full example <em>for linux</em> looks like this:</p>
+<pre><code class="language-bash use=sandboxed exec">curl --fail -Lso sy.tar.gz https://github.com/share-secrets-safely/cli/releases/download/4.0.5/sy-cli-Linux-x86_64.tar.gz
+curl --fail -Lso sy.tar.gz.gpg https://github.com/share-secrets-safely/cli/releases/download/4.0.5/sy-cli-Linux-x86_64.tar.gz.gpg
+# verify 'sy' was built by one of the maintainers
+gpg --import &lt;(curl -s https://raw.githubusercontent.com/share-secrets-safely/cli/master/signing-keys.asc) 2&gt;/dev/null
+gpg --sign-key --yes --batch 763629FEC8788FC35128B5F6EE029D1E5EB40300 &amp;&gt;/dev/null
+gpg --verify ./sy.tar.gz.gpg sy.tar.gz
+# now that we know it's the real thing, let's use it.
+tar xzf sy.tar.gz
+# This will print out that the file was created by one of the maintainers. If you chose to
+# trust the respective key after verifying it belongs to the maintainers, gpg will tell you
+# it is verified.
+
+# Finally put the executable into your PATH
+mv ./sy /usr/local/bin
+</code></pre>
+<pre><code class="language-output">gpg: Signature made Fri Aug 16 09:58:02 2019 UTC
+gpg:                using RSA key 763629FEC8788FC35128B5F6EE029D1E5EB40300
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   1  signed:   1  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: depth: 1  valid:   1  signed:   0  trust: 1-, 0q, 0n, 0m, 0f, 0u
+gpg: Good signature from &quot;Sebastian Thiel (Yubikey USB-C) &lt;sthiel@thoughtworks.com&gt;&quot; [full]
+</code></pre>
+<p>Now the <code>sy</code> executable is available in your <code>PATH</code>.</p>
+<pre><code class="language-bash use=sy-in-path exec">sy --help
+</code></pre>
+<pre><code class="language-output">sy 4.0.10
+Sebastian Thiel &lt;byronimo@gmail.com&gt;
+The 'share-secrets-safely' CLI to interact with GPG/pass-like vaults.
+
+USAGE:
+    sy &lt;SUBCOMMAND&gt;
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    vault          Various commands to store and retrieve secrets and control who has access.
+    substitute     Substitutes templates using structured data. The idea is to build a tree of data that is used to
+                   substitute in various templates, using multiple inputs and outputs.That way, secrets (like
+                   credentials) can be extracted from the vault just once and used wherever needed without them
+                   touching disk.Liquid is used as template engine, and it's possible to refer to and inherit from
+                   other templates by their file-stem. Read more on their website at
+                   https://shopify.github.io/liquid .
+    process        Merge JSON or YAML files from standard input from specified files. Multi-document YAML files are
+                   supported. Merging a single file is explicitly valid and can be used to check for syntax errors.
+    extract        Extract scalar or complex values from any JSON or YAML file. Multi-document YAML files are
+                   supported.
+    completions    generate completions for supported shell
+    help           Prints this message or the help of the given subcommand(s)
+
+Read more on https://share-secrets-safely.github.io/cli
+</code></pre>
+<a class="header" href="print.html#via-a-hrefhttprustuprscargoa" id="via-a-hrefhttprustuprscargoa"><h3>Via <a href="http://rustup.rs">Cargo</a></h3></a>
+<p>If you already have <code>cargo</code> available, installation is as easy as the following:</p>
+<pre><code class="language-bash">cargo install sheesy-cli
+</code></pre>
+<p>This installation should be preferred as it makes updating the binary much easier.
+If you don't have <code>cargo</code> yet, you can install it via <a href="http://rustup.rs">instructions on rustup.rs</a>.</p>
+<p>Please note that for building on OSX, you are required to locally install <a href="https://github.com/share-secrets-safely/cli/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L30">certain dependencies</a>,
+which is also the case on <a href="https://github.com/share-secrets-safely/cli/blob/ffafeacb744bdbe7af5a6317ecb65ee9aae13311/.travis.yml#L22">linux systems</a>.</p>
+<p>First of all, we assume that you have installed the <code>sy</code> command-line program already.
+If not, please have a look at the <a href="installation.html">chapter about installation</a>.</p>
+<a class="header" href="print.html#initializing-the-vault" id="initializing-the-vault"><h3>Initializing the vault</h3></a>
+<p>Assuming your current directory is empty, just running <code>vault</code> will error.</p>
+<pre><code class="language-bash use=in-vault-dir exec=1">sy vault
+</code></pre>
+<pre><code class="language-output">error: Failed to read vault configuration file at './sy-vault.yml'
+
+Caused by: 
+ 1: No such file or directory (os error 2)
+</code></pre>
+<p>What you want to do is to initialize the vault. This will add yourself as the first
+<a href="vault/about.html#about-recipients">recipient</a> and add some state to the directory you chose or that you are in.</p>
+<pre><code class="language-bash use=as-nobody exec=1">sy vault init
+</code></pre>
+<pre><code class="language-output">error: No existing GPG key found for which you have a secret key. Please create one with 'gpg --gen-key' and try again.
+</code></pre>
+<p>Assuming we have followed the instructions or already have setup a <em>gpg key</em>, you will
+get quite a different result.</p>
+<pre><code class="language-bash use=as-tester exec">sy vault init
+</code></pre>
+<pre><code class="language-output">Exported public key for user Tester (for testing only) &lt;tester@example.com&gt; to '.gpg-keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
+vault initialized at './sy-vault.yml'
+</code></pre>
+<a class="header" href="print.html#adding-resources" id="adding-resources"><h3>Adding Resources</h3></a>
+<p>Usually what happens next is to add some <a href="vault/about.html#about-resources">resources</a>. For now they will
+only be encrypted for you, and thus can only be read by you.</p>
+<p>Resources are added via resource <em>specs</em>, or can be created by editing.</p>
+<p>There are various ways to add new resources...</p>
+<p>...by gathering output from a program...</p>
+<pre><code class="language-bash use=as-tester exec">echo hi | sy vault add :from-program
+</code></pre>
+<pre><code class="language-output">Added 'from-program'.
+</code></pre>
+<p>...or from existing files.</p>
+<pre><code class="language-bash use=as-tester exec">sy vault add $SRC_DIR/README.md:README.md
+</code></pre>
+<pre><code class="language-output">Added 'README.md'.
+</code></pre>
+<p>You can <em>list</em> existing resources...</p>
+<pre><code class="language-bash use=as-tester exec">sy vault list
+</code></pre>
+<pre><code class="language-output">syv://.
+README.md
+from-program
+</code></pre>
+<p>or you can <em>show</em> them.</p>
+<pre><code class="language-bash use=as-tester exec">sy vault show from-program
+</code></pre>
+<pre><code class="language-output">hi
+</code></pre>
+<a class="header" href="print.html#meet-alexis" id="meet-alexis"><h3>Meet Alexis!</h3></a>
+<p>Even though secrets that are not shared with anyone (but yourself) are great for
+security, they are not too useful in many settings.</p>
+<p>So we will add our first recipient, <em>Alexis</em>!</p>
+<p>As always, <em>Alexis</em> will require an own <em>gpg key</em>, and for the sake of simplicity
+we will assume it is already present.</p>
+<p>Usually it's also easiest to let new recipients 'knock at the door of the vault',
+and leave it to existing recipients of the vault to 'let them in'.</p>
+<p>In this analogy, 'knocking the door' is equivalent to placing their key in the vaults
+keys directory. 'Letting them in' means re-encrypting all <em>resources</em> for the
+current and the new recipients after verifying their key truly belongs to them.</p>
+<p>That's quite a lot to digest, so let's start and make small steps.</p>
+<p>Let's let <em>Alexis</em> look at the vault:</p>
+<pre><code class="language-bash use=as-alexis exec">sy vault
+</code></pre>
+<pre><code class="language-output">syv://.
+README.md
+from-program
+</code></pre>
+<p>What a good start! We can list resource, but does that mean we can also see them?</p>
+<pre><code class="language-bash use=as-alexis exec=1">sy vault show from-program
+</code></pre>
+<pre><code class="language-output">error: Export your public key using 'sy vault recipient init', then ask one of the existing recipients to import your public key using 'sy vault recipients add &lt;your-userid&gt;.'
+Caused by: 
+ 2: The content was not encrypted for you.
+ 1: No secret key (gpg error 17)
+</code></pre>
+<p>Phew, that's good actually! It's also good that it tells you right away how to
+solve the issue. Let's follow along.</p>
+<pre><code class="language-bash use=as-alexis exec">sy vault recipient init
+</code></pre>
+<pre><code class="language-output">Exported public key for user c &lt;c@example.com&gt; (905E53FE2FC0A500100AB80B056F92A52DF04D4E).
+</code></pre>
+<p><em>Cough</em>, let's ignore this key seems to be for <em>c <a href="mailto:c@example.com">c@example.com</a></em>, <em>Alexis</em> loves
+simplicity!</p>
+<p>Let's see what changed - where is this key exactly?</p>
+<pre><code class="language-bash use=as-alexis exec">tree -a
+</code></pre>
+<pre><code class="language-output">.
+├── .gpg-id
+├── .gpg-keys
+│   ├── 905E53FE2FC0A500100AB80B056F92A52DF04D4E
+│   └── D6339718E9B58FCE3C66C78AAA5B7BF150F48332
+├── README.md.gpg
+├── from-program.gpg
+└── sy-vault.yml
+
+1 directory, 6 files
+</code></pre>
+<p>It looks like the keyfile is actually stored in a hidden directory. But as you can see,
+it's just something that can be configured to your liking.</p>
+<pre><code class="language-bash use=as-alexis exec">cat sy-vault.yml
+</code></pre>
+<pre><code class="language-output">---
+name: ~
+auto_import: true
+trust_model: always
+secrets: &quot;.&quot;
+gpg_keys: &quot;.gpg-keys&quot;
+recipients: &quot;./.gpg-id&quot;
+</code></pre>
+<p>That's all we can do here, now back to the <em>prime recipient</em>.</p>
+<a class="header" href="print.html#adding-alexis" id="adding-alexis"><h3>Adding <em>Alexis</em></h3></a>
+<p>Back with the very first recipient of the vault who has already been informed
+about <em>Alexis</em> arrival. We received an e-mail and know it's <code>c@example.com</code>,
+maybe we can use that.</p>
+<pre><code class="language-bash use=as-tester exec=1">sy vault recipient add c@example.com
+</code></pre>
+<pre><code class="language-output">error: Fingerprint 'c@example.com' must only contain characters a-f, A-F and 0-9.
+</code></pre>
+<p>Looks like it doesn't like the format. The problem is that for verification purposes,
+it wants you to add the fingerprint, which you should also have received by <em>Alexis</em>.
+This links the key (identified by its fingerprint) to <em>Alexis</em>.</p>
+<p>Let's spell it out:</p>
+<pre><code class="language-bash use=as-tester exec=0">sy vault recipient add 2DF04D4E
+</code></pre>
+<pre><code class="language-output">Imported recipient key at path '.gpg-keys/905E53FE2FC0A500100AB80B056F92A52DF04D4E'
+Signed recipients key user c &lt;c@example.com&gt; (905E53FE2FC0A500100AB80B056F92A52DF04D4E) with signing key Tester (for testing only) &lt;tester@example.com&gt; (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
+Exported public key for user user c &lt;c@example.com&gt; to '.gpg-keys/905E53FE2FC0A500100AB80B056F92A52DF04D4E'
+Added recipient user c &lt;c@example.com&gt;
+Re-encrypted 'README.md' for new recipient(s)
+Re-encrypted 'from-program' for new recipient(s)
+</code></pre>
+<p>Let's look at the steps that it performs in details:</p>
+<ul>
+<li><em>import</em>
+<ul>
+<li>it finds <em>Alexis</em> key as identified by the fingerprint in the vaults keys
+directory and <em>imports</em> it into the <em>gpg keychain</em>.</li>
+</ul>
+</li>
+<li><em>signing</em>
+<ul>
+<li><em>Alexis</em> key is signed with the one of the prime recipient, which indicates
+we verified that it truly belongs to <em>Alexis</em>.</li>
+</ul>
+</li>
+<li><em>export</em>
+<ul>
+<li><em>Alexis</em> key is re-exported as it now also contains said signature. The fact
+that the prime recipient believes that the key belongs to <em>Alexis</em> is communicated
+to others that way, which helps building the <a href="https://www.gnupg.org/gph/en/manual/x547.html">Web of Trust</a>.</li>
+</ul>
+</li>
+<li><em>encrypt</em>
+<ul>
+<li>Each <em>resource</em> of the vault is re-encrypted for all recipients. This means
+<em>Alexis</em> will be able to get to peek inside.</li>
+</ul>
+</li>
+</ul>
+<p><em>(If we would already have <em>Alexis</em> in our keychain and signed their key, you
+could also more easily add them using their email alongside the <code>--verified</code>
+flag.
+Find all possible flags of the <code>sy-vault-recipients-add</code> <a href="vault/recipients/add.html">here</a>)</em></p>
+<a class="header" href="print.html#back-with-alexis-the-latest-recipient-of-the-vault" id="back-with-alexis-the-latest-recipient-of-the-vault"><h3>Back with Alexis, the latest recipient of the vault</h3></a>
+<p>Now that <em>Alexis</em> has been added as a recipient, it should be possible to peek
+at the secrets it contains!</p>
+<pre><code class="language-bash use=as-alexis exec">sy vault show from-program
+</code></pre>
+<pre><code class="language-output">hi
+</code></pre>
+<p>Beautiful!</p>
+<p>And what's even better: <em>Alexis</em> now can add <em>recipients</em> on their own!</p>
+<a class="header" href="print.html#next-steps" id="next-steps"><h3>Next steps</h3></a>
+<p>This is just the beginnings! Feel free to add more <em>resources</em> and <em>recipients</em>, add
+the contents of the vault to git and distribute it that way, or add it to your tooling
+to extract secrets when building your software.</p>
+<p>The <code>vault</code> sub-command is quite a complex one as it implements all interactions with <strong>vaults</strong>.
+A <strong>vault</strong> contains shared secrets, and is compatible to the <a href="http://passwordstore.org/">unix password manager</a>.</p>
+<p>It provides subcommands for dealing with two kinds of items</p>
+<ul>
+<li><em>resources</em></li>
+<li><em>recipients</em></li>
+</ul>
+<a class="header" href="print.html#about-resources" id="about-resources"><h3>About Resources</h3></a>
+<p>Most of the time, when using the <em>vault</em>, you will deal with the <em>resources</em> contained
+within. A <em>resource</em> is an encrypted secret so that it is readable and writable by
+all <em>recipients</em>.</p>
+<p><em>Resources</em> can be <em>add</em>ed, <em>remove</em>d, <em>edit</em>ed, <em>list</em>ed and <em>show</em>n.</p>
+<p><strong>As they are used most of the time, they are found directly in the <code>vault</code> sub-command.</strong></p>
+<a class="header" href="print.html#about-recipients" id="about-recipients"><h3>About Recipients</h3></a>
+<p>Each recipient is identified by their <em>gpg-key</em>, which is tied to their identity.
+New recipients can only be added by existing recipients of the vault, which also requires
+them to verify that the new key truly belongs to the respective person.</p>
+<p>Recipients may indicate trust-relationships between each other, which allows
+to encrypt for recipients whose keys have not been explicitly verified.
+This is called the <a href="https://en.wikipedia.org/wiki/Web_of_trust">Web of trust</a>, a feature that <code>sheesy</code> makes easier to use.</p>
+<p><strong>As they are used less often, they are tucked away in the <code>recipients</code> sub-command.</strong></p>
+<a class="header" href="print.html#the-vault-sub-command" id="the-vault-sub-command"><h3>The <em>vault</em> sub-command</h3></a>
+<p>As the <code>vault</code> sub-command is only a hub, we recommend you to look at its sub-commands
+instead.</p>
+<pre><code class="language-bash use=sy-in-path exec">sy vault --help
+</code></pre>
+<pre><code class="language-output">sy-vault 4.0.10
+Sebastian Thiel &lt;byronimo@gmail.com&gt;
+Various commands to store and retrieve secrets and control who has access.
+
+USAGE:
+    sy vault [OPTIONS] --config-file &lt;path&gt; [SUBCOMMAND]
+
+FLAGS:
+    -h, --help    Prints help information
+
+OPTIONS:
+    -s, --select &lt;selector&gt;     Specify the vault which should be the leader.This is particularly relevant for
+                                operations with partitions.It has no effect during 'vault init'.A vault can be selected
+                                by the directory used to stored its resources, by its name (which may be ambiguous), or
+                                by the index in the vault description file. [default: 0]
+    -c, --config-file &lt;path&gt;    Path to the vault configuration YAML file. [default: ./sy-vault.yml]
+
+SUBCOMMANDS:
+    init          Initialize the vault in the current directory. If --gpg-key-id is unset, we will use the only key
+                  that you have a secret key for, assuming it is yours.If you have multiple keys, the --gpg-key-id
+                  must be specified to make the input unambiguous.
+    add           Add a new resource to the vault.
+    edit          Edit a resource. This will decrypt the resource to a temporary file, open up the $EDITOR you have
+                  specified, and re-encrypt the changed content before deleting it on disk.
+    show          Decrypt a resource
+    list          List the vault's content.
+    remove        Delete a resource from the vault.
+    recipients    Interact with recipients of a vault. They can encrypt and decrypt its contents.
+    partitions    A partition is essentially another vault, as such it has its own recipients list, name, keys
+                  directory place to store resources.Its major promise is that it is non-overlapping with any other
+                  partition.Its main benefit is that it allows one recipients list per resource directory,
+                  effectively emulating simple access control lists.
+    help          Prints this message or the help of the given subcommand(s)
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault init --help
+</code></pre>
+<pre><code class="language-output">sy-vault-init 
+Initialize the vault in the current directory. If --gpg-key-id is unset, we will use the only key that you have a secret
+key for, assuming it is yours.If you have multiple keys, the --gpg-key-id must be specified to make the input
+unambiguous.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; init [FLAGS] [OPTIONS]
+
+FLAGS:
+    -p, --first-partition    Setting this flag indicates that you want to add partitions later.It enforces a
+                             configuration which makes your vault suitable, namely it assures that you set an explicit
+                             secrets directory.
+    -h, --help               Prints help information
+        --no-auto-import     If set, missing keys will not automatically be imported to your keychain. This may make
+                             attempts to encrypt resources fail.
+
+OPTIONS:
+    -i, --gpg-key-id &lt;userid&gt;...      The key-id of the public key identifying a recipient in your gpg keychain.
+    -k, --gpg-keys-dir &lt;directory&gt;    The directory to hold the public keys of all recipients.Please note that these
+                                      keys are exported with signatures. [default: .gpg-keys]
+    -n, --name &lt;name&gt;                 The name of the vault. It can be used to identify the vault more easily, and its
+                                      primary purpose is convenience.
+    -r, --recipients-file &lt;path&gt;      The path to the file to hold the fingerprints of all recipients. If set to just
+                                      the file name, like 'recipients', it will be interpreted as relative to the
+                                      --secrets-dir. If a path is given, like './recipients', it is used as is.
+                                      [default: .gpg-id]
+    -s, --secrets-dir &lt;path&gt;          The directory which stores the vaults secrets. [default: .]
+        --trust-model &lt;model&gt;         The model by which keys to encrypt for are verified to truly belong to the person.
+                                      If unset, it defaults to 'always'.'always': whenever a key has been added to the
+                                      vault, it is trusted without your intervention. 'web-of-trust': the standard GPG
+                                      web of trust with default rules. In the most simple case, you will need to sign a
+                                      key prior to be able to encrypt for it. [default: always]  [possible values: web-
+                                      of-trust, always]
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault add --help
+</code></pre>
+<pre><code class="language-output">sy-vault-add 
+Add a new resource to the vault.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; add &lt;spec&gt;
+
+FLAGS:
+    -h, --help    Prints help information
+
+ARGS:
+    &lt;spec&gt;    A specification identifying a mapping from a source file to be stored in a location of the vault. It
+              takes the form '&lt;src&gt;:&lt;dst&gt;', where '&lt;src&gt;' is equivalent to '&lt;src&gt;:&lt;src&gt;'.&lt;dst&gt; should be vault-
+              relative paths, whereas &lt;src&gt; must point to a readable file and can be empty to read from
+              standard input, such as in ':&lt;dst&gt;'.If standard input is a TTY, it will open the editor as defined by
+              the EDITOR environment variable.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault edit --help
+</code></pre>
+<pre><code class="language-output">sy-vault-edit 
+Edit a resource. This will decrypt the resource to a temporary file, open up the $EDITOR you have specified, and re-
+encrypt the changed content before deleting it on disk.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; edit [FLAGS] [OPTIONS] &lt;path&gt;
+
+FLAGS:
+    -h, --help              Prints help information
+        --no-create         If set, the resource you are editing must exist. Otherwise it will be created on the fly,
+                            allowing you to add new resources by editing them.
+        --no-try-encrypt    Unless set, we will assure encryption works prior to launching the editor. This assures you
+                            do not accidentally loose your edits.
+
+OPTIONS:
+    -e, --editor &lt;editor&gt;    The path to your editor program. It receives the decrypted content as first argument and is
+                             expected to write the changes back to that file before quitting. [default: vim]
+
+ARGS:
+    &lt;path&gt;    Either a vault-relative path to the file as displayed by 'vault show',a vault-relative path with the
+              '.gpg' suffix, or an absolute path with or without the '.gpg' suffix.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault list --help
+</code></pre>
+<pre><code class="language-output">sy-vault-list 
+List the vault's content.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; list
+
+FLAGS:
+    -h, --help    Prints help information
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault remove --help
+</code></pre>
+<pre><code class="language-output">sy-vault-remove 
+Delete a resource from the vault.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; remove &lt;path&gt;...
+
+FLAGS:
+    -h, --help    Prints help information
+
+ARGS:
+    &lt;path&gt;...    The vault-relative path of a resource in the vault
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault show --help
+</code></pre>
+<pre><code class="language-output">sy-vault-show 
+Decrypt a resource
+
+USAGE:
+    sy vault --config-file &lt;path&gt; show &lt;path&gt;
+
+FLAGS:
+    -h, --help    Prints help information
+
+ARGS:
+    &lt;path&gt;    Either a vault-relative path to the file as displayed by 'vault show',a vault-relative path with the
+              '.gpg' suffix, or an absolute path with or without the '.gpg' suffix.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault recipients --help
+</code></pre>
+<pre><code class="language-output">sy-vault-recipients 
+Interact with recipients of a vault. They can encrypt and decrypt its contents.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; recipients [SUBCOMMAND]
+
+FLAGS:
+    -h, --help    Prints help information
+
+SUBCOMMANDS:
+    init      Add your single (or the given) recipient key to the vault by exporting the public key and storing it
+              in the vaults local gpg key database. Afterwards someone able to decrypt the vault contents can re-
+              encrypt the content for you.
+    add       Add a new recipient. This will re-encrypt all the vaults content.If the '--verified' flag is unset,
+              you will have to specify the fingerprint directly (as opposed to allowing the recipients email address
+              or name) to indicate you have assured yourself that it actually belongs to the person.Otherwise the
+              respective key as identified by its fingerprint will then be imported and signed. It is expected that
+              you have assured the keys fingerprint belongs to the recipient. Keys will always be exported into the
+              vaults key directory (if set), which includes signatures.Signatures allow others to use the 'Web of
+              Trust' for convenient encryption.
+    list      List the vaults recipients as identified by the recipients file.
+    remove    Remove the given recipient. This will re-encrypt all the vaults content for the remaining
+              recipients.The gpg keychain will not be altered, thus the trust-relationship with the removed
+              recipient is left intact.However, the recipients key file will be removed from the vault.
+    help      Prints this message or the help of the given subcommand(s)
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault recipients init --help
+</code></pre>
+<pre><code class="language-output">sy-vault-recipients-init 
+Add your single (or the given) recipient key to the vault by exporting the public key and storing it in the vaults local
+gpg key database. Afterwards someone able to decrypt the vault contents can re-encrypt the content for you.
+
+USAGE:
+    sy vault recipients init [userid]...
+
+FLAGS:
+    -h, --help    Prints help information
+
+ARGS:
+    &lt;userid&gt;...    The key-id of the public key identifying a recipient in your gpg keychain.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault recipients add --help
+</code></pre>
+<pre><code class="language-output">sy-vault-recipients-add 
+Add a new recipient. This will re-encrypt all the vaults content.If the '--verified' flag is unset, you will have to
+specify the fingerprint directly (as opposed to allowing the recipients email address or name) to indicate you have
+assured yourself that it actually belongs to the person.Otherwise the respective key as identified by its fingerprint
+will then be imported and signed. It is expected that you have assured the keys fingerprint belongs to the recipient.
+Keys will always be exported into the vaults key directory (if set), which includes signatures.Signatures allow others
+to use the 'Web of Trust' for convenient encryption.
+
+USAGE:
+    sy vault recipients add [FLAGS] [OPTIONS] &lt;userid&gt;...
+
+FLAGS:
+    -h, --help        Prints help information
+        --verified    If specified, you indicate that the user id to be added truly belongs to a person you know and
+                      that you have verified that relationship already. You have used `gpg --sign-key &lt;recipient&gt;` or
+                      have set the owner trust to ultimate so that you can encrypt for the recipient.
+
+OPTIONS:
+    -p, --partition=&lt;partition&gt;...     Identifies the partition to add the recipient to. This can be done either using
+                                       its name or its secrets directory.If unset, the recipient will be added to
+                                       naturally selected vault, see the --select flag.
+        --signing-key &lt;signing-key&gt;    The userid or fingerprint of the key to use for signing not-yet-verified keys. It
+                                       must only be specified if you have access to multiple secret keys which are also
+                                       current recipients.
+
+ARGS:
+    &lt;userid&gt;...    The key-id of the public key identifying a recipient in your gpg keychain.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault recipients list --help
+</code></pre>
+<pre><code class="language-output">sy-vault-recipients-list 
+List the vaults recipients as identified by the recipients file.
+
+USAGE:
+    sy vault recipients list
+
+FLAGS:
+    -h, --help    Prints help information
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault recipients remove --help
+</code></pre>
+<pre><code class="language-output">sy-vault-recipients-remove 
+Remove the given recipient. This will re-encrypt all the vaults content for the remaining recipients.The gpg keychain
+will not be altered, thus the trust-relationship with the removed recipient is left intact.However, the recipients key
+file will be removed from the vault.
+
+USAGE:
+    sy vault recipients remove [OPTIONS] &lt;userid&gt;...
+
+FLAGS:
+    -h, --help    Prints help information
+
+OPTIONS:
+    -f, --partition=&lt;partition&gt;...    Identifies the partition to remove the recipient from. This can be done either
+                                      using its name or its secrets directory.If unset, the recipient will be added to
+                                      naturally selected vault, see the --select flag.
+
+ARGS:
+    &lt;userid&gt;...    The key-id of the public key identifying a recipient in your gpg keychain.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault partitions --help
+</code></pre>
+<pre><code class="language-output">sy-vault-partitions 
+A partition is essentially another vault, as such it has its own recipients list, name, keys directory place to store
+resources.Its major promise is that it is non-overlapping with any other partition.Its main benefit is that it allows
+one recipients list per resource directory, effectively emulating simple access control lists.
+
+USAGE:
+    sy vault --config-file &lt;path&gt; partitions [SUBCOMMAND]
+
+FLAGS:
+    -h, --help    Prints help information
+
+SUBCOMMANDS:
+    add       Adds a partition to the vault.
+    remove    Removes a partition.Please note that this will not delete any files on disk, but change the vault
+              description file accordingly.
+    help      Prints this message or the help of the given subcommand(s)
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault partitions add --help
+</code></pre>
+<pre><code class="language-output">sy-vault-partitions-add 
+Adds a partition to the vault.
+
+USAGE:
+    sy vault partitions add [OPTIONS] &lt;partition-path&gt;
+
+FLAGS:
+    -h, --help    
+            Prints help information
+
+
+OPTIONS:
+    -i, --gpg-key-id &lt;userid&gt;...    
+            The fingerprint or user ids of the members of the partition.If unset, it will default to your key, if there
+            is no ambiguity.
+    -n, --name &lt;name&gt;               
+            The name of the partitions vault to use. If unset, it will default to the basename of the partitions
+            resources directory.
+    -r, --recipients-file &lt;path&gt;    
+            The path to the file to hold the fingerprints of all recipients. If set to just the file name, like
+            'recipients', it will be interpreted as relative to the --secrets-dir. If a path is given, like
+            './recipients', it is used as is.
+
+ARGS:
+    &lt;partition-path&gt;    
+            The path at which the partition should store resources.It may be a relative path which will be adjusted to
+            be relative to the root of the resource directory of the master vault.It may also be an absolute directory,
+            which works but removes portability.
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy vault partitions remove --help
+</code></pre>
+<pre><code class="language-output">sy-vault-partitions-remove 
+Removes a partition.Please note that this will not delete any files on disk, but change the vault description file
+accordingly.
+
+USAGE:
+    sy vault partitions remove &lt;partition-selector&gt;
+
+FLAGS:
+    -h, --help    Prints help information
+
+ARGS:
+    &lt;partition-selector&gt;    A partition can be selected by the directory used to stored its resources, by its name
+                            (which may be ambiguous), or by the index in the vault description file.
+</code></pre>
+<p>Tools are everything not directly related to managing secrets, and help to use them
+while avoiding them to touch disk.</p>
+<p>This can be achieved by putting the following capabilities together:</p>
+<ol>
+<li><strong>Context Creation</strong>
+<ul>
+<li>A context is just a bunch of properties in a structure.</li>
+<li>Used to instantiate and customize templates.</li>
+<li>Parts of it may be secret.</li>
+<li>It can live in multiple places, such as files and in-memory as it is produced
+in real-time by programs. The latter can be 'sheesy' decrypting a file on the fly.</li>
+</ul>
+</li>
+<li><strong>Template Substitution</strong>
+<ul>
+<li>Using a templating engine and a set of templates, the data can be placed in
+any kind of file to be consumed by other tools.</li>
+<li>It's also useful to maintain a library of templates which are controlled by
+contexts, which change depending on the one use-case.</li>
+</ul>
+</li>
+</ol>
+<p>As an abstract example, this is how the build-pipeline for kubernetes could look like:</p>
+<pre><code class="language-bash">stage=production
+merge \
+    &lt;(show-secret $stage/infrastructure.yml) \
+    etc/team.json \
+    etc/stages/$stage.yml \
+| substitute \
+    --separator $'---\n' \
+    etc/template/k8s-shared-infrastructure.yml \
+    etc/template/k8s-$stage-infrastructure.yml \
+| kubectl --kubeconfig &lt;(show-secret $stage/kube.config) apply -f -
+</code></pre>
+<p><strong>Read on to learn more about the individual tools to <em>merge</em>, <em>substitute</em> and
+<em>extract</em></strong>.</p>
+<pre><code class="language-bash use=sy-in-path exec">sy substitute --help
+</code></pre>
+<pre><code class="language-output">sy-substitute 
+Substitutes templates using structured data. The idea is to build a tree of data that is used to substitute in various
+templates, using multiple inputs and outputs.That way, secrets (like credentials) can be extracted from the vault just
+once and used wherever needed without them touching disk.Liquid is used as template engine, and it's possible to refer
+to and inherit from other templates by their file-stem. Read more on their website at https://shopify.github.io/liquid .
+
+USAGE:
+    sy substitute [FLAGS] [OPTIONS] [--] [template-spec]...
+
+FLAGS:
+    -h, --help        
+            Prints help information
+
+        --no-stdin    
+            If set, we will not try to read structured data from standard input. This may be required in some situations
+            where we are blockingly reading from a standard input which is attached to a pseudo-terminal.
+    -v, --validate    
+            If set, the instantiated template will be parsed as YAML or JSON. If both of them are invalid, the command
+            will fail.
+
+OPTIONS:
+    -d, --data=&lt;data&gt;
+            Structured data in YAML or JSON format to use when instantiating/substituting the template. If set,
+            everything from standard input is interpreted as template.
+    -e, --engine=&lt;name&gt;
+            The choice of engine used for the substitution. Valid values are 'handlebars' and 'liquid'. 'liquid', the
+            default, is coming with batteries included and very good at handling
+                                   one template at a time.
+                                   'handlebars' supports referencing other templates using partials, which is useful for
+            sharing of common functionality. [default: liquid]  [possible values: handlebars, liquid]
+        --partial=&lt;template&gt;...
+            A file to be read as partial template, whose name will be the its file stem. It can then be included from
+            another template, and thus act as a function call.
+        --replace=&lt;find-this:replace-with-that&gt;...
+            A simple find &amp; replace for values for the string data to be placed into the template. The word to find is
+            the first specified argument, the second one is the word to replace it with, e.g. -r=foo:bar.
+    -s, --separator=&lt;separator&gt;
+            The string to use to separate multiple documents that are written to the same stream. This can be useful to
+            output a multi-document YAML file from multiple input templates to stdout if the separator is '---'. The
+            separator is also used when writing multiple templates into the same file, like in 'a:out b:out'. [default: 
+            ]
+
+ARGS:
+    &lt;template-spec&gt;...    
+            Identifies the how to map template files to output. The syntax is '&lt;src&gt;:&lt;dst&gt;'. &lt;src&gt; and &lt;dst&gt; are a
+            relative or absolute paths to the source templates or destination files respectively. If &lt;src&gt; is
+            unspecified, the template will be read from stdin, e.g. ':output'. Only one spec can read from stdin. If
+            &lt;dst&gt; is unspecified, the substituted template will be output to stdout, e.g 'input.hbs:' or 'input.hbs'.
+            Multiple templates are separated by the '--separator' accordingly. This is particularly useful for YAML
+            files,where the separator should be `$'---\n'`
+</code></pre>
+<p>You can also use this alias: <strong>sub</strong>.</p>
+<a class="header" href="print.html#control-your-output" id="control-your-output"><h3>Control your output</h3></a>
+<p><code>template-specs</code> are the bread and butter of this substitution engine. They allow to not
+only specify the input templates, like <code>./some-file.tpl</code>, but also set the output location.</p>
+<p>By default, this is standard ouptut, but can easily be <code>some-file.yml</code>, as in <code>./some-file.tpl:out/some-file.yml</code>.</p>
+<p>You can have <em>any amount of template specs</em>, which allows them to use the same, possibly
+expensive, data-model.</p>
+<a class="header" href="print.html#separating-yaml-documents" id="separating-yaml-documents"><h4>Separating YAML Documents</h4></a>
+<p>At first sight, it might not be so useful to output multiple templates to standard output.
+Some formats are built just for that usecase, provided you separate the documents correctly.</p>
+<p>If there are multiple YAML files for instance, you can separate them like this:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=0">echo 'value: 42' \
+| sy substitute --separator=$'---\n' &lt;(echo 'first: {{value}}') &lt;(echo 'second: {{value}}')
+</code></pre>
+<pre><code class="language-output">first: 42
+---
+second: 42
+</code></pre>
+<p>Also note the explicit newline in the separator, which might call for special syntax
+depending on which shell you use.</p>
+<a class="header" href="print.html#validating-yaml-or-json-documents" id="validating-yaml-or-json-documents"><h4>Validating YAML or JSON Documents</h4></a>
+<p>In the example above, how great would it be to protect ourselves from accidentially creating
+invalid YAML or JSON documents?</p>
+<p>Fortunately, <code>sheesy</code> has got you covered with the <code>--validate</code> flag.</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=1">echo 'value: 42' \
+| sy substitute --validate &lt;(echo '{&quot;first&quot;:&quot;{{value}}}') 
+</code></pre>
+<pre><code class="language-output">error: Validation of template output at 'stream' failed. It's neither valid YAML, nor JSON
+Caused by: 
+ 1: while scanning a quoted scalar, found unexpected end of stream at line 1 column 10
+</code></pre>
+<a class="header" href="print.html#protecting-against-special-values" id="protecting-against-special-values"><h4>Protecting against 'special' values</h4></a>
+<p>When generating structured data files, like YAML or JSON, even with a valid template you
+are very vulnerable to the values contained in the data-model. Some passwords for instance
+may contain characters which break your output. Even though <code>--validate</code> can tell you right away,
+how can you make this work without pre-processing your data?</p>
+<p><code>--replace</code> to the rescure. The following example fails to validate as the password was
+now changed to contain a special character in the JSON context:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=1">echo 'password: xyz&quot;abc' \
+| sy substitute --validate &lt;(echo '{&quot;pw&quot;:&quot;{{password}}&quot;}') 
+</code></pre>
+<pre><code class="language-output">error: Validation of template output at 'stream' failed. It's neither valid YAML, nor JSON
+Caused by: 
+ 1: while parsing a flow mapping, did not find expected ',' or '}' at line 1 column 12
+</code></pre>
+<p>Here is how it looks like without validation:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=0">echo 'password: xyz&quot;abc' \
+| sy substitute &lt;(echo '{&quot;pw&quot;:&quot;{{password}}&quot;}') 
+</code></pre>
+<pre><code class="language-output">{&quot;pw&quot;:&quot;xyz&quot;abc&quot;}
+</code></pre>
+<p>You can fix it by replacing all violating characters with the respective escaped version:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=0">echo 'password: xyz&quot;abc' \
+| sy substitute --replace='&quot;:\&quot;' --validate &lt;(echo '{&quot;pw&quot;:&quot;{{password}}&quot;}') 
+</code></pre>
+<pre><code class="language-output">{&quot;pw&quot;:&quot;xyz\&quot;abc&quot;}
+</code></pre>
+<a class="header" href="print.html#how-to-use-multi-file-data-in-your-templates" id="how-to-use-multi-file-data-in-your-templates"><h3>How to use multi-file data in your templates</h3></a>
+<p>You have probably seen this coming from a mile away, but this is a great opportunity for a shameless plug to advertise <code>sy merge</code>.</p>
+<p><code>sy merge</code> allows to merge multiple files together to become one, and even some additional processing to it.
+That way you can use the combined data as model during template substitution.</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">sy merge --at=team team.yml --at=project project.yml --at=env --environment \
+| sy substitute kubernetes-manifest.yaml.tpl
+</code></pre>
+<pre><code class="language-output">apiVersion: v1
+data:
+  game.properties: |
+    enemies=aliens
+    lives=3
+    enemies.cheat=true
+  ui.properties: |
+    color.good=purple
+    color.bad=yellow
+kind: ConfigMap
+metadata:
+  name: game-config
+  namespace: default
+  labels:
+    team: awesomenessies
+    department: finance
+    project: fantasti-project
+    kind: AI-research
+</code></pre>
+<a class="header" href="print.html#templates-from-stdin--sure-thing" id="templates-from-stdin--sure-thing"><h3>Templates from STDIN ? Sure thing...</h3></a>
+<p>By default, we read the <em>data model</em> from stdin and expect all templates to be provided
+by <code>template-spec</code>. However, sometimes doing exactly the opposite might be what you need.</p>
+<p>In this case, just use the <code>-d</code> flag to feed the <em>data model</em>, which automatically turns
+standard input into expecting the template.</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">echo '{{greeting | capitalize}} {{name}}' | sy substitute -d &lt;(echo '{&quot;greeting&quot;:&quot;hello&quot;, &quot;name&quot;:&quot;Hans&quot;}')
+</code></pre>
+<pre><code class="language-output">Hello Hans
+</code></pre>
+<a class="header" href="print.html#meet-the-engines" id="meet-the-engines"><h3>Meet the engines</h3></a>
+<p>The substitution can be performed by various engines, each with their distinct advantages and disadvantages.</p>
+<p>This section sums up their highlights.</p>
+<a class="header" href="print.html#liquid-default" id="liquid-default"><h4>Liquid (default)</h4></a>
+<p>The <a href="http://shopify.github.io/liquid/"><code>Liquid</code> template engine</a> was originally created for web-shops and is both easy to use as well as fully-featured.</p>
+<p>It’s main benefit is its various filters, which can be used to put something into uppercase (<code>{{ “something” | uppercase }}</code>), or to encode text into base64 (<code>{{ “text” | base64 }}</code>).</p>
+<p>There are a few filters which have been added for convenience:</p>
+<ul>
+<li><strong>base64</strong>
+<ul>
+<li>Converts anything into its base64 representation.</li>
+<li>No arguments are supported.</li>
+</ul>
+</li>
+</ul>
+<a class="header" href="print.html#handlebars" id="handlebars"><h4>Handlebars</h4></a>
+<p>The first optional template engine is <a href="http://handlebarsjs.com"><code>handlebars</code></a>. Compared to <code>Liquid</code>, it’s rather bare-bone and does not support any filters. The filtering syntax also makes chained filters more cumbersome.</p>
+<p>However, it allows you to use <em>partials</em>, which are good to model something like multiple sites, which share a header and a footer. The shared portions are filled with data that contextually originates in the page that uses them.</p>
+<p>For example, in an invocation like this you can declare headers and footers without rendering them, and then output multiple pages that use it.</p>
+<p><em>Here is the content of the files used</em>:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat data.json
+</code></pre>
+<pre><code class="language-output">{
+  &quot;title&quot; : &quot;Main Heading&quot;,
+  &quot;parent&quot; : &quot;base0&quot;
+}
+</code></pre>
+<pre><code class="language-bash use=in-fixtures exec">cat base0.hbs
+</code></pre>
+<pre><code class="language-output">&lt;html&gt;
+  &lt;head&gt;{{title}}&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div&gt;&lt;h1&gt;Derived from base0.hbs&lt;/h1&gt;&lt;/div&gt;
+    {{~&gt; page}}
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<pre><code class="language-bash use=in-fixtures exec">cat template.hbs
+</code></pre>
+<pre><code class="language-output">{{#*inline &quot;page&quot;}}
+  &lt;p&gt;Rendered in partial, parent is {{parent}}&lt;/p&gt;
+{{/inline}}
+{{~&gt; (parent)~}}
+</code></pre>
+<p>When using these in substitution, this is the output:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">sy substitute --engine=handlebars -d data.json base0.hbs:/dev/null template.hbs
+</code></pre>
+<pre><code class="language-output">&lt;html&gt;
+  &lt;head&gt;Main Heading&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div&gt;&lt;h1&gt;Derived from base0.hbs&lt;/h1&gt;&lt;/div&gt;
+  &lt;p&gt;Rendered in partial, parent is base0&lt;/p&gt;
+
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>The perceived disadvantage of having close to zero available filters would have to be compensated using a processing program which takes the data, and adds all the variations that you would need in your templates:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">./data-processor &lt; data.json | sy substitute template.tpl
+</code></pre>
+<pre><code class="language-output">The normal title: Main Heading
+The capitalized title: main heading
+</code></pre>
+<p>The <code>data-processor</code> in the example just adds transformed values for all fields it sees:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">./data-processor &lt; data.json
+</code></pre>
+<pre><code class="language-output">{
+  &quot;title&quot; : &quot;Main Heading&quot;,
+  &quot;title_lowercase&quot; : &quot;main heading&quot;,
+}
+</code></pre>
+<pre><code class="language-bash use=sy-in-path exec">sy process --help
+</code></pre>
+<pre><code class="language-output">sy-process 
+Merge JSON or YAML files from standard input from specified files. Multi-document YAML files are supported. Merging a
+single file is explicitly valid and can be used to check for syntax errors.
+
+USAGE:
+    sy process [FLAGS] [OPTIONS] [--] [path-or-value]...
+
+FLAGS:
+    -h, --help            Prints help information
+        --no-overwrite    If set, values in the merged document may not overwrite values already present. This is
+                          enabled by default,and can be explicitly turned off with --overwrite.
+        --no-stdin        If set, we will not try to read structured data from standard input. This may be required in
+                          some situations where we are blockingly reading from a standard input which is attached to a
+                          pseudo-terminal.
+        --overwrite       If set, values in the merged document can overwrite values already present. This is disabled
+                          by default,and can be explicitly turned off with --no-overwrite.
+
+OPTIONS:
+    -a, --at=&lt;pointer&gt;...            Use a JSON pointer to specify an existing mapping at which the next merged value
+                                     should be placed. This affects only the next following --environment or &lt;path&gt;.
+                                     Valid specifications are for example '0/a/b/4' or 'a.b.0'. If it is specified last,
+                                     without a following merged value, the entire aggregated value so far is moved.
+    -e, --environment=&lt;filter&gt;...    Import all environment variables matching the given filter. If no filter is set,
+                                     all variables are imported. Otherwise it is applied as a glob, e.g. 'FOO*' includes
+                                     'FOO_BAR', but not 'BAZ_BAR'.Other valid meta characters are '?' to find any
+                                     character, e.g. 'FO?' matches 'FOO'. [default: *]
+    -o, --output=&lt;mode&gt;              Specifies how the merged result should be serialized. [default: json]  [possible
+                                     values: json, yaml]
+    -s, --select=&lt;pointer&gt;...        Use a JSON pointer to specify which sub-value to use. This affects only the next
+                                     following --environment or &lt;path&gt;. Valid specifications are for example '0/a/b/4'
+                                     or 'a.b.0', and they must point to a valid value. If it is specified last, without
+                                     a following merged value, a sub-value is selected from the aggregated value.
+
+ARGS:
+    &lt;path-or-value&gt;...    The path to the file to include, or '-' to read from standard input. It must be in a
+                          format that can be output using the --output flag. Alternatively it can be a value
+                          assignment like 'a=42' or a.b.c=value.
+</code></pre>
+<p>You can also use these aliases:</p>
+<ul>
+<li><strong>merge</strong></li>
+<li><strong>show</strong></li>
+</ul>
+<p>It helps to use this powerful command by understanding its mindset a little.</p>
+<ul>
+<li>it wants to produce a single document <em>(JSON or YAML)</em> from multiple input documents <em>(JSON or YAML)</em></li>
+<li>by default, it will <em>refuse to overwrite</em> existing values</li>
+<li>multi-document YAML files are fully supported</li>
+<li>standard input is a valid source for documents</li>
+<li>the order of arguments matter, as this program is implemented as <em>state-machine</em></li>
+<li>by default it produces <em>JSON</em> output</li>
+</ul>
+<p>This program helps to quickly manipulate various inputs and produce a new output, which can then
+more easily be used in programs like <code>sy substitute</code>, or to generate configuration files.</p>
+<p>Now let's look typical use-cases.</p>
+<a class="header" href="print.html#merge-multiple-documents-into-one" id="merge-multiple-documents-into-one"><h3>Merge multiple documents into one</h3></a>
+<p>This case often arises by the mere necessity of keeping things separate. Even though
+keeping all data in a single structured data file would work just fine, in practice
+not all information is under your direct control and thus pulled in separately from
+other locations.</p>
+<p>For substitution, multiple files are not viable, which is why a single file should be produced
+instead:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy merge --at=project project.yml --at=team team.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;project&quot;: {
+    &quot;kind&quot;: &quot;ios-game&quot;,
+    &quot;name&quot;: &quot;super-punch&quot;
+  },
+  &quot;team&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>As you can see, we use the <code>--at</code> flag to put the contents of both files into their
+own namespaces. Without that, we would have a clashing <code>name</code> field which makes the
+program fail.</p>
+<pre><code class="language-bash use=in-fixtures exec=1">sy merge project.yml team.yml
+</code></pre>
+<pre><code class="language-output">error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+name
+
+
+</code></pre>
+<a class="header" href="print.html#overwriting-individual-values-or-creating-new-ones" id="overwriting-individual-values-or-creating-new-ones"><h3>Overwriting individual values (or creating new ones)</h3></a>
+<p>Sometimes during testing, it's useful to change a single value, in the configuration
+for instance. You can easily do this using the <code>key=value</code> specification.</p>
+<pre><code class="language-bash use=in-fixtures exec=1">sy merge game-config.yml player.lives=99
+</code></pre>
+<pre><code class="language-output">error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+player.lives
+
+
+</code></pre>
+<p>However, the above fails as we won't ever overwrite existing values. Let's try to
+argue with the program to make it work nonetheless:</p>
+<pre><code class="language-bash use=in-fixtures exec=1">sy merge game-config.yml player.lives=99 --overwrite
+</code></pre>
+<pre><code class="language-output">error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+player.lives
+
+
+</code></pre>
+<p>This might appear unexpected, even though it is not when you have understood that the order
+matters. In the example above, <code>--overwrite</code> simply applies too late for overwriting the
+value. If we swap their positions, it will work.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy merge game-config.yml  --overwrite player.lives=99 player.invincible=true
+</code></pre>
+<pre><code class="language-output">{
+  &quot;enemies&quot;: {
+    &quot;cheat&quot;: true,
+    &quot;type&quot;: &quot;aliens&quot;
+  },
+  &quot;player&quot;: {
+    &quot;invincible&quot;: true,
+    &quot;lives&quot;: 99
+  }
+}
+</code></pre>
+<p>Please note that <code>--overwrite</code> acts as a toggle and affects all following arguments. You can
+toggle it back off with the <code>--no-overwrite</code> flag</p>
+<pre><code class="language-bash use=in-fixtures exec">sy merge game-config.yml  --overwrite player.lives=99 \
+        --no-overwrite --at=project project.yml --at=team team.yml \
+        -o yaml
+</code></pre>
+<pre><code class="language-output">---
+enemies:
+  cheat: true
+  type: aliens
+player:
+  lives: 99
+project:
+  kind: ios-game
+  name: super-punch
+team:
+  name: dept. nine
+  product-owner: Max Owner
+</code></pre>
+<a class="header" href="print.html#converting-yaml-to-json-or-vice-versa" id="converting-yaml-to-json-or-vice-versa"><h3>Converting YAML to JSON (or vice versa)</h3></a>
+<p>As a side-effect, you can easily convert YAML to JSON, like so...</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process &lt; game-config.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;enemies&quot;: {
+    &quot;cheat&quot;: true,
+    &quot;type&quot;: &quot;aliens&quot;
+  },
+  &quot;player&quot;: {
+    &quot;lives&quot;: 3
+  }
+}
+</code></pre>
+<p>...or the other way around:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process &lt; game-config.yml | sy process -o yaml
+</code></pre>
+<pre><code class="language-output">---
+enemies:
+  cheat: true
+  type: aliens
+player:
+  lives: 3
+</code></pre>
+<a class="header" href="print.html#accessing-to-environment-variables" id="accessing-to-environment-variables"><h3>Accessing to environment variables</h3></a>
+<p>More often than not, the environment contains information you will want to make use of
+in our configuration. It's easy to bring it into your data model, and filter them by their name.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process --environment=HO*
+</code></pre>
+<pre><code class="language-output">{
+  &quot;HOME&quot;: &quot;/root&quot;,
+  &quot;HOSTNAME&quot;: &quot;52170f35ed69&quot;
+}
+</code></pre>
+<p>Of course this can be combined with all other flags:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process --at env --environment=HO* env.NEW=value
+</code></pre>
+<pre><code class="language-output">{
+  &quot;env&quot;: {
+    &quot;HOME&quot;: &quot;/root&quot;,
+    &quot;HOSTNAME&quot;: &quot;52170f35ed69&quot;,
+    &quot;NEW&quot;: &quot;value&quot;
+  }
+}
+</code></pre>
+<a class="header" href="print.html#pulling-up-values-to-allow-general-substitution" id="pulling-up-values-to-allow-general-substitution"><h3>'Pulling up' values to allow general substitution</h3></a>
+<p>It's most common to have different sets of configuration for different environments. For example, most
+deploy to at least two stages: <em>pre-production</em> and <em>production</em>.</p>
+<p>When using <code>sy process</code> for generating configuration to be used by tooling, it's not practical to force
+the tooling to know the stage.</p>
+<p>Imagine the following configuration file:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat multi-stage-config.yml
+</code></pre>
+<pre><code class="language-output">pre-production:
+  replicas: 1
+  max-cpu: 200mi
+  max-memory: 64M
+production:
+  replicas: 3
+  max-cpu: 2000mi
+  max-memory: 1024M
+</code></pre>
+<p>Tools either get to know which stage configuration to use, or you 'pull it up' for them:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process --select=production multi-stage-config.yml -o yaml
+</code></pre>
+<pre><code class="language-output">---
+max-cpu: 2000mi
+max-memory: 1024M
+replicas: 3
+</code></pre>
+<a class="header" href="print.html#using-multi-document-yaml-documents-as-input" id="using-multi-document-yaml-documents-as-input"><h3>Using multi-document yaml documents as input</h3></a>
+<p>A feature that is still rare in the wild, probably due to lacking tool support, is multi-document
+YAML files.</p>
+<p>We fully support them, but will merge them into a single document before processing it any further.</p>
+<p>A file like this...</p>
+<pre><code class="language-bash use=in-fixtures exec">cat multi-document.yml
+</code></pre>
+<pre><code class="language-output">---
+pre-production:
+  replicas: 1
+  max-memory: 64M
+---
+production:
+  replicas: 3
+  max-memory: 1024M
+</code></pre>
+<p>...looks like this when processing. Clashing keys will clash unless <code>--overwrite</code> is set.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process multi-document.yml -o yaml
+</code></pre>
+<pre><code class="language-output">---
+pre-production:
+  max-memory: 64M
+  replicas: 1
+production:
+  max-memory: 1024M
+  replicas: 3
+</code></pre>
+<a class="header" href="print.html#controlling-standard-input" id="controlling-standard-input"><h3>Controlling standard input</h3></a>
+<p>We will read JSON or YAML from standard input if possible. To make it more flexible,
+any <em>non-path</em> flags are applied to standard input. This may lead to unexpected output
+if more than one document source is specified.</p>
+<p>Let's start with a simple case:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat team.yml | sy process --at=team-from-stdin
+</code></pre>
+<pre><code class="language-output">{
+  &quot;team-from-stdin&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>In the moment another file is added for processing, it's a bit more difficult to
+control which argument applies where:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat team.yml | sy process --at=team-from-stdin --at=project project.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;kind&quot;: &quot;ios-game&quot;,
+  &quot;name&quot;: &quot;super-punch&quot;,
+  &quot;project&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>As you can see, the <code>project</code> key is used for standard input, and the <code>team-from-stdin</code>
+is seemingly ignored.</p>
+<p>To fix this, be explicit to make obvious what you expect:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat team.yml | sy process --at=team-from-stdin - --at=project project.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;project&quot;: {
+    &quot;kind&quot;: &quot;ios-game&quot;,
+    &quot;name&quot;: &quot;super-punch&quot;
+  },
+  &quot;team-from-stdin&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>Note the single <code>dash (-)</code>, which indicates when to read from standard input. As
+standard input is always consumed entirely, it can only be specified <em>once</em>.</p>
+<pre><code class="language-bash use=sy-in-path exec">sy extract --help
+</code></pre>
+<pre><code class="language-output">sy-extract 
+Extract scalar or complex values from any JSON or YAML file. Multi-document YAML files are supported.
+
+USAGE:
+    sy extract [FLAGS] [OPTIONS] &lt;pointer&gt;...
+
+FLAGS:
+    -h, --help        Prints help information
+        --no-stdin    If set, we will not try to read structured data from standard input. This may be required in some
+                      situations where we are blockingly reading from a standard input which is attached to a pseudo-
+                      terminal.
+
+OPTIONS:
+    -f, --file=&lt;file&gt;...    The path to the file to include, or '-' to read from standard input. It must be in a format
+                            that can be output using the --output flag.
+    -o, --output=&lt;mode&gt;     Specifies how the extracted result should be serialized. If the output format is not
+                            explicitly set, the output will be a single scalar value per line. If the output contains a
+                            complex value, the default serialization format will be used. [possible values: json, yaml]
+
+ARGS:
+    &lt;pointer&gt;...    Use a JSON pointer to specify which value to extract. Valid specifications are for example
+                    '0/a/b/4' or 'a.b.0', and they must point to a valid value.
+</code></pre>
+<p>You can also use this alias: <strong>fetch</strong>.</p>
+<p>The <code>extract</code> sub-command is meant for those cases when you need individual values from
+a file with structured data, for example when consuming credentials in scripts.</p>
+<p>When extracting scalar values, those will be output <em>one per line</em>. If an extracted value
+<em>is not scalar</em>, e.g. an object or array, the output mode of all extracted values will change
+to JSON (default) or YAML with <code>--output</code>.</p>
+<p>All values are specified using <a href="http://rapidjson.org/md_doc_pointer.html">JSON-pointer notation</a>, with the added convenience
+that slashes <em>(-)</em> can be exchanged with dots <em>(.)</em> .</p>
+<a class="header" href="print.html#extracting-username-and-password" id="extracting-username-and-password"><h3>Extracting username and password</h3></a>
+<p>Given an input file like this, here is how you can extract <code>username</code> and <code>password</code> for usage
+in scripts:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat credentials.yml
+</code></pre>
+<pre><code class="language-output">user:
+  name: Hans
+  password: geheim
+</code></pre>
+<p>Extract using the JSON pointer syntax is quite straightforward, and rather forgiving:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy extract -f=credentials.yml user.name /user/password
+</code></pre>
+<pre><code class="language-output">Hans
+geheim
+</code></pre>
+<p>From here it should be easy to assign individual values to variables for use in scripts</p>
+<pre><code class="language-bash use=in-fixtures exec">password=&quot;$(sy extract user.password &lt; credentials.yml)&quot;
+username=&quot;$(sy extract user.name &lt; credentials.yml)&quot;
+echo Authorization: Basic $(echo $username:$password | base64)
+</code></pre>
+<pre><code class="language-output">Authorization: Basic SGFuczpnZWhlaW0K
+</code></pre>
+<a class="header" href="print.html#collecting-individual-values-into-a-structured-format" id="collecting-individual-values-into-a-structured-format"><h3>Collecting individual values into a structured format</h3></a>
+<p>By default, and as long as you are not extracting a non-sclar value, the output will be
+a single line per value.
+Otherwise, you will either get a list of JSON or YAML values.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy extract user.name user/password -o json &lt; credentials.yml
+</code></pre>
+<pre><code class="language-output">[
+  &quot;Hans&quot;,
+  &quot;geheim&quot;
+]
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.print();
+            })
+        </script>
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

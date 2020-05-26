@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Introduction - </title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html" class="active">Introduction</a></li><li class="affix"><a href="compare.html">Comparisons</a></li><li class="affix"><a href="installation.html">Installation</a></li><li><a href="vault/first-steps.html"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="index.html#share-secrets-safely" id="share-secrets-safely"><h1>Share Secrets Safely</h1></a>
+<p>...and here is how!</p>
+<p><code>share secrets safely</code>, or <code>sheesy</code> in short, is a command-line tool which makes
+using cryptography powered by <a href="https://www.gnupg.org/"><code>gpg</code></a> easy.</p>
+<p>It's there for you and your team to help you avoid putting plain-text secrets into
+your repository from day one.</p>
+<p>However, there is more to it and this guide will give you an overview of the
+difficulties associated with <em>shared secrets</em>, and how to overcome them.</p>
+<a class="header" href="index.html#about-shared-secrets" id="about-shared-secrets"><h2>About shared secrets!</h2></a>
+<p><code>secrets</code>, that's knowledge whose possession yields a value. It can be credentials
+providing access to databases, which in turn may contain confidential data or all
+your customers payment information.
+Or it can be a token giving full access to a big companys AWS account with unlimited
+credit.</p>
+<p>The first line of defense is to never, ever store <code>secrets</code> in plain text! This cannot
+be stressed enough. Never do it, ever, and instead read the <a href="vault/first-steps.html">'First Steps'</a>
+to learn how to avoid it from day one.</p>
+<a class="header" href="index.html#rotation-rotation-rotation" id="rotation-rotation-rotation"><h2>Rotation, Rotation, Rotation!</h2></a>
+<p>An interesting property of <em>shared</em> secrets is that once they have been read, they
+must be considered leaked. By using <code>sheesy</code> you try to assure no unauthorized party
+gets to easily read them, but authorized parties still read them eventually, adding
+the risk of leakage each time.</p>
+<p>After adding <code>sheesy</code> into your workflow, it <em>must</em> be your next goal to make it easy
+(e.g. automatically) to rotate these secrets. This invalidates any leak and acts like a
+reset. The shorter the secrets remain valid, the better when it comes to risk of leakage.</p>
+<p><em>If you think further, the safest secrets are the ones that never stay valid for an extended
+period of time, and which are tied to a specific entity.</em></p>
+<a class="header" href="index.html#the-tools" id="the-tools"><h2>The Tools</h2></a>
+<p>Fortunately all the tooling exists to avoid plain-text secrets and make sharing them
+a little safer.
+<code>sheesy</code> does nothing more than bringing them together in a single binary.</p>
+<p>Those are namely</p>
+<ul>
+<li><strong>gpg-cryptography</strong>
+<ul>
+<li>This provides user-identification with public keys as well as proven cryptography</li>
+<li>The <a href="https://www.gnupg.org/gph/en/manual/x547.html"><em>Web of Trust</em></a> helps to conveniently assure public keys actually belong
+to the individual, assuring nobody <em>sneaks in</em>.</li>
+</ul>
+</li>
+<li><strong><em>sheesy</em> command-line tool</strong>
+<ul>
+<li>A binary communicating with the <code>gpg</code> cryptography engine via <a href="https://github.com/johnschug/rust-gpgme"><code>gpgme</code></a>.</li>
+<li>It provides a great user experience making using <code>gpg</code> easy even without prior
+knowledge.</li>
+<li>It provides capabilities to make it easy to use <code>sheesy vaults</code> from your
+build pipeline.</li>
+</ul>
+</li>
+<li><strong>pass - the standard unix password manager</strong>
+<ul>
+<li><a href="https://www.passwordstore.org">pass</a> is a shell-script which drives the <code>gpg</code> program to make it easier
+to use in teams. <code>sheesy</code> vaults are fully compatible to <code>pass</code> vaults.</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+                            <a rel="next" href="compare.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+                    <a href="compare.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

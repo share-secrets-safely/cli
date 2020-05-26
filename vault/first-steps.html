@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Getting Started with The Vault - </title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <base href="../">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html">Introduction</a></li><li class="affix"><a href="compare.html">Comparisons</a></li><li class="affix"><a href="installation.html">Installation</a></li><li><a href="vault/first-steps.html" class="active"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>First of all, we assume that you have installed the <code>sy</code> command-line program already.
+If not, please have a look at the <a href="installation.html">chapter about installation</a>.</p>
+<a class="header" href="vault/first-steps.html#initializing-the-vault" id="initializing-the-vault"><h3>Initializing the vault</h3></a>
+<p>Assuming your current directory is empty, just running <code>vault</code> will error.</p>
+<pre><code class="language-bash use=in-vault-dir exec=1">sy vault
+</code></pre>
+<pre><code class="language-output">error: Failed to read vault configuration file at './sy-vault.yml'
+
+Caused by: 
+ 1: No such file or directory (os error 2)
+</code></pre>
+<p>What you want to do is to initialize the vault. This will add yourself as the first
+<a href="vault/about.html#about-recipients">recipient</a> and add some state to the directory you chose or that you are in.</p>
+<pre><code class="language-bash use=as-nobody exec=1">sy vault init
+</code></pre>
+<pre><code class="language-output">error: No existing GPG key found for which you have a secret key. Please create one with 'gpg --gen-key' and try again.
+</code></pre>
+<p>Assuming we have followed the instructions or already have setup a <em>gpg key</em>, you will
+get quite a different result.</p>
+<pre><code class="language-bash use=as-tester exec">sy vault init
+</code></pre>
+<pre><code class="language-output">Exported public key for user Tester (for testing only) &lt;tester@example.com&gt; to '.gpg-keys/D6339718E9B58FCE3C66C78AAA5B7BF150F48332'
+vault initialized at './sy-vault.yml'
+</code></pre>
+<a class="header" href="vault/first-steps.html#adding-resources" id="adding-resources"><h3>Adding Resources</h3></a>
+<p>Usually what happens next is to add some <a href="vault/about.html#about-resources">resources</a>. For now they will
+only be encrypted for you, and thus can only be read by you.</p>
+<p>Resources are added via resource <em>specs</em>, or can be created by editing.</p>
+<p>There are various ways to add new resources...</p>
+<p>...by gathering output from a program...</p>
+<pre><code class="language-bash use=as-tester exec">echo hi | sy vault add :from-program
+</code></pre>
+<pre><code class="language-output">Added 'from-program'.
+</code></pre>
+<p>...or from existing files.</p>
+<pre><code class="language-bash use=as-tester exec">sy vault add $SRC_DIR/README.md:README.md
+</code></pre>
+<pre><code class="language-output">Added 'README.md'.
+</code></pre>
+<p>You can <em>list</em> existing resources...</p>
+<pre><code class="language-bash use=as-tester exec">sy vault list
+</code></pre>
+<pre><code class="language-output">syv://.
+README.md
+from-program
+</code></pre>
+<p>or you can <em>show</em> them.</p>
+<pre><code class="language-bash use=as-tester exec">sy vault show from-program
+</code></pre>
+<pre><code class="language-output">hi
+</code></pre>
+<a class="header" href="vault/first-steps.html#meet-alexis" id="meet-alexis"><h3>Meet Alexis!</h3></a>
+<p>Even though secrets that are not shared with anyone (but yourself) are great for
+security, they are not too useful in many settings.</p>
+<p>So we will add our first recipient, <em>Alexis</em>!</p>
+<p>As always, <em>Alexis</em> will require an own <em>gpg key</em>, and for the sake of simplicity
+we will assume it is already present.</p>
+<p>Usually it's also easiest to let new recipients 'knock at the door of the vault',
+and leave it to existing recipients of the vault to 'let them in'.</p>
+<p>In this analogy, 'knocking the door' is equivalent to placing their key in the vaults
+keys directory. 'Letting them in' means re-encrypting all <em>resources</em> for the
+current and the new recipients after verifying their key truly belongs to them.</p>
+<p>That's quite a lot to digest, so let's start and make small steps.</p>
+<p>Let's let <em>Alexis</em> look at the vault:</p>
+<pre><code class="language-bash use=as-alexis exec">sy vault
+</code></pre>
+<pre><code class="language-output">syv://.
+README.md
+from-program
+</code></pre>
+<p>What a good start! We can list resource, but does that mean we can also see them?</p>
+<pre><code class="language-bash use=as-alexis exec=1">sy vault show from-program
+</code></pre>
+<pre><code class="language-output">error: Export your public key using 'sy vault recipient init', then ask one of the existing recipients to import your public key using 'sy vault recipients add &lt;your-userid&gt;.'
+Caused by: 
+ 2: The content was not encrypted for you.
+ 1: No secret key (gpg error 17)
+</code></pre>
+<p>Phew, that's good actually! It's also good that it tells you right away how to
+solve the issue. Let's follow along.</p>
+<pre><code class="language-bash use=as-alexis exec">sy vault recipient init
+</code></pre>
+<pre><code class="language-output">Exported public key for user c &lt;c@example.com&gt; (905E53FE2FC0A500100AB80B056F92A52DF04D4E).
+</code></pre>
+<p><em>Cough</em>, let's ignore this key seems to be for <em>c <a href="mailto:c@example.com">c@example.com</a></em>, <em>Alexis</em> loves
+simplicity!</p>
+<p>Let's see what changed - where is this key exactly?</p>
+<pre><code class="language-bash use=as-alexis exec">tree -a
+</code></pre>
+<pre><code class="language-output">.
+├── .gpg-id
+├── .gpg-keys
+│   ├── 905E53FE2FC0A500100AB80B056F92A52DF04D4E
+│   └── D6339718E9B58FCE3C66C78AAA5B7BF150F48332
+├── README.md.gpg
+├── from-program.gpg
+└── sy-vault.yml
+
+1 directory, 6 files
+</code></pre>
+<p>It looks like the keyfile is actually stored in a hidden directory. But as you can see,
+it's just something that can be configured to your liking.</p>
+<pre><code class="language-bash use=as-alexis exec">cat sy-vault.yml
+</code></pre>
+<pre><code class="language-output">---
+name: ~
+auto_import: true
+trust_model: always
+secrets: &quot;.&quot;
+gpg_keys: &quot;.gpg-keys&quot;
+recipients: &quot;./.gpg-id&quot;
+</code></pre>
+<p>That's all we can do here, now back to the <em>prime recipient</em>.</p>
+<a class="header" href="vault/first-steps.html#adding-alexis" id="adding-alexis"><h3>Adding <em>Alexis</em></h3></a>
+<p>Back with the very first recipient of the vault who has already been informed
+about <em>Alexis</em> arrival. We received an e-mail and know it's <code>c@example.com</code>,
+maybe we can use that.</p>
+<pre><code class="language-bash use=as-tester exec=1">sy vault recipient add c@example.com
+</code></pre>
+<pre><code class="language-output">error: Fingerprint 'c@example.com' must only contain characters a-f, A-F and 0-9.
+</code></pre>
+<p>Looks like it doesn't like the format. The problem is that for verification purposes,
+it wants you to add the fingerprint, which you should also have received by <em>Alexis</em>.
+This links the key (identified by its fingerprint) to <em>Alexis</em>.</p>
+<p>Let's spell it out:</p>
+<pre><code class="language-bash use=as-tester exec=0">sy vault recipient add 2DF04D4E
+</code></pre>
+<pre><code class="language-output">Imported recipient key at path '.gpg-keys/905E53FE2FC0A500100AB80B056F92A52DF04D4E'
+Signed recipients key user c &lt;c@example.com&gt; (905E53FE2FC0A500100AB80B056F92A52DF04D4E) with signing key Tester (for testing only) &lt;tester@example.com&gt; (D6339718E9B58FCE3C66C78AAA5B7BF150F48332)
+Exported public key for user user c &lt;c@example.com&gt; to '.gpg-keys/905E53FE2FC0A500100AB80B056F92A52DF04D4E'
+Added recipient user c &lt;c@example.com&gt;
+Re-encrypted 'README.md' for new recipient(s)
+Re-encrypted 'from-program' for new recipient(s)
+</code></pre>
+<p>Let's look at the steps that it performs in details:</p>
+<ul>
+<li><em>import</em>
+<ul>
+<li>it finds <em>Alexis</em> key as identified by the fingerprint in the vaults keys
+directory and <em>imports</em> it into the <em>gpg keychain</em>.</li>
+</ul>
+</li>
+<li><em>signing</em>
+<ul>
+<li><em>Alexis</em> key is signed with the one of the prime recipient, which indicates
+we verified that it truly belongs to <em>Alexis</em>.</li>
+</ul>
+</li>
+<li><em>export</em>
+<ul>
+<li><em>Alexis</em> key is re-exported as it now also contains said signature. The fact
+that the prime recipient believes that the key belongs to <em>Alexis</em> is communicated
+to others that way, which helps building the <a href="https://www.gnupg.org/gph/en/manual/x547.html">Web of Trust</a>.</li>
+</ul>
+</li>
+<li><em>encrypt</em>
+<ul>
+<li>Each <em>resource</em> of the vault is re-encrypted for all recipients. This means
+<em>Alexis</em> will be able to get to peek inside.</li>
+</ul>
+</li>
+</ul>
+<p><em>(If we would already have <em>Alexis</em> in our keychain and signed their key, you
+could also more easily add them using their email alongside the <code>--verified</code>
+flag.
+Find all possible flags of the <code>sy-vault-recipients-add</code> <a href="vault/recipients/add.html">here</a>)</em></p>
+<a class="header" href="vault/first-steps.html#back-with-alexis-the-latest-recipient-of-the-vault" id="back-with-alexis-the-latest-recipient-of-the-vault"><h3>Back with Alexis, the latest recipient of the vault</h3></a>
+<p>Now that <em>Alexis</em> has been added as a recipient, it should be possible to peek
+at the secrets it contains!</p>
+<pre><code class="language-bash use=as-alexis exec">sy vault show from-program
+</code></pre>
+<pre><code class="language-output">hi
+</code></pre>
+<p>Beautiful!</p>
+<p>And what's even better: <em>Alexis</em> now can add <em>recipients</em> on their own!</p>
+<a class="header" href="vault/first-steps.html#next-steps" id="next-steps"><h3>Next steps</h3></a>
+<p>This is just the beginnings! Feel free to add more <em>resources</em> and <em>recipients</em>, add
+the contents of the vault to git and distribute it that way, or add it to your tooling
+to extract secrets when building your software.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="installation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="vault/about.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="installation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="vault/about.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

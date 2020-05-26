@@ -1,0 +1,477 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>process - </title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <base href="../">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html">Introduction</a></li><li class="affix"><a href="compare.html">Comparisons</a></li><li class="affix"><a href="installation.html">Installation</a></li><li><a href="vault/first-steps.html"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html" class="active"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <pre><code class="language-bash use=sy-in-path exec">sy process --help
+</code></pre>
+<pre><code class="language-output">sy-process 
+Merge JSON or YAML files from standard input from specified files. Multi-document YAML files are supported. Merging a
+single file is explicitly valid and can be used to check for syntax errors.
+
+USAGE:
+    sy process [FLAGS] [OPTIONS] [--] [path-or-value]...
+
+FLAGS:
+    -h, --help            Prints help information
+        --no-overwrite    If set, values in the merged document may not overwrite values already present. This is
+                          enabled by default,and can be explicitly turned off with --overwrite.
+        --no-stdin        If set, we will not try to read structured data from standard input. This may be required in
+                          some situations where we are blockingly reading from a standard input which is attached to a
+                          pseudo-terminal.
+        --overwrite       If set, values in the merged document can overwrite values already present. This is disabled
+                          by default,and can be explicitly turned off with --no-overwrite.
+
+OPTIONS:
+    -a, --at=&lt;pointer&gt;...            Use a JSON pointer to specify an existing mapping at which the next merged value
+                                     should be placed. This affects only the next following --environment or &lt;path&gt;.
+                                     Valid specifications are for example '0/a/b/4' or 'a.b.0'. If it is specified last,
+                                     without a following merged value, the entire aggregated value so far is moved.
+    -e, --environment=&lt;filter&gt;...    Import all environment variables matching the given filter. If no filter is set,
+                                     all variables are imported. Otherwise it is applied as a glob, e.g. 'FOO*' includes
+                                     'FOO_BAR', but not 'BAZ_BAR'.Other valid meta characters are '?' to find any
+                                     character, e.g. 'FO?' matches 'FOO'. [default: *]
+    -o, --output=&lt;mode&gt;              Specifies how the merged result should be serialized. [default: json]  [possible
+                                     values: json, yaml]
+    -s, --select=&lt;pointer&gt;...        Use a JSON pointer to specify which sub-value to use. This affects only the next
+                                     following --environment or &lt;path&gt;. Valid specifications are for example '0/a/b/4'
+                                     or 'a.b.0', and they must point to a valid value. If it is specified last, without
+                                     a following merged value, a sub-value is selected from the aggregated value.
+
+ARGS:
+    &lt;path-or-value&gt;...    The path to the file to include, or '-' to read from standard input. It must be in a
+                          format that can be output using the --output flag. Alternatively it can be a value
+                          assignment like 'a=42' or a.b.c=value.
+</code></pre>
+<p>You can also use these aliases:</p>
+<ul>
+<li><strong>merge</strong></li>
+<li><strong>show</strong></li>
+</ul>
+<p>It helps to use this powerful command by understanding its mindset a little.</p>
+<ul>
+<li>it wants to produce a single document <em>(JSON or YAML)</em> from multiple input documents <em>(JSON or YAML)</em></li>
+<li>by default, it will <em>refuse to overwrite</em> existing values</li>
+<li>multi-document YAML files are fully supported</li>
+<li>standard input is a valid source for documents</li>
+<li>the order of arguments matter, as this program is implemented as <em>state-machine</em></li>
+<li>by default it produces <em>JSON</em> output</li>
+</ul>
+<p>This program helps to quickly manipulate various inputs and produce a new output, which can then
+more easily be used in programs like <code>sy substitute</code>, or to generate configuration files.</p>
+<p>Now let's look typical use-cases.</p>
+<a class="header" href="tools/process.html#merge-multiple-documents-into-one" id="merge-multiple-documents-into-one"><h3>Merge multiple documents into one</h3></a>
+<p>This case often arises by the mere necessity of keeping things separate. Even though
+keeping all data in a single structured data file would work just fine, in practice
+not all information is under your direct control and thus pulled in separately from
+other locations.</p>
+<p>For substitution, multiple files are not viable, which is why a single file should be produced
+instead:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy merge --at=project project.yml --at=team team.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;project&quot;: {
+    &quot;kind&quot;: &quot;ios-game&quot;,
+    &quot;name&quot;: &quot;super-punch&quot;
+  },
+  &quot;team&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>As you can see, we use the <code>--at</code> flag to put the contents of both files into their
+own namespaces. Without that, we would have a clashing <code>name</code> field which makes the
+program fail.</p>
+<pre><code class="language-bash use=in-fixtures exec=1">sy merge project.yml team.yml
+</code></pre>
+<pre><code class="language-output">error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+name
+
+
+</code></pre>
+<a class="header" href="tools/process.html#overwriting-individual-values-or-creating-new-ones" id="overwriting-individual-values-or-creating-new-ones"><h3>Overwriting individual values (or creating new ones)</h3></a>
+<p>Sometimes during testing, it's useful to change a single value, in the configuration
+for instance. You can easily do this using the <code>key=value</code> specification.</p>
+<pre><code class="language-bash use=in-fixtures exec=1">sy merge game-config.yml player.lives=99
+</code></pre>
+<pre><code class="language-output">error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+player.lives
+
+
+</code></pre>
+<p>However, the above fails as we won't ever overwrite existing values. Let's try to
+argue with the program to make it work nonetheless:</p>
+<pre><code class="language-bash use=in-fixtures exec=1">sy merge game-config.yml player.lives=99 --overwrite
+</code></pre>
+<pre><code class="language-output">error: The merge failed due to conflicts
+Caused by: 
+ 1: Refusing to merge due to the following clashing keys:
+player.lives
+
+
+</code></pre>
+<p>This might appear unexpected, even though it is not when you have understood that the order
+matters. In the example above, <code>--overwrite</code> simply applies too late for overwriting the
+value. If we swap their positions, it will work.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy merge game-config.yml  --overwrite player.lives=99 player.invincible=true
+</code></pre>
+<pre><code class="language-output">{
+  &quot;enemies&quot;: {
+    &quot;cheat&quot;: true,
+    &quot;type&quot;: &quot;aliens&quot;
+  },
+  &quot;player&quot;: {
+    &quot;invincible&quot;: true,
+    &quot;lives&quot;: 99
+  }
+}
+</code></pre>
+<p>Please note that <code>--overwrite</code> acts as a toggle and affects all following arguments. You can
+toggle it back off with the <code>--no-overwrite</code> flag</p>
+<pre><code class="language-bash use=in-fixtures exec">sy merge game-config.yml  --overwrite player.lives=99 \
+        --no-overwrite --at=project project.yml --at=team team.yml \
+        -o yaml
+</code></pre>
+<pre><code class="language-output">---
+enemies:
+  cheat: true
+  type: aliens
+player:
+  lives: 99
+project:
+  kind: ios-game
+  name: super-punch
+team:
+  name: dept. nine
+  product-owner: Max Owner
+</code></pre>
+<a class="header" href="tools/process.html#converting-yaml-to-json-or-vice-versa" id="converting-yaml-to-json-or-vice-versa"><h3>Converting YAML to JSON (or vice versa)</h3></a>
+<p>As a side-effect, you can easily convert YAML to JSON, like so...</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process &lt; game-config.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;enemies&quot;: {
+    &quot;cheat&quot;: true,
+    &quot;type&quot;: &quot;aliens&quot;
+  },
+  &quot;player&quot;: {
+    &quot;lives&quot;: 3
+  }
+}
+</code></pre>
+<p>...or the other way around:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process &lt; game-config.yml | sy process -o yaml
+</code></pre>
+<pre><code class="language-output">---
+enemies:
+  cheat: true
+  type: aliens
+player:
+  lives: 3
+</code></pre>
+<a class="header" href="tools/process.html#accessing-to-environment-variables" id="accessing-to-environment-variables"><h3>Accessing to environment variables</h3></a>
+<p>More often than not, the environment contains information you will want to make use of
+in our configuration. It's easy to bring it into your data model, and filter them by their name.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process --environment=HO*
+</code></pre>
+<pre><code class="language-output">{
+  &quot;HOME&quot;: &quot;/root&quot;,
+  &quot;HOSTNAME&quot;: &quot;52170f35ed69&quot;
+}
+</code></pre>
+<p>Of course this can be combined with all other flags:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process --at env --environment=HO* env.NEW=value
+</code></pre>
+<pre><code class="language-output">{
+  &quot;env&quot;: {
+    &quot;HOME&quot;: &quot;/root&quot;,
+    &quot;HOSTNAME&quot;: &quot;52170f35ed69&quot;,
+    &quot;NEW&quot;: &quot;value&quot;
+  }
+}
+</code></pre>
+<a class="header" href="tools/process.html#pulling-up-values-to-allow-general-substitution" id="pulling-up-values-to-allow-general-substitution"><h3>'Pulling up' values to allow general substitution</h3></a>
+<p>It's most common to have different sets of configuration for different environments. For example, most
+deploy to at least two stages: <em>pre-production</em> and <em>production</em>.</p>
+<p>When using <code>sy process</code> for generating configuration to be used by tooling, it's not practical to force
+the tooling to know the stage.</p>
+<p>Imagine the following configuration file:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat multi-stage-config.yml
+</code></pre>
+<pre><code class="language-output">pre-production:
+  replicas: 1
+  max-cpu: 200mi
+  max-memory: 64M
+production:
+  replicas: 3
+  max-cpu: 2000mi
+  max-memory: 1024M
+</code></pre>
+<p>Tools either get to know which stage configuration to use, or you 'pull it up' for them:</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process --select=production multi-stage-config.yml -o yaml
+</code></pre>
+<pre><code class="language-output">---
+max-cpu: 2000mi
+max-memory: 1024M
+replicas: 3
+</code></pre>
+<a class="header" href="tools/process.html#using-multi-document-yaml-documents-as-input" id="using-multi-document-yaml-documents-as-input"><h3>Using multi-document yaml documents as input</h3></a>
+<p>A feature that is still rare in the wild, probably due to lacking tool support, is multi-document
+YAML files.</p>
+<p>We fully support them, but will merge them into a single document before processing it any further.</p>
+<p>A file like this...</p>
+<pre><code class="language-bash use=in-fixtures exec">cat multi-document.yml
+</code></pre>
+<pre><code class="language-output">---
+pre-production:
+  replicas: 1
+  max-memory: 64M
+---
+production:
+  replicas: 3
+  max-memory: 1024M
+</code></pre>
+<p>...looks like this when processing. Clashing keys will clash unless <code>--overwrite</code> is set.</p>
+<pre><code class="language-bash use=in-fixtures exec">sy process multi-document.yml -o yaml
+</code></pre>
+<pre><code class="language-output">---
+pre-production:
+  max-memory: 64M
+  replicas: 1
+production:
+  max-memory: 1024M
+  replicas: 3
+</code></pre>
+<a class="header" href="tools/process.html#controlling-standard-input" id="controlling-standard-input"><h3>Controlling standard input</h3></a>
+<p>We will read JSON or YAML from standard input if possible. To make it more flexible,
+any <em>non-path</em> flags are applied to standard input. This may lead to unexpected output
+if more than one document source is specified.</p>
+<p>Let's start with a simple case:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat team.yml | sy process --at=team-from-stdin
+</code></pre>
+<pre><code class="language-output">{
+  &quot;team-from-stdin&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>In the moment another file is added for processing, it's a bit more difficult to
+control which argument applies where:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat team.yml | sy process --at=team-from-stdin --at=project project.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;kind&quot;: &quot;ios-game&quot;,
+  &quot;name&quot;: &quot;super-punch&quot;,
+  &quot;project&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>As you can see, the <code>project</code> key is used for standard input, and the <code>team-from-stdin</code>
+is seemingly ignored.</p>
+<p>To fix this, be explicit to make obvious what you expect:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat team.yml | sy process --at=team-from-stdin - --at=project project.yml
+</code></pre>
+<pre><code class="language-output">{
+  &quot;project&quot;: {
+    &quot;kind&quot;: &quot;ios-game&quot;,
+    &quot;name&quot;: &quot;super-punch&quot;
+  },
+  &quot;team-from-stdin&quot;: {
+    &quot;name&quot;: &quot;dept. nine&quot;,
+    &quot;product-owner&quot;: &quot;Max Owner&quot;
+  }
+}
+</code></pre>
+<p>Note the single <code>dash (-)</code>, which indicates when to read from standard input. As
+standard input is always consumed entirely, it can only be specified <em>once</em>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="tools/substitute.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="tools/extract.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="tools/substitute.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="tools/extract.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>substitute - </title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <base href="../">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+    </head>
+    <body class="light">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme;
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            document.querySelector('html').classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="index.html">Introduction</a></li><li class="affix"><a href="compare.html">Comparisons</a></li><li class="affix"><a href="installation.html">Installation</a></li><li><a href="vault/first-steps.html"><strong aria-hidden="true">1.</strong> Getting Started with The Vault</a></li><li><a href="vault/about.html"><strong aria-hidden="true">2.</strong> The Vault</a></li><li><ol class="section"><li><a href="vault/init.html"><strong aria-hidden="true">2.1.</strong> vault init</a></li><li><a href="vault/add.html"><strong aria-hidden="true">2.2.</strong> vault add (Resource)</a></li><li><a href="vault/edit.html"><strong aria-hidden="true">2.3.</strong> vault edit (Resource)</a></li><li><a href="vault/list.html"><strong aria-hidden="true">2.4.</strong> vault list (Resource)</a></li><li><a href="vault/remove.html"><strong aria-hidden="true">2.5.</strong> vault remove (Resource)</a></li><li><a href="vault/show.html"><strong aria-hidden="true">2.6.</strong> vault show (Resource)</a></li><li><a href="vault/recipients/about.html"><strong aria-hidden="true">2.7.</strong> vault recipients</a></li><li><ol class="section"><li><a href="vault/recipients/init.html"><strong aria-hidden="true">2.7.1.</strong> vault recipients init</a></li><li><a href="vault/recipients/add.html"><strong aria-hidden="true">2.7.2.</strong> vault recipients add</a></li><li><a href="vault/recipients/list.html"><strong aria-hidden="true">2.7.3.</strong> vault recipients list</a></li><li><a href="vault/recipients/remove.html"><strong aria-hidden="true">2.7.4.</strong> vault recipients remove</a></li></ol></li><li><a href="vault/partitions/about.html"><strong aria-hidden="true">2.8.</strong> vault partitions</a></li><li><ol class="section"><li><a href="vault/partitions/add.html"><strong aria-hidden="true">2.8.1.</strong> vault partitions add</a></li><li><a href="vault/partitions/remove.html"><strong aria-hidden="true">2.8.2.</strong> vault partitions remove</a></li></ol></li></ol></li><li><a href="tools/about.html"><strong aria-hidden="true">3.</strong> Tooling</a></li><li><ol class="section"><li><a href="tools/substitute.html" class="active"><strong aria-hidden="true">3.1.</strong> substitute</a></li><li><a href="tools/process.html"><strong aria-hidden="true">3.2.</strong> process</a></li><li><a href="tools/extract.html"><strong aria-hidden="true">3.3.</strong> extract</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="submenu">
+                                <li><button class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li><button class="theme" id="rust">Rust</button></li>
+                                <li><button class="theme" id="coal">Coal</button></li>
+                                <li><button class="theme" id="navy">Navy</button></li>
+                                <li><button class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                        </div>
+
+                        <h1 class="menu-title"></h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <pre><code class="language-bash use=sy-in-path exec">sy substitute --help
+</code></pre>
+<pre><code class="language-output">sy-substitute 
+Substitutes templates using structured data. The idea is to build a tree of data that is used to substitute in various
+templates, using multiple inputs and outputs.That way, secrets (like credentials) can be extracted from the vault just
+once and used wherever needed without them touching disk.Liquid is used as template engine, and it's possible to refer
+to and inherit from other templates by their file-stem. Read more on their website at https://shopify.github.io/liquid .
+
+USAGE:
+    sy substitute [FLAGS] [OPTIONS] [--] [template-spec]...
+
+FLAGS:
+    -h, --help        
+            Prints help information
+
+        --no-stdin    
+            If set, we will not try to read structured data from standard input. This may be required in some situations
+            where we are blockingly reading from a standard input which is attached to a pseudo-terminal.
+    -v, --validate    
+            If set, the instantiated template will be parsed as YAML or JSON. If both of them are invalid, the command
+            will fail.
+
+OPTIONS:
+    -d, --data=&lt;data&gt;
+            Structured data in YAML or JSON format to use when instantiating/substituting the template. If set,
+            everything from standard input is interpreted as template.
+    -e, --engine=&lt;name&gt;
+            The choice of engine used for the substitution. Valid values are 'handlebars' and 'liquid'. 'liquid', the
+            default, is coming with batteries included and very good at handling
+                                   one template at a time.
+                                   'handlebars' supports referencing other templates using partials, which is useful for
+            sharing of common functionality. [default: liquid]  [possible values: handlebars, liquid]
+        --partial=&lt;template&gt;...
+            A file to be read as partial template, whose name will be the its file stem. It can then be included from
+            another template, and thus act as a function call.
+        --replace=&lt;find-this:replace-with-that&gt;...
+            A simple find &amp; replace for values for the string data to be placed into the template. The word to find is
+            the first specified argument, the second one is the word to replace it with, e.g. -r=foo:bar.
+    -s, --separator=&lt;separator&gt;
+            The string to use to separate multiple documents that are written to the same stream. This can be useful to
+            output a multi-document YAML file from multiple input templates to stdout if the separator is '---'. The
+            separator is also used when writing multiple templates into the same file, like in 'a:out b:out'. [default: 
+            ]
+
+ARGS:
+    &lt;template-spec&gt;...    
+            Identifies the how to map template files to output. The syntax is '&lt;src&gt;:&lt;dst&gt;'. &lt;src&gt; and &lt;dst&gt; are a
+            relative or absolute paths to the source templates or destination files respectively. If &lt;src&gt; is
+            unspecified, the template will be read from stdin, e.g. ':output'. Only one spec can read from stdin. If
+            &lt;dst&gt; is unspecified, the substituted template will be output to stdout, e.g 'input.hbs:' or 'input.hbs'.
+            Multiple templates are separated by the '--separator' accordingly. This is particularly useful for YAML
+            files,where the separator should be `$'---\n'`
+</code></pre>
+<p>You can also use this alias: <strong>sub</strong>.</p>
+<a class="header" href="tools/substitute.html#control-your-output" id="control-your-output"><h3>Control your output</h3></a>
+<p><code>template-specs</code> are the bread and butter of this substitution engine. They allow to not
+only specify the input templates, like <code>./some-file.tpl</code>, but also set the output location.</p>
+<p>By default, this is standard ouptut, but can easily be <code>some-file.yml</code>, as in <code>./some-file.tpl:out/some-file.yml</code>.</p>
+<p>You can have <em>any amount of template specs</em>, which allows them to use the same, possibly
+expensive, data-model.</p>
+<a class="header" href="tools/substitute.html#separating-yaml-documents" id="separating-yaml-documents"><h4>Separating YAML Documents</h4></a>
+<p>At first sight, it might not be so useful to output multiple templates to standard output.
+Some formats are built just for that usecase, provided you separate the documents correctly.</p>
+<p>If there are multiple YAML files for instance, you can separate them like this:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=0">echo 'value: 42' \
+| sy substitute --separator=$'---\n' &lt;(echo 'first: {{value}}') &lt;(echo 'second: {{value}}')
+</code></pre>
+<pre><code class="language-output">first: 42
+---
+second: 42
+</code></pre>
+<p>Also note the explicit newline in the separator, which might call for special syntax
+depending on which shell you use.</p>
+<a class="header" href="tools/substitute.html#validating-yaml-or-json-documents" id="validating-yaml-or-json-documents"><h4>Validating YAML or JSON Documents</h4></a>
+<p>In the example above, how great would it be to protect ourselves from accidentially creating
+invalid YAML or JSON documents?</p>
+<p>Fortunately, <code>sheesy</code> has got you covered with the <code>--validate</code> flag.</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=1">echo 'value: 42' \
+| sy substitute --validate &lt;(echo '{&quot;first&quot;:&quot;{{value}}}') 
+</code></pre>
+<pre><code class="language-output">error: Validation of template output at 'stream' failed. It's neither valid YAML, nor JSON
+Caused by: 
+ 1: while scanning a quoted scalar, found unexpected end of stream at line 1 column 10
+</code></pre>
+<a class="header" href="tools/substitute.html#protecting-against-special-values" id="protecting-against-special-values"><h4>Protecting against 'special' values</h4></a>
+<p>When generating structured data files, like YAML or JSON, even with a valid template you
+are very vulnerable to the values contained in the data-model. Some passwords for instance
+may contain characters which break your output. Even though <code>--validate</code> can tell you right away,
+how can you make this work without pre-processing your data?</p>
+<p><code>--replace</code> to the rescure. The following example fails to validate as the password was
+now changed to contain a special character in the JSON context:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=1">echo 'password: xyz&quot;abc' \
+| sy substitute --validate &lt;(echo '{&quot;pw&quot;:&quot;{{password}}&quot;}') 
+</code></pre>
+<pre><code class="language-output">error: Validation of template output at 'stream' failed. It's neither valid YAML, nor JSON
+Caused by: 
+ 1: while parsing a flow mapping, did not find expected ',' or '}' at line 1 column 12
+</code></pre>
+<p>Here is how it looks like without validation:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=0">echo 'password: xyz&quot;abc' \
+| sy substitute &lt;(echo '{&quot;pw&quot;:&quot;{{password}}&quot;}') 
+</code></pre>
+<pre><code class="language-output">{&quot;pw&quot;:&quot;xyz&quot;abc&quot;}
+</code></pre>
+<p>You can fix it by replacing all violating characters with the respective escaped version:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec=0">echo 'password: xyz&quot;abc' \
+| sy substitute --replace='&quot;:\&quot;' --validate &lt;(echo '{&quot;pw&quot;:&quot;{{password}}&quot;}') 
+</code></pre>
+<pre><code class="language-output">{&quot;pw&quot;:&quot;xyz\&quot;abc&quot;}
+</code></pre>
+<a class="header" href="tools/substitute.html#how-to-use-multi-file-data-in-your-templates" id="how-to-use-multi-file-data-in-your-templates"><h3>How to use multi-file data in your templates</h3></a>
+<p>You have probably seen this coming from a mile away, but this is a great opportunity for a shameless plug to advertise <code>sy merge</code>.</p>
+<p><code>sy merge</code> allows to merge multiple files together to become one, and even some additional processing to it.
+That way you can use the combined data as model during template substitution.</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">sy merge --at=team team.yml --at=project project.yml --at=env --environment \
+| sy substitute kubernetes-manifest.yaml.tpl
+</code></pre>
+<pre><code class="language-output">apiVersion: v1
+data:
+  game.properties: |
+    enemies=aliens
+    lives=3
+    enemies.cheat=true
+  ui.properties: |
+    color.good=purple
+    color.bad=yellow
+kind: ConfigMap
+metadata:
+  name: game-config
+  namespace: default
+  labels:
+    team: awesomenessies
+    department: finance
+    project: fantasti-project
+    kind: AI-research
+</code></pre>
+<a class="header" href="tools/substitute.html#templates-from-stdin--sure-thing" id="templates-from-stdin--sure-thing"><h3>Templates from STDIN ? Sure thing...</h3></a>
+<p>By default, we read the <em>data model</em> from stdin and expect all templates to be provided
+by <code>template-spec</code>. However, sometimes doing exactly the opposite might be what you need.</p>
+<p>In this case, just use the <code>-d</code> flag to feed the <em>data model</em>, which automatically turns
+standard input into expecting the template.</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">echo '{{greeting | capitalize}} {{name}}' | sy substitute -d &lt;(echo '{&quot;greeting&quot;:&quot;hello&quot;, &quot;name&quot;:&quot;Hans&quot;}')
+</code></pre>
+<pre><code class="language-output">Hello Hans
+</code></pre>
+<a class="header" href="tools/substitute.html#meet-the-engines" id="meet-the-engines"><h3>Meet the engines</h3></a>
+<p>The substitution can be performed by various engines, each with their distinct advantages and disadvantages.</p>
+<p>This section sums up their highlights.</p>
+<a class="header" href="tools/substitute.html#liquid-default" id="liquid-default"><h4>Liquid (default)</h4></a>
+<p>The <a href="http://shopify.github.io/liquid/"><code>Liquid</code> template engine</a> was originally created for web-shops and is both easy to use as well as fully-featured.</p>
+<p>It’s main benefit is its various filters, which can be used to put something into uppercase (<code>{{ “something” | uppercase }}</code>), or to encode text into base64 (<code>{{ “text” | base64 }}</code>).</p>
+<p>There are a few filters which have been added for convenience:</p>
+<ul>
+<li><strong>base64</strong>
+<ul>
+<li>Converts anything into its base64 representation.</li>
+<li>No arguments are supported.</li>
+</ul>
+</li>
+</ul>
+<a class="header" href="tools/substitute.html#handlebars" id="handlebars"><h4>Handlebars</h4></a>
+<p>The first optional template engine is <a href="http://handlebarsjs.com"><code>handlebars</code></a>. Compared to <code>Liquid</code>, it’s rather bare-bone and does not support any filters. The filtering syntax also makes chained filters more cumbersome.</p>
+<p>However, it allows you to use <em>partials</em>, which are good to model something like multiple sites, which share a header and a footer. The shared portions are filled with data that contextually originates in the page that uses them.</p>
+<p>For example, in an invocation like this you can declare headers and footers without rendering them, and then output multiple pages that use it.</p>
+<p><em>Here is the content of the files used</em>:</p>
+<pre><code class="language-bash use=in-fixtures exec">cat data.json
+</code></pre>
+<pre><code class="language-output">{
+  &quot;title&quot; : &quot;Main Heading&quot;,
+  &quot;parent&quot; : &quot;base0&quot;
+}
+</code></pre>
+<pre><code class="language-bash use=in-fixtures exec">cat base0.hbs
+</code></pre>
+<pre><code class="language-output">&lt;html&gt;
+  &lt;head&gt;{{title}}&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div&gt;&lt;h1&gt;Derived from base0.hbs&lt;/h1&gt;&lt;/div&gt;
+    {{~&gt; page}}
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<pre><code class="language-bash use=in-fixtures exec">cat template.hbs
+</code></pre>
+<pre><code class="language-output">{{#*inline &quot;page&quot;}}
+  &lt;p&gt;Rendered in partial, parent is {{parent}}&lt;/p&gt;
+{{/inline}}
+{{~&gt; (parent)~}}
+</code></pre>
+<p>When using these in substitution, this is the output:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">sy substitute --engine=handlebars -d data.json base0.hbs:/dev/null template.hbs
+</code></pre>
+<pre><code class="language-output">&lt;html&gt;
+  &lt;head&gt;Main Heading&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div&gt;&lt;h1&gt;Derived from base0.hbs&lt;/h1&gt;&lt;/div&gt;
+  &lt;p&gt;Rendered in partial, parent is base0&lt;/p&gt;
+
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>The perceived disadvantage of having close to zero available filters would have to be compensated using a processing program which takes the data, and adds all the variations that you would need in your templates:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">./data-processor &lt; data.json | sy substitute template.tpl
+</code></pre>
+<pre><code class="language-output">The normal title: Main Heading
+The capitalized title: main heading
+</code></pre>
+<p>The <code>data-processor</code> in the example just adds transformed values for all fields it sees:</p>
+<pre><code class="language-bash use=in-fixtures use=sy-in-path exec">./data-processor &lt; data.json
+</code></pre>
+<pre><code class="language-output">{
+  &quot;title&quot; : &quot;Main Heading&quot;,
+  &quot;title_lowercase&quot; : &quot;main heading&quot;,
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="tools/about.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="tools/process.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="tools/about.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="tools/process.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if (getComputedStyle(document.querySelector(".fa")).fontFamily !== "FontAwesome") {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '_FontAwesome/css/font-awesome.css';
+                document.head.insertBefore(link, document.head.firstChild)
+            }
+        </script>
+
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>
