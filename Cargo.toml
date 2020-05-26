@@ -11,7 +11,7 @@ homepage = "https://github.com/share-secrets-safely/cli"
 documentation = "https://share-secrets-safely.github.io/cli"
 keywords = ["gnupg", "pgp", "crypto"]
 readme = "README.md"
-exclude = ["HomebrewFormula", "tests/**", "pkg/**", "lib/**", "etc/**", "doc/**", "bin/**"]
+include = ["src/**/*", "LICENSE.md", "README.md"]
 
 [profile.release]
 opt-level = 3
