@@ -65,7 +65,7 @@ curl --fail -Lso sy.tar.gz https://github.com/share-secrets-safely/cli/releases/
 curl --fail -Lso sy.tar.gz.gpg https://github.com/share-secrets-safely/cli/releases/download/4.0.5/sy-cli-Linux-x86_64.tar.gz.gpg
 # verify 'sy' was built by one of the maintainers
 gpg --import <(curl -s https://raw.githubusercontent.com/share-secrets-safely/cli/master/signing-keys.asc) 2>/dev/null
-gpg --sign-key --yes --batch 763629FEC8788FC35128B5F6EE029D1E5EB40300 &>/dev/null
+gpg --sign-key --yes --batch 27C50E7F590947D7273A741E85194C08421980C9 &>/dev/null
 gpg --verify ./sy.tar.gz.gpg sy.tar.gz
 # now that we know it's the real thing, let's use it.
 tar xzf sy.tar.gz
