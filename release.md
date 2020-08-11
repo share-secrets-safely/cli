@@ -1,3 +1,7 @@
+### V4.0.11: update dependencies
+
+### V4.0.10: downgrade GPGME to 0.8 - otherwise it won't compile on some platforms
+
 ### V4.0.9: Update brew package description; update dependencies
 
 * it's necessary to depend on `gpgme` instead of just `gnupg` for the tool to work on MacOS by default
